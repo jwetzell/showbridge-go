@@ -38,6 +38,7 @@ func NewRouter(ctx context.Context, config Config) (*Router, error) {
 
 func (r *Router) Run() {
 	for _, protocolInstance := range r.ProtocolInstances {
-		protocolInstance.Run(r.Context)
+		go protocolInstance.Run(r.Context)
 	}
+	<-r.Context.Done()
 }
