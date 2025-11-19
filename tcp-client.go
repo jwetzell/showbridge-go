@@ -65,6 +65,8 @@ func init() {
 				framer = framing.NewByteSeparatorFramer([]byte{'\n'})
 			case "CRLF":
 				framer = framing.NewByteSeparatorFramer([]byte{'\r', '\n'})
+			case "SLIP":
+				framer = framing.NewSlipFramer()
 			default:
 				return nil, fmt.Errorf("unknown framing method: %s", framingMethodString)
 			}

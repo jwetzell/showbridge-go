@@ -67,6 +67,8 @@ func (ts TCPServer) HandleClient(ctx context.Context, client net.Conn) {
 		framer = framing.NewByteSeparatorFramer([]byte{'\r'})
 	case "CRLF":
 		framer = framing.NewByteSeparatorFramer([]byte{'\r', '\n'})
+	case "SLIP":
+		framer = framing.NewSlipFramer()
 	}
 
 	buffer := make([]byte, 1024)
