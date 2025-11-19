@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+
+	"github.com/jwetzell/showbridge-go/internals/framing"
 )
 
 type TCPServer struct {
-	config ModuleConfig
-	Port   uint16
+	config        ModuleConfig
+	Port          uint16
+	framingMethod string
 }
 
 func init() {
@@ -28,7 +31,18 @@ func init() {
 				return nil, fmt.Errorf("tcp server port must be uint16")
 			}
 
-			return TCPServer{Port: uint16(portNum), config: config}, nil
+			framingMethod, ok := params["framing"]
+			if !ok {
+				return nil, fmt.Errorf("tcp server requires a framing method")
+			}
+
+			framingMethodString, ok := framingMethod.(string)
+
+			if !ok {
+				return nil, fmt.Errorf("tcp framing method must be a string")
+			}
+
+			return TCPServer{framingMethod: framingMethodString, Port: uint16(portNum), config: config}, nil
 		},
 	})
 }
@@ -44,6 +58,17 @@ func (ts TCPServer) Type() string {
 func (ts TCPServer) HandleClient(ctx context.Context, client net.Conn) {
 	slog.Info("handling connection", "remoteAddr", client.RemoteAddr().String())
 
+	var framer framing.Framer
+
+	switch ts.framingMethod {
+	case "LF":
+		framer = framing.NewByteSeparatorFramer([]byte{'\n'})
+	case "CR":
+		framer = framing.NewByteSeparatorFramer([]byte{'\r'})
+	case "CRLF":
+		framer = framing.NewByteSeparatorFramer([]byte{'\r', '\n'})
+	}
+
 	buffer := make([]byte, 1024)
 	for {
 		select {
@@ -58,9 +83,13 @@ func (ts TCPServer) HandleClient(ctx context.Context, client net.Conn) {
 				}
 				return
 			}
-
-			if byteCount > 0 {
-				slog.Info(string(buffer[0:byteCount]))
+			if framer != nil {
+				if byteCount > 0 {
+					messages := framer.Frame(buffer[0:byteCount])
+					for _, message := range messages {
+						slog.Debug("tcp-server message", "bytes", message)
+					}
+				}
 			}
 		}
 

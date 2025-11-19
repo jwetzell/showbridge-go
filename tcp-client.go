@@ -6,12 +6,15 @@ import (
 	"log/slog"
 	"net"
 	"time"
+
+	"github.com/jwetzell/showbridge-go/internals/framing"
 )
 
 type TCPClient struct {
 	config ModuleConfig
 	Host   string
 	Port   uint16
+	framer framing.Framer
 }
 
 func init() {
@@ -42,7 +45,31 @@ func init() {
 				return nil, fmt.Errorf("tcp client port must be uint16")
 			}
 
-			return TCPClient{Host: hostString, Port: uint16(portNum), config: config}, nil
+			framingMethod, ok := params["framing"]
+			if !ok {
+				return nil, fmt.Errorf("tcp client requires a framing method")
+			}
+
+			framingMethodString, ok := framingMethod.(string)
+
+			if !ok {
+				return nil, fmt.Errorf("tcp framing method must be a string")
+			}
+
+			var framer framing.Framer
+
+			switch framingMethodString {
+			case "CR":
+				framer = framing.NewByteSeparatorFramer([]byte{'\r'})
+			case "LF":
+				framer = framing.NewByteSeparatorFramer([]byte{'\n'})
+			case "CRLF":
+				framer = framing.NewByteSeparatorFramer([]byte{'\r', '\n'})
+			default:
+				return nil, fmt.Errorf("unknown framing method: %s", framingMethodString)
+			}
+
+			return TCPClient{framer: framer, Host: hostString, Port: uint16(portNum), config: config}, nil
 		},
 	})
 }
@@ -79,11 +106,17 @@ func (tc TCPClient) Run(ctx context.Context) error {
 
 					if err != nil {
 						slog.Debug("connection closed")
+						tc.framer.Clear()
 						break READ
 					}
 
-					if byteCount > 0 {
-						slog.Info(string(buffer[0:byteCount]))
+					if tc.framer != nil {
+						if byteCount > 0 {
+							messages := tc.framer.Frame(buffer[0:byteCount])
+							for _, message := range messages {
+								slog.Debug("tcp-client message", "bytes", message)
+							}
+						}
 					}
 				}
 

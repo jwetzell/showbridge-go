@@ -3,7 +3,8 @@
         {
             "type": "net.tcp.server",
             "params": {
-                "port": 8000
+                "port": 8000,
+                "framing": "LF"
             }
         }
     ]
