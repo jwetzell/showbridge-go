@@ -3,6 +3,7 @@ package showbridge
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net"
 )
 
@@ -31,7 +32,7 @@ func init() {
 }
 
 func (ts TCPServer) HandleClient(ctx context.Context, client net.Conn) {
-	fmt.Printf("handling connection %s\n", client.RemoteAddr())
+	slog.Info("handling connection", "remoteAddr", client.RemoteAddr().String())
 
 	buffer := make([]byte, 1024)
 	for {
@@ -43,13 +44,13 @@ func (ts TCPServer) HandleClient(ctx context.Context, client net.Conn) {
 
 			if err != nil {
 				if err.Error() == "EOF" {
-					fmt.Println("connection closed")
+					slog.Debug("connection closed")
 				}
 				return
 			}
 
 			if byteCount > 0 {
-				fmt.Println(buffer[0:byteCount])
+				slog.Info(string(buffer[0:byteCount]))
 			}
 		}
 

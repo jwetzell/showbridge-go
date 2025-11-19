@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 	"net"
 )
 
@@ -55,7 +56,7 @@ func (us UDPServer) Run(ctx context.Context) error {
 			if err != nil {
 				return err
 			}
-			fmt.Println(buffer[:numBytes])
+			slog.Info(string(buffer[:numBytes]))
 		}
 	}
 

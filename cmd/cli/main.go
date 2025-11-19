@@ -29,7 +29,6 @@ func main() {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("%+v\n", config)
 			router, err := showbridge.NewRouter(ctx, config)
 			if err != nil {
 				return err

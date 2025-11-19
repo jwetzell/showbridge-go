@@ -3,6 +3,7 @@ package showbridge
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net"
 	"time"
 )
@@ -49,7 +50,7 @@ func (ts TCPClient) Run(ctx context.Context) error {
 	for {
 		client, err := net.Dial("tcp", fmt.Sprintf(":%d", ts.Port))
 		if err != nil {
-			fmt.Println(err)
+			slog.Error(err.Error())
 			time.Sleep(time.Second * 2)
 			continue
 		}
@@ -68,12 +69,12 @@ func (ts TCPClient) Run(ctx context.Context) error {
 					byteCount, err := client.Read(buffer)
 
 					if err != nil {
-						fmt.Println("connection closed")
+						slog.Debug("connection closed")
 						break READ
 					}
 
 					if byteCount > 0 {
-						fmt.Println(buffer[0:byteCount])
+						slog.Info(string(buffer[0:byteCount]))
 					}
 				}
 

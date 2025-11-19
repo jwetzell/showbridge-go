@@ -3,6 +3,8 @@ package showbridge
 import (
 	"context"
 	"fmt"
+	"log/slog"
+	"os"
 )
 
 type Router struct {
@@ -11,6 +13,14 @@ type Router struct {
 }
 
 func NewRouter(ctx context.Context, config Config) (*Router, error) {
+
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	}))
+
+	slog.SetDefault(logger)
+
+	slog.Debug("creating router", "config", config)
 
 	router := Router{
 		Context:         ctx,
