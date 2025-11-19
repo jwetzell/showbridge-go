@@ -9,15 +9,16 @@ import (
 )
 
 type TCPClient struct {
-	Host string
-	Port uint16
+	config ModuleConfig
+	Host   string
+	Port   uint16
 }
 
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.tcp.client",
-		New: func(params map[string]any) (Module, error) {
-
+		New: func(config ModuleConfig) (Module, error) {
+			params := config.Params
 			host, ok := params["host"]
 
 			if !ok {
@@ -41,14 +42,22 @@ func init() {
 				return nil, fmt.Errorf("tcp client port must be uint16")
 			}
 
-			return TCPClient{Host: hostString, Port: uint16(portNum)}, nil
+			return TCPClient{Host: hostString, Port: uint16(portNum), config: config}, nil
 		},
 	})
 }
 
-func (ts TCPClient) Run(ctx context.Context) error {
+func (tc TCPClient) Id() string {
+	return tc.config.Id
+}
+
+func (tc TCPClient) Type() string {
+	return tc.config.Type
+}
+
+func (tc TCPClient) Run(ctx context.Context) error {
 	for {
-		client, err := net.Dial("tcp", fmt.Sprintf(":%d", ts.Port))
+		client, err := net.Dial("tcp", fmt.Sprintf(":%d", tc.Port))
 		if err != nil {
 			slog.Error(err.Error())
 			time.Sleep(time.Second * 2)

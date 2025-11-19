@@ -8,13 +8,15 @@ import (
 )
 
 type TCPServer struct {
-	Port uint16
+	config ModuleConfig
+	Port   uint16
 }
 
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.tcp.server",
-		New: func(params map[string]any) (Module, error) {
+		New: func(config ModuleConfig) (Module, error) {
+			params := config.Params
 			port, ok := params["port"]
 			if !ok {
 				return nil, fmt.Errorf("tcp server requires a port parameter")
@@ -26,9 +28,17 @@ func init() {
 				return nil, fmt.Errorf("tcp server port must be uint16")
 			}
 
-			return TCPServer{Port: uint16(portNum)}, nil
+			return TCPServer{Port: uint16(portNum), config: config}, nil
 		},
 	})
+}
+
+func (ts TCPServer) Id() string {
+	return ts.config.Id
+}
+
+func (ts TCPServer) Type() string {
+	return ts.config.Type
 }
 
 func (ts TCPServer) HandleClient(ctx context.Context, client net.Conn) {

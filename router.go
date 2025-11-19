@@ -34,12 +34,23 @@ func NewRouter(ctx context.Context, config Config) (*Router, error) {
 			return nil, fmt.Errorf("problem loading module registration for module type: %s", moduleDecl.Type)
 		}
 
-		moduleInstance, err := moduleInfo.New(moduleDecl.Params)
-		if err != nil {
-			return nil, err
+		moduleInstanceExists := false
+		for _, moduleInstance := range router.ModuleInstances {
+			if moduleInstance.Id() == moduleDecl.Id {
+				moduleInstanceExists = true
+				slog.Warn("module id conflict", "id", moduleDecl.Id, "type", moduleDecl.Type)
+				break
+			}
 		}
 
-		router.ModuleInstances = append(router.ModuleInstances, moduleInstance)
+		if !moduleInstanceExists {
+			moduleInstance, err := moduleInfo.New(moduleDecl)
+			if err != nil {
+				return nil, err
+			}
+
+			router.ModuleInstances = append(router.ModuleInstances, moduleInstance)
+		}
 
 	}
 

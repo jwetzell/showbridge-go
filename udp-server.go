@@ -9,13 +9,15 @@ import (
 )
 
 type UDPServer struct {
-	Port uint16
+	Port   uint16
+	config ModuleConfig
 }
 
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.udp.server",
-		New: func(params map[string]any) (Module, error) {
+		New: func(config ModuleConfig) (Module, error) {
+			params := config.Params
 			port, ok := params["port"]
 			if !ok {
 				return nil, fmt.Errorf("udp server requires a port parameter")
@@ -27,9 +29,17 @@ func init() {
 				return nil, fmt.Errorf("udp server port must be uint16")
 			}
 
-			return UDPServer{Port: uint16(portNum)}, nil
+			return UDPServer{Port: uint16(portNum), config: config}, nil
 		},
 	})
+}
+
+func (us UDPServer) Id() string {
+	return us.config.Id
+}
+
+func (us UDPServer) Type() string {
+	return us.config.Id
 }
 
 func (us UDPServer) Run(ctx context.Context) error {

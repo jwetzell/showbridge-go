@@ -7,17 +7,20 @@ import (
 )
 
 type Module interface {
+	Id() string
+	Type() string
 	Run(context.Context) error
 }
 
 type ModuleConfig struct {
+	Id     string         `json:"id"`
 	Type   string         `json:"type"`
 	Params map[string]any `json:"params"`
 }
 
 type ModuleRegistration struct {
 	Type string `json:"type"`
-	New  func(map[string]any) (Module, error)
+	New  func(ModuleConfig) (Module, error)
 }
 
 func RegisterModule(mod ModuleRegistration) {
