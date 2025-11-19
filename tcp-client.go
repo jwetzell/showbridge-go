@@ -14,7 +14,7 @@ type TCPClient struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "tcp.client",
+		Type: "net.tcp.client",
 		New: func(params map[string]any) (Module, error) {
 
 			host, ok := params["host"]

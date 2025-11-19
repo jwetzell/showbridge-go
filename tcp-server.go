@@ -12,7 +12,7 @@ type TCPServer struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "tcp.server",
+		Type: "net.tcp.server",
 		New: func(params map[string]any) (Module, error) {
 			port, ok := params["port"]
 			if !ok {

@@ -1,7 +1,7 @@
 {
     "modules": [
         {
-            "type": "tcp.server",
+            "type": "net.tcp.server",
             "params": {
                 "port": 8000
             }

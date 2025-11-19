@@ -13,7 +13,7 @@ type UDPServer struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "udp.server",
+		Type: "net.udp.server",
 		New: func(params map[string]any) (Module, error) {
 			port, ok := params["port"]
 			if !ok {
