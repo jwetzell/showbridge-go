@@ -6,30 +6,30 @@ import (
 )
 
 type Router struct {
-	Context           context.Context
-	ProtocolInstances []Protocol
+	Context         context.Context
+	ModuleInstances []Module
 }
 
 func NewRouter(ctx context.Context, config Config) (*Router, error) {
 
 	router := Router{
-		Context:           ctx,
-		ProtocolInstances: []Protocol{},
+		Context:         ctx,
+		ModuleInstances: []Module{},
 	}
 
-	for _, protocolDecl := range config.Protocols {
+	for _, moduleDecl := range config.Modules {
 
-		protocolInfo, ok := protocolRegistry[protocolDecl.Type]
+		moduleInfo, ok := moduleRegistry[moduleDecl.Type]
 		if !ok {
-			return nil, fmt.Errorf("problem loading protocol registration for protocol type: %s", protocolDecl.Type)
+			return nil, fmt.Errorf("problem loading module registration for module type: %s", moduleDecl.Type)
 		}
 
-		protocolInstance, err := protocolInfo.New(protocolDecl.Params)
+		moduleInstance, err := moduleInfo.New(moduleDecl.Params)
 		if err != nil {
 			return nil, err
 		}
 
-		router.ProtocolInstances = append(router.ProtocolInstances, protocolInstance)
+		router.ModuleInstances = append(router.ModuleInstances, moduleInstance)
 
 	}
 
@@ -37,8 +37,8 @@ func NewRouter(ctx context.Context, config Config) (*Router, error) {
 }
 
 func (r *Router) Run() {
-	for _, protocolInstance := range r.ProtocolInstances {
-		go protocolInstance.Run(r.Context)
+	for _, moduleInstance := range r.ModuleInstances {
+		go moduleInstance.Run(r.Context)
 	}
 	<-r.Context.Done()
 }

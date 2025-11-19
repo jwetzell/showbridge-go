@@ -1,5 +1,5 @@
 {
-    "protocols": [
+    "modules": [
         {
             "type": "tcp.server",
             "params": {

@@ -1,5 +1,5 @@
 package showbridge
 
 type Config struct {
-	Protocols []ProtocolConfig `json:"protocols"`
+	Modules []ModuleConfig `json:"modules"`
 }

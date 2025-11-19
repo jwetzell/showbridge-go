@@ -12,9 +12,9 @@ type UDPServer struct {
 }
 
 func init() {
-	RegisterProtocol(ProtocolRegistration{
+	RegisterModule(ModuleRegistration{
 		Type: "udp.server",
-		New: func(params map[string]any) (Protocol, error) {
+		New: func(params map[string]any) (Module, error) {
 			port, ok := params["port"]
 			if !ok {
 				return nil, fmt.Errorf("udp server requires a port parameter")
