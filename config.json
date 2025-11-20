@@ -1,7 +1,7 @@
 {
   "modules": [
     {
-      "id": "tcp1",
+      "id": "tcp",
       "type": "net.tcp.server",
       "params": {
         "port": 8000,
@@ -9,18 +9,18 @@
       }
     },
     {
-      "id": "tcp2",
-      "type": "net.tcp.server",
+      "id": "udp",
+      "type": "net.udp.client",
       "params": {
-        "port": 8001,
-        "framing": "LF"
+        "host": "127.0.0.1",
+        "port": 8888
       }
     }
   ],
   "routes": [
     {
-      "input": "tcp1",
-      "output": "tcp2"
+      "input": "tcp",
+      "output": "udp"
     }
   ]
 }
