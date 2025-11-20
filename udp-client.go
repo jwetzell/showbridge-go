@@ -62,7 +62,11 @@ func (uc *UDPClient) RegisterRouter(router *Router) {
 }
 
 func (uc *UDPClient) Run(ctx context.Context) error {
-	client, err := net.Dial("udp", fmt.Sprintf(":%d", uc.Port))
+	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", uc.Host, uc.Port))
+	if err != nil {
+		return err
+	}
+	client, err := net.DialUDP("udp", nil, addr)
 	if err != nil {
 		return err
 	}
