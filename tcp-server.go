@@ -98,7 +98,7 @@ func (ts *TCPServer) HandleClient(ctx context.Context, client net.Conn) {
 						if ts.router != nil {
 							ts.router.HandleInput(ts.config.Id, message)
 						} else {
-							slog.Error("tcp-server has not router", "id", ts.config.Id)
+							slog.Error("tcp-server has no router", "id", ts.config.Id)
 						}
 					}
 				}

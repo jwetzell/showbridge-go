@@ -128,7 +128,7 @@ func (tc *TCPClient) Run(ctx context.Context) error {
 								if tc.router != nil {
 									tc.router.HandleInput(tc.config.Id, message)
 								} else {
-									slog.Error("tcp-client has not router", "id", tc.config.Id)
+									slog.Error("tcp-client has no router", "id", tc.config.Id)
 								}
 							}
 						}

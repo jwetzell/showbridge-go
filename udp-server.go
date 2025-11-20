@@ -75,7 +75,7 @@ func (us *UDPServer) Run(ctx context.Context) error {
 			if us.router != nil {
 				us.router.HandleInput(us.config.Id, message)
 			} else {
-				slog.Error("tcp-server has not router", "id", us.config.Id)
+				slog.Error("tcp-server has no router", "id", us.config.Id)
 			}
 		}
 	}
