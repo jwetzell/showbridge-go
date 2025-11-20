@@ -92,8 +92,12 @@ func (tc *TCPClient) RegisterRouter(router *Router) {
 }
 
 func (tc *TCPClient) Run(ctx context.Context) error {
+	addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", tc.Host, tc.Port))
+	if err != nil {
+		return err
+	}
 	for {
-		client, err := net.Dial("tcp", fmt.Sprintf(":%d", tc.Port))
+		client, err := net.DialTCP("tcp", nil, addr)
 		if err != nil {
 			slog.Error(err.Error())
 			time.Sleep(time.Second * 2)
