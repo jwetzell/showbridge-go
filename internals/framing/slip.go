@@ -8,8 +8,9 @@ func NewSlipFramer() *SlipFramer {
 	return &SlipFramer{buffer: []byte{}}
 }
 
-func (sf *SlipFramer) Frame(data []byte) [][]byte {
+func (sf *SlipFramer) Decode(data []byte) [][]byte {
 	messages := [][]byte{}
+
 	END := byte(0xc0)
 	ESC := byte(0xdb)
 	ESC_END := byte(0xdc)
@@ -45,6 +46,29 @@ func (sf *SlipFramer) Frame(data []byte) [][]byte {
 	}
 
 	return messages
+}
+
+func (sf *SlipFramer) Encode(data []byte) []byte {
+	END := byte(0xc0)
+	ESC := byte(0xdb)
+	ESC_END := byte(0xdc)
+	ESC_ESC := byte(0xdd)
+
+	var encodedBytes = []byte{END}
+
+	for _, byteToEncode := range data {
+		switch byteToEncode {
+		case END:
+			encodedBytes = append(encodedBytes, ESC_END)
+		case ESC:
+			encodedBytes = append(encodedBytes, ESC_ESC)
+		default:
+			encodedBytes = append(encodedBytes, byteToEncode)
+		}
+	}
+
+	encodedBytes = append(encodedBytes, END)
+	return encodedBytes
 }
 
 func (sf *SlipFramer) Clear() {

@@ -15,6 +15,8 @@ type TCPClient struct {
 	Host   string
 	Port   uint16
 	framer framing.Framer
+	conn   net.Conn
+	router *Router
 }
 
 func init() {
@@ -71,20 +73,25 @@ func init() {
 				return nil, fmt.Errorf("unknown framing method: %s", framingMethodString)
 			}
 
-			return TCPClient{framer: framer, Host: hostString, Port: uint16(portNum), config: config}, nil
+			return &TCPClient{framer: framer, Host: hostString, Port: uint16(portNum), config: config}, nil
 		},
 	})
 }
 
-func (tc TCPClient) Id() string {
+func (tc *TCPClient) Id() string {
 	return tc.config.Id
 }
 
-func (tc TCPClient) Type() string {
+func (tc *TCPClient) Type() string {
 	return tc.config.Type
 }
 
-func (tc TCPClient) Run(ctx context.Context) error {
+func (tc *TCPClient) RegisterRouter(router *Router) {
+	slog.Debug("registering router", "id", tc.config.Id)
+	tc.router = router
+}
+
+func (tc *TCPClient) Run(ctx context.Context) error {
 	for {
 		client, err := net.Dial("tcp", fmt.Sprintf(":%d", tc.Port))
 		if err != nil {
@@ -92,6 +99,8 @@ func (tc TCPClient) Run(ctx context.Context) error {
 			time.Sleep(time.Second * 2)
 			continue
 		}
+
+		tc.conn = client
 
 		buffer := make([]byte, 1024)
 		select {
@@ -114,9 +123,13 @@ func (tc TCPClient) Run(ctx context.Context) error {
 
 					if tc.framer != nil {
 						if byteCount > 0 {
-							messages := tc.framer.Frame(buffer[0:byteCount])
+							messages := tc.framer.Decode(buffer[0:byteCount])
 							for _, message := range messages {
-								slog.Debug("tcp-client message", "bytes", message)
+								if tc.router != nil {
+									tc.router.HandleInput(tc.config.Id, message)
+								} else {
+									slog.Error("tcp-client has not router", "id", tc.config.Id)
+								}
 							}
 						}
 					}
@@ -127,4 +140,16 @@ func (tc TCPClient) Run(ctx context.Context) error {
 
 	}
 
+}
+
+func (tc *TCPClient) Output(payload any) error {
+	if tc.conn != nil {
+		payloadBytes, ok := payload.([]byte)
+		if !ok {
+			return fmt.Errorf("tcp-client is only able to output bytes")
+		}
+		_, err := tc.conn.Write(tc.framer.Encode(payloadBytes))
+		return err
+	}
+	return nil
 }

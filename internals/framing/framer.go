@@ -1,6 +1,7 @@
 package framing
 
 type Framer interface {
-	Frame([]byte) [][]byte
+	Decode([]byte) [][]byte
+	Encode([]byte) []byte
 	Clear()
 }

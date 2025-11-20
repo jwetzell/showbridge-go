@@ -9,7 +9,9 @@ import (
 type Module interface {
 	Id() string
 	Type() string
+	RegisterRouter(*Router)
 	Run(context.Context) error
+	Output(any) error
 }
 
 type ModuleConfig struct {

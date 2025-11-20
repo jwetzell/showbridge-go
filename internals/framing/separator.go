@@ -13,7 +13,7 @@ func NewByteSeparatorFramer(separator []byte) *ByteSeparatorFramer {
 	return &ByteSeparatorFramer{separator: separator, buffer: []byte{}}
 }
 
-func (bsf *ByteSeparatorFramer) Frame(data []byte) [][]byte {
+func (bsf *ByteSeparatorFramer) Decode(data []byte) [][]byte {
 	messages := [][]byte{}
 
 	bsf.buffer = append(bsf.buffer, data...)
@@ -26,6 +26,10 @@ func (bsf *ByteSeparatorFramer) Frame(data []byte) [][]byte {
 	}
 
 	return messages
+}
+
+func (bsf *ByteSeparatorFramer) Encode(data []byte) []byte {
+	return append(data, bsf.separator...)
 }
 
 func (bsf *ByteSeparatorFramer) Clear() {

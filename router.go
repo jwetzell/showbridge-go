@@ -10,21 +10,23 @@ import (
 type Router struct {
 	Context         context.Context
 	ModuleInstances []Module
+	RouteInstances  []*Route
 }
 
 func NewRouter(ctx context.Context, config Config) (*Router, error) {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelDebug,
+		Level: slog.LevelInfo,
 	}))
 
 	slog.SetDefault(logger)
 
-	slog.Debug("creating router", "config", config)
+	slog.Debug("creating router")
 
 	router := Router{
 		Context:         ctx,
 		ModuleInstances: []Module{},
+		RouteInstances:  []*Route{},
 	}
 
 	for _, moduleDecl := range config.Modules {
@@ -54,6 +56,14 @@ func NewRouter(ctx context.Context, config Config) (*Router, error) {
 
 	}
 
+	for routeIndex, routeDecl := range config.Routes {
+		router.RouteInstances = append(router.RouteInstances, NewRoute(routeIndex, routeDecl, &router))
+	}
+
+	for _, moduleInstance := range router.ModuleInstances {
+		moduleInstance.RegisterRouter(&router)
+	}
+
 	return &router, nil
 }
 
@@ -62,4 +72,21 @@ func (r *Router) Run() {
 		go moduleInstance.Run(r.Context)
 	}
 	<-r.Context.Done()
+}
+
+func (r *Router) HandleInput(sourceId string, payload any) {
+	for _, route := range r.RouteInstances {
+		if route.Input == sourceId {
+			route.HandleInput(sourceId, payload)
+		}
+	}
+}
+
+func (r *Router) HandleOutput(destinationId string, payload any) error {
+	for _, moduleInstance := range r.ModuleInstances {
+		if moduleInstance.Id() == destinationId {
+			return moduleInstance.Output(payload)
+		}
+	}
+	return fmt.Errorf("no module instance found for destination %s", destinationId)
 }

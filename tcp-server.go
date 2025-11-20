@@ -13,6 +13,7 @@ type TCPServer struct {
 	config        ModuleConfig
 	Port          uint16
 	framingMethod string
+	router        *Router
 }
 
 func init() {
@@ -42,21 +43,26 @@ func init() {
 				return nil, fmt.Errorf("tcp framing method must be a string")
 			}
 
-			return TCPServer{framingMethod: framingMethodString, Port: uint16(portNum), config: config}, nil
+			return &TCPServer{framingMethod: framingMethodString, Port: uint16(portNum), config: config}, nil
 		},
 	})
 }
 
-func (ts TCPServer) Id() string {
+func (ts *TCPServer) Id() string {
 	return ts.config.Id
 }
 
-func (ts TCPServer) Type() string {
+func (ts *TCPServer) Type() string {
 	return ts.config.Type
 }
 
-func (ts TCPServer) HandleClient(ctx context.Context, client net.Conn) {
-	slog.Info("handling connection", "remoteAddr", client.RemoteAddr().String())
+func (ts *TCPServer) RegisterRouter(router *Router) {
+	slog.Debug("registering router", "id", ts.config.Id)
+	ts.router = router
+}
+
+func (ts *TCPServer) HandleClient(ctx context.Context, client net.Conn) {
+	slog.Debug("connection accepted", "id", ts.config.Id, "remoteAddr", client.RemoteAddr().String())
 
 	var framer framing.Framer
 
@@ -81,15 +87,19 @@ func (ts TCPServer) HandleClient(ctx context.Context, client net.Conn) {
 
 			if err != nil {
 				if err.Error() == "EOF" {
-					slog.Debug("connection closed")
+					slog.Debug("connection closed", "id", ts.config.Id, "remoteAddr", client.RemoteAddr().String())
 				}
 				return
 			}
 			if framer != nil {
 				if byteCount > 0 {
-					messages := framer.Frame(buffer[0:byteCount])
+					messages := framer.Decode(buffer[0:byteCount])
 					for _, message := range messages {
-						slog.Debug("tcp-server message", "bytes", message)
+						if ts.router != nil {
+							ts.router.HandleInput(ts.config.Id, message)
+						} else {
+							slog.Error("tcp-server has not router", "id", ts.config.Id)
+						}
 					}
 				}
 			}
@@ -116,5 +126,8 @@ func (ts TCPServer) Run(ctx context.Context) error {
 			go ts.HandleClient(ctx, client)
 		}
 	}
+}
 
+func (ts *TCPServer) Output(payload any) error {
+	return fmt.Errorf("tcp-server output is not implemented")
 }

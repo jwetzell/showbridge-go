@@ -1,11 +1,26 @@
 {
-    "modules": [
-        {
-            "type": "net.tcp.server",
-            "params": {
-                "port": 8000,
-                "framing": "LF"
-            }
-        }
-    ]
+  "modules": [
+    {
+      "id": "tcp1",
+      "type": "net.tcp.server",
+      "params": {
+        "port": 8000,
+        "framing": "LF"
+      }
+    },
+    {
+      "id": "tcp2",
+      "type": "net.tcp.server",
+      "params": {
+        "port": 8001,
+        "framing": "LF"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "input": "tcp1",
+      "output": "tcp2"
+    }
+  ]
 }

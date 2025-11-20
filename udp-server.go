@@ -11,6 +11,7 @@ import (
 type UDPServer struct {
 	Port   uint16
 	config ModuleConfig
+	router *Router
 }
 
 func init() {
@@ -29,20 +30,24 @@ func init() {
 				return nil, fmt.Errorf("udp server port must be uint16")
 			}
 
-			return UDPServer{Port: uint16(portNum), config: config}, nil
+			return &UDPServer{Port: uint16(portNum), config: config}, nil
 		},
 	})
 }
 
-func (us UDPServer) Id() string {
+func (us *UDPServer) Id() string {
 	return us.config.Id
 }
 
-func (us UDPServer) Type() string {
+func (us *UDPServer) Type() string {
 	return us.config.Id
 }
 
-func (us UDPServer) Run(ctx context.Context) error {
+func (us *UDPServer) RegisterRouter(router *Router) {
+	us.router = router
+}
+
+func (us *UDPServer) Run(ctx context.Context) error {
 
 	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf(":%d", us.Port))
 	if err != nil {
@@ -66,8 +71,17 @@ func (us UDPServer) Run(ctx context.Context) error {
 			if err != nil {
 				return err
 			}
-			slog.Info(string(buffer[:numBytes]))
+			message := buffer[:numBytes]
+			if us.router != nil {
+				us.router.HandleInput(us.config.Id, message)
+			} else {
+				slog.Error("tcp-server has not router", "id", us.config.Id)
+			}
 		}
 	}
 
+}
+
+func (us *UDPServer) Output(payload any) error {
+	return fmt.Errorf("udp-server output is not implemented")
 }
