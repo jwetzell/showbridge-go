@@ -1,0 +1,70 @@
+package showbridge
+
+import (
+	"context"
+	"fmt"
+	"log/slog"
+	"time"
+)
+
+type Timer struct {
+	config   ModuleConfig
+	Duration uint32
+	router   *Router
+	timer    *time.Timer
+}
+
+func init() {
+	RegisterModule(ModuleRegistration{
+		Type: "gen.timer",
+		New: func(config ModuleConfig) (Module, error) {
+			params := config.Params
+
+			duration, ok := params["duration"]
+			if !ok {
+				return nil, fmt.Errorf("timer requires a duration parameter")
+			}
+
+			durationNum, ok := duration.(float64)
+
+			if !ok {
+				return nil, fmt.Errorf("timer duration must be number")
+			}
+
+			return &Interval{Duration: uint32(durationNum), config: config}, nil
+		},
+	})
+}
+
+func (t *Timer) Id() string {
+	return t.config.Id
+}
+
+func (t *Timer) Type() string {
+	return t.config.Type
+}
+
+func (t *Timer) RegisterRouter(router *Router) {
+	slog.Debug("registering router", "id", t.config.Id)
+	t.router = router
+}
+
+func (t *Timer) Run(ctx context.Context) error {
+	t.timer = time.NewTimer(time.Millisecond * time.Duration(t.Duration))
+	defer t.timer.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			t.timer.Stop()
+			return nil
+		case time := <-t.timer.C:
+			if t.router != nil {
+				t.router.HandleInput(t.config.Id, time)
+			}
+		}
+	}
+}
+
+func (t *Timer) Output(payload any) error {
+	return fmt.Errorf("timer output is not implemented")
+}
