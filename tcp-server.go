@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"net"
 
-	"github.com/jwetzell/showbridge-go/internals/framing"
+	"github.com/jwetzell/showbridge-go/internal/framing"
 )
 
 type TCPServer struct {

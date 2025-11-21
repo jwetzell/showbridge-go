@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/jwetzell/showbridge-go/internals/processing"
+	"github.com/jwetzell/showbridge-go/internal/processing"
 )
 
 type Route struct {

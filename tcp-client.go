@@ -7,7 +7,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/jwetzell/showbridge-go/internals/framing"
+	"github.com/jwetzell/showbridge-go/internal/framing"
 )
 
 type TCPClient struct {
