@@ -21,13 +21,13 @@ func init() {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {
-				return nil, fmt.Errorf("udp server requires a port parameter")
+				return nil, fmt.Errorf("net.udp.server requires a port parameter")
 			}
 
 			portNum, ok := port.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("udp server port must be uint16")
+				return nil, fmt.Errorf("net.udp.server port must be uint16")
 			}
 
 			return &UDPServer{Port: uint16(portNum), config: config}, nil
@@ -75,7 +75,7 @@ func (us *UDPServer) Run(ctx context.Context) error {
 			if us.router != nil {
 				us.router.HandleInput(us.config.Id, message)
 			} else {
-				slog.Error("tcp-server has no router", "id", us.config.Id)
+				slog.Error("net.udp.server has no router", "id", us.config.Id)
 			}
 		}
 	}
@@ -83,5 +83,5 @@ func (us *UDPServer) Run(ctx context.Context) error {
 }
 
 func (us *UDPServer) Output(payload any) error {
-	return fmt.Errorf("udp-server output is not implemented")
+	return fmt.Errorf("net.udp.server output is not implemented")
 }

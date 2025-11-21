@@ -27,29 +27,29 @@ func init() {
 			host, ok := params["host"]
 
 			if !ok {
-				return nil, fmt.Errorf("tcp client requires a host parameter")
+				return nil, fmt.Errorf("net.tcp.client requires a host parameter")
 			}
 
 			hostString, ok := host.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("tcp client host must be uint16")
+				return nil, fmt.Errorf("net.tcp.client host must be uint16")
 			}
 
 			port, ok := params["port"]
 			if !ok {
-				return nil, fmt.Errorf("tcp client requires a port parameter")
+				return nil, fmt.Errorf("net.tcp.client requires a port parameter")
 			}
 
 			portNum, ok := port.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("tcp client port must be uint16")
+				return nil, fmt.Errorf("net.tcp.client port must be uint16")
 			}
 
 			framingMethod, ok := params["framing"]
 			if !ok {
-				return nil, fmt.Errorf("tcp client requires a framing method")
+				return nil, fmt.Errorf("net.tcp.client requires a framing method")
 			}
 
 			framingMethodString, ok := framingMethod.(string)
@@ -132,7 +132,7 @@ func (tc *TCPClient) Run(ctx context.Context) error {
 								if tc.router != nil {
 									tc.router.HandleInput(tc.config.Id, message)
 								} else {
-									slog.Error("tcp-client has no router", "id", tc.config.Id)
+									slog.Error("net.tcp.client has no router", "id", tc.config.Id)
 								}
 							}
 						}
@@ -150,7 +150,7 @@ func (tc *TCPClient) Output(payload any) error {
 	if tc.conn != nil {
 		payloadBytes, ok := payload.([]byte)
 		if !ok {
-			return fmt.Errorf("tcp-client is only able to output bytes")
+			return fmt.Errorf("net.tcp.client is only able to output bytes")
 		}
 		_, err := tc.conn.Write(tc.framer.Encode(payloadBytes))
 		return err

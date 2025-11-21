@@ -23,18 +23,18 @@ func init() {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {
-				return nil, fmt.Errorf("tcp server requires a port parameter")
+				return nil, fmt.Errorf("net.tcp.server requires a port parameter")
 			}
 
 			portNum, ok := port.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("tcp server port must be uint16")
+				return nil, fmt.Errorf("net.tcp.server port must be uint16")
 			}
 
 			framingMethod, ok := params["framing"]
 			if !ok {
-				return nil, fmt.Errorf("tcp server requires a framing method")
+				return nil, fmt.Errorf("net.tcp.server requires a framing method")
 			}
 
 			framingMethodString, ok := framingMethod.(string)
@@ -129,5 +129,5 @@ func (ts TCPServer) Run(ctx context.Context) error {
 }
 
 func (ts *TCPServer) Output(payload any) error {
-	return fmt.Errorf("tcp-server output is not implemented")
+	return fmt.Errorf("net.tcp.server output is not implemented")
 }
