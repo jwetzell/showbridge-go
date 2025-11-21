@@ -57,7 +57,12 @@ func NewRouter(ctx context.Context, config Config) (*Router, error) {
 	}
 
 	for routeIndex, routeDecl := range config.Routes {
-		router.RouteInstances = append(router.RouteInstances, NewRoute(routeIndex, routeDecl, &router))
+		route, err := NewRoute(routeIndex, routeDecl, &router)
+		if err != nil {
+			slog.Error("problem creating route", "index", routeIndex, "error", err.Error())
+			continue
+		}
+		router.RouteInstances = append(router.RouteInstances, route)
 	}
 
 	for _, moduleInstance := range router.ModuleInstances {
@@ -75,9 +80,12 @@ func (r *Router) Run() {
 }
 
 func (r *Router) HandleInput(sourceId string, payload any) {
-	for _, route := range r.RouteInstances {
+	for routeIndex, route := range r.RouteInstances {
 		if route.Input == sourceId {
-			route.HandleInput(sourceId, payload)
+			err := route.HandleInput(sourceId, payload)
+			if err != nil {
+				slog.Error("router unable to route input", "route", routeIndex, "source", sourceId, "error", err)
+			}
 		}
 	}
 }
