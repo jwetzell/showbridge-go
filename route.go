@@ -52,6 +52,10 @@ func (r *Route) HandleInput(sourceId string, payload any) error {
 		if err != nil {
 			return err
 		}
+		//NOTE(jwetzell) nil payload will result in the route being "terminated"
+		if payload == nil {
+			return nil
+		}
 	}
 	return r.HandleOutput(payload)
 }
