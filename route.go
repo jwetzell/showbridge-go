@@ -2,7 +2,6 @@ package showbridge
 
 import (
 	"fmt"
-	"log/slog"
 
 	"github.com/jwetzell/showbridge-go/internal/processing"
 )
@@ -49,9 +48,6 @@ func NewRoute(index int, config RouteConfig, router *Router) (*Route, error) {
 }
 
 func (r *Route) HandleInput(sourceId string, payload any) error {
-	slog.Debug("route input", "index", r.index, "source", sourceId, "payload", payload)
-	slog.Debug("route processing", "processorCount", len(r.Processors))
-
 	var err error
 	for _, processor := range r.Processors {
 		payload, err = processor.Process(r.router.Context, payload)
@@ -67,6 +63,5 @@ func (r *Route) HandleInput(sourceId string, payload any) error {
 }
 
 func (r *Route) HandleOutput(payload any) error {
-	slog.Debug("route output", "index", r.index, "destination", r.Output, "payload", payload)
 	return r.router.HandleOutput(r.Output, payload)
 }
