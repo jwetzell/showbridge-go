@@ -13,11 +13,11 @@ type HTTPResponseEncode struct {
 
 func (hre *HTTPResponseEncode) Process(ctx context.Context, payload any) (any, error) {
 	payloadResponse, ok := payload.(*http.Response)
-	defer payloadResponse.Body.Close()
 
 	if !ok {
 		return nil, fmt.Errorf("http.response.encode processor only accepts an http.Response")
 	}
+	defer payloadResponse.Body.Close()
 
 	bytes, err := io.ReadAll(payloadResponse.Body)
 	if err != nil {
