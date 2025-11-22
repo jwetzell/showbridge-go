@@ -57,8 +57,6 @@ func init() {
 			addressPattern = strings.ReplaceAll(addressPattern, "}", ")")
 			addressPattern = strings.ReplaceAll(addressPattern, ",", "|")
 
-			fmt.Println(addressPattern)
-
 			addressPatternRegexp, err := regexp.Compile(fmt.Sprintf("^%s$", addressPattern))
 
 			if err != nil {
