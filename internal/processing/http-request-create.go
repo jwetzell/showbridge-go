@@ -25,6 +25,7 @@ func (hre *HTTPRequestCreate) Process(ctx context.Context, payload any) (any, er
 
 	urlString := urlBuffer.String()
 
+	//TODO(jwetzell): support body
 	request, err := http.NewRequest(hre.Method, urlString, bytes.NewBuffer([]byte{}))
 
 	if err != nil {
