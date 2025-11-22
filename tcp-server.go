@@ -1,10 +1,11 @@
 package showbridge
 
 import (
-	"context"
 	"fmt"
 	"log/slog"
 	"net"
+	"sync"
+	"time"
 
 	"github.com/jwetzell/showbridge-go/internal/framing"
 )
@@ -14,6 +15,8 @@ type TCPServer struct {
 	Port          uint16
 	framingMethod string
 	router        *Router
+	quit          chan interface{}
+	wg            sync.WaitGroup
 }
 
 func init() {
@@ -43,7 +46,7 @@ func init() {
 				return nil, fmt.Errorf("tcp framing method must be a string")
 			}
 
-			return &TCPServer{framingMethod: framingMethodString, Port: uint16(portNum), config: config}, nil
+			return &TCPServer{framingMethod: framingMethodString, Port: uint16(portNum), config: config, quit: make(chan interface{})}, nil
 		},
 	})
 }
@@ -60,9 +63,9 @@ func (ts *TCPServer) RegisterRouter(router *Router) {
 	ts.router = router
 }
 
-func (ts *TCPServer) HandleClient(ctx context.Context, client net.Conn) {
+func (ts *TCPServer) handleClient(client net.Conn) {
 	slog.Debug("connection accepted", "id", ts.config.Id, "remoteAddr", client.RemoteAddr().String())
-
+	defer client.Close()
 	var framer framing.Framer
 
 	switch ts.framingMethod {
@@ -77,14 +80,20 @@ func (ts *TCPServer) HandleClient(ctx context.Context, client net.Conn) {
 	}
 
 	buffer := make([]byte, 1024)
+ClientRead:
 	for {
 		select {
-		case <-ctx.Done():
+		case <-ts.quit:
 			return
 		default:
+			client.SetDeadline(time.Now().Add(time.Millisecond * 200))
 			byteCount, err := client.Read(buffer)
 
 			if err != nil {
+				//NOTE(jwetzell) we hit deadline
+				if opErr, ok := err.(*net.OpError); ok && opErr.Timeout() {
+					continue ClientRead
+				}
 				if err.Error() == "EOF" {
 					slog.Debug("connection closed", "id", ts.config.Id, "remoteAddr", client.RemoteAddr().String())
 				}
@@ -103,35 +112,44 @@ func (ts *TCPServer) HandleClient(ctx context.Context, client net.Conn) {
 				}
 			}
 		}
-
 	}
 }
 
-func (ts TCPServer) Run() error {
+func (ts *TCPServer) Run() error {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", ts.Port))
 	if err != nil {
 		return err
 	}
+	ts.wg.Add(1)
 
-	// TODO(jwetzell): shutdown with router.Context properly
 	go func() {
 		<-ts.router.Context.Done()
-		slog.Debug("router context done in module", "id", ts.config.Id)
+		close(ts.quit)
 		listener.Close()
+		slog.Debug("router context done in module", "id", ts.config.Id)
 	}()
 
+AcceptLoop:
 	for {
-		select {
-		case <-ts.router.Context.Done():
-			return nil
-		default:
-			client, err := listener.Accept()
-			if err != nil {
-				return err
+		conn, err := listener.Accept()
+		if err != nil {
+			select {
+			case <-ts.quit:
+				break AcceptLoop
+			default:
+				slog.Debug("net.tcp.server problem with listener", "error", err)
 			}
-			go ts.HandleClient(ts.router.Context, client)
+		} else {
+			ts.wg.Add(1)
+			go func() {
+				ts.handleClient(conn)
+				ts.wg.Done()
+			}()
 		}
 	}
+	ts.wg.Done()
+	ts.wg.Wait()
+	return nil
 }
 
 func (ts *TCPServer) Output(payload any) error {
