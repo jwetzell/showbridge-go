@@ -8,6 +8,11 @@ import (
 	"sync"
 )
 
+type RoutingError struct {
+	Index int
+	Error error
+}
+
 type Router struct {
 	contextCancel   context.CancelFunc
 	Context         context.Context
@@ -129,15 +134,24 @@ func (r *Router) Stop() {
 	r.contextCancel()
 }
 
-func (r *Router) HandleInput(sourceId string, payload any) {
+func (r *Router) HandleInput(sourceId string, payload any) []RoutingError {
+	var routingErrors []RoutingError
 	for routeIndex, route := range r.RouteInstances {
 		if route.Input == sourceId {
 			err := route.HandleInput(sourceId, payload)
 			if err != nil {
+				if routingErrors == nil {
+					routingErrors = []RoutingError{}
+				}
+				routingErrors = append(routingErrors, RoutingError{
+					Index: routeIndex,
+					Error: err,
+				})
 				slog.Error("router unable to route input", "route", routeIndex, "source", sourceId, "error", err)
 			}
 		}
 	}
+	return routingErrors
 }
 
 func (r *Router) HandleOutput(destinationId string, payload any) error {
