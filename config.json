@@ -1,11 +1,10 @@
 {
   "modules": [
     {
-      "id": "tcp",
-      "type": "net.tcp.server",
+      "id": "http",
+      "type": "net.http.server",
       "params": {
-        "port": 8000,
-        "framing": "LF"
+        "port": 3000
       }
     },
     {
@@ -13,13 +12,24 @@
       "type": "net.udp.client",
       "params": {
         "host": "127.0.0.1",
-        "port": 8888
+        "port": 8000
       }
     }
   ],
   "routes": [
     {
-      "input": "tcp",
+      "input": "http",
+      "processors": [
+        {
+          "type":"osc.message.create",
+          "params": {
+            "address": "{{.URL.Path}}"
+          }
+        },
+        {
+          "type": "osc.message.encode"
+        }
+      ],
       "output": "udp"
     }
   ]
