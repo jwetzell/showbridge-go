@@ -111,7 +111,7 @@ func (tc *TCPClient) Run() error {
 				slog.Debug("router context done in module", "id", tc.config.Id)
 				return nil
 			}
-			slog.Error(err.Error())
+			slog.Error("net.tcp.client", "id", tc.config.Id, "error", err.Error())
 			time.Sleep(time.Second * 2)
 			continue
 		}
