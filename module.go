@@ -6,6 +6,12 @@ import (
 	"sync"
 )
 
+type ModuleError struct {
+	Index  int
+	Config ModuleConfig
+	Error  error
+}
+
 type Module interface {
 	Id() string
 	Type() string

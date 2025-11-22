@@ -13,7 +13,7 @@ type Router struct {
 	RouteInstances  []*Route
 }
 
-func NewRouter(ctx context.Context, config Config) (*Router, error) {
+func NewRouter(ctx context.Context, config Config) (*Router, []ModuleError, []RouteError) {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelDebug,
@@ -29,18 +29,35 @@ func NewRouter(ctx context.Context, config Config) (*Router, error) {
 		RouteInstances:  []*Route{},
 	}
 
-	for _, moduleDecl := range config.Modules {
+	var moduleErrors []ModuleError
+
+	for moduleIndex, moduleDecl := range config.Modules {
 
 		moduleInfo, ok := moduleRegistry[moduleDecl.Type]
 		if !ok {
-			return nil, fmt.Errorf("problem loading module registration for module type: %s", moduleDecl.Type)
+			if moduleErrors == nil {
+				moduleErrors = []ModuleError{}
+			}
+			moduleErrors = append(moduleErrors, ModuleError{
+				Index:  moduleIndex,
+				Config: moduleDecl,
+				Error:  fmt.Errorf("module type not defined"),
+			})
+
 		}
 
 		moduleInstanceExists := false
 		for _, moduleInstance := range router.ModuleInstances {
 			if moduleInstance.Id() == moduleDecl.Id {
 				moduleInstanceExists = true
-				slog.Warn("module id conflict", "id", moduleDecl.Id, "type", moduleDecl.Type)
+				if moduleErrors == nil {
+					moduleErrors = []ModuleError{}
+				}
+				moduleErrors = append(moduleErrors, ModuleError{
+					Index:  moduleIndex,
+					Config: moduleDecl,
+					Error:  fmt.Errorf("duplicate module id"),
+				})
 				break
 			}
 		}
@@ -48,7 +65,15 @@ func NewRouter(ctx context.Context, config Config) (*Router, error) {
 		if !moduleInstanceExists {
 			moduleInstance, err := moduleInfo.New(moduleDecl)
 			if err != nil {
-				return nil, err
+				if moduleErrors == nil {
+					moduleErrors = []ModuleError{}
+				}
+				moduleErrors = append(moduleErrors, ModuleError{
+					Index:  moduleIndex,
+					Config: moduleDecl,
+					Error:  err,
+				})
+				continue
 			}
 
 			router.ModuleInstances = append(router.ModuleInstances, moduleInstance)
@@ -56,20 +81,29 @@ func NewRouter(ctx context.Context, config Config) (*Router, error) {
 
 	}
 
+	var routeErrors []RouteError
 	for routeIndex, routeDecl := range config.Routes {
 		route, err := NewRoute(routeIndex, routeDecl, &router)
 		if err != nil {
-			slog.Error("problem creating route", "index", routeIndex, "error", err.Error())
+			if routeErrors == nil {
+				routeErrors = []RouteError{}
+			}
+			routeErrors = append(routeErrors, RouteError{
+				Index:  routeIndex,
+				Config: routeDecl,
+				Error:  err,
+			})
 			continue
 		}
 		router.RouteInstances = append(router.RouteInstances, route)
 	}
 
 	for _, moduleInstance := range router.ModuleInstances {
+		slog.Debug("registering router with module", "id", moduleInstance.Id())
 		moduleInstance.RegisterRouter(&router)
 	}
 
-	return &router, nil
+	return &router, moduleErrors, routeErrors
 }
 
 func (r *Router) Run() {

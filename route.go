@@ -7,6 +7,12 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processing"
 )
 
+type RouteError struct {
+	Index  int
+	Config RouteConfig
+	Error  error
+}
+
 type Route struct {
 	index      int
 	Input      string

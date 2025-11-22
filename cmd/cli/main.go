@@ -29,12 +29,15 @@ func main() {
 			if err != nil {
 				return err
 			}
-			router, err := showbridge.NewRouter(ctx, config)
-			if err != nil {
-				return err
+			router, moduleErrors, routeErrors := showbridge.NewRouter(ctx, config)
+			for _, moduleError := range moduleErrors {
+				slog.Error("problem initializing module", "index", moduleError.Index, "error", moduleError.Error)
+			}
+
+			for _, routeError := range routeErrors {
+				slog.Error("problem initializing module", "index", routeError.Index, "error", routeError.Error)
 			}
 			router.Run()
-
 			return nil
 		},
 	}
