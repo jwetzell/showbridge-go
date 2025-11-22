@@ -53,7 +53,7 @@ func NewRouter(ctx context.Context, config Config) (*Router, []ModuleError, []Ro
 				Config: moduleDecl,
 				Error:  fmt.Errorf("module type not defined"),
 			})
-
+			continue
 		}
 
 		moduleInstanceExists := false
