@@ -1,7 +1,6 @@
 package showbridge
 
 import (
-	"context"
 	"fmt"
 	"log/slog"
 	"net"
@@ -87,18 +86,31 @@ func (tc *TCPClient) Type() string {
 }
 
 func (tc *TCPClient) RegisterRouter(router *Router) {
-	slog.Debug("registering router", "id", tc.config.Id)
 	tc.router = router
 }
 
-func (tc *TCPClient) Run(ctx context.Context) error {
+func (tc *TCPClient) Run() error {
 	addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", tc.Host, tc.Port))
 	if err != nil {
 		return err
 	}
+
+	// TODO(jwetzell): shutdown with router.Context properly
+	go func() {
+		<-tc.router.Context.Done()
+		slog.Debug("router context done in module", "id", tc.config.Id)
+		if tc.conn != nil {
+			tc.conn.Close()
+		}
+	}()
+
 	for {
 		client, err := net.DialTCP("tcp", nil, addr)
 		if err != nil {
+			if tc.router.Context.Err() != nil {
+				slog.Debug("router context done in module", "id", tc.config.Id)
+				return nil
+			}
 			slog.Error(err.Error())
 			time.Sleep(time.Second * 2)
 			continue
@@ -108,19 +120,20 @@ func (tc *TCPClient) Run(ctx context.Context) error {
 
 		buffer := make([]byte, 1024)
 		select {
-		case <-ctx.Done():
+		case <-tc.router.Context.Done():
+			slog.Debug("router context done in module", "id", tc.config.Id)
 			return nil
 		default:
 		READ:
 			for {
 				select {
-				case <-ctx.Done():
+				case <-tc.router.Context.Done():
+					slog.Debug("router context done in module", "id", tc.config.Id)
 					return nil
 				default:
 					byteCount, err := client.Read(buffer)
 
 					if err != nil {
-						slog.Debug("connection closed")
 						tc.framer.Clear()
 						break READ
 					}

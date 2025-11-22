@@ -5,12 +5,15 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"sync"
 )
 
 type Router struct {
+	contextCancel   context.CancelFunc
 	Context         context.Context
 	ModuleInstances []Module
 	RouteInstances  []*Route
+	moduleWait      sync.WaitGroup
 }
 
 func NewRouter(ctx context.Context, config Config) (*Router, []ModuleError, []RouteError) {
@@ -23,8 +26,10 @@ func NewRouter(ctx context.Context, config Config) (*Router, []ModuleError, []Ro
 
 	slog.Debug("creating router")
 
+	routerContext, cancel := context.WithCancel(ctx)
 	router := Router{
-		Context:         ctx,
+		Context:         routerContext,
+		contextCancel:   cancel,
 		ModuleInstances: []Module{},
 		RouteInstances:  []*Route{},
 	}
@@ -108,9 +113,20 @@ func NewRouter(ctx context.Context, config Config) (*Router, []ModuleError, []Ro
 
 func (r *Router) Run() {
 	for _, moduleInstance := range r.ModuleInstances {
-		go moduleInstance.Run(r.Context)
+		moduleInstance.RegisterRouter(r)
+		r.moduleWait.Add(1)
+		go func() {
+			moduleInstance.Run()
+			r.moduleWait.Done()
+		}()
 	}
 	<-r.Context.Done()
+	r.moduleWait.Wait()
+	slog.Info("router context done")
+}
+
+func (r *Router) Stop() {
+	r.contextCancel()
 }
 
 func (r *Router) HandleInput(sourceId string, payload any) {

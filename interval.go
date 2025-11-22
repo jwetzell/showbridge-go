@@ -1,7 +1,6 @@
 package showbridge
 
 import (
-	"context"
 	"fmt"
 	"log/slog"
 	"time"
@@ -44,17 +43,17 @@ func (i *Interval) Type() string {
 }
 
 func (i *Interval) RegisterRouter(router *Router) {
-	slog.Debug("registering router", "id", i.config.Id)
 	i.router = router
 }
 
-func (i *Interval) Run(ctx context.Context) error {
+func (i *Interval) Run() error {
 	ticker := time.NewTicker(time.Millisecond * time.Duration(i.Duration))
 	defer ticker.Stop()
 	for {
 		select {
-		case <-ctx.Done():
+		case <-i.router.Context.Done():
 			ticker.Stop()
+			slog.Debug("router context done in module", "id", i.config.Id)
 			return nil
 		case t := <-ticker.C:
 			if i.router != nil {

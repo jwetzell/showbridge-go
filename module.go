@@ -1,7 +1,6 @@
 package showbridge
 
 import (
-	"context"
 	"fmt"
 	"sync"
 )
@@ -16,7 +15,7 @@ type Module interface {
 	Id() string
 	Type() string
 	RegisterRouter(*Router)
-	Run(context.Context) error
+	Run() error
 	Output(any) error
 }
 

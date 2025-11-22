@@ -45,7 +45,6 @@ func (t *Timer) Type() string {
 }
 
 func (t *Timer) RegisterRouter(router *Router) {
-	slog.Debug("registering router", "id", t.config.Id)
 	t.router = router
 }
 
@@ -56,6 +55,7 @@ func (t *Timer) Run(ctx context.Context) error {
 		select {
 		case <-ctx.Done():
 			t.timer.Stop()
+			slog.Debug("router context done in module", "id", t.config.Id)
 			return nil
 		case time := <-t.timer.C:
 			if t.router != nil {

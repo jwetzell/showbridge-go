@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
+	"os/signal"
 
 	"github.com/jwetzell/showbridge-go"
 	"github.com/urfave/cli/v3"
@@ -42,7 +44,9 @@ func main() {
 		},
 	}
 
-	err := cmd.Run(context.Background(), os.Args)
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Interrupt)
+	defer cancel()
+	err := cmd.Run(ctx, os.Args)
 
 	if err != nil {
 		panic(err)

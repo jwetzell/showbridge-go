@@ -1,7 +1,6 @@
 package showbridge
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"log/slog"
@@ -47,7 +46,7 @@ func (us *UDPServer) RegisterRouter(router *Router) {
 	us.router = router
 }
 
-func (us *UDPServer) Run(ctx context.Context) error {
+func (us *UDPServer) Run() error {
 
 	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf(":%d", us.Port))
 	if err != nil {
@@ -64,7 +63,9 @@ func (us *UDPServer) Run(ctx context.Context) error {
 	buffer := make([]byte, 1024)
 	for {
 		select {
-		case <-ctx.Done():
+		case <-us.router.Context.Done():
+			// TODO(jwetzell): cleanup?
+			slog.Debug("router context done in module", "id", us.config.Id)
 			return nil
 		default:
 			numBytes, _, err := listener.ReadFromUDP(buffer)

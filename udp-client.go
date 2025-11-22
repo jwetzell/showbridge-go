@@ -1,7 +1,6 @@
 package showbridge
 
 import (
-	"context"
 	"fmt"
 	"log/slog"
 	"net"
@@ -57,11 +56,10 @@ func (uc *UDPClient) Type() string {
 }
 
 func (uc *UDPClient) RegisterRouter(router *Router) {
-	slog.Debug("registering router", "id", uc.config.Id)
 	uc.router = router
 }
 
-func (uc *UDPClient) Run(ctx context.Context) error {
+func (uc *UDPClient) Run() error {
 	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", uc.Host, uc.Port))
 	if err != nil {
 		return err
@@ -72,7 +70,8 @@ func (uc *UDPClient) Run(ctx context.Context) error {
 	}
 
 	uc.conn = client
-	<-ctx.Done()
+	<-uc.router.Context.Done()
+	slog.Debug("router context done in module", "id", uc.config.Id)
 	return nil
 }
 

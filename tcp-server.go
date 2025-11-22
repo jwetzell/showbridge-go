@@ -57,7 +57,6 @@ func (ts *TCPServer) Type() string {
 }
 
 func (ts *TCPServer) RegisterRouter(router *Router) {
-	slog.Debug("registering router", "id", ts.config.Id)
 	ts.router = router
 }
 
@@ -108,22 +107,29 @@ func (ts *TCPServer) HandleClient(ctx context.Context, client net.Conn) {
 	}
 }
 
-func (ts TCPServer) Run(ctx context.Context) error {
+func (ts TCPServer) Run() error {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", ts.Port))
 	if err != nil {
 		return err
 	}
 
+	// TODO(jwetzell): shutdown with router.Context properly
+	go func() {
+		<-ts.router.Context.Done()
+		slog.Debug("router context done in module", "id", ts.config.Id)
+		listener.Close()
+	}()
+
 	for {
 		select {
-		case <-ctx.Done():
+		case <-ts.router.Context.Done():
 			return nil
 		default:
 			client, err := listener.Accept()
 			if err != nil {
 				return err
 			}
-			go ts.HandleClient(ctx, client)
+			go ts.HandleClient(ts.router.Context, client)
 		}
 	}
 }
