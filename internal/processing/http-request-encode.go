@@ -15,7 +15,7 @@ func (hre *HTTPRequestEncode) Process(ctx context.Context, payload any) (any, er
 	payloadRequest, ok := payload.(*http.Request)
 
 	if !ok {
-		return nil, fmt.Errorf("http.request.encode processor only accepts an OSCMessage")
+		return nil, fmt.Errorf("http.request.encode processor only accepts an http.Request")
 	}
 
 	bytes, err := io.ReadAll(payloadRequest.Body)
