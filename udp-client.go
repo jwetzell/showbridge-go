@@ -12,6 +12,7 @@ type UDPClient struct {
 	Port   uint16
 	conn   net.Conn
 	router *Router
+	addr   *net.UDPAddr
 }
 
 func init() {
@@ -39,7 +40,7 @@ func init() {
 			portNum, ok := port.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("net.udp.client port must be uint16")
+				return nil, fmt.Errorf("net.udp.client port must be a number")
 			}
 
 			return &UDPClient{Host: hostString, Port: uint16(portNum), config: config}, nil
@@ -60,28 +61,36 @@ func (uc *UDPClient) RegisterRouter(router *Router) {
 }
 
 func (uc *UDPClient) Run() error {
+
 	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", uc.Host, uc.Port))
 	if err != nil {
 		return err
 	}
-	client, err := net.DialUDP("udp", nil, addr)
-	if err != nil {
-		return err
-	}
 
-	uc.conn = client
+	uc.addr = addr
+
 	<-uc.router.Context.Done()
 	slog.Debug("router context done in module", "id", uc.config.Id)
 	return nil
 }
 
 func (uc *UDPClient) Output(payload any) error {
-	if uc.conn != nil {
-		payloadBytes, ok := payload.([]byte)
-		if !ok {
-			return fmt.Errorf("net.udp.client is only able to output bytes")
-		}
-		_, err := uc.conn.Write(payloadBytes)
+
+	client, err := net.DialUDP("udp", nil, uc.addr)
+	if err != nil {
+		return err
+	}
+
+	uc.conn = client
+
+	payloadBytes, ok := payload.([]byte)
+	if !ok {
+		return fmt.Errorf("net.udp.client is only able to output bytes")
+	}
+
+	_, err = uc.conn.Write(payloadBytes)
+
+	if err != nil {
 		return err
 	}
 	return nil
