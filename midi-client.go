@@ -18,6 +18,7 @@ type MIDIClient struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
+		//TODO(jwetzell): find a better namespace than "misc"
 		Type: "misc.midi.client",
 		New: func(config ModuleConfig) (Module, error) {
 			params := config.Params
