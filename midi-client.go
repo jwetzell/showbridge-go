@@ -76,6 +76,11 @@ func (mc *MIDIClient) Run() error {
 			mc.router.HandleInput(mc.Id(), msg)
 		}
 	}, midi.UseSysEx())
+
+	if err != nil {
+		return err
+	}
+
 	defer stop()
 
 	out, err := midi.FindOutPort(mc.OutputPort)
@@ -90,10 +95,6 @@ func (mc *MIDIClient) Run() error {
 	}
 
 	mc.SendFunc = send
-
-	if err != nil {
-		return err
-	}
 
 	<-mc.router.Context.Done()
 	slog.Debug("router context done in module", "id", mc.config.Id)
