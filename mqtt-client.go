@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/jwetzell/showbridge-go/internal/processing"
 )
 
 type MQTTClient struct {
@@ -104,5 +105,23 @@ func (mc *MQTTClient) Run() error {
 }
 
 func (mc *MQTTClient) Output(payload any) error {
-	return fmt.Errorf("net.mqtt.client output is not implemented")
+	payloadMessage, ok := payload.(processing.MQTTMessage)
+
+	if !ok {
+		return fmt.Errorf("net.mqtt.client is only able to output MQTTMessage")
+	}
+
+	if mc.client == nil {
+		return fmt.Errorf("net.mqtt.client client is not setup")
+	}
+
+	if !mc.client.IsConnected() {
+		return fmt.Errorf("net.mqtt.client is not connected")
+	}
+
+	token := mc.client.Publish(payloadMessage.Topic, payloadMessage.QoS, payloadMessage.Retained, payloadMessage.Payload)
+
+	token.Wait()
+
+	return token.Error()
 }
