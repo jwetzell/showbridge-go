@@ -1,0 +1,18 @@
+modules:
+  - id: http
+    type: net.http.server
+    params:
+      port: 3000
+  - id: udp
+    type: net.udp.client
+    params:
+      host: 127.0.0.1
+      port: 8000
+routes:
+  - input: http
+    processors:
+      - type: osc.message.create
+        params:
+          address: "{{.URL.Path}}"
+      - type: osc.message.encode
+    output: udp

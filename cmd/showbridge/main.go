@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/jwetzell/showbridge-go"
 	"github.com/urfave/cli/v3"
+	"sigs.k8s.io/yaml"
 )
 
 func main() {
@@ -18,7 +18,7 @@ func main() {
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "config",
-				Value: "./config.json",
+				Value: "./config.yaml",
 			},
 		},
 		Action: func(ctx context.Context, c *cli.Command) error {
@@ -63,7 +63,7 @@ func readConfig(configPath string) (showbridge.Config, error) {
 
 	config := showbridge.Config{}
 
-	err = json.Unmarshal(configBytes, &config)
+	err = yaml.Unmarshal(configBytes, &config)
 	if err != nil {
 		return showbridge.Config{}, err
 	}
