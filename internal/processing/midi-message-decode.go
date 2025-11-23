@@ -15,7 +15,7 @@ func (mmd *MIDIMessageDecode) Process(ctx context.Context, payload any) (any, er
 	payloadBytes, ok := payload.([]byte)
 
 	if !ok {
-		return nil, fmt.Errorf("mqtt.message.decode processor only accepts a []byte")
+		return nil, fmt.Errorf("midi.message.decode processor only accepts a []byte")
 	}
 
 	payloadMessage := midi.Message(payloadBytes)

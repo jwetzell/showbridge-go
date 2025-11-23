@@ -15,7 +15,7 @@ func (mme *MIDIMessageEncode) Process(ctx context.Context, payload any) (any, er
 	payloadMessage, ok := payload.(midi.Message)
 
 	if !ok {
-		return nil, fmt.Errorf("mqtt.message.encode processor only accepts an mqtt.Message")
+		return nil, fmt.Errorf("midi.message.encode processor only accepts an midi.Message")
 	}
 
 	return payloadMessage.Bytes(), nil
