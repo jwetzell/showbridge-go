@@ -121,7 +121,10 @@ func (r *Router) Run() {
 		moduleInstance.RegisterRouter(r)
 		r.moduleWait.Add(1)
 		go func() {
-			moduleInstance.Run()
+			err := moduleInstance.Run()
+			if err != nil {
+				slog.Error("error encountered running module", "id", moduleInstance.Id(), "error", err)
+			}
 			r.moduleWait.Done()
 		}()
 	}
