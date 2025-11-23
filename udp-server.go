@@ -5,6 +5,7 @@ import (
 	"log"
 	"log/slog"
 	"net"
+	"time"
 )
 
 type UDPServer struct {
@@ -68,8 +69,14 @@ func (us *UDPServer) Run() error {
 			slog.Debug("router context done in module", "id", us.config.Id)
 			return nil
 		default:
+			listener.SetDeadline(time.Now().Add(time.Millisecond * 200))
+
 			numBytes, _, err := listener.ReadFromUDP(buffer)
 			if err != nil {
+				//NOTE(jwetzell) we hit deadline
+				if opErr, ok := err.(*net.OpError); ok && opErr.Timeout() {
+					continue
+				}
 				return err
 			}
 			message := buffer[:numBytes]
