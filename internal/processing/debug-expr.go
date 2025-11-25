@@ -14,9 +14,9 @@ type DebugExpr struct {
 	Program *vm.Program
 }
 
-func (dl *DebugExpr) Process(ctx context.Context, payload any) (any, error) {
+func (de *DebugExpr) Process(ctx context.Context, payload any) (any, error) {
 
-	output, err := expr.Run(dl.Program, payload)
+	output, err := expr.Run(de.Program, payload)
 	if err != nil {
 		return nil, err
 	}
@@ -24,8 +24,8 @@ func (dl *DebugExpr) Process(ctx context.Context, payload any) (any, error) {
 	return output, nil
 }
 
-func (dl *DebugExpr) Type() string {
-	return dl.config.Type
+func (de *DebugExpr) Type() string {
+	return de.config.Type
 }
 
 func init() {
