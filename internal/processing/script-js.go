@@ -7,12 +7,12 @@ import (
 	"modernc.org/quickjs"
 )
 
-type ProgramJS struct {
+type ScriptJS struct {
 	config  ProcessorConfig
 	Program string
 }
 
-func (pj *ProgramJS) Process(ctx context.Context, payload any) (any, error) {
+func (sj *ScriptJS) Process(ctx context.Context, payload any) (any, error) {
 
 	vm, err := quickjs.NewVM()
 
@@ -28,7 +28,7 @@ func (pj *ProgramJS) Process(ctx context.Context, payload any) (any, error) {
 
 	vm.SetProperty(vm.GlobalObject(), payloadAtom, payload)
 
-	output, err := vm.Eval(pj.Program, quickjs.EvalGlobal)
+	output, err := vm.Eval(sj.Program, quickjs.EvalGlobal)
 	if err != nil {
 		return nil, err
 	}
@@ -36,29 +36,29 @@ func (pj *ProgramJS) Process(ctx context.Context, payload any) (any, error) {
 	return output, nil
 }
 
-func (pj *ProgramJS) Type() string {
-	return pj.config.Type
+func (sj *ScriptJS) Type() string {
+	return sj.config.Type
 }
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "program.js",
+		Type: "script.js",
 		New: func(config ProcessorConfig) (Processor, error) {
 			params := config.Params
 
 			program, ok := params["program"]
 
 			if !ok {
-				return nil, fmt.Errorf("program.js requires a program parameter")
+				return nil, fmt.Errorf("script.js requires a program parameter")
 			}
 
 			programString, ok := program.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("program.js program must be a string")
+				return nil, fmt.Errorf("script.js program must be a string")
 			}
 
-			return &ProgramJS{config: config, Program: programString}, nil
+			return &ScriptJS{config: config, Program: programString}, nil
 		},
 	})
 }
