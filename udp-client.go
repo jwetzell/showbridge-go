@@ -76,17 +76,17 @@ func (uc *UDPClient) Run() error {
 
 func (uc *UDPClient) Output(payload any) error {
 
+	payloadBytes, ok := payload.([]byte)
+	if !ok {
+		return fmt.Errorf("net.udp.client is only able to output bytes")
+	}
+
 	client, err := net.DialUDP("udp", nil, uc.addr)
 	if err != nil {
 		return err
 	}
 
 	uc.conn = client
-
-	payloadBytes, ok := payload.([]byte)
-	if !ok {
-		return fmt.Errorf("net.udp.client is only able to output bytes")
-	}
 
 	_, err = uc.conn.Write(payloadBytes)
 
