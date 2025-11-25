@@ -13,7 +13,7 @@ type DebugJS struct {
 	Program string
 }
 
-func (dl *DebugJS) Process(ctx context.Context, payload any) (any, error) {
+func (dj *DebugJS) Process(ctx context.Context, payload any) (any, error) {
 
 	vm, err := quickjs.NewVM()
 
@@ -29,7 +29,7 @@ func (dl *DebugJS) Process(ctx context.Context, payload any) (any, error) {
 
 	vm.SetProperty(vm.GlobalObject(), payloadAtom, payload)
 
-	output, err := vm.Eval(dl.Program, quickjs.EvalGlobal)
+	output, err := vm.Eval(dj.Program, quickjs.EvalGlobal)
 	if err != nil {
 		return nil, err
 	}
@@ -37,8 +37,8 @@ func (dl *DebugJS) Process(ctx context.Context, payload any) (any, error) {
 	return output, nil
 }
 
-func (dl *DebugJS) Type() string {
-	return dl.config.Type
+func (dj *DebugJS) Type() string {
+	return dj.config.Type
 }
 
 func init() {
