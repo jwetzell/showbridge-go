@@ -1,7 +1,6 @@
 package showbridge
 
 import (
-	"context"
 	"fmt"
 	"log/slog"
 	"time"
@@ -31,7 +30,7 @@ func init() {
 				return nil, fmt.Errorf("timer duration must be number")
 			}
 
-			return &Interval{Duration: uint32(durationNum), config: config}, nil
+			return &Timer{Duration: uint32(durationNum), config: config}, nil
 		},
 	})
 }
@@ -48,12 +47,12 @@ func (t *Timer) RegisterRouter(router *Router) {
 	t.router = router
 }
 
-func (t *Timer) Run(ctx context.Context) error {
+func (t *Timer) Run() error {
 	t.timer = time.NewTimer(time.Millisecond * time.Duration(t.Duration))
 	defer t.timer.Stop()
 	for {
 		select {
-		case <-ctx.Done():
+		case <-t.router.Context.Done():
 			t.timer.Stop()
 			slog.Debug("router context done in module", "id", t.config.Id)
 			return nil
