@@ -43,7 +43,7 @@ func init() {
 			expressionString, ok := expression.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("debug.expr url must be a string")
+				return nil, fmt.Errorf("debug.expr expression must be a string")
 			}
 
 			program, err := expr.Compile(expressionString)
