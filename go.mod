@@ -4,6 +4,7 @@ go 1.25.3
 
 require (
 	github.com/eclipse/paho.mqtt.golang v1.5.1
+	github.com/expr-lang/expr v1.17.6
 	github.com/jwetzell/osc-go v0.1.0
 	github.com/jwetzell/psn-go v0.2.0
 	github.com/urfave/cli/v3 v3.6.1
