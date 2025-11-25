@@ -7,13 +7,12 @@ import (
 	"modernc.org/quickjs"
 )
 
-// NOTE(jwetzell): see language definition https://expr-lang.org/docs/language-definition
-type DebugJS struct {
+type ProgramJS struct {
 	config  ProcessorConfig
 	Program string
 }
 
-func (dj *DebugJS) Process(ctx context.Context, payload any) (any, error) {
+func (pj *ProgramJS) Process(ctx context.Context, payload any) (any, error) {
 
 	vm, err := quickjs.NewVM()
 
@@ -29,7 +28,7 @@ func (dj *DebugJS) Process(ctx context.Context, payload any) (any, error) {
 
 	vm.SetProperty(vm.GlobalObject(), payloadAtom, payload)
 
-	output, err := vm.Eval(dj.Program, quickjs.EvalGlobal)
+	output, err := vm.Eval(pj.Program, quickjs.EvalGlobal)
 	if err != nil {
 		return nil, err
 	}
@@ -37,29 +36,29 @@ func (dj *DebugJS) Process(ctx context.Context, payload any) (any, error) {
 	return output, nil
 }
 
-func (dj *DebugJS) Type() string {
-	return dj.config.Type
+func (pj *ProgramJS) Type() string {
+	return pj.config.Type
 }
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "debug.js",
+		Type: "program.js",
 		New: func(config ProcessorConfig) (Processor, error) {
 			params := config.Params
 
 			program, ok := params["program"]
 
 			if !ok {
-				return nil, fmt.Errorf("debug.js requires a program parameter")
+				return nil, fmt.Errorf("program.js requires a program parameter")
 			}
 
 			programString, ok := program.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("debug.js program must be a string")
+				return nil, fmt.Errorf("program.js program must be a string")
 			}
 
-			return &DebugJS{config: config, Program: programString}, nil
+			return &ProgramJS{config: config, Program: programString}, nil
 		},
 	})
 }

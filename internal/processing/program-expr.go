@@ -9,14 +9,14 @@ import (
 )
 
 // NOTE(jwetzell): see language definition https://expr-lang.org/docs/language-definition
-type DebugExpr struct {
+type ProgramExpr struct {
 	config  ProcessorConfig
 	Program *vm.Program
 }
 
-func (de *DebugExpr) Process(ctx context.Context, payload any) (any, error) {
+func (pe *ProgramExpr) Process(ctx context.Context, payload any) (any, error) {
 
-	output, err := expr.Run(de.Program, payload)
+	output, err := expr.Run(pe.Program, payload)
 	if err != nil {
 		return nil, err
 	}
@@ -24,26 +24,26 @@ func (de *DebugExpr) Process(ctx context.Context, payload any) (any, error) {
 	return output, nil
 }
 
-func (de *DebugExpr) Type() string {
-	return de.config.Type
+func (pe *ProgramExpr) Type() string {
+	return pe.config.Type
 }
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "debug.expr",
+		Type: "program.expr",
 		New: func(config ProcessorConfig) (Processor, error) {
 			params := config.Params
 
 			expression, ok := params["expression"]
 
 			if !ok {
-				return nil, fmt.Errorf("debug.expr requires an expression parameter")
+				return nil, fmt.Errorf("program.expr requires an expression parameter")
 			}
 
 			expressionString, ok := expression.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("debug.expr expression must be a string")
+				return nil, fmt.Errorf("program.expr expression must be a string")
 			}
 
 			program, err := expr.Compile(expressionString)
@@ -51,7 +51,7 @@ func init() {
 				return nil, err
 			}
 
-			return &DebugExpr{config: config, Program: program}, nil
+			return &ProgramExpr{config: config, Program: program}, nil
 		},
 	})
 }
