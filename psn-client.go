@@ -26,19 +26,19 @@ func init() {
 	})
 }
 
-func (uc *PSNClient) Id() string {
-	return uc.config.Id
+func (pc *PSNClient) Id() string {
+	return pc.config.Id
 }
 
-func (uc *PSNClient) Type() string {
-	return uc.config.Type
+func (pc *PSNClient) Type() string {
+	return pc.config.Type
 }
 
-func (uc *PSNClient) RegisterRouter(router *Router) {
-	uc.router = router
+func (pc *PSNClient) RegisterRouter(router *Router) {
+	pc.router = router
 }
 
-func (uc *PSNClient) Run() error {
+func (pc *PSNClient) Run() error {
 
 	addr, err := net.ResolveUDPAddr("udp", "236.10.10.10:56565")
 	if err != nil {
@@ -51,19 +51,19 @@ func (uc *PSNClient) Run() error {
 	}
 	defer client.Close()
 
-	uc.conn = client
+	pc.conn = client
 
 	buffer := make([]byte, 2048)
 	for {
 		select {
-		case <-uc.router.Context.Done():
+		case <-pc.router.Context.Done():
 			// TODO(jwetzell): cleanup?
-			slog.Debug("router context done in module", "id", uc.config.Id)
+			slog.Debug("router context done in module", "id", pc.config.Id)
 			return nil
 		default:
-			uc.conn.SetDeadline(time.Now().Add(time.Millisecond * 200))
+			pc.conn.SetDeadline(time.Now().Add(time.Millisecond * 200))
 
-			numBytes, _, err := uc.conn.ReadFromUDP(buffer)
+			numBytes, _, err := pc.conn.ReadFromUDP(buffer)
 			if err != nil {
 				//NOTE(jwetzell) we hit deadline
 				if opErr, ok := err.(*net.OpError); ok && opErr.Timeout() {
@@ -74,23 +74,23 @@ func (uc *PSNClient) Run() error {
 
 			if numBytes > 0 {
 				message := buffer[:numBytes]
-				err := uc.decoder.Decode(message)
+				err := pc.decoder.Decode(message)
 				if err != nil {
-					slog.Error("net.psn.client problem decoding psn traffic", "id", uc.config.Id, "error", err)
+					slog.Error("net.psn.client problem decoding psn traffic", "id", pc.config.Id, "error", err)
 				}
 
-				if uc.router != nil {
-					for _, tracker := range uc.decoder.Trackers {
-						uc.router.HandleInput(uc.config.Id, tracker)
+				if pc.router != nil {
+					for _, tracker := range pc.decoder.Trackers {
+						pc.router.HandleInput(pc.config.Id, tracker)
 					}
 				} else {
-					slog.Error("net.psn.client has no router", "id", uc.config.Id)
+					slog.Error("net.psn.client has no router", "id", pc.config.Id)
 				}
 			}
 		}
 	}
 }
 
-func (uc *PSNClient) Output(payload any) error {
+func (pc *PSNClient) Output(payload any) error {
 	return fmt.Errorf("net.psn.client output is not implemented")
 }
