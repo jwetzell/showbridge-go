@@ -10,6 +10,7 @@ type Interval struct {
 	config   ModuleConfig
 	Duration uint32
 	router   *Router
+	ticker   *time.Ticker
 }
 
 func init() {
@@ -48,11 +49,11 @@ func (i *Interval) RegisterRouter(router *Router) {
 
 func (i *Interval) Run() error {
 	ticker := time.NewTicker(time.Millisecond * time.Duration(i.Duration))
+	i.ticker = ticker
 	defer ticker.Stop()
 	for {
 		select {
 		case <-i.router.Context.Done():
-			ticker.Stop()
 			slog.Debug("router context done in module", "id", i.config.Id)
 			return nil
 		case t := <-ticker.C:
@@ -65,5 +66,6 @@ func (i *Interval) Run() error {
 }
 
 func (i *Interval) Output(payload any) error {
-	return fmt.Errorf("interval output is not implemented")
+	i.ticker.Reset(time.Millisecond * time.Duration(i.Duration))
+	return nil
 }
