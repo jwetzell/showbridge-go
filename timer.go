@@ -65,5 +65,6 @@ func (t *Timer) Run() error {
 }
 
 func (t *Timer) Output(payload any) error {
-	return fmt.Errorf("timer output is not implemented")
+	t.timer.Reset(time.Millisecond * time.Duration(t.Duration))
+	return nil
 }
