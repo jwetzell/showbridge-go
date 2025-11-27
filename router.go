@@ -163,5 +163,5 @@ func (r *Router) HandleOutput(destinationId string, payload any) error {
 			return moduleInstance.Output(payload)
 		}
 	}
-	return fmt.Errorf("no module instance found for destination %s", destinationId)
+	return fmt.Errorf("router could not find module instance for destination %s", destinationId)
 }
