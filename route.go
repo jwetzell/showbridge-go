@@ -59,9 +59,9 @@ func (r *Route) HandleInput(sourceId string, payload any) error {
 			return nil
 		}
 	}
-	return r.HandleOutput(payload)
+	return r.HandleOutput(sourceId, payload)
 }
 
-func (r *Route) HandleOutput(payload any) error {
-	return r.router.HandleOutput(r.Output, payload)
+func (r *Route) HandleOutput(sourceId string, payload any) error {
+	return r.router.HandleOutput(sourceId, r.Output, payload)
 }
