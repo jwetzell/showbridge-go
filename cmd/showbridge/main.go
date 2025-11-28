@@ -37,7 +37,7 @@ func main() {
 			}
 
 			for _, routeError := range routeErrors {
-				slog.Error("problem initializing module", "index", routeError.Index, "error", routeError.Error)
+				slog.Error("problem initializing route", "index", routeError.Index, "error", routeError.Error)
 			}
 			router.Run()
 			return nil
