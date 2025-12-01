@@ -24,7 +24,7 @@ type Router struct {
 func NewRouter(ctx context.Context, config Config) (*Router, []ModuleError, []RouteError) {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelDebug,
+		Level: slog.LevelInfo,
 	}))
 
 	slog.SetDefault(logger)
@@ -117,6 +117,7 @@ func NewRouter(ctx context.Context, config Config) (*Router, []ModuleError, []Ro
 }
 
 func (r *Router) Run() {
+	slog.Info("running router")
 	for _, moduleInstance := range r.ModuleInstances {
 		moduleInstance.RegisterRouter(r)
 		r.moduleWait.Add(1)
@@ -130,7 +131,7 @@ func (r *Router) Run() {
 	}
 	<-r.Context.Done()
 	r.moduleWait.Wait()
-	slog.Info("router context done")
+	slog.Info("router done")
 }
 
 func (r *Router) Stop() {
