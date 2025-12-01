@@ -7,7 +7,7 @@ require (
 	github.com/expr-lang/expr v1.17.6
 	github.com/jwetzell/free-d-go v0.1.0
 	github.com/jwetzell/osc-go v0.1.0
-	github.com/jwetzell/psn-go v0.2.0
+	github.com/jwetzell/psn-go v0.2.1
 	github.com/urfave/cli/v3 v3.6.1
 	gitlab.com/gomidi/midi/v2 v2.3.16
 	modernc.org/quickjs v0.17.0
