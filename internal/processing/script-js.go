@@ -2,6 +2,7 @@ package processing
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"modernc.org/quickjs"
@@ -28,9 +29,28 @@ func (sj *ScriptJS) Process(ctx context.Context, payload any) (any, error) {
 
 	vm.SetProperty(vm.GlobalObject(), payloadAtom, payload)
 
-	output, err := vm.Eval(sj.Program, quickjs.EvalGlobal)
+	_, err = vm.Eval(sj.Program, quickjs.EvalGlobal)
+
+	output, err := vm.GetProperty(vm.GlobalObject(), payloadAtom)
+
 	if err != nil {
 		return nil, err
+	}
+
+	// NOTE(jwetzell): turn undefined into nil
+	_, ok := output.(quickjs.Undefined)
+
+	if ok {
+		return nil, nil
+	}
+
+	// NOTE(jwetzell): turn object into map[string]interface{}
+	outputObject, ok := output.(*quickjs.Object)
+
+	if ok {
+		var outputMap map[string]interface{}
+		err := json.Unmarshal([]byte(outputObject.String()), &outputMap)
+		return outputMap, err
 	}
 
 	return output, nil
