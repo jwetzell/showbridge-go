@@ -28,13 +28,13 @@ func TestGoodStringDecode(t *testing.T) {
 
 			gotString, ok := got.(string)
 			if !ok {
-				t.Errorf("string decode returned a %T payload: %s", got, got)
+				t.Errorf("string.decode returned a %T payload: %s", got, got)
 			}
 			if err != nil {
-				t.Errorf("string decode failed: %s", err)
+				t.Errorf("string.decode failed: %s", err)
 			}
 			if gotString != test.expected {
-				t.Errorf("String decode got %s, expected %s", got, test.expected)
+				t.Errorf("string.decode got %s, expected %s", got, test.expected)
 			}
 		})
 	}
