@@ -1,0 +1,11 @@
+framing:
+  - changed-files:
+      - any-glob-to-any-file: 'internal/framing/**'
+
+processing:
+  - changed-files:
+      - any-glob-to-any-file: 'internal/processing/**'
+
+cli:
+  - changed-files:
+      - any-glob-to-any-file: 'cmd/showbridge/**'
