@@ -31,6 +31,10 @@ func (sj *ScriptJS) Process(ctx context.Context, payload any) (any, error) {
 
 	_, err = vm.Eval(sj.Program, quickjs.EvalGlobal)
 
+	if err != nil {
+		return nil, err
+	}
+
 	output, err := vm.GetProperty(vm.GlobalObject(), payloadAtom)
 
 	if err != nil {
