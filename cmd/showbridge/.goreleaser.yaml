@@ -17,7 +17,7 @@ builds:
 
 archives:
   - formats: [tar.gz]
-    name_template: "showbridge_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    name_template: "showbridge_{{ .Version }}_{{ .Os }}-{{ .Arch }}"
     format_overrides:
       - goos: windows
         formats: [zip]
@@ -31,5 +31,4 @@ changelog:
 
 release:
   draft: true
-  use_existing_draft: true
-  replace_existing_artifacts: true
+  replace_existing_draft: true
