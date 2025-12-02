@@ -1,0 +1,19 @@
+changelog:
+  exclude:
+    authors:
+      - dependabot
+    labels:
+      - dependencies
+  categories:
+    - title: Framing 🖼️
+      labels:
+        - framing
+    - title: Processing 🏭
+      labels:
+        - processing
+    - title: CLI ⌨️
+      labels:
+        - cmd
+    - title: Other Changes
+      labels:
+        - '*'
