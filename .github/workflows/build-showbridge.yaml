@@ -16,8 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install alsa
-        run: sudo apt install -y libasound2-dev
-        
+        run: sudo apt-get install -y libasound2-dev
+
       - uses: actions/checkout@v6
       - uses: actions/setup-go@v6
         with:
