@@ -1,0 +1,31 @@
+name: showbridge release
+
+on:
+  push:
+    tags:
+      - "showbridge/*"
+
+permissions:
+  contents: write
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+      - name: release nightly
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          workdir: cmd/showbridge
+          distribution: goreleaser
+          version: "v2.13.0"
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
