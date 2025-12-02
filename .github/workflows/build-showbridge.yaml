@@ -21,8 +21,9 @@ jobs:
         uses: crazy-max/ghaction-xgo@v3
         with:
           xgo_version: latest
-          go_version: 1.25.3
+          go_version: 1.24
           dest: build
+          pkg: cmd/showbridge
           prefix: showbridge
           targets: windows/amd64,linux/amd64,linux/arm64,darwin/arm64,darwin/amd64
           v: true
