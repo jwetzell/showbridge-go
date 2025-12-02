@@ -18,6 +18,8 @@ Simple protocol router _/s_
   - server
 - [MQTT](https://mqtt.org/)
   - client
+- [NATS](https://nats.io/)
+  - client
 - [PosiStageNet](https://posistage.net/)
   - client
 - MIDI
