@@ -12,23 +12,14 @@ permissions:
   contents: read
 
 jobs:
-  xgo:
+  build-linux:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: Build
-        uses: crazy-max/ghaction-xgo@v3
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
         with:
-          xgo_version: latest
-          go_version: 1.24
-          dest: build
-          pkg: cmd/showbridge
-          prefix: showbridge
-          targets: windows/amd64,linux/amd64,linux/arm64,darwin/arm64,darwin/amd64
-          v: true
-          x: false
-          race: false
-          ldflags: -s -w
-          buildmode: default
-          trimpath: true
+          go-version-file: 'go.mod'
+      - name: mod tidy
+        run: go mod tidy
+      - name: build
+        run: CGO_ENABLED=1 go build -v -o dist/showbridge-linux ./cmd/showbridge
