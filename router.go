@@ -161,7 +161,6 @@ func (r *Router) HandleInput(sourceId string, payload any) []RoutingError {
 func (r *Router) HandleOutput(sourceId string, destinationId string, payload any) error {
 	for _, moduleInstance := range r.ModuleInstances {
 		if moduleInstance.Id() == destinationId {
-			slog.Debug("routing", "source", sourceId, "destination", destinationId, "payload", payload)
 			return moduleInstance.Output(payload)
 		}
 	}
