@@ -3,7 +3,7 @@ name: showbridge release
 on:
   push:
     tags:
-      - "showbridge/*"
+      - "*"
 
 permissions:
   contents: write
@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
-      - name: release nightly
+      - name: release
         uses: goreleaser/goreleaser-action@v6
         with:
           workdir: cmd/showbridge
