@@ -12,6 +12,7 @@ import (
 
 type TCPServer struct {
 	config        ModuleConfig
+	Ip            string
 	Port          uint16
 	framingMethod string
 	router        *Router
@@ -46,7 +47,20 @@ func init() {
 				return nil, fmt.Errorf("tcp framing method must be a string")
 			}
 
-			return &TCPServer{framingMethod: framingMethodString, Port: uint16(portNum), config: config, quit: make(chan interface{})}, nil
+			ipString := "0.0.0.0"
+
+			ip, ok := params["ip"]
+			if ok {
+
+				specificIpString, ok := ip.(string)
+
+				if !ok {
+					return nil, fmt.Errorf("tcp ip method must be a string")
+				}
+				ipString = specificIpString
+			}
+
+			return &TCPServer{framingMethod: framingMethodString, Port: uint16(portNum), Ip: ipString, config: config, quit: make(chan interface{})}, nil
 		},
 	})
 }
@@ -116,7 +130,7 @@ ClientRead:
 }
 
 func (ts *TCPServer) Run() error {
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", ts.Port))
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", ts.Ip, ts.Port))
 	if err != nil {
 		return err
 	}

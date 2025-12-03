@@ -9,6 +9,7 @@ import (
 )
 
 type UDPServer struct {
+	Ip     string
 	Port   uint16
 	config ModuleConfig
 	router *Router
@@ -30,7 +31,20 @@ func init() {
 				return nil, fmt.Errorf("net.udp.server port must be uint16")
 			}
 
-			return &UDPServer{Port: uint16(portNum), config: config}, nil
+			ipString := "0.0.0.0"
+
+			ip, ok := params["ip"]
+			if ok {
+
+				specificIpString, ok := ip.(string)
+
+				if !ok {
+					return nil, fmt.Errorf("tcp ip method must be a string")
+				}
+				ipString = specificIpString
+			}
+
+			return &UDPServer{Ip: ipString, Port: uint16(portNum), config: config}, nil
 		},
 	})
 }
@@ -49,7 +63,7 @@ func (us *UDPServer) RegisterRouter(router *Router) {
 
 func (us *UDPServer) Run() error {
 
-	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf(":%d", us.Port))
+	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", us.Ip, us.Port))
 	if err != nil {
 		log.Fatalf("error resolving UDP address: %v", err)
 	}
