@@ -21,13 +21,13 @@ func init() {
 
 			duration, ok := params["duration"]
 			if !ok {
-				return nil, fmt.Errorf("timer requires a duration parameter")
+				return nil, fmt.Errorf("gen.timer requires a duration parameter")
 			}
 
 			durationNum, ok := duration.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("timer duration must be number")
+				return nil, fmt.Errorf("gen.timer duration must be a number")
 			}
 
 			return &Timer{Duration: uint32(durationNum), config: config}, nil

@@ -29,7 +29,7 @@ func init() {
 			hostString, ok := host.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("net.udp.client host must be uint16")
+				return nil, fmt.Errorf("net.udp.client host must be a string")
 			}
 
 			port, ok := params["port"]

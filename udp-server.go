@@ -28,7 +28,7 @@ func init() {
 			portNum, ok := port.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("net.udp.server port must be uint16")
+				return nil, fmt.Errorf("net.udp.server port must be a number")
 			}
 
 			ipString := "0.0.0.0"
@@ -39,7 +39,7 @@ func init() {
 				specificIpString, ok := ip.(string)
 
 				if !ok {
-					return nil, fmt.Errorf("tcp ip method must be a string")
+					return nil, fmt.Errorf("net.udp.server ip must be a string")
 				}
 				ipString = specificIpString
 			}
@@ -63,6 +63,7 @@ func (us *UDPServer) RegisterRouter(router *Router) {
 
 func (us *UDPServer) Run() error {
 
+	// TODO(jwetzell): move this to init
 	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", us.Ip, us.Port))
 	if err != nil {
 		log.Fatalf("error resolving UDP address: %v", err)

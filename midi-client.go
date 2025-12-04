@@ -27,7 +27,7 @@ func init() {
 			input, ok := params["input"]
 
 			if !ok {
-				return nil, fmt.Errorf("net.mqtt.client requires a input parameter")
+				return nil, fmt.Errorf("misc.midi.client requires a input parameter")
 			}
 
 			inputString, ok := input.(string)
@@ -39,7 +39,7 @@ func init() {
 			output, ok := params["output"]
 
 			if !ok {
-				return nil, fmt.Errorf("net.mqtt.client requires a output parameter")
+				return nil, fmt.Errorf("misc.midi.client requires a output parameter")
 			}
 
 			outputString, ok := output.(string)

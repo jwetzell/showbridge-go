@@ -31,7 +31,7 @@ func init() {
 			hostString, ok := host.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("net.tcp.client host must be uint16")
+				return nil, fmt.Errorf("net.tcp.client host must be string")
 			}
 
 			port, ok := params["port"]
@@ -42,7 +42,7 @@ func init() {
 			portNum, ok := port.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("net.tcp.client port must be uint16")
+				return nil, fmt.Errorf("net.tcp.client port must be a number")
 			}
 
 			addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", hostString, uint16(portNum)))
@@ -58,7 +58,7 @@ func init() {
 			framingMethodString, ok := framingMethod.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("tcp framing method must be a string")
+				return nil, fmt.Errorf("net.tcp.client framing method must be a string")
 			}
 
 			var framer framing.Framer

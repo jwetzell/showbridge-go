@@ -21,13 +21,13 @@ func init() {
 
 			duration, ok := params["duration"]
 			if !ok {
-				return nil, fmt.Errorf("interval requires a duration parameter")
+				return nil, fmt.Errorf("gen.interval requires a duration parameter")
 			}
 
 			durationNum, ok := duration.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("interval duration must be number")
+				return nil, fmt.Errorf("gen.interval duration must be number")
 			}
 
 			return &Interval{Duration: uint32(durationNum), config: config}, nil
@@ -51,14 +51,15 @@ func (i *Interval) Run() error {
 	ticker := time.NewTicker(time.Millisecond * time.Duration(i.Duration))
 	i.ticker = ticker
 	defer ticker.Stop()
+
 	for {
 		select {
 		case <-i.router.Context.Done():
 			slog.Debug("router context done in module", "id", i.config.Id)
 			return nil
-		case t := <-ticker.C:
+		case <-ticker.C:
 			if i.router != nil {
-				i.router.HandleInput(i.config.Id, t)
+				i.router.HandleInput(i.config.Id, time.Now())
 			}
 		}
 	}

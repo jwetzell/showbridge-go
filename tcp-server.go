@@ -33,7 +33,7 @@ func init() {
 			portNum, ok := port.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("net.tcp.server port must be uint16")
+				return nil, fmt.Errorf("net.tcp.server port must be a number")
 			}
 
 			framingMethod, ok := params["framing"]
@@ -44,7 +44,7 @@ func init() {
 			framingMethodString, ok := framingMethod.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("tcp framing method must be a string")
+				return nil, fmt.Errorf("net.tcp.server framing method must be a string")
 			}
 
 			ipString := "0.0.0.0"
@@ -55,7 +55,7 @@ func init() {
 				specificIpString, ok := ip.(string)
 
 				if !ok {
-					return nil, fmt.Errorf("tcp ip method must be a string")
+					return nil, fmt.Errorf("net.tcp.server ip must be a string")
 				}
 				ipString = specificIpString
 			}
@@ -120,7 +120,7 @@ ClientRead:
 						if ts.router != nil {
 							ts.router.HandleInput(ts.config.Id, message)
 						} else {
-							slog.Error("tcp-server has no router", "id", ts.config.Id)
+							slog.Error("net.tcp.server has no router", "id", ts.config.Id)
 						}
 					}
 				}
@@ -130,6 +130,7 @@ ClientRead:
 }
 
 func (ts *TCPServer) Run() error {
+	// TODO(jwetzell): switch to net.ListenTCP and move addr resolution to init
 	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", ts.Ip, ts.Port))
 	if err != nil {
 		return err

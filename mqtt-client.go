@@ -31,7 +31,7 @@ func init() {
 			brokerString, ok := broker.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("net.mqtt.client host must be string")
+				return nil, fmt.Errorf("net.mqtt.client broker must be string")
 			}
 
 			topic, ok := params["topic"]
@@ -43,7 +43,7 @@ func init() {
 			topicString, ok := topic.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("net.mqtt.client host must be string")
+				return nil, fmt.Errorf("net.mqtt.client topic must be string")
 			}
 
 			clientId, ok := params["clientId"]
@@ -55,7 +55,7 @@ func init() {
 			clientIdString, ok := clientId.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("net.mqtt.client host must be string")
+				return nil, fmt.Errorf("net.mqtt.client clientId must be string")
 			}
 
 			return &MQTTClient{config: config, Broker: brokerString, Topic: topicString, ClientID: clientIdString}, nil
@@ -108,7 +108,7 @@ func (mc *MQTTClient) Output(payload any) error {
 	payloadMessage, ok := payload.(processing.MQTTMessage)
 
 	if !ok {
-		return fmt.Errorf("net.mqtt.client is only able to output MQTTMessage")
+		return fmt.Errorf("net.mqtt.client is only able to output a MQTTMessage")
 	}
 
 	if mc.client == nil {
