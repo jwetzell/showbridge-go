@@ -11,11 +11,10 @@ import (
 
 type TCPClient struct {
 	config ModuleConfig
-	Host   string
-	Port   uint16
 	framer framing.Framer
 	conn   net.Conn
 	router *Router
+	Addr   *net.TCPAddr
 }
 
 func init() {
@@ -46,6 +45,11 @@ func init() {
 				return nil, fmt.Errorf("net.tcp.client port must be uint16")
 			}
 
+			addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", hostString, uint16(portNum)))
+			if err != nil {
+				return nil, err
+			}
+
 			framingMethod, ok := params["framing"]
 			if !ok {
 				return nil, fmt.Errorf("net.tcp.client requires a framing method")
@@ -72,7 +76,7 @@ func init() {
 				return nil, fmt.Errorf("unknown framing method: %s", framingMethodString)
 			}
 
-			return &TCPClient{framer: framer, Host: hostString, Port: uint16(portNum), config: config}, nil
+			return &TCPClient{framer: framer, Addr: addr, config: config}, nil
 		},
 	})
 }
@@ -90,10 +94,6 @@ func (tc *TCPClient) RegisterRouter(router *Router) {
 }
 
 func (tc *TCPClient) Run() error {
-	addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", tc.Host, tc.Port))
-	if err != nil {
-		return err
-	}
 
 	// TODO(jwetzell): shutdown with router.Context properly
 	go func() {
@@ -105,7 +105,7 @@ func (tc *TCPClient) Run() error {
 	}()
 
 	for {
-		client, err := net.DialTCP("tcp", nil, addr)
+		err := tc.SetupConn()
 		if err != nil {
 			if tc.router.Context.Err() != nil {
 				slog.Debug("router context done in module", "id", tc.config.Id)
@@ -115,8 +115,6 @@ func (tc *TCPClient) Run() error {
 			time.Sleep(time.Second * 2)
 			continue
 		}
-
-		tc.conn = client
 
 		buffer := make([]byte, 1024)
 		select {
@@ -131,7 +129,7 @@ func (tc *TCPClient) Run() error {
 					slog.Debug("router context done in module", "id", tc.config.Id)
 					return nil
 				default:
-					byteCount, err := client.Read(buffer)
+					byteCount, err := tc.conn.Read(buffer)
 
 					if err != nil {
 						tc.framer.Clear()
@@ -151,22 +149,29 @@ func (tc *TCPClient) Run() error {
 						}
 					}
 				}
-
 			}
 		}
-
 	}
+}
 
+func (tc *TCPClient) SetupConn() error {
+	client, err := net.DialTCP("tcp", nil, tc.Addr)
+	tc.conn = client
+	return err
 }
 
 func (tc *TCPClient) Output(payload any) error {
-	if tc.conn != nil {
-		payloadBytes, ok := payload.([]byte)
-		if !ok {
-			return fmt.Errorf("net.tcp.client is only able to output bytes")
+	// NOTE(jwetzell): not sure how this would occur but
+	if tc.conn == nil {
+		err := tc.SetupConn()
+		if err != nil {
+			return err
 		}
-		_, err := tc.conn.Write(tc.framer.Encode(payloadBytes))
-		return err
 	}
-	return nil
+	payloadBytes, ok := payload.([]byte)
+	if !ok {
+		return fmt.Errorf("net.tcp.client is only able to output bytes")
+	}
+	_, err := tc.conn.Write(tc.framer.Encode(payloadBytes))
+	return err
 }
