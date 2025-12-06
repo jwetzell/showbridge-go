@@ -49,19 +49,10 @@ func init() {
 				return nil, fmt.Errorf("misc.serial.client framing method must be a string")
 			}
 
-			var framer framing.Framer
+			framer, err := framing.GetFramer(framingMethodString)
 
-			switch framingMethodString {
-			case "CR":
-				framer = framing.NewByteSeparatorFramer([]byte{'\r'})
-			case "LF":
-				framer = framing.NewByteSeparatorFramer([]byte{'\n'})
-			case "CRLF":
-				framer = framing.NewByteSeparatorFramer([]byte{'\r', '\n'})
-			case "SLIP":
-				framer = framing.NewSlipFramer()
-			default:
-				return nil, fmt.Errorf("unknown framing method: %s", framingMethodString)
+			if err != nil {
+				return nil, err
 			}
 
 			buadRate, ok := params["baudRate"]

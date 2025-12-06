@@ -16,7 +16,7 @@ import (
 type TCPServer struct {
 	config        ModuleConfig
 	Addr          *net.TCPAddr
-	FramingMethod string
+	Framer        framing.Framer
 	router        *Router
 	quit          chan interface{}
 	wg            sync.WaitGroup
@@ -51,6 +51,12 @@ func init() {
 				return nil, fmt.Errorf("net.tcp.server framing method must be a string")
 			}
 
+			framer, err := framing.GetFramer(framingMethodString)
+
+			if err != nil {
+				return nil, err
+			}
+
 			ipString := "0.0.0.0"
 
 			ip, ok := params["ip"]
@@ -69,7 +75,7 @@ func init() {
 				return nil, err
 			}
 
-			return &TCPServer{FramingMethod: framingMethodString, Addr: addr, config: config, quit: make(chan interface{})}, nil
+			return &TCPServer{Framer: framer, Addr: addr, config: config, quit: make(chan interface{})}, nil
 		},
 	})
 }
@@ -92,18 +98,6 @@ func (ts *TCPServer) handleClient(client *net.TCPConn) {
 	ts.connectionsMu.Unlock()
 	slog.Debug("net.tcp.server connection accepted", "id", ts.config.Id, "remoteAddr", client.RemoteAddr().String())
 	defer client.Close()
-	var framer framing.Framer
-
-	switch ts.FramingMethod {
-	case "LF":
-		framer = framing.NewByteSeparatorFramer([]byte{'\n'})
-	case "CR":
-		framer = framing.NewByteSeparatorFramer([]byte{'\r'})
-	case "CRLF":
-		framer = framing.NewByteSeparatorFramer([]byte{'\r', '\n'})
-	case "SLIP":
-		framer = framing.NewSlipFramer()
-	}
 
 	buffer := make([]byte, 1024)
 ClientRead:
@@ -147,9 +141,9 @@ ClientRead:
 				}
 				return
 			}
-			if framer != nil {
+			if ts.Framer != nil {
 				if byteCount > 0 {
-					messages := framer.Decode(buffer[0:byteCount])
+					messages := ts.Framer.Decode(buffer[0:byteCount])
 					for _, message := range messages {
 						if ts.router != nil {
 							ts.router.HandleInput(ts.config.Id, message)
