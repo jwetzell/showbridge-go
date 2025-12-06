@@ -12,7 +12,7 @@ import (
 type TCPClient struct {
 	config ModuleConfig
 	framer framing.Framer
-	conn   net.Conn
+	conn   *net.TCPConn
 	router *Router
 	Addr   *net.TCPAddr
 }
