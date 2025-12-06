@@ -94,9 +94,6 @@ func (um *UDPMulticast) Run() error {
 
 			if numBytes > 0 {
 				message := buffer[:numBytes]
-				if err != nil {
-					slog.Error("net.udp.multicast problem decoding psn traffic", "id", um.config.Id, "error", err)
-				}
 
 				if um.router != nil {
 					um.router.HandleInput(um.config.Id, message)
