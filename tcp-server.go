@@ -15,13 +15,12 @@ import (
 
 type TCPServer struct {
 	config        ModuleConfig
-	Ip            string
-	Port          uint16
-	framingMethod string
+	Addr          *net.TCPAddr
+	FramingMethod string
 	router        *Router
 	quit          chan interface{}
 	wg            sync.WaitGroup
-	connections   []net.Conn
+	connections   []*net.TCPConn
 	connectionsMu sync.RWMutex
 }
 
@@ -65,7 +64,12 @@ func init() {
 				ipString = specificIpString
 			}
 
-			return &TCPServer{framingMethod: framingMethodString, Port: uint16(portNum), Ip: ipString, config: config, quit: make(chan interface{})}, nil
+			addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", ipString, uint16(portNum)))
+			if err != nil {
+				return nil, err
+			}
+
+			return &TCPServer{FramingMethod: framingMethodString, Addr: addr, config: config, quit: make(chan interface{})}, nil
 		},
 	})
 }
@@ -82,7 +86,7 @@ func (ts *TCPServer) RegisterRouter(router *Router) {
 	ts.router = router
 }
 
-func (ts *TCPServer) handleClient(client net.Conn) {
+func (ts *TCPServer) handleClient(client *net.TCPConn) {
 	ts.connectionsMu.Lock()
 	ts.connections = append(ts.connections, client)
 	ts.connectionsMu.Unlock()
@@ -90,7 +94,7 @@ func (ts *TCPServer) handleClient(client net.Conn) {
 	defer client.Close()
 	var framer framing.Framer
 
-	switch ts.framingMethod {
+	switch ts.FramingMethod {
 	case "LF":
 		framer = framing.NewByteSeparatorFramer([]byte{'\n'})
 	case "CR":
@@ -160,8 +164,7 @@ ClientRead:
 }
 
 func (ts *TCPServer) Run() error {
-	// TODO(jwetzell): switch to net.ListenTCP and move addr resolution to init
-	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", ts.Ip, ts.Port))
+	listener, err := net.ListenTCP("tcp", ts.Addr)
 	if err != nil {
 		return err
 	}
@@ -176,7 +179,7 @@ func (ts *TCPServer) Run() error {
 
 AcceptLoop:
 	for {
-		conn, err := listener.Accept()
+		conn, err := listener.AcceptTCP()
 		if err != nil {
 			select {
 			case <-ts.quit:
