@@ -1,0 +1,113 @@
+package showbridge
+
+import (
+	"fmt"
+	"log/slog"
+	"net"
+	"time"
+)
+
+type UDPMulticast struct {
+	config ModuleConfig
+	conn   *net.UDPConn
+	router *Router
+	Addr   *net.UDPAddr
+}
+
+func init() {
+	RegisterModule(ModuleRegistration{
+		Type: "net.udp.multicast",
+		New: func(config ModuleConfig) (Module, error) {
+			params := config.Params
+			ip, ok := params["ip"]
+
+			if !ok {
+				return nil, fmt.Errorf("net.udp.client requires am ip parameter")
+			}
+
+			ipString, ok := ip.(string)
+
+			if !ok {
+				return nil, fmt.Errorf("net.udp.client ip must be a string")
+			}
+
+			port, ok := params["port"]
+			if !ok {
+				return nil, fmt.Errorf("net.udp.client requires a port parameter")
+			}
+
+			portNum, ok := port.(float64)
+
+			if !ok {
+				return nil, fmt.Errorf("net.udp.client port must be a number")
+			}
+
+			addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", ipString, uint16(portNum)))
+			if err != nil {
+				return nil, err
+			}
+			return &UDPMulticast{config: config, Addr: addr}, nil
+		},
+	})
+}
+
+func (um *UDPMulticast) Id() string {
+	return um.config.Id
+}
+
+func (um *UDPMulticast) Type() string {
+	return um.config.Type
+}
+
+func (um *UDPMulticast) RegisterRouter(router *Router) {
+	um.router = router
+}
+
+func (um *UDPMulticast) Run() error {
+
+	client, err := net.ListenMulticastUDP("udp", nil, um.Addr)
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	um.conn = client
+
+	buffer := make([]byte, 2048)
+	for {
+		select {
+		case <-um.router.Context.Done():
+			// TODO(jwetzell): cleanup?
+			slog.Debug("router context done in module", "id", um.config.Id)
+			return nil
+		default:
+			um.conn.SetDeadline(time.Now().Add(time.Millisecond * 200))
+
+			numBytes, _, err := um.conn.ReadFromUDP(buffer)
+			if err != nil {
+				//NOTE(jwetzell) we hit deadline
+				if opErr, ok := err.(*net.OpError); ok && opErr.Timeout() {
+					continue
+				}
+				return err
+			}
+
+			if numBytes > 0 {
+				message := buffer[:numBytes]
+				if err != nil {
+					slog.Error("net.udp.multicast problem decoding psn traffic", "id", um.config.Id, "error", err)
+				}
+
+				if um.router != nil {
+					um.router.HandleInput(um.config.Id, message)
+				} else {
+					slog.Error("net.udp.multicast has no router", "id", um.config.Id)
+				}
+			}
+		}
+	}
+}
+
+func (um *UDPMulticast) Output(payload any) error {
+	return fmt.Errorf("net.udp.multicast output is not implemented")
+}
