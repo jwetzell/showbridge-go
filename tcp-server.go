@@ -112,12 +112,11 @@ ClientRead:
 			byteCount, err := client.Read(buffer)
 
 			if err != nil {
-				//NOTE(jwetzell) we hit deadline
 				if opErr, ok := err.(*net.OpError); ok {
+					//NOTE(jwetzell) we hit deadline
 					if opErr.Timeout() {
 						continue ClientRead
 					}
-					fmt.Println(opErr.Err)
 					if errors.Is(opErr, syscall.ECONNRESET) {
 						ts.connectionsMu.Lock()
 						for i := 0; i < len(ts.connections); i++ {
@@ -126,7 +125,7 @@ ClientRead:
 								break
 							}
 						}
-						slog.Debug("connection closed", "id", ts.config.Id, "remoteAddr", client.RemoteAddr().String())
+						slog.Debug("connection reset", "id", ts.config.Id, "remoteAddr", client.RemoteAddr().String())
 						ts.connectionsMu.Unlock()
 					}
 				}
@@ -139,7 +138,7 @@ ClientRead:
 							break
 						}
 					}
-					slog.Debug("connection closed", "id", ts.config.Id, "remoteAddr", client.RemoteAddr().String())
+					slog.Debug("stream ended", "id", ts.config.Id, "remoteAddr", client.RemoteAddr().String())
 					ts.connectionsMu.Unlock()
 				}
 				return
