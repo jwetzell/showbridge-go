@@ -10,7 +10,7 @@ type UDPClient struct {
 	config ModuleConfig
 	Host   string
 	Port   uint16
-	conn   net.Conn
+	conn   *net.UDPConn
 	router *Router
 	addr   *net.UDPAddr
 }
@@ -71,6 +71,9 @@ func (uc *UDPClient) Run() error {
 
 	<-uc.router.Context.Done()
 	slog.Debug("router context done in module", "id", uc.config.Id)
+	if uc.conn != nil {
+		uc.conn.Close()
+	}
 	return nil
 }
 
@@ -81,6 +84,7 @@ func (uc *UDPClient) Output(payload any) error {
 		return fmt.Errorf("net.udp.client is only able to output bytes")
 	}
 
+	// TODO(jwetzell): reuse connection or setup new one when necessary
 	client, err := net.DialUDP("udp", nil, uc.addr)
 	if err != nil {
 		return err
