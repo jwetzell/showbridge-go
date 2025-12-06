@@ -86,7 +86,7 @@ func (ts *TCPServer) handleClient(client net.Conn) {
 	ts.connectionsMu.Lock()
 	ts.connections = append(ts.connections, client)
 	ts.connectionsMu.Unlock()
-	slog.Debug("connection accepted", "id", ts.config.Id, "remoteAddr", client.RemoteAddr().String())
+	slog.Debug("net.tcp.server connection accepted", "id", ts.config.Id, "remoteAddr", client.RemoteAddr().String())
 	defer client.Close()
 	var framer framing.Framer
 
@@ -125,7 +125,7 @@ ClientRead:
 								break
 							}
 						}
-						slog.Debug("connection reset", "id", ts.config.Id, "remoteAddr", client.RemoteAddr().String())
+						slog.Debug("net.tcp.server connection reset", "id", ts.config.Id, "remoteAddr", client.RemoteAddr().String())
 						ts.connectionsMu.Unlock()
 					}
 				}
@@ -138,7 +138,7 @@ ClientRead:
 							break
 						}
 					}
-					slog.Debug("stream ended", "id", ts.config.Id, "remoteAddr", client.RemoteAddr().String())
+					slog.Debug("net.tcp.server stream ended", "id", ts.config.Id, "remoteAddr", client.RemoteAddr().String())
 					ts.connectionsMu.Unlock()
 				}
 				return
