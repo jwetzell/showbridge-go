@@ -8,11 +8,10 @@ import (
 
 type UDPClient struct {
 	config ModuleConfig
-	Host   string
+	Addr   *net.UDPAddr
 	Port   uint16
 	conn   *net.UDPConn
 	router *Router
-	addr   *net.UDPAddr
 }
 
 func init() {
@@ -43,7 +42,12 @@ func init() {
 				return nil, fmt.Errorf("net.udp.client port must be a number")
 			}
 
-			return &UDPClient{Host: hostString, Port: uint16(portNum), config: config}, nil
+			addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", hostString, uint16(portNum)))
+			if err != nil {
+				return nil, err
+			}
+
+			return &UDPClient{Addr: addr, config: config}, nil
 		},
 	})
 }
@@ -62,12 +66,12 @@ func (uc *UDPClient) RegisterRouter(router *Router) {
 
 func (uc *UDPClient) Run() error {
 
-	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", uc.Host, uc.Port))
+	client, err := net.DialUDP("udp", nil, uc.Addr)
 	if err != nil {
 		return err
 	}
 
-	uc.addr = addr
+	uc.conn = client
 
 	<-uc.router.Context.Done()
 	slog.Debug("router context done in module", "id", uc.config.Id)
@@ -83,19 +87,14 @@ func (uc *UDPClient) Output(payload any) error {
 	if !ok {
 		return fmt.Errorf("net.udp.client is only able to output bytes")
 	}
+	if uc.conn != nil {
+		_, err := uc.conn.Write(payloadBytes)
 
-	// TODO(jwetzell): reuse connection or setup new one when necessary
-	client, err := net.DialUDP("udp", nil, uc.addr)
-	if err != nil {
-		return err
-	}
-
-	uc.conn = client
-
-	_, err = uc.conn.Write(payloadBytes)
-
-	if err != nil {
-		return err
+		if err != nil {
+			return err
+		}
+	} else {
+		return fmt.Errorf("net.udp.client client is not setup")
 	}
 	return nil
 }
