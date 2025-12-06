@@ -9,8 +9,7 @@ import (
 )
 
 type UDPServer struct {
-	Ip     string
-	Port   uint16
+	Addr   *net.UDPAddr
 	config ModuleConfig
 	router *Router
 }
@@ -44,7 +43,12 @@ func init() {
 				ipString = specificIpString
 			}
 
-			return &UDPServer{Ip: ipString, Port: uint16(portNum), config: config}, nil
+			addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", ipString, uint16(portNum)))
+			if err != nil {
+				log.Fatalf("error resolving UDP address: %v", err)
+			}
+
+			return &UDPServer{Addr: addr, config: config}, nil
 		},
 	})
 }
@@ -63,13 +67,7 @@ func (us *UDPServer) RegisterRouter(router *Router) {
 
 func (us *UDPServer) Run() error {
 
-	// TODO(jwetzell): move this to init
-	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", us.Ip, us.Port))
-	if err != nil {
-		log.Fatalf("error resolving UDP address: %v", err)
-	}
-
-	listener, err := net.ListenUDP("udp", addr)
+	listener, err := net.ListenUDP("udp", us.Addr)
 	if err != nil {
 		return err
 	}
