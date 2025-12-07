@@ -39,3 +39,33 @@ func TestGoodStringDecode(t *testing.T) {
 		})
 	}
 }
+
+func TestBadStringDecode(t *testing.T) {
+	stringDecoder := processor.StringDecode{}
+	tests := []struct {
+		processor   processor.Processor
+		name        string
+		payload     any
+		errorString string
+	}{
+		{
+			processor:   &stringDecoder,
+			name:        "non-[]byte input",
+			payload:     "hello",
+			errorString: "string.decode processor only accepts a []byte",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := test.processor.Process(t.Context(), test.payload)
+
+			if err == nil {
+				t.Errorf("string.decode expected to fail but got payload: %s", got)
+			}
+			if err.Error() != test.errorString {
+				t.Errorf("string.decode got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+		})
+	}
+}

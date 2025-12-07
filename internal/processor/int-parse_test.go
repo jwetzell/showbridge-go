@@ -48,3 +48,38 @@ func TestGoodIntParse(t *testing.T) {
 		})
 	}
 }
+
+func TestBadIntParse(t *testing.T) {
+	intParser := processor.IntParse{}
+	tests := []struct {
+		processor   processor.Processor
+		name        string
+		payload     any
+		errorString string
+	}{
+		{
+			name:        "non-string input",
+			payload:     []byte{0x01},
+			errorString: "int.parse processor only accepts a string",
+		},
+		{
+			name:        "not int string",
+			payload:     "123.46",
+			errorString: "strconv.ParseInt: parsing \"123.46\": invalid syntax",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := intParser.Process(t.Context(), test.payload)
+
+			if err == nil {
+				t.Errorf("int.parse expected to fail but succeeded, got: %v", got)
+
+			}
+			if err.Error() != test.errorString {
+				t.Errorf("int.parse got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+		})
+	}
+}

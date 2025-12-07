@@ -48,3 +48,38 @@ func TestGoodFloatParse(t *testing.T) {
 		})
 	}
 }
+
+func TestBadFloatParse(t *testing.T) {
+	floatParser := processor.FloatParse{}
+	tests := []struct {
+		processor   processor.Processor
+		name        string
+		payload     any
+		errorString string
+	}{
+		{
+			name:        "non-string input",
+			payload:     []byte{0x01},
+			errorString: "float.parse processor only accepts a string",
+		},
+		{
+			name:        "not float string",
+			payload:     "abcd",
+			errorString: "strconv.ParseFloat: parsing \"abcd\": invalid syntax",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := floatParser.Process(t.Context(), test.payload)
+
+			if err == nil {
+				t.Errorf("float.parse expected to fail but succeeded, got: %v", got)
+
+			}
+			if err.Error() != test.errorString {
+				t.Errorf("float.parse got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+		})
+	}
+}

@@ -40,3 +40,33 @@ func TestGoodStringEncode(t *testing.T) {
 		})
 	}
 }
+
+func TestBadStringEncode(t *testing.T) {
+	stringEncoder := processor.StringEncode{}
+	tests := []struct {
+		processor   processor.Processor
+		name        string
+		payload     any
+		errorString string
+	}{
+		{
+			processor:   &stringEncoder,
+			name:        "non-string input",
+			payload:     []byte{0x68, 0x65, 0x6c, 0x6c, 0x6f},
+			errorString: "string.encode processor only accepts a string",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := test.processor.Process(t.Context(), test.payload)
+
+			if err == nil {
+				t.Errorf("string.encode expected to fail but got payload: %s", got)
+			}
+			if err.Error() != test.errorString {
+				t.Errorf("string.encode got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+		})
+	}
+}

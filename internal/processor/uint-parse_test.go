@@ -43,3 +43,38 @@ func TestGoodUintParse(t *testing.T) {
 		})
 	}
 }
+
+func TestBadUintParse(t *testing.T) {
+	uintParser := processor.UintParse{}
+	tests := []struct {
+		processor   processor.Processor
+		name        string
+		payload     any
+		errorString string
+	}{
+		{
+			name:        "non-string input",
+			payload:     []byte{0x01},
+			errorString: "uint.parse processor only accepts a string",
+		},
+		{
+			name:        "not uint string",
+			payload:     "-1234",
+			errorString: "strconv.ParseUint: parsing \"-1234\": invalid syntax",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := uintParser.Process(t.Context(), test.payload)
+
+			if err == nil {
+				t.Errorf("uint.parse expected to fail but succeeded, got: %v", got)
+
+			}
+			if err.Error() != test.errorString {
+				t.Errorf("uint.parse got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+		})
+	}
+}
