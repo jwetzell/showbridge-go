@@ -106,5 +106,16 @@ func (um *UDPMulticast) Run() error {
 }
 
 func (um *UDPMulticast) Output(payload any) error {
-	return fmt.Errorf("net.udp.multicast output is not implemented")
+
+	payloadBytes, ok := payload.([]byte)
+	if !ok {
+		return fmt.Errorf("net.udp.multicast can only output bytes")
+	}
+
+	if um.conn == nil {
+		return fmt.Errorf("net.udp.multicast connection is not setup")
+	}
+
+	_, err := um.conn.Write(payloadBytes)
+	return err
 }
