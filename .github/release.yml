@@ -5,12 +5,21 @@ changelog:
     labels:
       - dependencies
   categories:
-    - title: Framing 🖼️
+    - title: Config ⚙️
       labels:
-        - framing
-    - title: Processing 🏭
+        - config
+    - title: Framer 🖼️
       labels:
-        - processing
+        - framer
+    - title: Module 📦
+      labels:
+        - module
+    - title: Processor 🏭
+      labels:
+        - processor
+    - title: Route 🛣️
+      labels:
+        - route
     - title: CLI ⌨️
       labels:
         - cmd
