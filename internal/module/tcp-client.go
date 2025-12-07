@@ -8,13 +8,13 @@ import (
 	"time"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
-	"github.com/jwetzell/showbridge-go/internal/framing"
+	"github.com/jwetzell/showbridge-go/internal/framer"
 	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type TCPClient struct {
 	config config.ModuleConfig
-	framer framing.Framer
+	framer framer.Framer
 	conn   *net.TCPConn
 	ctx    context.Context
 	router route.RouteIO
@@ -65,7 +65,7 @@ func init() {
 				return nil, fmt.Errorf("net.tcp.client framing method must be a string")
 			}
 
-			framer, err := framing.GetFramer(framingMethodString)
+			framer, err := framer.GetFramer(framingMethodString)
 
 			if err != nil {
 				return nil, err

@@ -1,4 +1,4 @@
-package framing
+package framer
 
 import (
 	"fmt"

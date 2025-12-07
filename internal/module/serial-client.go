@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
-	"github.com/jwetzell/showbridge-go/internal/framing"
+	"github.com/jwetzell/showbridge-go/internal/framer"
 	"github.com/jwetzell/showbridge-go/internal/route"
 	"go.bug.st/serial"
 )
@@ -19,7 +19,7 @@ type SerialClient struct {
 	ctx    context.Context
 	router route.RouteIO
 	Port   string
-	Framer framing.Framer
+	Framer framer.Framer
 	Mode   *serial.Mode
 	port   serial.Port
 }
@@ -53,7 +53,7 @@ func init() {
 				return nil, fmt.Errorf("misc.serial.client framing method must be a string")
 			}
 
-			framer, err := framing.GetFramer(framingMethodString)
+			framer, err := framer.GetFramer(framingMethodString)
 
 			if err != nil {
 				return nil, err

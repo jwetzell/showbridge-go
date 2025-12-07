@@ -1,4 +1,4 @@
-package framing
+package framer
 
 type SlipFramer struct {
 	buffer []byte
