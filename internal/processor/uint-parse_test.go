@@ -1,0 +1,45 @@
+package processor_test
+
+import (
+	"testing"
+
+	"github.com/jwetzell/showbridge-go/internal/processor"
+)
+
+func TestGoodUintParse(t *testing.T) {
+	uintParser := processor.UintParse{}
+	tests := []struct {
+		processor processor.Processor
+		name      string
+		payload   any
+		expected  uint64
+	}{
+		{
+			name:     "positive number",
+			payload:  "12345",
+			expected: 12345,
+		},
+		{
+			name:     "zero",
+			payload:  "0",
+			expected: 0,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := uintParser.Process(t.Context(), test.payload)
+
+			gotUint, ok := got.(uint64)
+			if !ok {
+				t.Errorf("uint.parse returned a %T payload: %s", got, got)
+			}
+			if err != nil {
+				t.Errorf("uint.parse failed: %s", err)
+			}
+			if gotUint != test.expected {
+				t.Errorf("uint.parse got %d, expected %d", gotUint, test.expected)
+			}
+		})
+	}
+}
