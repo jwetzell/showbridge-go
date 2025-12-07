@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
-	"github.com/jwetzell/showbridge-go/internal/processing"
+	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
 type RouteError struct {
@@ -33,16 +33,16 @@ type Route interface {
 
 type ProcessorRoute struct {
 	input      string
-	processors []processing.Processor
+	processors []processor.Processor
 	output     string
 }
 
 func NewRoute(config config.RouteConfig) (Route, error) {
-	processors := []processing.Processor{}
+	processors := []processor.Processor{}
 
 	if len(config.Processors) > 0 {
 		for _, processorDecl := range config.Processors {
-			processorInfo, ok := processing.ProcessorRegistry[processorDecl.Type]
+			processorInfo, ok := processor.ProcessorRegistry[processorDecl.Type]
 			if !ok {
 				return nil, fmt.Errorf("problem loading processor registration for processor type: %s", processorDecl.Type)
 			}

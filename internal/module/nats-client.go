@@ -6,7 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
-	"github.com/jwetzell/showbridge-go/internal/processing"
+	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/route"
 	"github.com/nats-io/nats.go"
 )
@@ -93,7 +93,7 @@ func (nc *NATSClient) Run() error {
 
 func (nc *NATSClient) Output(payload any) error {
 
-	payloadMessage, ok := payload.(processing.NATSMessage)
+	payloadMessage, ok := payload.(processor.NATSMessage)
 
 	if !ok {
 		return fmt.Errorf("net.nats.client is only able to output NATSMessage")
