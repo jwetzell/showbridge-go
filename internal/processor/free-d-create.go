@@ -52,6 +52,10 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 
 	panNum, err := strconv.ParseFloat(panString, 32)
 
+	if err != nil {
+		return nil, err
+	}
+
 	var tiltBuffer bytes.Buffer
 	err = fc.Tilt.Execute(&tiltBuffer, payload)
 
@@ -63,6 +67,10 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 
 	tiltNum, err := strconv.ParseFloat(tiltString, 32)
 
+	if err != nil {
+		return nil, err
+	}
+
 	var rollBuffer bytes.Buffer
 	err = fc.Tilt.Execute(&rollBuffer, payload)
 
@@ -73,10 +81,6 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	rollString := rollBuffer.String()
 
 	rollNum, err := strconv.ParseFloat(rollString, 32)
-
-	if err != nil {
-		return nil, err
-	}
 
 	if err != nil {
 		return nil, err
