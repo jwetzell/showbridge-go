@@ -56,18 +56,18 @@ func main() {
 }
 
 func readConfig(configPath string) (config.Config, error) {
-	config := config.Config{}
+	cfg := config.Config{}
 
 	configBytes, err := os.ReadFile(configPath)
 
 	if err != nil {
-		return config, err
+		return config.Config{}, err
 	}
 
-	err = yaml.Unmarshal(configBytes, &config)
+	err = yaml.Unmarshal(configBytes, &cfg)
 	if err != nil {
-		return config, err
+		return config.Config{}, err
 	}
 
-	return config, nil
+	return cfg, nil
 }
