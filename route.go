@@ -13,14 +13,28 @@ type RouteError struct {
 	Error  error
 }
 
-type Route struct {
-	index      int
-	Input      string
-	Processors []processing.Processor
-	Output     string
+type Route interface {
+	Input() string
+	Output() string
+	HandleInput(sourceId string, payload any, router *Router) error
+	HandleOutput(sourceId string, payload any, router *Router) error
 }
 
-func NewRoute(index int, config config.RouteConfig) (*Route, error) {
+type ProcessorRoute struct {
+	input      string
+	processors []processing.Processor
+	output     string
+}
+
+func (r *ProcessorRoute) Input() string {
+	return r.input
+}
+
+func (r *ProcessorRoute) Output() string {
+	return r.output
+}
+
+func NewRoute(config config.RouteConfig) (Route, error) {
 	processors := []processing.Processor{}
 
 	if len(config.Processors) > 0 {
@@ -38,12 +52,12 @@ func NewRoute(index int, config config.RouteConfig) (*Route, error) {
 		}
 	}
 
-	return &Route{Input: config.Input, Processors: processors, Output: config.Output, index: index}, nil
+	return &ProcessorRoute{input: config.Input, processors: processors, output: config.Output}, nil
 }
 
-func (r *Route) HandleInput(sourceId string, payload any, router *Router) error {
+func (r *ProcessorRoute) HandleInput(sourceId string, payload any, router *Router) error {
 	var err error
-	for _, processor := range r.Processors {
+	for _, processor := range r.processors {
 		payload, err = processor.Process(router.Context, payload)
 		if err != nil {
 			return err
@@ -56,6 +70,6 @@ func (r *Route) HandleInput(sourceId string, payload any, router *Router) error 
 	return r.HandleOutput(sourceId, payload, router)
 }
 
-func (r *Route) HandleOutput(sourceId string, payload any, router *Router) error {
-	return router.HandleOutput(sourceId, r.Output, payload)
+func (r *ProcessorRoute) HandleOutput(sourceId string, payload any, router *Router) error {
+	return router.HandleOutput(sourceId, r.output, payload)
 }

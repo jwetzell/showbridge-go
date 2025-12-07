@@ -19,7 +19,7 @@ type Router struct {
 	contextCancel   context.CancelFunc
 	Context         context.Context
 	ModuleInstances []Module
-	RouteInstances  []*Route
+	RouteInstances  []Route
 	moduleWait      sync.WaitGroup
 }
 
@@ -38,7 +38,7 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []ModuleErro
 		Context:         routerContext,
 		contextCancel:   cancel,
 		ModuleInstances: []Module{},
-		RouteInstances:  []*Route{},
+		RouteInstances:  []Route{},
 	}
 
 	var moduleErrors []ModuleError
@@ -95,7 +95,7 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []ModuleErro
 
 	var routeErrors []RouteError
 	for routeIndex, routeDecl := range config.Routes {
-		route, err := NewRoute(routeIndex, routeDecl)
+		route, err := NewRoute(routeDecl)
 		if err != nil {
 			if routeErrors == nil {
 				routeErrors = []RouteError{}
@@ -137,7 +137,7 @@ func (r *Router) Stop() {
 func (r *Router) HandleInput(sourceId string, payload any) []RoutingError {
 	var routingErrors []RoutingError
 	for routeIndex, route := range r.RouteInstances {
-		if route.Input == sourceId {
+		if route.Input() == sourceId {
 			err := route.HandleInput(sourceId, payload, r)
 			if err != nil {
 				if routingErrors == nil {
