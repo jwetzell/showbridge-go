@@ -18,10 +18,9 @@ type Route struct {
 	Input      string
 	Processors []processing.Processor
 	Output     string
-	router     *Router
 }
 
-func NewRoute(index int, config config.RouteConfig, router *Router) (*Route, error) {
+func NewRoute(index int, config config.RouteConfig) (*Route, error) {
 	processors := []processing.Processor{}
 
 	if len(config.Processors) > 0 {
@@ -39,13 +38,13 @@ func NewRoute(index int, config config.RouteConfig, router *Router) (*Route, err
 		}
 	}
 
-	return &Route{Input: config.Input, Processors: processors, Output: config.Output, router: router, index: index}, nil
+	return &Route{Input: config.Input, Processors: processors, Output: config.Output, index: index}, nil
 }
 
-func (r *Route) HandleInput(sourceId string, payload any) error {
+func (r *Route) HandleInput(sourceId string, payload any, router *Router) error {
 	var err error
 	for _, processor := range r.Processors {
-		payload, err = processor.Process(r.router.Context, payload)
+		payload, err = processor.Process(router.Context, payload)
 		if err != nil {
 			return err
 		}
@@ -54,9 +53,9 @@ func (r *Route) HandleInput(sourceId string, payload any) error {
 			return nil
 		}
 	}
-	return r.HandleOutput(sourceId, payload)
+	return r.HandleOutput(sourceId, payload, router)
 }
 
-func (r *Route) HandleOutput(sourceId string, payload any) error {
-	return r.router.HandleOutput(sourceId, r.Output, payload)
+func (r *Route) HandleOutput(sourceId string, payload any, router *Router) error {
+	return router.HandleOutput(sourceId, r.Output, payload)
 }

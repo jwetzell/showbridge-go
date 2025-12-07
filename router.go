@@ -95,7 +95,7 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []ModuleErro
 
 	var routeErrors []RouteError
 	for routeIndex, routeDecl := range config.Routes {
-		route, err := NewRoute(routeIndex, routeDecl, &router)
+		route, err := NewRoute(routeIndex, routeDecl)
 		if err != nil {
 			if routeErrors == nil {
 				routeErrors = []RouteError{}
@@ -138,7 +138,7 @@ func (r *Router) HandleInput(sourceId string, payload any) []RoutingError {
 	var routingErrors []RoutingError
 	for routeIndex, route := range r.RouteInstances {
 		if route.Input == sourceId {
-			err := route.HandleInput(sourceId, payload)
+			err := route.HandleInput(sourceId, payload, r)
 			if err != nil {
 				if routingErrors == nil {
 					routingErrors = []RoutingError{}
