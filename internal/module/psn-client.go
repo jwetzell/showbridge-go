@@ -1,6 +1,7 @@
-package showbridge
+package module
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"net"
@@ -8,21 +9,23 @@ import (
 
 	"github.com/jwetzell/psn-go"
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type PSNClient struct {
 	config  config.ModuleConfig
 	conn    *net.UDPConn
-	router  *Router
+	ctx     context.Context
+	router  route.RouteIO
 	decoder *psn.Decoder
 }
 
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.psn.client",
-		New: func(config config.ModuleConfig, router *Router) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 
-			return &PSNClient{config: config, decoder: psn.NewDecoder(), router: router}, nil
+			return &PSNClient{config: config, decoder: psn.NewDecoder(), ctx: ctx, router: router}, nil
 		},
 	})
 }
@@ -53,7 +56,7 @@ func (pc *PSNClient) Run() error {
 	buffer := make([]byte, 2048)
 	for {
 		select {
-		case <-pc.router.Context.Done():
+		case <-pc.ctx.Done():
 			// TODO(jwetzell): cleanup?
 			slog.Debug("router context done in module", "id", pc.config.Id)
 			return nil

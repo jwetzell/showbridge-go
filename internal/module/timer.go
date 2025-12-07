@@ -1,24 +1,27 @@
-package showbridge
+package module
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"time"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type Timer struct {
 	config   config.ModuleConfig
 	Duration uint32
-	router   *Router
+	ctx      context.Context
+	router   route.RouteIO
 	timer    *time.Timer
 }
 
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "gen.timer",
-		New: func(config config.ModuleConfig, router *Router) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params
 
 			duration, ok := params["duration"]
@@ -32,7 +35,7 @@ func init() {
 				return nil, fmt.Errorf("gen.timer duration must be a number")
 			}
 
-			return &Timer{Duration: uint32(durationNum), config: config, router: router}, nil
+			return &Timer{Duration: uint32(durationNum), config: config, ctx: ctx, router: router}, nil
 		},
 	})
 }
@@ -50,7 +53,7 @@ func (t *Timer) Run() error {
 	defer t.timer.Stop()
 	for {
 		select {
-		case <-t.router.Context.Done():
+		case <-t.ctx.Done():
 			t.timer.Stop()
 			slog.Debug("router context done in module", "id", t.config.Id)
 			return nil

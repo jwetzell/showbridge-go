@@ -1,6 +1,7 @@
-package showbridge
+package route
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -13,11 +14,21 @@ type RouteError struct {
 	Error  error
 }
 
+type RouteIOError struct {
+	Index int
+	Error error
+}
+
+type RouteIO interface {
+	HandleInput(sourceId string, payload any) []RouteIOError
+	HandleOutput(sourceId string, destinationId string, payload any) error
+}
+
 type Route interface {
 	Input() string
 	Output() string
-	HandleInput(sourceId string, payload any, router *Router) error
-	HandleOutput(sourceId string, payload any, router *Router) error
+	HandleInput(ctx context.Context, sourceId string, payload any, router RouteIO) error
+	HandleOutput(ctx context.Context, sourceId string, payload any, router RouteIO) error
 }
 
 type ProcessorRoute struct {
@@ -55,10 +66,10 @@ func (r *ProcessorRoute) Output() string {
 	return r.output
 }
 
-func (r *ProcessorRoute) HandleInput(sourceId string, payload any, router *Router) error {
+func (r *ProcessorRoute) HandleInput(ctx context.Context, sourceId string, payload any, router RouteIO) error {
 	var err error
 	for _, processor := range r.processors {
-		payload, err = processor.Process(router.Context, payload)
+		payload, err = processor.Process(ctx, payload)
 		if err != nil {
 			return err
 		}
@@ -67,9 +78,9 @@ func (r *ProcessorRoute) HandleInput(sourceId string, payload any, router *Route
 			return nil
 		}
 	}
-	return r.HandleOutput(sourceId, payload, router)
+	return r.HandleOutput(ctx, sourceId, payload, router)
 }
 
-func (r *ProcessorRoute) HandleOutput(sourceId string, payload any, router *Router) error {
+func (r *ProcessorRoute) HandleOutput(ctx context.Context, sourceId string, payload any, router RouteIO) error {
 	return router.HandleOutput(sourceId, r.output, payload)
 }

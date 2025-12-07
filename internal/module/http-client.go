@@ -1,26 +1,29 @@
-package showbridge
+package module
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type HTTPClient struct {
 	config config.ModuleConfig
-	router *Router
+	ctx    context.Context
 	client *http.Client
+	router route.RouteIO
 }
 
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.http.client",
-		New: func(config config.ModuleConfig, router *Router) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 
-			return &HTTPClient{config: config, router: router}, nil
+			return &HTTPClient{config: config, ctx: ctx, router: router}, nil
 		},
 	})
 }
@@ -39,7 +42,7 @@ func (hc *HTTPClient) Run() error {
 		Timeout: 10 * time.Second,
 	}
 
-	<-hc.router.Context.Done()
+	<-hc.ctx.Done()
 	slog.Debug("router context done in module", "id", hc.config.Id)
 	return nil
 }

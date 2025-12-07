@@ -1,6 +1,7 @@
-package showbridge
+package module
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"log/slog"
@@ -8,18 +9,20 @@ import (
 	"time"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type UDPServer struct {
 	Addr   *net.UDPAddr
 	config config.ModuleConfig
-	router *Router
+	ctx    context.Context
+	router route.RouteIO
 }
 
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.udp.server",
-		New: func(config config.ModuleConfig, router *Router) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {
@@ -50,7 +53,7 @@ func init() {
 				log.Fatalf("error resolving UDP address: %v", err)
 			}
 
-			return &UDPServer{Addr: addr, config: config, router: router}, nil
+			return &UDPServer{Addr: addr, config: config, ctx: ctx, router: router}, nil
 		},
 	})
 }
@@ -75,7 +78,7 @@ func (us *UDPServer) Run() error {
 	buffer := make([]byte, 1024)
 	for {
 		select {
-		case <-us.router.Context.Done():
+		case <-us.ctx.Done():
 			// TODO(jwetzell): cleanup?
 			slog.Debug("router context done in module", "id", us.config.Id)
 			return nil

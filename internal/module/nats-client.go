@@ -1,17 +1,20 @@
-package showbridge
+package module
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processing"
+	"github.com/jwetzell/showbridge-go/internal/route"
 	"github.com/nats-io/nats.go"
 )
 
 type NATSClient struct {
 	config  config.ModuleConfig
-	router  *Router
+	ctx     context.Context
+	router  route.RouteIO
 	URL     string
 	Subject string
 	client  *nats.Conn
@@ -20,7 +23,7 @@ type NATSClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.nats.client",
-		New: func(config config.ModuleConfig, router *Router) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params
 			url, ok := params["url"]
 
@@ -46,7 +49,7 @@ func init() {
 				return nil, fmt.Errorf("net.nats.client subject must be string")
 			}
 
-			return &NATSClient{config: config, URL: urlString, Subject: subjectString, router: router}, nil
+			return &NATSClient{config: config, URL: urlString, Subject: subjectString, ctx: ctx, router: router}, nil
 		},
 	})
 }
@@ -83,7 +86,7 @@ func (nc *NATSClient) Run() error {
 
 	defer sub.Unsubscribe()
 
-	<-nc.router.Context.Done()
+	<-nc.ctx.Done()
 	slog.Debug("router context done in module", "id", nc.config.Id)
 	return nil
 }

@@ -1,6 +1,7 @@
-package showbridge
+package module
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"net"
@@ -8,20 +9,22 @@ import (
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/framing"
+	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type TCPClient struct {
 	config config.ModuleConfig
 	framer framing.Framer
 	conn   *net.TCPConn
-	router *Router
+	ctx    context.Context
+	router route.RouteIO
 	Addr   *net.TCPAddr
 }
 
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.tcp.client",
-		New: func(config config.ModuleConfig, router *Router) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params
 			host, ok := params["host"]
 
@@ -68,7 +71,7 @@ func init() {
 				return nil, err
 			}
 
-			return &TCPClient{framer: framer, Addr: addr, config: config, router: router}, nil
+			return &TCPClient{framer: framer, Addr: addr, config: config, ctx: ctx, router: router}, nil
 		},
 	})
 }
@@ -85,7 +88,7 @@ func (tc *TCPClient) Run() error {
 
 	// TODO(jwetzell): shutdown with router.Context properly
 	go func() {
-		<-tc.router.Context.Done()
+		<-tc.ctx.Done()
 		slog.Debug("router context done in module", "id", tc.config.Id)
 		if tc.conn != nil {
 			tc.conn.Close()
@@ -95,7 +98,7 @@ func (tc *TCPClient) Run() error {
 	for {
 		err := tc.SetupConn()
 		if err != nil {
-			if tc.router.Context.Err() != nil {
+			if tc.ctx.Err() != nil {
 				slog.Debug("router context done in module", "id", tc.config.Id)
 				return nil
 			}
@@ -106,14 +109,14 @@ func (tc *TCPClient) Run() error {
 
 		buffer := make([]byte, 1024)
 		select {
-		case <-tc.router.Context.Done():
+		case <-tc.ctx.Done():
 			slog.Debug("router context done in module", "id", tc.config.Id)
 			return nil
 		default:
 		READ:
 			for {
 				select {
-				case <-tc.router.Context.Done():
+				case <-tc.ctx.Done():
 					slog.Debug("router context done in module", "id", tc.config.Id)
 					return nil
 				default:

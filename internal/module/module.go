@@ -1,10 +1,12 @@
-package showbridge
+package module
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type ModuleError struct {
@@ -22,7 +24,7 @@ type Module interface {
 
 type ModuleRegistration struct {
 	Type string `json:"type"`
-	New  func(config.ModuleConfig, *Router) (Module, error)
+	New  func(context.Context, config.ModuleConfig, route.RouteIO) (Module, error)
 }
 
 func RegisterModule(mod ModuleRegistration) {
@@ -37,13 +39,13 @@ func RegisterModule(mod ModuleRegistration) {
 	moduleRegistryMu.Lock()
 	defer moduleRegistryMu.Unlock()
 
-	if _, ok := moduleRegistry[string(mod.Type)]; ok {
+	if _, ok := ModuleRegistry[string(mod.Type)]; ok {
 		panic(fmt.Sprintf("module already registered: %s", mod.Type))
 	}
-	moduleRegistry[string(mod.Type)] = mod
+	ModuleRegistry[string(mod.Type)] = mod
 }
 
 var (
 	moduleRegistryMu sync.RWMutex
-	moduleRegistry   = make(map[string]ModuleRegistration)
+	ModuleRegistry   = make(map[string]ModuleRegistration)
 )

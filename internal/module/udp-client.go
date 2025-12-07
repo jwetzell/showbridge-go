@@ -1,11 +1,13 @@
-package showbridge
+package module
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"net"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type UDPClient struct {
@@ -13,13 +15,14 @@ type UDPClient struct {
 	Addr   *net.UDPAddr
 	Port   uint16
 	conn   *net.UDPConn
-	router *Router
+	ctx    context.Context
+	router route.RouteIO
 }
 
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.udp.client",
-		New: func(config config.ModuleConfig, router *Router) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params
 			host, ok := params["host"]
 
@@ -49,7 +52,7 @@ func init() {
 				return nil, err
 			}
 
-			return &UDPClient{Addr: addr, config: config, router: router}, nil
+			return &UDPClient{Addr: addr, config: config, ctx: ctx, router: router}, nil
 		},
 	})
 }
@@ -70,8 +73,7 @@ func (uc *UDPClient) Run() error {
 	}
 
 	uc.conn = client
-
-	<-uc.router.Context.Done()
+	<-uc.ctx.Done()
 	slog.Debug("router context done in module", "id", uc.config.Id)
 	if uc.conn != nil {
 		uc.conn.Close()

@@ -1,17 +1,20 @@
-package showbridge
+package module
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processing"
+	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type MQTTClient struct {
 	config   config.ModuleConfig
-	router   *Router
+	ctx      context.Context
+	router   route.RouteIO
 	Broker   string
 	ClientID string
 	Topic    string
@@ -21,7 +24,7 @@ type MQTTClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.mqtt.client",
-		New: func(config config.ModuleConfig, router *Router) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params
 			broker, ok := params["broker"]
 
@@ -59,7 +62,7 @@ func init() {
 				return nil, fmt.Errorf("net.mqtt.client clientId must be string")
 			}
 
-			return &MQTTClient{config: config, Broker: brokerString, Topic: topicString, ClientID: clientIdString, router: router}, nil
+			return &MQTTClient{config: config, Broker: brokerString, Topic: topicString, ClientID: clientIdString, ctx: ctx, router: router}, nil
 		},
 	})
 }
@@ -96,7 +99,7 @@ func (mc *MQTTClient) Run() error {
 		return err
 	}
 
-	<-mc.router.Context.Done()
+	<-mc.ctx.Done()
 	slog.Debug("router context done in module", "id", mc.config.Id)
 	return nil
 }

@@ -1,6 +1,7 @@
-package showbridge
+package module
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -12,13 +13,15 @@ import (
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/framing"
+	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type TCPServer struct {
 	config        config.ModuleConfig
 	Addr          *net.TCPAddr
 	Framer        framing.Framer
-	router        *Router
+	ctx           context.Context
+	router        route.RouteIO
 	quit          chan interface{}
 	wg            sync.WaitGroup
 	connections   []*net.TCPConn
@@ -28,7 +31,7 @@ type TCPServer struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.tcp.server",
-		New: func(config config.ModuleConfig, router *Router) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {
@@ -76,7 +79,7 @@ func init() {
 				return nil, err
 			}
 
-			return &TCPServer{Framer: framer, Addr: addr, config: config, quit: make(chan interface{}), router: router}, nil
+			return &TCPServer{Framer: framer, Addr: addr, config: config, quit: make(chan interface{}), ctx: ctx, router: router}, nil
 		},
 	})
 }
@@ -162,7 +165,7 @@ func (ts *TCPServer) Run() error {
 	ts.wg.Add(1)
 
 	go func() {
-		<-ts.router.Context.Done()
+		<-ts.ctx.Done()
 		close(ts.quit)
 		listener.Close()
 		slog.Debug("router context done in module", "id", ts.config.Id)

@@ -1,19 +1,22 @@
 //go:build cgo
 
-package showbridge
+package module
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/route"
 	"gitlab.com/gomidi/midi/v2"
 	_ "gitlab.com/gomidi/midi/v2/drivers/rtmididrv"
 )
 
 type MIDIClient struct {
 	config     config.ModuleConfig
-	router     *Router
+	ctx        context.Context
+	router     route.RouteIO
 	InputPort  string
 	OutputPort string
 	SendFunc   func(midi.Message) error
@@ -23,7 +26,7 @@ func init() {
 	RegisterModule(ModuleRegistration{
 		//TODO(jwetzell): find a better namespace than "misc"
 		Type: "misc.midi.client",
-		New: func(config config.ModuleConfig, router *Router) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params
 			input, ok := params["input"]
 
@@ -49,7 +52,7 @@ func init() {
 				return nil, fmt.Errorf("misc.midi.client output must be a string")
 			}
 
-			return &MIDIClient{config: config, InputPort: inputString, OutputPort: outputString, router: router}, nil
+			return &MIDIClient{config: config, InputPort: inputString, OutputPort: outputString, ctx: ctx, router: router}, nil
 		},
 	})
 }
@@ -95,7 +98,7 @@ func (mc *MIDIClient) Run() error {
 
 	mc.SendFunc = send
 
-	<-mc.router.Context.Done()
+	<-mc.ctx.Done()
 	slog.Debug("router context done in module", "id", mc.config.Id)
 	return nil
 }

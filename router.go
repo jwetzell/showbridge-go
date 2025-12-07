@@ -8,23 +8,19 @@ import (
 	"sync"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/module"
+	"github.com/jwetzell/showbridge-go/internal/route"
 )
-
-type RoutingError struct {
-	Index int
-	Error error
-}
 
 type Router struct {
 	contextCancel   context.CancelFunc
 	Context         context.Context
-	ModuleInstances []Module
-	RouteInstances  []Route
+	ModuleInstances []module.Module
+	RouteInstances  []route.Route
 	moduleWait      sync.WaitGroup
 }
 
-func NewRouter(ctx context.Context, config config.Config) (*Router, []ModuleError, []RouteError) {
-
+func NewRouter(ctx context.Context, config config.Config) (*Router, []module.ModuleError, []route.RouteError) {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	}))
@@ -37,20 +33,20 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []ModuleErro
 	router := Router{
 		Context:         routerContext,
 		contextCancel:   cancel,
-		ModuleInstances: []Module{},
-		RouteInstances:  []Route{},
+		ModuleInstances: []module.Module{},
+		RouteInstances:  []route.Route{},
 	}
 
-	var moduleErrors []ModuleError
+	var moduleErrors []module.ModuleError
 
 	for moduleIndex, moduleDecl := range config.Modules {
 
-		moduleInfo, ok := moduleRegistry[moduleDecl.Type]
+		moduleInfo, ok := module.ModuleRegistry[moduleDecl.Type]
 		if !ok {
 			if moduleErrors == nil {
-				moduleErrors = []ModuleError{}
+				moduleErrors = []module.ModuleError{}
 			}
-			moduleErrors = append(moduleErrors, ModuleError{
+			moduleErrors = append(moduleErrors, module.ModuleError{
 				Index:  moduleIndex,
 				Config: moduleDecl,
 				Error:  fmt.Errorf("module type not defined"),
@@ -63,9 +59,9 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []ModuleErro
 			if moduleInstance.Id() == moduleDecl.Id {
 				moduleInstanceExists = true
 				if moduleErrors == nil {
-					moduleErrors = []ModuleError{}
+					moduleErrors = []module.ModuleError{}
 				}
-				moduleErrors = append(moduleErrors, ModuleError{
+				moduleErrors = append(moduleErrors, module.ModuleError{
 					Index:  moduleIndex,
 					Config: moduleDecl,
 					Error:  fmt.Errorf("duplicate module id"),
@@ -75,12 +71,12 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []ModuleErro
 		}
 
 		if !moduleInstanceExists {
-			moduleInstance, err := moduleInfo.New(moduleDecl, &router)
+			moduleInstance, err := moduleInfo.New(router.Context, moduleDecl, &router)
 			if err != nil {
 				if moduleErrors == nil {
-					moduleErrors = []ModuleError{}
+					moduleErrors = []module.ModuleError{}
 				}
-				moduleErrors = append(moduleErrors, ModuleError{
+				moduleErrors = append(moduleErrors, module.ModuleError{
 					Index:  moduleIndex,
 					Config: moduleDecl,
 					Error:  err,
@@ -93,21 +89,21 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []ModuleErro
 
 	}
 
-	var routeErrors []RouteError
+	var routeErrors []route.RouteError
 	for routeIndex, routeDecl := range config.Routes {
-		route, err := NewRoute(routeDecl)
+		routeInstance, err := route.NewRoute(routeDecl)
 		if err != nil {
 			if routeErrors == nil {
-				routeErrors = []RouteError{}
+				routeErrors = []route.RouteError{}
 			}
-			routeErrors = append(routeErrors, RouteError{
+			routeErrors = append(routeErrors, route.RouteError{
 				Index:  routeIndex,
 				Config: routeDecl,
 				Error:  err,
 			})
 			continue
 		}
-		router.RouteInstances = append(router.RouteInstances, route)
+		router.RouteInstances = append(router.RouteInstances, routeInstance)
 	}
 
 	return &router, moduleErrors, routeErrors
@@ -134,16 +130,16 @@ func (r *Router) Stop() {
 	r.contextCancel()
 }
 
-func (r *Router) HandleInput(sourceId string, payload any) []RoutingError {
-	var routingErrors []RoutingError
-	for routeIndex, route := range r.RouteInstances {
-		if route.Input() == sourceId {
-			err := route.HandleInput(sourceId, payload, r)
+func (r *Router) HandleInput(sourceId string, payload any) []route.RouteIOError {
+	var routingErrors []route.RouteIOError
+	for routeIndex, routeInstance := range r.RouteInstances {
+		if routeInstance.Input() == sourceId {
+			err := routeInstance.HandleInput(r.Context, sourceId, payload, r)
 			if err != nil {
 				if routingErrors == nil {
-					routingErrors = []RoutingError{}
+					routingErrors = []route.RouteIOError{}
 				}
-				routingErrors = append(routingErrors, RoutingError{
+				routingErrors = append(routingErrors, route.RouteIOError{
 					Index: routeIndex,
 					Error: err,
 				})

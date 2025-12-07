@@ -1,20 +1,23 @@
 //go:build cgo
 
-package showbridge
+package module
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"time"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/framing"
+	"github.com/jwetzell/showbridge-go/internal/route"
 	"go.bug.st/serial"
 )
 
 type SerialClient struct {
 	config config.ModuleConfig
-	router *Router
+	ctx    context.Context
+	router route.RouteIO
 	Port   string
 	Framer framing.Framer
 	Mode   *serial.Mode
@@ -25,7 +28,7 @@ func init() {
 	RegisterModule(ModuleRegistration{
 		//TODO(jwetzell): find a better namespace than "misc"
 		Type: "misc.serial.client",
-		New: func(config config.ModuleConfig, router *Router) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 
@@ -70,7 +73,7 @@ func init() {
 				BaudRate: int(baudRateNum),
 			}
 
-			return &SerialClient{config: config, Port: portString, Framer: framer, Mode: &mode, router: router}, nil
+			return &SerialClient{config: config, Port: portString, Framer: framer, Mode: &mode, ctx: ctx, router: router}, nil
 		},
 	})
 }
@@ -99,7 +102,7 @@ func (mc *SerialClient) Run() error {
 
 	// TODO(jwetzell): shutdown with router.Context properly
 	go func() {
-		<-mc.router.Context.Done()
+		<-mc.ctx.Done()
 		slog.Debug("router context done in module", "id", mc.config.Id)
 		if mc.port != nil {
 			mc.port.Close()
@@ -109,7 +112,7 @@ func (mc *SerialClient) Run() error {
 	for {
 		err := mc.SetupPort()
 		if err != nil {
-			if mc.router.Context.Err() != nil {
+			if mc.ctx.Err() != nil {
 				slog.Debug("router context done in module", "id", mc.config.Id)
 				return nil
 			}
@@ -120,14 +123,14 @@ func (mc *SerialClient) Run() error {
 
 		buffer := make([]byte, 1024)
 		select {
-		case <-mc.router.Context.Done():
+		case <-mc.ctx.Done():
 			slog.Debug("router context done in module", "id", mc.config.Id)
 			return nil
 		default:
 		READ:
 			for {
 				select {
-				case <-mc.router.Context.Done():
+				case <-mc.ctx.Done():
 					slog.Debug("router context done in module", "id", mc.config.Id)
 					return nil
 				default:

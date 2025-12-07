@@ -1,25 +1,28 @@
-package showbridge
+package module
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"net"
 	"time"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type UDPMulticast struct {
 	config config.ModuleConfig
 	conn   *net.UDPConn
-	router *Router
+	ctx    context.Context
+	router route.RouteIO
 	Addr   *net.UDPAddr
 }
 
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.udp.multicast",
-		New: func(config config.ModuleConfig, router *Router) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params
 			ip, ok := params["ip"]
 
@@ -48,7 +51,7 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			return &UDPMulticast{config: config, Addr: addr, router: router}, nil
+			return &UDPMulticast{config: config, Addr: addr, ctx: ctx, router: router}, nil
 		},
 	})
 }
@@ -74,7 +77,7 @@ func (um *UDPMulticast) Run() error {
 	buffer := make([]byte, 2048)
 	for {
 		select {
-		case <-um.router.Context.Done():
+		case <-um.ctx.Done():
 			// TODO(jwetzell): cleanup?
 			slog.Debug("router context done in module", "id", um.config.Id)
 			return nil

@@ -1,18 +1,21 @@
-package showbridge
+package module
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type HTTPServer struct {
 	config config.ModuleConfig
 	Port   uint16
-	router *Router
+	ctx    context.Context
+	router route.RouteIO
 }
 
 type ResponseData struct {
@@ -23,7 +26,7 @@ type ResponseData struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.http.server",
-		New: func(config config.ModuleConfig, router *Router) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {
@@ -36,7 +39,7 @@ func init() {
 				return nil, fmt.Errorf("net.http.server port must be uint16")
 			}
 
-			return &HTTPServer{Port: uint16(portNum), config: config, router: router}, nil
+			return &HTTPServer{Port: uint16(portNum), config: config, ctx: ctx, router: router}, nil
 		},
 	})
 }
@@ -85,7 +88,7 @@ func (hs *HTTPServer) Run() error {
 	}
 
 	go func() {
-		<-hs.router.Context.Done()
+		<-hs.ctx.Done()
 		slog.Debug("router context done in module", "id", hs.config.Id)
 		httpServer.Close()
 	}()
@@ -97,7 +100,7 @@ func (hs *HTTPServer) Run() error {
 		return err
 	}
 
-	<-hs.router.Context.Done()
+	<-hs.ctx.Done()
 	return nil
 }
 
