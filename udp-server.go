@@ -19,7 +19,7 @@ type UDPServer struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.udp.server",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig, router *Router) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {
@@ -50,7 +50,7 @@ func init() {
 				log.Fatalf("error resolving UDP address: %v", err)
 			}
 
-			return &UDPServer{Addr: addr, config: config}, nil
+			return &UDPServer{Addr: addr, config: config, router: router}, nil
 		},
 	})
 }
@@ -61,10 +61,6 @@ func (us *UDPServer) Id() string {
 
 func (us *UDPServer) Type() string {
 	return us.config.Id
-}
-
-func (us *UDPServer) RegisterRouter(router *Router) {
-	us.router = router
 }
 
 func (us *UDPServer) Run() error {

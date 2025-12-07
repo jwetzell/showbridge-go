@@ -23,7 +23,7 @@ type ResponseData struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.http.server",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig, router *Router) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {
@@ -36,7 +36,7 @@ func init() {
 				return nil, fmt.Errorf("net.http.server port must be uint16")
 			}
 
-			return &HTTPServer{Port: uint16(portNum), config: config}, nil
+			return &HTTPServer{Port: uint16(portNum), config: config, router: router}, nil
 		},
 	})
 }
@@ -47,10 +47,6 @@ func (hs *HTTPServer) Id() string {
 
 func (hs *HTTPServer) Type() string {
 	return hs.config.Type
-}
-
-func (hs *HTTPServer) RegisterRouter(router *Router) {
-	hs.router = router
 }
 
 func (hs *HTTPServer) HandleDefault(w http.ResponseWriter, r *http.Request) {

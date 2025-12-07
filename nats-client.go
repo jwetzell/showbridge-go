@@ -20,7 +20,7 @@ type NATSClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.nats.client",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig, router *Router) (Module, error) {
 			params := config.Params
 			url, ok := params["url"]
 
@@ -46,7 +46,7 @@ func init() {
 				return nil, fmt.Errorf("net.nats.client subject must be string")
 			}
 
-			return &NATSClient{config: config, URL: urlString, Subject: subjectString}, nil
+			return &NATSClient{config: config, URL: urlString, Subject: subjectString, router: router}, nil
 		},
 	})
 }
@@ -57,10 +57,6 @@ func (nc *NATSClient) Id() string {
 
 func (nc *NATSClient) Type() string {
 	return nc.config.Type
-}
-
-func (nc *NATSClient) RegisterRouter(router *Router) {
-	nc.router = router
 }
 
 func (nc *NATSClient) Run() error {

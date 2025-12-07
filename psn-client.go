@@ -20,9 +20,9 @@ type PSNClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.psn.client",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig, router *Router) (Module, error) {
 
-			return &PSNClient{config: config, decoder: psn.NewDecoder()}, nil
+			return &PSNClient{config: config, decoder: psn.NewDecoder(), router: router}, nil
 		},
 	})
 }
@@ -33,10 +33,6 @@ func (pc *PSNClient) Id() string {
 
 func (pc *PSNClient) Type() string {
 	return pc.config.Type
-}
-
-func (pc *PSNClient) RegisterRouter(router *Router) {
-	pc.router = router
 }
 
 func (pc *PSNClient) Run() error {

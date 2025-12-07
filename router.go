@@ -75,7 +75,7 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []ModuleErro
 		}
 
 		if !moduleInstanceExists {
-			moduleInstance, err := moduleInfo.New(moduleDecl)
+			moduleInstance, err := moduleInfo.New(moduleDecl, &router)
 			if err != nil {
 				if moduleErrors == nil {
 					moduleErrors = []ModuleError{}
@@ -110,18 +110,12 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []ModuleErro
 		router.RouteInstances = append(router.RouteInstances, route)
 	}
 
-	for _, moduleInstance := range router.ModuleInstances {
-		slog.Debug("registering router with module", "id", moduleInstance.Id())
-		moduleInstance.RegisterRouter(&router)
-	}
-
 	return &router, moduleErrors, routeErrors
 }
 
 func (r *Router) Run() {
 	slog.Info("running router")
 	for _, moduleInstance := range r.ModuleInstances {
-		moduleInstance.RegisterRouter(r)
 		r.moduleWait.Add(1)
 		go func() {
 			err := moduleInstance.Run()

@@ -18,7 +18,7 @@ type Timer struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "gen.timer",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig, router *Router) (Module, error) {
 			params := config.Params
 
 			duration, ok := params["duration"]
@@ -32,7 +32,7 @@ func init() {
 				return nil, fmt.Errorf("gen.timer duration must be a number")
 			}
 
-			return &Timer{Duration: uint32(durationNum), config: config}, nil
+			return &Timer{Duration: uint32(durationNum), config: config, router: router}, nil
 		},
 	})
 }
@@ -43,10 +43,6 @@ func (t *Timer) Id() string {
 
 func (t *Timer) Type() string {
 	return t.config.Type
-}
-
-func (t *Timer) RegisterRouter(router *Router) {
-	t.router = router
 }
 
 func (t *Timer) Run() error {

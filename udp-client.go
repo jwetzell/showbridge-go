@@ -19,7 +19,7 @@ type UDPClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.udp.client",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig, router *Router) (Module, error) {
 			params := config.Params
 			host, ok := params["host"]
 
@@ -49,7 +49,7 @@ func init() {
 				return nil, err
 			}
 
-			return &UDPClient{Addr: addr, config: config}, nil
+			return &UDPClient{Addr: addr, config: config, router: router}, nil
 		},
 	})
 }
@@ -60,10 +60,6 @@ func (uc *UDPClient) Id() string {
 
 func (uc *UDPClient) Type() string {
 	return uc.config.Type
-}
-
-func (uc *UDPClient) RegisterRouter(router *Router) {
-	uc.router = router
 }
 
 func (uc *UDPClient) Run() error {

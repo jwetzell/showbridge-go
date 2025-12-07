@@ -23,7 +23,7 @@ func init() {
 	RegisterModule(ModuleRegistration{
 		//TODO(jwetzell): find a better namespace than "misc"
 		Type: "misc.midi.client",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig, router *Router) (Module, error) {
 			params := config.Params
 			input, ok := params["input"]
 
@@ -49,7 +49,7 @@ func init() {
 				return nil, fmt.Errorf("misc.midi.client output must be a string")
 			}
 
-			return &MIDIClient{config: config, InputPort: inputString, OutputPort: outputString}, nil
+			return &MIDIClient{config: config, InputPort: inputString, OutputPort: outputString, router: router}, nil
 		},
 	})
 }
@@ -60,10 +60,6 @@ func (mc *MIDIClient) Id() string {
 
 func (mc *MIDIClient) Type() string {
 	return mc.config.Type
-}
-
-func (mc *MIDIClient) RegisterRouter(router *Router) {
-	mc.router = router
 }
 
 func (mc *MIDIClient) Run() error {

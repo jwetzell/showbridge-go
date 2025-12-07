@@ -18,9 +18,9 @@ type HTTPClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.http.client",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig, router *Router) (Module, error) {
 
-			return &HTTPClient{config: config}, nil
+			return &HTTPClient{config: config, router: router}, nil
 		},
 	})
 }
@@ -31,10 +31,6 @@ func (hc *HTTPClient) Id() string {
 
 func (hc *HTTPClient) Type() string {
 	return hc.config.Type
-}
-
-func (hc *HTTPClient) RegisterRouter(router *Router) {
-	hc.router = router
 }
 
 func (hc *HTTPClient) Run() error {

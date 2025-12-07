@@ -25,7 +25,7 @@ func init() {
 	RegisterModule(ModuleRegistration{
 		//TODO(jwetzell): find a better namespace than "misc"
 		Type: "misc.serial.client",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig, router *Router) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 
@@ -70,7 +70,7 @@ func init() {
 				BaudRate: int(baudRateNum),
 			}
 
-			return &SerialClient{config: config, Port: portString, Framer: framer, Mode: &mode}, nil
+			return &SerialClient{config: config, Port: portString, Framer: framer, Mode: &mode, router: router}, nil
 		},
 	})
 }
@@ -81,10 +81,6 @@ func (mc *SerialClient) Id() string {
 
 func (mc *SerialClient) Type() string {
 	return mc.config.Type
-}
-
-func (mc *SerialClient) RegisterRouter(router *Router) {
-	mc.router = router
 }
 
 func (mc *SerialClient) SetupPort() error {

@@ -19,7 +19,7 @@ type UDPMulticast struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.udp.multicast",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig, router *Router) (Module, error) {
 			params := config.Params
 			ip, ok := params["ip"]
 
@@ -48,7 +48,7 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			return &UDPMulticast{config: config, Addr: addr}, nil
+			return &UDPMulticast{config: config, Addr: addr, router: router}, nil
 		},
 	})
 }
@@ -59,10 +59,6 @@ func (um *UDPMulticast) Id() string {
 
 func (um *UDPMulticast) Type() string {
 	return um.config.Type
-}
-
-func (um *UDPMulticast) RegisterRouter(router *Router) {
-	um.router = router
 }
 
 func (um *UDPMulticast) Run() error {

@@ -18,7 +18,7 @@ type Interval struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "gen.interval",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig, router *Router) (Module, error) {
 			params := config.Params
 
 			duration, ok := params["duration"]
@@ -32,7 +32,7 @@ func init() {
 				return nil, fmt.Errorf("gen.interval duration must be number")
 			}
 
-			return &Interval{Duration: uint32(durationNum), config: config}, nil
+			return &Interval{Duration: uint32(durationNum), config: config, router: router}, nil
 		},
 	})
 }
@@ -43,10 +43,6 @@ func (i *Interval) Id() string {
 
 func (i *Interval) Type() string {
 	return i.config.Type
-}
-
-func (i *Interval) RegisterRouter(router *Router) {
-	i.router = router
 }
 
 func (i *Interval) Run() error {

@@ -21,7 +21,7 @@ type TCPClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.tcp.client",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig, router *Router) (Module, error) {
 			params := config.Params
 			host, ok := params["host"]
 
@@ -68,7 +68,7 @@ func init() {
 				return nil, err
 			}
 
-			return &TCPClient{framer: framer, Addr: addr, config: config}, nil
+			return &TCPClient{framer: framer, Addr: addr, config: config, router: router}, nil
 		},
 	})
 }
@@ -79,10 +79,6 @@ func (tc *TCPClient) Id() string {
 
 func (tc *TCPClient) Type() string {
 	return tc.config.Type
-}
-
-func (tc *TCPClient) RegisterRouter(router *Router) {
-	tc.router = router
 }
 
 func (tc *TCPClient) Run() error {

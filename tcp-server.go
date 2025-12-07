@@ -28,7 +28,7 @@ type TCPServer struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.tcp.server",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig, router *Router) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {
@@ -76,7 +76,7 @@ func init() {
 				return nil, err
 			}
 
-			return &TCPServer{Framer: framer, Addr: addr, config: config, quit: make(chan interface{})}, nil
+			return &TCPServer{Framer: framer, Addr: addr, config: config, quit: make(chan interface{}), router: router}, nil
 		},
 	})
 }
@@ -87,10 +87,6 @@ func (ts *TCPServer) Id() string {
 
 func (ts *TCPServer) Type() string {
 	return ts.config.Type
-}
-
-func (ts *TCPServer) RegisterRouter(router *Router) {
-	ts.router = router
 }
 
 func (ts *TCPServer) handleClient(client *net.TCPConn) {

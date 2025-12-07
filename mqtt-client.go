@@ -21,7 +21,7 @@ type MQTTClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.mqtt.client",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig, router *Router) (Module, error) {
 			params := config.Params
 			broker, ok := params["broker"]
 
@@ -59,7 +59,7 @@ func init() {
 				return nil, fmt.Errorf("net.mqtt.client clientId must be string")
 			}
 
-			return &MQTTClient{config: config, Broker: brokerString, Topic: topicString, ClientID: clientIdString}, nil
+			return &MQTTClient{config: config, Broker: brokerString, Topic: topicString, ClientID: clientIdString, router: router}, nil
 		},
 	})
 }
@@ -70,10 +70,6 @@ func (mc *MQTTClient) Id() string {
 
 func (mc *MQTTClient) Type() string {
 	return mc.config.Type
-}
-
-func (mc *MQTTClient) RegisterRouter(router *Router) {
-	mc.router = router
 }
 
 func (mc *MQTTClient) Run() error {
