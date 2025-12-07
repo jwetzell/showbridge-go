@@ -92,6 +92,7 @@ func (hs *HTTPServer) Run() error {
 
 	err := httpServer.ListenAndServe()
 	slog.Debug("net.http.server closed", "id", hs.config.Id)
+	// TODO(jwetzell): handle server closed error differently
 	if err != nil {
 		return err
 	}
