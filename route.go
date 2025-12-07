@@ -26,14 +26,6 @@ type ProcessorRoute struct {
 	output     string
 }
 
-func (r *ProcessorRoute) Input() string {
-	return r.input
-}
-
-func (r *ProcessorRoute) Output() string {
-	return r.output
-}
-
 func NewRoute(config config.RouteConfig) (Route, error) {
 	processors := []processing.Processor{}
 
@@ -53,6 +45,14 @@ func NewRoute(config config.RouteConfig) (Route, error) {
 	}
 
 	return &ProcessorRoute{input: config.Input, processors: processors, output: config.Output}, nil
+}
+
+func (r *ProcessorRoute) Input() string {
+	return r.input
+}
+
+func (r *ProcessorRoute) Output() string {
+	return r.output
 }
 
 func (r *ProcessorRoute) HandleInput(sourceId string, payload any, router *Router) error {
