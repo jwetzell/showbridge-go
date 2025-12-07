@@ -6,12 +6,13 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/jwetzell/showbridge-go/internal/config"
 	"gitlab.com/gomidi/midi/v2"
 	_ "gitlab.com/gomidi/midi/v2/drivers/rtmididrv"
 )
 
 type MIDIClient struct {
-	config     ModuleConfig
+	config     config.ModuleConfig
 	router     *Router
 	InputPort  string
 	OutputPort string
@@ -22,7 +23,7 @@ func init() {
 	RegisterModule(ModuleRegistration{
 		//TODO(jwetzell): find a better namespace than "misc"
 		Type: "misc.midi.client",
-		New: func(config ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			input, ok := params["input"]
 

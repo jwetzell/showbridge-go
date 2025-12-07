@@ -5,11 +5,12 @@ import (
 	"log/slog"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processing"
 )
 
 type MQTTClient struct {
-	config   ModuleConfig
+	config   config.ModuleConfig
 	router   *Router
 	Broker   string
 	ClientID string
@@ -20,7 +21,7 @@ type MQTTClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.mqtt.client",
-		New: func(config ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			broker, ok := params["broker"]
 

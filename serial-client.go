@@ -7,12 +7,13 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/framing"
 	"go.bug.st/serial"
 )
 
 type SerialClient struct {
-	config ModuleConfig
+	config config.ModuleConfig
 	router *Router
 	Port   string
 	Framer framing.Framer
@@ -24,7 +25,7 @@ func init() {
 	RegisterModule(ModuleRegistration{
 		//TODO(jwetzell): find a better namespace than "misc"
 		Type: "misc.serial.client",
-		New: func(config ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 

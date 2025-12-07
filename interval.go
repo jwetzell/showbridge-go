@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"log/slog"
 	"time"
+
+	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
 type Interval struct {
-	config   ModuleConfig
+	config   config.ModuleConfig
 	Duration uint32
 	router   *Router
 	ticker   *time.Ticker
@@ -16,7 +18,7 @@ type Interval struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "gen.interval",
-		New: func(config ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 
 			duration, ok := params["duration"]

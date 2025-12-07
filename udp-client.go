@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+
+	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
 type UDPClient struct {
-	config ModuleConfig
+	config config.ModuleConfig
 	Addr   *net.UDPAddr
 	Port   uint16
 	conn   *net.UDPConn
@@ -17,7 +19,7 @@ type UDPClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.udp.client",
-		New: func(config ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			host, ok := params["host"]
 

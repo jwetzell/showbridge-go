@@ -7,10 +7,11 @@ import (
 	"time"
 
 	"github.com/jwetzell/psn-go"
+	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
 type PSNClient struct {
-	config  ModuleConfig
+	config  config.ModuleConfig
 	conn    *net.UDPConn
 	router  *Router
 	decoder *psn.Decoder
@@ -19,7 +20,7 @@ type PSNClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.psn.client",
-		New: func(config ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 
 			return &PSNClient{config: config, decoder: psn.NewDecoder()}, nil
 		},

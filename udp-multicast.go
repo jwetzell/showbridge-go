@@ -5,10 +5,12 @@ import (
 	"log/slog"
 	"net"
 	"time"
+
+	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
 type UDPMulticast struct {
-	config ModuleConfig
+	config config.ModuleConfig
 	conn   *net.UDPConn
 	router *Router
 	Addr   *net.UDPAddr
@@ -17,7 +19,7 @@ type UDPMulticast struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.udp.multicast",
-		New: func(config ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			ip, ok := params["ip"]
 

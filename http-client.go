@@ -5,10 +5,12 @@ import (
 	"log/slog"
 	"net/http"
 	"time"
+
+	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
 type HTTPClient struct {
-	config ModuleConfig
+	config config.ModuleConfig
 	router *Router
 	client *http.Client
 }
@@ -16,7 +18,7 @@ type HTTPClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.http.client",
-		New: func(config ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 
 			return &HTTPClient{config: config}, nil
 		},

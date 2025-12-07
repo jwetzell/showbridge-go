@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"os"
 	"sync"
+
+	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
 type RoutingError struct {
@@ -21,7 +23,7 @@ type Router struct {
 	moduleWait      sync.WaitGroup
 }
 
-func NewRouter(ctx context.Context, config Config) (*Router, []ModuleError, []RouteError) {
+func NewRouter(ctx context.Context, config config.Config) (*Router, []ModuleError, []RouteError) {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,

@@ -10,11 +10,12 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/framing"
 )
 
 type TCPServer struct {
-	config        ModuleConfig
+	config        config.ModuleConfig
 	Addr          *net.TCPAddr
 	Framer        framing.Framer
 	router        *Router
@@ -27,7 +28,7 @@ type TCPServer struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.tcp.server",
-		New: func(config ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {

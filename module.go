@@ -3,11 +3,13 @@ package showbridge
 import (
 	"fmt"
 	"sync"
+
+	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
 type ModuleError struct {
 	Index  int
-	Config ModuleConfig
+	Config config.ModuleConfig
 	Error  error
 }
 
@@ -19,15 +21,9 @@ type Module interface {
 	Output(any) error
 }
 
-type ModuleConfig struct {
-	Id     string         `json:"id"`
-	Type   string         `json:"type"`
-	Params map[string]any `json:"params"`
-}
-
 type ModuleRegistration struct {
 	Type string `json:"type"`
-	New  func(ModuleConfig) (Module, error)
+	New  func(config.ModuleConfig) (Module, error)
 }
 
 func RegisterModule(mod ModuleRegistration) {

@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processing"
 	"github.com/nats-io/nats.go"
 )
 
 type NATSClient struct {
-	config  ModuleConfig
+	config  config.ModuleConfig
 	router  *Router
 	URL     string
 	Subject string
@@ -19,7 +20,7 @@ type NATSClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.nats.client",
-		New: func(config ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			url, ok := params["url"]
 

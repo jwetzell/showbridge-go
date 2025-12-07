@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+
+	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
 type HTTPServer struct {
-	config ModuleConfig
+	config config.ModuleConfig
 	Port   uint16
 	router *Router
 }
@@ -21,7 +23,7 @@ type ResponseData struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.http.server",
-		New: func(config ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {

@@ -6,18 +6,20 @@ import (
 	"log/slog"
 	"net"
 	"time"
+
+	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
 type UDPServer struct {
 	Addr   *net.UDPAddr
-	config ModuleConfig
+	config config.ModuleConfig
 	router *Router
 }
 
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.udp.server",
-		New: func(config ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {

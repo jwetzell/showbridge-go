@@ -3,12 +3,13 @@ package showbridge
 import (
 	"fmt"
 
+	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processing"
 )
 
 type RouteError struct {
 	Index  int
-	Config RouteConfig
+	Config config.RouteConfig
 	Error  error
 }
 
@@ -20,13 +21,7 @@ type Route struct {
 	router     *Router
 }
 
-type RouteConfig struct {
-	Input      string                       `json:"input"`
-	Processors []processing.ProcessorConfig `json:"processors"`
-	Output     string                       `json:"output"`
-}
-
-func NewRoute(index int, config RouteConfig, router *Router) (*Route, error) {
+func NewRoute(index int, config config.RouteConfig, router *Router) (*Route, error) {
 	processors := []processing.Processor{}
 
 	if len(config.Processors) > 0 {

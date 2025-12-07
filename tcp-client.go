@@ -6,11 +6,12 @@ import (
 	"net"
 	"time"
 
+	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/framing"
 )
 
 type TCPClient struct {
-	config ModuleConfig
+	config config.ModuleConfig
 	framer framing.Framer
 	conn   *net.TCPConn
 	router *Router
@@ -20,7 +21,7 @@ type TCPClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.tcp.client",
-		New: func(config ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			host, ok := params["host"]
 
