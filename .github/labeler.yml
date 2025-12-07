@@ -1,10 +1,22 @@
-framing:
+config:
   - changed-files:
-      - any-glob-to-any-file: 'internal/framing/**'
+      - any-glob-to-any-file: 'internal/config/**'
 
-processing:
+framer:
   - changed-files:
-      - any-glob-to-any-file: 'internal/processing/**'
+      - any-glob-to-any-file: 'internal/framer/**'
+
+module:
+  - changed-files:
+      - any-glob-to-any-file: 'internal/module/**'
+
+processor:
+  - changed-files:
+      - any-glob-to-any-file: 'internal/processor/**'
+
+route:
+  - changed-files:
+      - any-glob-to-any-file: 'internal/route/**'
 
 cli:
   - changed-files:
