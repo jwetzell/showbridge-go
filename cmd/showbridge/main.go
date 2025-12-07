@@ -8,6 +8,7 @@ import (
 	"os/signal"
 
 	"github.com/jwetzell/showbridge-go"
+	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/urfave/cli/v3"
 	"sigs.k8s.io/yaml"
 )
@@ -54,18 +55,18 @@ func main() {
 
 }
 
-func readConfig(configPath string) (showbridge.Config, error) {
+func readConfig(configPath string) (config.Config, error) {
+	config := config.Config{}
+
 	configBytes, err := os.ReadFile(configPath)
 
 	if err != nil {
-		return showbridge.Config{}, err
+		return config, err
 	}
-
-	config := showbridge.Config{}
 
 	err = yaml.Unmarshal(configBytes, &config)
 	if err != nil {
-		return showbridge.Config{}, err
+		return config, err
 	}
 
 	return config, nil
