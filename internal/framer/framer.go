@@ -8,6 +8,7 @@ type Framer interface {
 	Decode([]byte) [][]byte
 	Encode([]byte) []byte
 	Clear()
+	Buffer() []byte
 }
 
 func GetFramer(framingType string) (Framer, error) {

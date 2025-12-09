@@ -35,3 +35,7 @@ func (bsf *ByteSeparatorFramer) Encode(data []byte) []byte {
 func (bsf *ByteSeparatorFramer) Clear() {
 	bsf.buffer = []byte{}
 }
+
+func (bsf *ByteSeparatorFramer) Buffer() []byte {
+	return bsf.buffer
+}

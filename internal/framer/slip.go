@@ -74,3 +74,7 @@ func (sf *SlipFramer) Encode(data []byte) []byte {
 func (sf *SlipFramer) Clear() {
 	sf.buffer = []byte{}
 }
+
+func (sf *SlipFramer) Buffer() []byte {
+	return sf.buffer
+}
