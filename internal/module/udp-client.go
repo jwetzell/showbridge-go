@@ -65,14 +65,19 @@ func (uc *UDPClient) Type() string {
 	return uc.config.Type
 }
 
+func (uc *UDPClient) SetupConn() error {
+	client, err := net.DialUDP("udp", nil, uc.Addr)
+	uc.conn = client
+	return err
+}
+
 func (uc *UDPClient) Run() error {
 
-	client, err := net.DialUDP("udp", nil, uc.Addr)
+	err := uc.SetupConn()
 	if err != nil {
 		return err
 	}
 
-	uc.conn = client
 	<-uc.ctx.Done()
 	slog.Debug("router context done in module", "id", uc.config.Id)
 	if uc.conn != nil {
