@@ -21,6 +21,8 @@ func GetFramer(framingType string) (Framer, error) {
 		return NewByteSeparatorFramer([]byte{'\r', '\n'}), nil
 	case "SLIP":
 		return NewSlipFramer(), nil
+	case "RAW":
+		return NewRawFramer(), nil
 	default:
 		return nil, fmt.Errorf("unknown framing method: %s", framingType)
 	}
