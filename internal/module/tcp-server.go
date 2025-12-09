@@ -44,18 +44,20 @@ func init() {
 				return nil, fmt.Errorf("net.tcp.server port must be a number")
 			}
 
-			framingMethod, ok := params["framing"]
-			if !ok {
-				return nil, fmt.Errorf("net.tcp.server requires a framing method")
+			framingMethod := "RAW"
+
+			framingMethodRaw, ok := params["framing"]
+
+			if ok {
+				framingMethodString, ok := framingMethodRaw.(string)
+
+				if !ok {
+					return nil, fmt.Errorf("misc.serial.client framing method must be a string")
+				}
+				framingMethod = framingMethodString
 			}
 
-			framingMethodString, ok := framingMethod.(string)
-
-			if !ok {
-				return nil, fmt.Errorf("net.tcp.server framing method must be a string")
-			}
-
-			framer, err := framer.GetFramer(framingMethodString)
+			framer, err := framer.GetFramer(framingMethod)
 
 			if err != nil {
 				return nil, err
