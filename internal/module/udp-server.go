@@ -75,7 +75,8 @@ func (us *UDPServer) Run() error {
 
 	defer listener.Close()
 
-	buffer := make([]byte, 1024)
+	// TODO(jwetzell): make buffer size configurable
+	buffer := make([]byte, 65535)
 	for {
 		select {
 		case <-us.ctx.Done():
