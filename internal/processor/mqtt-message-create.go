@@ -8,10 +8,10 @@ import (
 )
 
 type MQTTMessage struct {
-	Topic    string
-	QoS      byte
-	Payload  any
-	Retained bool
+	topic    string
+	qos      byte
+	payload  []byte
+	retained bool
 }
 
 type MQTTMessageCreate struct {
@@ -19,16 +19,44 @@ type MQTTMessageCreate struct {
 	Topic    string
 	QoS      byte
 	Retained bool
-	Payload  any
+	Payload  []byte
 }
+
+func (mm MQTTMessage) Duplicate() bool {
+	// TODO(jwetzell): implement?
+	return false
+}
+
+func (mm MQTTMessage) Qos() byte {
+	return mm.qos
+}
+
+func (mm MQTTMessage) Retained() bool {
+	return mm.retained
+}
+
+func (mm MQTTMessage) Topic() string {
+	return mm.topic
+}
+
+func (mm MQTTMessage) MessageID() uint16 {
+	// TODO(jwetzell): implement?
+	return 0
+}
+
+func (mm MQTTMessage) Payload() []byte {
+	return mm.payload
+}
+
+func (mm MQTTMessage) Ack() {}
 
 func (mmc *MQTTMessageCreate) Process(ctx context.Context, payload any) (any, error) {
 
 	message := MQTTMessage{
-		Topic:    mmc.Topic,
-		QoS:      mmc.QoS,
-		Retained: mmc.Retained,
-		Payload:  mmc.Payload,
+		topic:    mmc.Topic,
+		qos:      mmc.QoS,
+		retained: mmc.Retained,
+		payload:  mmc.Payload,
 	}
 
 	return message, nil
@@ -86,7 +114,19 @@ func init() {
 				return nil, fmt.Errorf("mqtt.message.create requires an payload parameter")
 			}
 
-			return &MQTTMessageCreate{config: config, Topic: topicString, QoS: byte(qosByte), Retained: retainedBool, Payload: payload}, nil
+			if payloadBytes, ok := payload.([]byte); ok {
+				return &MQTTMessageCreate{config: config, Topic: topicString, QoS: byte(qosByte), Retained: retainedBool, Payload: payloadBytes}, nil
+			}
+
+			payloadString, ok := payload.(string)
+
+			if !ok {
+				return nil, fmt.Errorf("mqtt.message.create payload must be a string or byte array")
+			}
+
+			payloadBytes := []byte(payloadString)
+
+			return &MQTTMessageCreate{config: config, Topic: topicString, QoS: byte(qosByte), Retained: retainedBool, Payload: payloadBytes}, nil
 		},
 	})
 }

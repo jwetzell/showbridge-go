@@ -7,7 +7,6 @@ import (
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/jwetzell/showbridge-go/internal/config"
-	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
@@ -105,7 +104,9 @@ func (mc *MQTTClient) Run() error {
 }
 
 func (mc *MQTTClient) Output(payload any) error {
-	payloadMessage, ok := payload.(processor.MQTTMessage)
+	payloadMessage, ok := payload.(mqtt.Message)
+
+	fmt.Printf("payload type: %T\n", payload)
 
 	if !ok {
 		return fmt.Errorf("net.mqtt.client is only able to output a MQTTMessage")
@@ -119,7 +120,7 @@ func (mc *MQTTClient) Output(payload any) error {
 		return fmt.Errorf("net.mqtt.client is not connected")
 	}
 
-	token := mc.client.Publish(payloadMessage.Topic, payloadMessage.QoS, payloadMessage.Retained, payloadMessage.Payload)
+	token := mc.client.Publish(payloadMessage.Topic(), payloadMessage.Qos(), payloadMessage.Retained(), payloadMessage.Payload())
 
 	token.Wait()
 
