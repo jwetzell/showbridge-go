@@ -58,7 +58,7 @@ func (pc *PSNClient) Run() error {
 		select {
 		case <-pc.ctx.Done():
 			// TODO(jwetzell): cleanup?
-			slog.Debug("router context done in module", "id", pc.config.Id)
+			slog.Debug("router context done in module", "id", pc.Id())
 			return nil
 		default:
 			pc.conn.SetDeadline(time.Now().Add(time.Millisecond * 200))
@@ -76,15 +76,15 @@ func (pc *PSNClient) Run() error {
 				message := buffer[:numBytes]
 				err := pc.decoder.Decode(message)
 				if err != nil {
-					slog.Error("net.psn.client problem decoding psn traffic", "id", pc.config.Id, "error", err)
+					slog.Error("net.psn.client problem decoding psn traffic", "id", pc.Id(), "error", err)
 				}
 
 				if pc.router != nil {
 					for _, tracker := range pc.decoder.Trackers {
-						pc.router.HandleInput(pc.config.Id, tracker)
+						pc.router.HandleInput(pc.Id(), tracker)
 					}
 				} else {
-					slog.Error("net.psn.client has no router", "id", pc.config.Id)
+					slog.Error("net.psn.client has no router", "id", pc.Id())
 				}
 			}
 		}

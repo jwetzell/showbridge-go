@@ -76,7 +76,7 @@ func (nc *NATSClient) Run() error {
 
 	sub, err := nc.client.Subscribe(nc.Subject, func(msg *nats.Msg) {
 		if nc.router != nil {
-			nc.router.HandleInput(nc.config.Id, msg)
+			nc.router.HandleInput(nc.Id(), msg)
 		}
 	})
 
@@ -87,7 +87,7 @@ func (nc *NATSClient) Run() error {
 	defer sub.Unsubscribe()
 
 	<-nc.ctx.Done()
-	slog.Debug("router context done in module", "id", nc.config.Id)
+	slog.Debug("router context done in module", "id", nc.Id())
 	return nil
 }
 

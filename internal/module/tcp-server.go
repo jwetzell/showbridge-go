@@ -98,7 +98,7 @@ func (ts *TCPServer) handleClient(client *net.TCPConn) {
 	ts.connectionsMu.Lock()
 	ts.connections = append(ts.connections, client)
 	ts.connectionsMu.Unlock()
-	slog.Debug("net.tcp.server connection accepted", "id", ts.config.Id, "remoteAddr", client.RemoteAddr().String())
+	slog.Debug("net.tcp.server connection accepted", "id", ts.Id(), "remoteAddr", client.RemoteAddr().String())
 	defer client.Close()
 
 	buffer := make([]byte, 1024)
@@ -125,7 +125,7 @@ ClientRead:
 								break
 							}
 						}
-						slog.Debug("net.tcp.server connection reset", "id", ts.config.Id, "remoteAddr", client.RemoteAddr().String())
+						slog.Debug("net.tcp.server connection reset", "id", ts.Id(), "remoteAddr", client.RemoteAddr().String())
 						ts.connectionsMu.Unlock()
 					}
 				}
@@ -138,7 +138,7 @@ ClientRead:
 							break
 						}
 					}
-					slog.Debug("net.tcp.server stream ended", "id", ts.config.Id, "remoteAddr", client.RemoteAddr().String())
+					slog.Debug("net.tcp.server stream ended", "id", ts.Id(), "remoteAddr", client.RemoteAddr().String())
 					ts.connectionsMu.Unlock()
 				}
 				return
@@ -148,9 +148,9 @@ ClientRead:
 					messages := ts.Framer.Decode(buffer[0:byteCount])
 					for _, message := range messages {
 						if ts.router != nil {
-							ts.router.HandleInput(ts.config.Id, message)
+							ts.router.HandleInput(ts.Id(), message)
 						} else {
-							slog.Error("net.tcp.server has no router", "id", ts.config.Id)
+							slog.Error("net.tcp.server has no router", "id", ts.Id())
 						}
 					}
 				}
@@ -170,7 +170,7 @@ func (ts *TCPServer) Run() error {
 		<-ts.ctx.Done()
 		close(ts.quit)
 		listener.Close()
-		slog.Debug("router context done in module", "id", ts.config.Id)
+		slog.Debug("router context done in module", "id", ts.Id())
 	}()
 
 AcceptLoop:

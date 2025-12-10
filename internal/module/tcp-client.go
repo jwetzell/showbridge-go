@@ -91,7 +91,7 @@ func (tc *TCPClient) Run() error {
 	// TODO(jwetzell): shutdown with router.Context properly
 	go func() {
 		<-tc.ctx.Done()
-		slog.Debug("router context done in module", "id", tc.config.Id)
+		slog.Debug("router context done in module", "id", tc.Id())
 		if tc.conn != nil {
 			tc.conn.Close()
 		}
@@ -101,10 +101,10 @@ func (tc *TCPClient) Run() error {
 		err := tc.SetupConn()
 		if err != nil {
 			if tc.ctx.Err() != nil {
-				slog.Debug("router context done in module", "id", tc.config.Id)
+				slog.Debug("router context done in module", "id", tc.Id())
 				return nil
 			}
-			slog.Error("net.tcp.client", "id", tc.config.Id, "error", err.Error())
+			slog.Error("net.tcp.client", "id", tc.Id(), "error", err.Error())
 			time.Sleep(time.Second * 2)
 			continue
 		}
@@ -112,14 +112,14 @@ func (tc *TCPClient) Run() error {
 		buffer := make([]byte, 1024)
 		select {
 		case <-tc.ctx.Done():
-			slog.Debug("router context done in module", "id", tc.config.Id)
+			slog.Debug("router context done in module", "id", tc.Id())
 			return nil
 		default:
 		READ:
 			for {
 				select {
 				case <-tc.ctx.Done():
-					slog.Debug("router context done in module", "id", tc.config.Id)
+					slog.Debug("router context done in module", "id", tc.Id())
 					return nil
 				default:
 					byteCount, err := tc.conn.Read(buffer)
@@ -134,9 +134,9 @@ func (tc *TCPClient) Run() error {
 							messages := tc.framer.Decode(buffer[0:byteCount])
 							for _, message := range messages {
 								if tc.router != nil {
-									tc.router.HandleInput(tc.config.Id, message)
+									tc.router.HandleInput(tc.Id(), message)
 								} else {
-									slog.Error("net.tcp.client has no router", "id", tc.config.Id)
+									slog.Error("net.tcp.client has no router", "id", tc.Id())
 								}
 							}
 						}

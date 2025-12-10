@@ -61,7 +61,7 @@ func (hs *HTTPServer) HandleDefault(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if hs.router != nil {
-		routingErrors := hs.router.HandleInput(hs.config.Id, r)
+		routingErrors := hs.router.HandleInput(hs.Id(), r)
 		if routingErrors != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			response.Status = "error"
@@ -89,12 +89,12 @@ func (hs *HTTPServer) Run() error {
 
 	go func() {
 		<-hs.ctx.Done()
-		slog.Debug("router context done in module", "id", hs.config.Id)
+		slog.Debug("router context done in module", "id", hs.Id())
 		httpServer.Close()
 	}()
 
 	err := httpServer.ListenAndServe()
-	slog.Debug("net.http.server closed", "id", hs.config.Id)
+	slog.Debug("net.http.server closed", "id", hs.Id())
 	// TODO(jwetzell): handle server closed error differently
 	if err != nil {
 		return err

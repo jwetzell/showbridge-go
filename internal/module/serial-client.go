@@ -105,7 +105,7 @@ func (mc *SerialClient) Run() error {
 	// TODO(jwetzell): shutdown with router.Context properly
 	go func() {
 		<-mc.ctx.Done()
-		slog.Debug("router context done in module", "id", mc.config.Id)
+		slog.Debug("router context done in module", "id", mc.Id())
 		if mc.port != nil {
 			mc.port.Close()
 		}
@@ -115,10 +115,10 @@ func (mc *SerialClient) Run() error {
 		err := mc.SetupPort()
 		if err != nil {
 			if mc.ctx.Err() != nil {
-				slog.Debug("router context done in module", "id", mc.config.Id)
+				slog.Debug("router context done in module", "id", mc.Id())
 				return nil
 			}
-			slog.Error("misc.serial.client", "id", mc.config.Id, "error", err.Error())
+			slog.Error("misc.serial.client", "id", mc.Id(), "error", err.Error())
 			time.Sleep(time.Second * 2)
 			continue
 		}
@@ -126,14 +126,14 @@ func (mc *SerialClient) Run() error {
 		buffer := make([]byte, 1024)
 		select {
 		case <-mc.ctx.Done():
-			slog.Debug("router context done in module", "id", mc.config.Id)
+			slog.Debug("router context done in module", "id", mc.Id())
 			return nil
 		default:
 		READ:
 			for {
 				select {
 				case <-mc.ctx.Done():
-					slog.Debug("router context done in module", "id", mc.config.Id)
+					slog.Debug("router context done in module", "id", mc.Id())
 					return nil
 				default:
 					byteCount, err := mc.port.Read(buffer)
@@ -148,9 +148,9 @@ func (mc *SerialClient) Run() error {
 							messages := mc.Framer.Decode(buffer[0:byteCount])
 							for _, message := range messages {
 								if mc.router != nil {
-									mc.router.HandleInput(mc.config.Id, message)
+									mc.router.HandleInput(mc.Id(), message)
 								} else {
-									slog.Error("misc.serial.client has no router", "id", mc.config.Id)
+									slog.Error("misc.serial.client has no router", "id", mc.Id())
 								}
 							}
 						}

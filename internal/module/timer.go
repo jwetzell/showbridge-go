@@ -55,11 +55,11 @@ func (t *Timer) Run() error {
 		select {
 		case <-t.ctx.Done():
 			t.timer.Stop()
-			slog.Debug("router context done in module", "id", t.config.Id)
+			slog.Debug("router context done in module", "id", t.Id())
 			return nil
 		case time := <-t.timer.C:
 			if t.router != nil {
-				t.router.HandleInput(t.config.Id, time)
+				t.router.HandleInput(t.Id(), time)
 			}
 		}
 	}

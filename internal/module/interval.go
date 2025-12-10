@@ -56,11 +56,11 @@ func (i *Interval) Run() error {
 	for {
 		select {
 		case <-i.ctx.Done():
-			slog.Debug("router context done in module", "id", i.config.Id)
+			slog.Debug("router context done in module", "id", i.Id())
 			return nil
 		case <-ticker.C:
 			if i.router != nil {
-				i.router.HandleInput(i.config.Id, time.Now())
+				i.router.HandleInput(i.Id(), time.Now())
 			}
 		}
 	}

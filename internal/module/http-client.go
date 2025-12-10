@@ -43,7 +43,7 @@ func (hc *HTTPClient) Run() error {
 	}
 
 	<-hc.ctx.Done()
-	slog.Debug("router context done in module", "id", hc.config.Id)
+	slog.Debug("router context done in module", "id", hc.Id())
 	return nil
 }
 
@@ -66,7 +66,7 @@ func (hc *HTTPClient) Output(payload any) error {
 	}
 
 	if hc.router != nil {
-		hc.router.HandleInput(hc.config.Id, response)
+		hc.router.HandleInput(hc.Id(), response)
 	}
 
 	return nil

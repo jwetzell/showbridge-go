@@ -75,6 +75,7 @@ func (mc *MIDIClient) Run() error {
 
 	stop, err := midi.ListenTo(in, func(msg midi.Message, timestampms int32) {
 		if mc.router != nil {
+			// TODO(jwetzell): unpack MIDI messsage into something more useful?
 			mc.router.HandleInput(mc.Id(), msg)
 		}
 	}, midi.UseSysEx())
@@ -99,7 +100,7 @@ func (mc *MIDIClient) Run() error {
 	mc.SendFunc = send
 
 	<-mc.ctx.Done()
-	slog.Debug("router context done in module", "id", mc.config.Id)
+	slog.Debug("router context done in module", "id", mc.Id())
 	return nil
 }
 

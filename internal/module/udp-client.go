@@ -79,7 +79,7 @@ func (uc *UDPClient) Run() error {
 	}
 
 	<-uc.ctx.Done()
-	slog.Debug("router context done in module", "id", uc.config.Id)
+	slog.Debug("router context done in module", "id", uc.Id())
 	if uc.conn != nil {
 		uc.conn.Close()
 	}
