@@ -39,12 +39,14 @@ func (ss *SIPServer) Type() string {
 }
 
 func (ss *SIPServer) Run() error {
-
-	ua, _ := sipgo.NewUA()
-
 	diagoLogger := slog.New(slog.NewJSONHandler(io.Discard, nil))
+
+	ua, _ := sipgo.NewUA(
+		sipgo.WithUserAgentTransportLayerOptions(sip.WithTransportLayerLogger(diagoLogger)),
+	)
+
 	sip.SetDefaultLogger(diagoLogger)
-	tu := diago.NewDiago(ua, diago.WithLogger(diagoLogger), diago.WithTransport(
+	dg := diago.NewDiago(ua, diago.WithLogger(diagoLogger), diago.WithTransport(
 		diago.Transport{
 			Transport: "udp",
 			BindHost:  "0.0.0.0",
@@ -52,7 +54,7 @@ func (ss *SIPServer) Run() error {
 		},
 	))
 
-	err := tu.Serve(ss.ctx, func(inDialog *diago.DialogServerSession) {
+	err := dg.Serve(ss.ctx, func(inDialog *diago.DialogServerSession) {
 		ss.HandleCall(inDialog)
 	})
 
