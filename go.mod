@@ -4,6 +4,8 @@ go 1.25.3
 
 require (
 	github.com/eclipse/paho.mqtt.golang v1.5.1
+	github.com/emiago/diago v0.23.1-0.20251211215055-e1d875617111
+	github.com/emiago/sipgo v1.0.0
 	github.com/expr-lang/expr v1.17.6
 	github.com/jwetzell/free-d-go v0.1.0
 	github.com/jwetzell/osc-go v0.1.0
@@ -19,8 +21,6 @@ require (
 require (
 	github.com/creack/goselect v0.1.2 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/emiago/diago v0.23.1-0.20251211215055-e1d875617111 // indirect
-	github.com/emiago/sipgo v1.0.0 // indirect
 	github.com/go-audio/riff v1.0.0 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
