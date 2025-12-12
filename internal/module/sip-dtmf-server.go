@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/emiago/diago"
+	"github.com/emiago/diago/media"
 	"github.com/emiago/sipgo"
 	"github.com/emiago/sipgo/sip"
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -102,10 +103,12 @@ func (sds *SIPDTMFServer) Run() error {
 
 	ua, _ := sipgo.NewUA(
 		sipgo.WithUserAgentTransportLayerOptions(sip.WithTransportLayerLogger(diagoLogger)),
+		sipgo.WithUserAgentTransactionLayerOptions(sip.WithTransactionLayerLogger(diagoLogger)),
 	)
 	defer ua.Close()
 
 	sip.SetDefaultLogger(diagoLogger)
+	media.SetDefaultLogger(diagoLogger)
 	dg := diago.NewDiago(ua, diago.WithLogger(diagoLogger), diago.WithTransport(
 		diago.Transport{
 			Transport: sds.Transport,
