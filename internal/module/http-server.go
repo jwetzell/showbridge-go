@@ -25,18 +25,18 @@ type ResponseData struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "net.http.server",
+		Type: "http.server",
 		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {
-				return nil, fmt.Errorf("net.http.server requires a port parameter")
+				return nil, fmt.Errorf("http.server requires a port parameter")
 			}
 
 			portNum, ok := port.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("net.http.server port must be uint16")
+				return nil, fmt.Errorf("http.server port must be uint16")
 			}
 
 			return &HTTPServer{Port: uint16(portNum), config: config, ctx: ctx, router: router}, nil
@@ -94,7 +94,7 @@ func (hs *HTTPServer) Run() error {
 	}()
 
 	err := httpServer.ListenAndServe()
-	slog.Debug("net.http.server closed", "id", hs.Id())
+	slog.Debug("http.server closed", "id", hs.Id())
 	// TODO(jwetzell): handle server closed error differently
 	if err != nil {
 		return err
@@ -105,5 +105,5 @@ func (hs *HTTPServer) Run() error {
 }
 
 func (hs *HTTPServer) Output(payload any) error {
-	return fmt.Errorf("net.http.server output is not implemented")
+	return fmt.Errorf("http.server output is not implemented")
 }

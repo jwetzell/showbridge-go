@@ -27,19 +27,19 @@ type SerialClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		//TODO(jwetzell): find a better namespace than "misc"
-		Type: "misc.serial.client",
+		Type: "serial.client",
 		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 
 			if !ok {
-				return nil, fmt.Errorf("misc.serial.client requires a port parameter")
+				return nil, fmt.Errorf("serial.client requires a port parameter")
 			}
 
 			portString, ok := port.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("misc.serial.client port must be a string")
+				return nil, fmt.Errorf("serial.client port must be a string")
 			}
 
 			framingMethod := "RAW"
@@ -50,7 +50,7 @@ func init() {
 				framingMethodString, ok := framingMethodRaw.(string)
 
 				if !ok {
-					return nil, fmt.Errorf("misc.serial.client framing method must be a string")
+					return nil, fmt.Errorf("serial.client framing method must be a string")
 				}
 				framingMethod = framingMethodString
 			}
@@ -63,12 +63,12 @@ func init() {
 
 			buadRate, ok := params["baudRate"]
 			if !ok {
-				return nil, fmt.Errorf("misc.serial.client requires a baudRate parameter")
+				return nil, fmt.Errorf("serial.client requires a baudRate parameter")
 			}
 
 			baudRateNum, ok := buadRate.(float64)
 			if !ok {
-				return nil, fmt.Errorf("misc.serial.client baudRate must be a number")
+				return nil, fmt.Errorf("serial.client baudRate must be a number")
 			}
 
 			mode := serial.Mode{
@@ -92,7 +92,7 @@ func (mc *SerialClient) SetupPort() error {
 
 	port, err := serial.Open(mc.Port, mc.Mode)
 	if err != nil {
-		return fmt.Errorf("misc.serial.client can't open input port: %s", mc.Port)
+		return fmt.Errorf("serial.client can't open input port: %s", mc.Port)
 	}
 
 	mc.port = port
@@ -118,7 +118,7 @@ func (mc *SerialClient) Run() error {
 				slog.Debug("router context done in module", "id", mc.Id())
 				return nil
 			}
-			slog.Error("misc.serial.client", "id", mc.Id(), "error", err.Error())
+			slog.Error("serial.client", "id", mc.Id(), "error", err.Error())
 			time.Sleep(time.Second * 2)
 			continue
 		}
@@ -150,7 +150,7 @@ func (mc *SerialClient) Run() error {
 								if mc.router != nil {
 									mc.router.HandleInput(mc.Id(), message)
 								} else {
-									slog.Error("misc.serial.client has no router", "id", mc.Id())
+									slog.Error("serial.client has no router", "id", mc.Id())
 								}
 							}
 						}
@@ -166,7 +166,7 @@ func (mc *SerialClient) Output(payload any) error {
 	payloadBytes, ok := payload.([]byte)
 
 	if !ok {
-		return fmt.Errorf("misc.serial.client can only ouptut bytes")
+		return fmt.Errorf("serial.client can only ouptut bytes")
 	}
 
 	_, err := mc.port.Write(mc.Framer.Encode(payloadBytes))

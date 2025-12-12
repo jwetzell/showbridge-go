@@ -22,7 +22,7 @@ type PSNClient struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "net.psn.client",
+		Type: "psn.client",
 		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 
 			return &PSNClient{config: config, decoder: psn.NewDecoder(), ctx: ctx, router: router}, nil
@@ -76,7 +76,7 @@ func (pc *PSNClient) Run() error {
 				message := buffer[:numBytes]
 				err := pc.decoder.Decode(message)
 				if err != nil {
-					slog.Error("net.psn.client problem decoding psn traffic", "id", pc.Id(), "error", err)
+					slog.Error("psn.client problem decoding psn traffic", "id", pc.Id(), "error", err)
 				}
 
 				if pc.router != nil {
@@ -84,7 +84,7 @@ func (pc *PSNClient) Run() error {
 						pc.router.HandleInput(pc.Id(), tracker)
 					}
 				} else {
-					slog.Error("net.psn.client has no router", "id", pc.Id())
+					slog.Error("psn.client has no router", "id", pc.Id())
 				}
 			}
 		}
@@ -92,5 +92,5 @@ func (pc *PSNClient) Run() error {
 }
 
 func (pc *PSNClient) Output(payload any) error {
-	return fmt.Errorf("net.psn.client output is not implemented")
+	return fmt.Errorf("psn.client output is not implemented")
 }

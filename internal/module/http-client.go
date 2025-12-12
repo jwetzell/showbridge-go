@@ -20,7 +20,7 @@ type HTTPClient struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "net.http.client",
+		Type: "http.client",
 		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 
 			return &HTTPClient{config: config, ctx: ctx, router: router}, nil
@@ -52,11 +52,11 @@ func (hc *HTTPClient) Output(payload any) error {
 	payloadRequest, ok := payload.(*http.Request)
 
 	if !ok {
-		return fmt.Errorf("net.http.client is only able to output an http.Request")
+		return fmt.Errorf("http.client is only able to output an http.Request")
 	}
 
 	if hc.client == nil {
-		return fmt.Errorf("net.http.client client is nil")
+		return fmt.Errorf("http.client client is nil")
 	}
 
 	response, err := hc.client.Do(payloadRequest)

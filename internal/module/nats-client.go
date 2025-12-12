@@ -22,31 +22,31 @@ type NATSClient struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "net.nats.client",
+		Type: "nats.client",
 		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params
 			url, ok := params["url"]
 
 			if !ok {
-				return nil, fmt.Errorf("net.nats.client requires a url parameter")
+				return nil, fmt.Errorf("nats.client requires a url parameter")
 			}
 
 			urlString, ok := url.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("net.nats.client url must be string")
+				return nil, fmt.Errorf("nats.client url must be string")
 			}
 
 			subject, ok := params["subject"]
 
 			if !ok {
-				return nil, fmt.Errorf("net.nats.client requires a subject parameter")
+				return nil, fmt.Errorf("nats.client requires a subject parameter")
 			}
 
 			subjectString, ok := subject.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("net.nats.client subject must be string")
+				return nil, fmt.Errorf("nats.client subject must be string")
 			}
 
 			return &NATSClient{config: config, URL: urlString, Subject: subjectString, ctx: ctx, router: router}, nil
@@ -96,15 +96,15 @@ func (nc *NATSClient) Output(payload any) error {
 	payloadMessage, ok := payload.(processor.NATSMessage)
 
 	if !ok {
-		return fmt.Errorf("net.nats.client is only able to output NATSMessage")
+		return fmt.Errorf("nats.client is only able to output NATSMessage")
 	}
 
 	if nc.client == nil {
-		return fmt.Errorf("net.nats.client client is not setup")
+		return fmt.Errorf("nats.client client is not setup")
 	}
 
 	if !nc.client.IsConnected() {
-		return fmt.Errorf("net.nats.client is not connected")
+		return fmt.Errorf("nats.client is not connected")
 	}
 
 	err := nc.client.Publish(payloadMessage.Subject, payloadMessage.Payload)

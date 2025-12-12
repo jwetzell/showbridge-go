@@ -25,31 +25,31 @@ type MIDIClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		//TODO(jwetzell): find a better namespace than "misc"
-		Type: "misc.midi.client",
+		Type: "midi.client",
 		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params
 			input, ok := params["input"]
 
 			if !ok {
-				return nil, fmt.Errorf("misc.midi.client requires a input parameter")
+				return nil, fmt.Errorf("midi.client requires a input parameter")
 			}
 
 			inputString, ok := input.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("misc.midi.client input must be a string")
+				return nil, fmt.Errorf("midi.client input must be a string")
 			}
 
 			output, ok := params["output"]
 
 			if !ok {
-				return nil, fmt.Errorf("misc.midi.client requires a output parameter")
+				return nil, fmt.Errorf("midi.client requires a output parameter")
 			}
 
 			outputString, ok := output.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("misc.midi.client output must be a string")
+				return nil, fmt.Errorf("midi.client output must be a string")
 			}
 
 			return &MIDIClient{config: config, InputPort: inputString, OutputPort: outputString, ctx: ctx, router: router}, nil
@@ -70,7 +70,7 @@ func (mc *MIDIClient) Run() error {
 
 	in, err := midi.FindInPort(mc.InputPort)
 	if err != nil {
-		return fmt.Errorf("misc.midi.client can't find input port: %s", mc.InputPort)
+		return fmt.Errorf("midi.client can't find input port: %s", mc.InputPort)
 	}
 
 	stop, err := midi.ListenTo(in, func(msg midi.Message, timestampms int32) {
@@ -89,7 +89,7 @@ func (mc *MIDIClient) Run() error {
 	out, err := midi.FindOutPort(mc.OutputPort)
 
 	if err != nil {
-		return fmt.Errorf("misc.midi.client can't find output port: %s", mc.OutputPort)
+		return fmt.Errorf("midi.client can't find output port: %s", mc.OutputPort)
 	}
 
 	send, err := midi.SendTo(out)
@@ -106,13 +106,13 @@ func (mc *MIDIClient) Run() error {
 
 func (mc *MIDIClient) Output(payload any) error {
 	if mc.SendFunc == nil {
-		return fmt.Errorf("misc.midi.client output is not setup")
+		return fmt.Errorf("midi.client output is not setup")
 	}
 
 	payloadMessage, ok := payload.(midi.Message)
 
 	if !ok {
-		return fmt.Errorf("misc.midi.client can only ouptut midi.Message")
+		return fmt.Errorf("midi.client can only ouptut midi.Message")
 	}
 
 	return mc.SendFunc(payloadMessage)
