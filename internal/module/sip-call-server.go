@@ -23,7 +23,7 @@ type SIPCallServer struct {
 	Port      int
 	Transport string
 	UserAgent string
-	diag      *diago.Diago
+	dg        *diago.Diago
 }
 
 type SIPCallMessage struct {
@@ -124,7 +124,7 @@ func (sds *SIPCallServer) Run() error {
 		})
 	}()
 
-	sds.diag = dg
+	sds.dg = dg
 
 	<-sds.ctx.Done()
 	slog.Debug("router context done in module", "id", sds.Id())
@@ -148,8 +148,8 @@ func (sds *SIPCallServer) Output(payload any) error {
 		return fmt.Errorf("sip.call.server output payload must be of type string")
 	}
 
-	if sds.diag == nil {
-		return fmt.Errorf("sip.call.server diago not initialized")
+	if sds.dg == nil {
+		return fmt.Errorf("sip.call.server diago is not initialized")
 	}
 
 	var uri sip.Uri
@@ -157,19 +157,29 @@ func (sds *SIPCallServer) Output(payload any) error {
 	if err != nil {
 		return fmt.Errorf("sip.call.server output payload is not a valid SIP URI: %v", err)
 	}
-	outDialog, err := sds.diag.NewDialog(uri, diago.NewDialogOptions{
+	outDialog, err := sds.dg.NewDialog(uri, diago.NewDialogOptions{
 		Transport: sds.Transport,
 	})
 
 	if err != nil {
 		return fmt.Errorf("sip.call.server failed to create new dialog: %v", err)
 	}
-	outDialog.Invite(sds.ctx, diago.InviteClientOptions{})
-	outDialog.Ack(sds.ctx)
 
+	err = outDialog.Invite(sds.ctx, diago.InviteClientOptions{})
+	if err != nil {
+		return fmt.Errorf("sip.call.server failed to send invite: %v", err)
+	}
+
+	err = outDialog.Ack(sds.ctx)
+	if err != nil {
+		return fmt.Errorf("sip.call.server failed to send ack: %v", err)
+	}
 	// TODO(jwetzell): make this configurable
 	// NOTE(jwetzell): wait 5 seconds before hanging up the call
 	time.Sleep(5 * time.Second)
-	outDialog.Hangup(sds.ctx)
+	err = outDialog.Hangup(sds.ctx)
+	if err != nil {
+		return fmt.Errorf("sip.call.server failed to hangup call: %v", err)
+	}
 	return nil
 }
