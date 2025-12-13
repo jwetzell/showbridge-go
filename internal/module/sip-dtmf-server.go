@@ -27,7 +27,7 @@ type SIPDTMFServer struct {
 }
 
 type SIPDTMFMessage struct {
-	From   string
+	To     string
 	Digits string
 }
 
@@ -146,7 +146,7 @@ func (sds *SIPDTMFServer) HandleCall(inDialog *diago.DialogServerSession) error 
 		if dtmf == rune(sds.Separator[0]) {
 			if sds.router != nil {
 				sds.router.HandleInput(sds.Id(), SIPDTMFMessage{
-					From:   inDialog.ToUser(),
+					To:     inDialog.ToUser(),
 					Digits: userString,
 				})
 			}
