@@ -26,6 +26,11 @@ type SIPDTMFServer struct {
 	Separator string
 }
 
+type SIPDTMFMessage struct {
+	From   string
+	Digits string
+}
+
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "sip.dtmf.server",
@@ -140,7 +145,10 @@ func (sds *SIPDTMFServer) HandleCall(inDialog *diago.DialogServerSession) error 
 	return reader.Listen(func(dtmf rune) error {
 		if dtmf == rune(sds.Separator[0]) {
 			if sds.router != nil {
-				sds.router.HandleInput(sds.Id(), userString)
+				sds.router.HandleInput(sds.Id(), SIPDTMFMessage{
+					From:   inDialog.ToUser(),
+					Digits: userString,
+				})
 			}
 			userString = ""
 		} else {
