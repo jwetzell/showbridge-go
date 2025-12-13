@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"time"
 
 	"github.com/emiago/diago"
 	"github.com/emiago/diago/media"
@@ -21,6 +22,8 @@ type SIPCallServer struct {
 	IP        string
 	Port      int
 	Transport string
+	UserAgent string
+	diag      *diago.Diago
 }
 
 type SIPCallMessage struct {
@@ -69,7 +72,20 @@ func init() {
 				}
 				transportString = specificTransportString
 			}
-			return &SIPCallServer{config: config, ctx: ctx, router: router, IP: ipString, Port: int(portNum), Transport: transportString}, nil
+
+			userAgentString := "showbridge"
+
+			userAgent, ok := params["userAgent"]
+			if ok {
+
+				specificTransportString, ok := userAgent.(string)
+
+				if !ok {
+					return nil, fmt.Errorf("sip.call.server userAgent must be a string")
+				}
+				userAgentString = specificTransportString
+			}
+			return &SIPCallServer{config: config, ctx: ctx, router: router, IP: ipString, Port: int(portNum), Transport: transportString, UserAgent: userAgentString}, nil
 		},
 	})
 }
@@ -86,6 +102,7 @@ func (sds *SIPCallServer) Run() error {
 	diagoLogger := slog.New(slog.NewJSONHandler(io.Discard, nil))
 
 	ua, _ := sipgo.NewUA(
+		sipgo.WithUserAgent(sds.UserAgent),
 		sipgo.WithUserAgentTransportLayerOptions(sip.WithTransportLayerLogger(diagoLogger)),
 		sipgo.WithUserAgentTransactionLayerOptions(sip.WithTransactionLayerLogger(diagoLogger)),
 	)
@@ -101,13 +118,13 @@ func (sds *SIPCallServer) Run() error {
 		},
 	))
 
-	err := dg.Serve(sds.ctx, func(inDialog *diago.DialogServerSession) {
-		sds.HandleCall(inDialog)
-	})
+	go func() {
+		dg.Serve(sds.ctx, func(inDialog *diago.DialogServerSession) {
+			sds.HandleCall(inDialog)
+		})
+	}()
 
-	if err != nil {
-		return err
-	}
+	sds.diag = dg
 
 	<-sds.ctx.Done()
 	slog.Debug("router context done in module", "id", sds.Id())
@@ -125,5 +142,34 @@ func (sds *SIPCallServer) HandleCall(inDialog *diago.DialogServerSession) {
 }
 
 func (sds *SIPCallServer) Output(payload any) error {
-	return fmt.Errorf("sip.call.server output is not implemented")
+
+	payloadMsg, ok := payload.(string)
+	if !ok {
+		return fmt.Errorf("sip.call.server output payload must be of type string")
+	}
+
+	if sds.diag == nil {
+		return fmt.Errorf("sip.call.server diago not initialized")
+	}
+
+	var uri sip.Uri
+	err := sip.ParseUri(payloadMsg, &uri)
+	if err != nil {
+		return fmt.Errorf("sip.call.server output payload is not a valid SIP URI: %v", err)
+	}
+	outDialog, err := sds.diag.NewDialog(uri, diago.NewDialogOptions{
+		Transport: sds.Transport,
+	})
+
+	if err != nil {
+		return fmt.Errorf("sip.call.server failed to create new dialog: %v", err)
+	}
+	outDialog.Invite(sds.ctx, diago.InviteClientOptions{})
+	outDialog.Ack(sds.ctx)
+
+	// TODO(jwetzell): make this configurable
+	// NOTE(jwetzell): wait 5 seconds before hanging up the call
+	time.Sleep(5 * time.Second)
+	outDialog.Hangup(sds.ctx)
+	return nil
 }
