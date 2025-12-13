@@ -24,6 +24,10 @@ Simple protocol router _/s_
   - client
 - MIDI
   - client (not included in pre-built binaries yet)
+- [SIP](https://en.wikipedia.org/wiki/Session_Initiation_Protocol)
+  - call server
+  - [DTMF](https://en.wikipedia.org/wiki/Dual-tone_multi-frequency_signaling) server
+
 
   
   
