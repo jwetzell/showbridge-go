@@ -12,7 +12,7 @@ require (
 	github.com/jwetzell/psn-go v0.3.0
 	github.com/nats-io/nats.go v1.47.0
 	github.com/urfave/cli/v3 v3.6.1
-	gitlab.com/gomidi/midi/v2 v2.3.16
+	gitlab.com/gomidi/midi/v2 v2.3.18
 	go.bug.st/serial v1.6.4
 	modernc.org/quickjs v0.17.0
 	sigs.k8s.io/yaml v1.6.0
