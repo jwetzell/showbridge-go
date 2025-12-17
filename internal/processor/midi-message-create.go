@@ -182,6 +182,163 @@ func newMidiNoteOffCreate(config config.ProcessorConfig) (Processor, error) {
 	}}, nil
 }
 
+func newMidiControlChangeCreate(config config.ProcessorConfig) (Processor, error) {
+
+	params := config.Params
+
+	channel, ok := params["channel"]
+
+	if !ok {
+		return nil, fmt.Errorf("midi.message.create ControlChange requires a channel parameter")
+	}
+
+	channelString, ok := channel.(string)
+
+	if !ok {
+		return nil, fmt.Errorf("midi.message.create ControlChange channel must be a string")
+	}
+
+	channelTemplate, err := template.New("channel").Parse(channelString)
+
+	if err != nil {
+		return nil, err
+	}
+
+	controller, ok := params["controller"]
+
+	if !ok {
+		return nil, fmt.Errorf("midi.message.create ControlChange requires a controller parameter")
+	}
+
+	controllerString, ok := controller.(string)
+
+	if !ok {
+		return nil, fmt.Errorf("midi.message.create ControlChange controller must be a string")
+	}
+
+	controllerTemplate, err := template.New("controller").Parse(controllerString)
+
+	if err != nil {
+		return nil, err
+	}
+
+	value, ok := params["value"]
+
+	if !ok {
+		return nil, fmt.Errorf("midi.message.create ControlChange requires a value parameter")
+	}
+
+	valueString, ok := value.(string)
+
+	if !ok {
+		return nil, fmt.Errorf("midi.message.create ControlChange value must be a string")
+	}
+
+	valueTemplate, err := template.New("value").Parse(valueString)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &MIDIMessageCreate{config: config, ProcessFunc: func(ctx context.Context, payload any) (any, error) {
+
+		var channelBuffer bytes.Buffer
+		err := channelTemplate.Execute(&channelBuffer, payload)
+
+		if err != nil {
+			return nil, err
+		}
+
+		channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
+
+		var controllerBuffer bytes.Buffer
+		err = controllerTemplate.Execute(&controllerBuffer, payload)
+
+		if err != nil {
+			return nil, err
+		}
+
+		controllerValue, err := strconv.ParseUint(controllerBuffer.String(), 10, 8)
+
+		var valueBuffer bytes.Buffer
+		err = valueTemplate.Execute(&valueBuffer, payload)
+
+		if err != nil {
+			return nil, err
+		}
+
+		valueValue, err := strconv.ParseUint(valueBuffer.String(), 10, 8)
+
+		payloadMessage := midi.ControlChange(uint8(channelValue), uint8(controllerValue), uint8(valueValue))
+		return payloadMessage, nil
+	}}, nil
+}
+
+func newMidiProgramChangeCreate(config config.ProcessorConfig) (Processor, error) {
+
+	params := config.Params
+
+	channel, ok := params["channel"]
+
+	if !ok {
+		return nil, fmt.Errorf("midi.message.create ProgramChange requires a channel parameter")
+	}
+
+	channelString, ok := channel.(string)
+
+	if !ok {
+		return nil, fmt.Errorf("midi.message.create ProgramChange channel must be a string")
+	}
+
+	channelTemplate, err := template.New("channel").Parse(channelString)
+
+	if err != nil {
+		return nil, err
+	}
+
+	program, ok := params["program"]
+
+	if !ok {
+		return nil, fmt.Errorf("midi.message.create ProgramChange requires a program parameter")
+	}
+
+	programString, ok := program.(string)
+
+	if !ok {
+		return nil, fmt.Errorf("midi.message.create ProgramChange program must be a string")
+	}
+
+	programTemplate, err := template.New("program").Parse(programString)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &MIDIMessageCreate{config: config, ProcessFunc: func(ctx context.Context, payload any) (any, error) {
+
+		var channelBuffer bytes.Buffer
+		err := channelTemplate.Execute(&channelBuffer, payload)
+
+		if err != nil {
+			return nil, err
+		}
+
+		channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
+
+		var programBuffer bytes.Buffer
+		err = programTemplate.Execute(&programBuffer, payload)
+
+		if err != nil {
+			return nil, err
+		}
+
+		programValue, err := strconv.ParseUint(programBuffer.String(), 10, 8)
+
+		payloadMessage := midi.ProgramChange(uint8(channelValue), uint8(programValue))
+		return payloadMessage, nil
+	}}, nil
+}
+
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type: "midi.message.create",
@@ -205,6 +362,10 @@ func init() {
 				return newMidiNoteOnCreate(config)
 			case "NoteOff":
 				return newMidiNoteOffCreate(config)
+			case "ControlChange":
+				return newMidiControlChangeCreate(config)
+			case "ProgramChange":
+				return newMidiProgramChangeCreate(config)
 			default:
 				return nil, fmt.Errorf("midi.message.create does not support type %s", msgTypeString)
 			}
