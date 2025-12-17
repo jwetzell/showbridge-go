@@ -358,13 +358,13 @@ func init() {
 			}
 
 			switch msgTypeString {
-			case "NoteOn":
+			case "NoteOn", "noteon", "note_on":
 				return newMidiNoteOnCreate(config)
-			case "NoteOff":
+			case "NoteOff", "noteoff", "note_off":
 				return newMidiNoteOffCreate(config)
-			case "ControlChange":
+			case "ControlChange", "controlchange", "control_change":
 				return newMidiControlChangeCreate(config)
-			case "ProgramChange":
+			case "ProgramChange", "programchange", "program_change":
 				return newMidiProgramChangeCreate(config)
 			default:
 				return nil, fmt.Errorf("midi.message.create does not support type %s", msgTypeString)
