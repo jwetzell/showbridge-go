@@ -13,9 +13,14 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+var (
+	version = "dev"
+)
+
 func main() {
 	cmd := &cli.Command{
-		Name: "showbridge",
+		Name:    "showbridge",
+		Version: version,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "config",
