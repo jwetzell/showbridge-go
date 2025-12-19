@@ -26,7 +26,6 @@ type SerialClient struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		//TODO(jwetzell): find a better namespace than "misc"
 		Type: "serial.client",
 		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params

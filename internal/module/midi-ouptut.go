@@ -23,7 +23,6 @@ type MIDIOutput struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		//TODO(jwetzell): find a better namespace than "misc"
 		Type: "midi.output",
 		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params
