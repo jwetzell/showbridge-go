@@ -40,7 +40,7 @@ func TestGoodStringSplit(t *testing.T) {
 	}
 }
 
-func TestBasStringSplit(t *testing.T) {
+func TestBadStringSplit(t *testing.T) {
 	tests := []struct {
 		processor   processor.Processor
 		name        string
