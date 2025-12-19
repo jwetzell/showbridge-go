@@ -1,6 +1,6 @@
 modules:
   - id: http
-    type: net.http.server
+    type: http.server
     params:
       port: 3000
   - id: udp
