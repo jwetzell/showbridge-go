@@ -20,6 +20,7 @@ var (
 func main() {
 	cmd := &cli.Command{
 		Name:    "showbridge",
+		Usage:   "Simple protocol router /s",
 		Version: version,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
