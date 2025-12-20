@@ -40,7 +40,7 @@ func init() {
 			pattern, ok := params["pattern"]
 
 			if !ok {
-				return nil, fmt.Errorf("http.request.filter requires an pattern parameter")
+				return nil, fmt.Errorf("http.request.filter requires a pattern parameter")
 			}
 
 			patternString, ok := pattern.(string)

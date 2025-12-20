@@ -208,7 +208,7 @@ func init() {
 			pan, ok := params["pan"]
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create requires an pan parameter")
+				return nil, fmt.Errorf("freed.create requires a pan parameter")
 			}
 
 			panString, ok := pan.(string)
@@ -222,7 +222,7 @@ func init() {
 			tilt, ok := params["tilt"]
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create requires an tilt parameter")
+				return nil, fmt.Errorf("freed.create requires a tilt parameter")
 			}
 
 			tiltString, ok := tilt.(string)
@@ -236,7 +236,7 @@ func init() {
 			roll, ok := params["roll"]
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create requires an roll parameter")
+				return nil, fmt.Errorf("freed.create requires a roll parameter")
 			}
 
 			rollString, ok := roll.(string)
@@ -308,7 +308,7 @@ func init() {
 			zoom, ok := params["zoom"]
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create requires an zoom parameter")
+				return nil, fmt.Errorf("freed.create requires a zoom parameter")
 			}
 
 			zoomString, ok := zoom.(string)
@@ -322,7 +322,7 @@ func init() {
 			focus, ok := params["focus"]
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create requires an focus parameter")
+				return nil, fmt.Errorf("freed.create requires a focus parameter")
 			}
 
 			focusString, ok := focus.(string)

@@ -74,7 +74,7 @@ func init() {
 			topic, ok := params["topic"]
 
 			if !ok {
-				return nil, fmt.Errorf("mqtt.message.create requires an topic parameter")
+				return nil, fmt.Errorf("mqtt.message.create requires a topic parameter")
 			}
 
 			topicString, ok := topic.(string)
@@ -86,7 +86,7 @@ func init() {
 			qos, ok := params["qos"]
 
 			if !ok {
-				return nil, fmt.Errorf("mqtt.message.create requires an qos parameter")
+				return nil, fmt.Errorf("mqtt.message.create requires a qos parameter")
 			}
 
 			qosByte, ok := qos.(float64)
@@ -98,7 +98,7 @@ func init() {
 			retained, ok := params["retained"]
 
 			if !ok {
-				return nil, fmt.Errorf("mqtt.message.create requires an retained parameter")
+				return nil, fmt.Errorf("mqtt.message.create requires a retained parameter")
 			}
 
 			retainedBool, ok := retained.(bool)
@@ -111,7 +111,7 @@ func init() {
 			payload, ok := params["payload"]
 
 			if !ok {
-				return nil, fmt.Errorf("mqtt.message.create requires an payload parameter")
+				return nil, fmt.Errorf("mqtt.message.create requires a payload parameter")
 			}
 
 			if payloadBytes, ok := payload.([]byte); ok {

@@ -50,7 +50,7 @@ func init() {
 			method, ok := params["method"]
 
 			if !ok {
-				return nil, fmt.Errorf("http.request.create requires an method parameter")
+				return nil, fmt.Errorf("http.request.create requires a method parameter")
 			}
 
 			methodString, ok := method.(string)
@@ -62,7 +62,7 @@ func init() {
 			url, ok := params["url"]
 
 			if !ok {
-				return nil, fmt.Errorf("http.request.create requires an url parameter")
+				return nil, fmt.Errorf("http.request.create requires a url parameter")
 			}
 
 			urlString, ok := url.(string)

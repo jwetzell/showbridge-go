@@ -48,7 +48,7 @@ func init() {
 			path, ok := params["path"]
 
 			if !ok {
-				return nil, fmt.Errorf("http.request.filter requires an path parameter")
+				return nil, fmt.Errorf("http.request.filter requires a path parameter")
 			}
 
 			pathString, ok := path.(string)
