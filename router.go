@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"os"
 	"sync"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -18,16 +17,10 @@ type Router struct {
 	ModuleInstances []module.Module
 	RouteInstances  []route.Route
 	moduleWait      sync.WaitGroup
+	logger          *slog.Logger
 }
 
 func NewRouter(ctx context.Context, config config.Config) (*Router, []module.ModuleError, []route.RouteError) {
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
-	}))
-
-	slog.SetDefault(logger)
-
-	slog.Debug("creating router")
 
 	routerContext, cancel := context.WithCancel(ctx)
 	router := Router{
@@ -35,7 +28,10 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []module.Mod
 		contextCancel:   cancel,
 		ModuleInstances: []module.Module{},
 		RouteInstances:  []route.Route{},
+		logger:          slog.Default().With("component", "router"),
 	}
+
+	router.logger.Debug("creating router")
 
 	var moduleErrors []module.ModuleError
 
@@ -110,20 +106,20 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []module.Mod
 }
 
 func (r *Router) Run() {
-	slog.Info("running router")
+	r.logger.Info("running router")
 	for _, moduleInstance := range r.ModuleInstances {
 		r.moduleWait.Add(1)
 		go func() {
 			err := moduleInstance.Run()
 			if err != nil {
-				slog.Error("error encountered running module", "id", moduleInstance.Id(), "error", err)
+				r.logger.Error("error encountered running module", "error", err)
 			}
 			r.moduleWait.Done()
 		}()
 	}
 	<-r.Context.Done()
 	r.moduleWait.Wait()
-	slog.Info("router done")
+	r.logger.Info("router done")
 }
 
 func (r *Router) Stop() {
@@ -143,7 +139,7 @@ func (r *Router) HandleInput(sourceId string, payload any) []route.RouteIOError 
 					Index: routeIndex,
 					Error: err,
 				})
-				slog.Error("router unable to route input", "route", routeIndex, "source", sourceId, "error", err)
+				r.logger.Error("router unable to route input", "route", routeIndex, "source", sourceId, "error", err)
 			}
 		}
 	}

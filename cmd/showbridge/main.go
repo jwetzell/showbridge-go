@@ -25,6 +25,17 @@ func main() {
 			&cli.StringFlag{
 				Name:  "config",
 				Value: "./config.yaml",
+				Usage: "path to config file",
+			},
+			&cli.BoolFlag{
+				Name:  "debug",
+				Value: false,
+				Usage: "set log level to DEBUG",
+			},
+			&cli.BoolFlag{
+				Name:  "json",
+				Value: false,
+				Usage: "log using JSON",
 			},
 		},
 		Action: func(ctx context.Context, c *cli.Command) error {
@@ -37,13 +48,37 @@ func main() {
 			if err != nil {
 				return err
 			}
+
+			logLevel := slog.LevelInfo
+
+			if c.Bool("debug") {
+				logLevel = slog.LevelDebug
+			}
+
+			logHandlerOptions := &slog.HandlerOptions{
+				Level: logLevel,
+			}
+
+			logOutput := os.Stderr
+
+			var logHandler slog.Handler = slog.NewTextHandler(logOutput, logHandlerOptions)
+
+			if c.Bool("json") {
+				logHandler = slog.NewJSONHandler(logOutput, logHandlerOptions)
+			}
+
+			logger := slog.New(logHandler)
+
+			slog.SetDefault(logger)
+
 			router, moduleErrors, routeErrors := showbridge.NewRouter(ctx, config)
+
 			for _, moduleError := range moduleErrors {
-				slog.Error("problem initializing module", "index", moduleError.Index, "error", moduleError.Error)
+				logger.Error("problem initializing module", "index", moduleError.Index, "error", moduleError.Error)
 			}
 
 			for _, routeError := range routeErrors {
-				slog.Error("problem initializing route", "index", routeError.Index, "error", routeError.Error)
+				logger.Error("problem initializing route", "index", routeError.Index, "error", routeError.Error)
 			}
 			router.Run()
 			return nil
