@@ -3,7 +3,6 @@ package processor
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	freeD "github.com/jwetzell/free-d-go"
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -22,7 +21,7 @@ func (fdd *FreeDDecode) Process(ctx context.Context, payload any) (any, error) {
 
 	payloadMessage, err := freeD.Decode(payloadBytes)
 	if err != nil {
-		slog.Error("error decoding", "err", err)
+		return nil, err
 	}
 	return payloadMessage, nil
 }
