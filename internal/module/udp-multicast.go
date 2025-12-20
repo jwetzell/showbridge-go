@@ -28,24 +28,24 @@ func init() {
 			ip, ok := params["ip"]
 
 			if !ok {
-				return nil, fmt.Errorf("net.udp.client requires am ip parameter")
+				return nil, fmt.Errorf("net.udp.multicast requires an ip parameter")
 			}
 
 			ipString, ok := ip.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("net.udp.client ip must be a string")
+				return nil, fmt.Errorf("net.udp.multicast ip must be a string")
 			}
 
 			port, ok := params["port"]
 			if !ok {
-				return nil, fmt.Errorf("net.udp.client requires a port parameter")
+				return nil, fmt.Errorf("net.udp.multicast requires a port parameter")
 			}
 
 			portNum, ok := port.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("net.udp.client port must be a number")
+				return nil, fmt.Errorf("net.udp.multicast port must be a number")
 			}
 
 			addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", ipString, uint16(portNum)))
