@@ -49,7 +49,7 @@ func init() {
 				return nil, fmt.Errorf("http.request.filter pattern must be a string")
 			}
 
-			patternRegexp, err := regexp.Compile(fmt.Sprintf("^%s$", patternString))
+			patternRegexp, err := regexp.Compile(patternString)
 
 			if err != nil {
 				return nil, err
