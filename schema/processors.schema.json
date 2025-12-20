@@ -1,0 +1,631 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://showbridge.io/processors.schema.json",
+  "title": "Processors",
+  "description": "showbridge processors array",
+  "type": "array",
+  "items": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "debug.log"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "float.parse"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "freed.create"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "pan": {
+                "type": "string"
+              },
+              "tilt": {
+                "type": "string"
+              },
+              "roll": {
+                "type": "string"
+              },
+              "posX": {
+                "type": "string"
+              },
+              "posY": {
+                "type": "string"
+              },
+              "posZ": {
+                "type": "string"
+              },
+              "zoom": {
+                "type": "string"
+              },
+              "focus": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "pan",
+              "tilt",
+              "roll",
+              "posX",
+              "posY",
+              "posZ",
+              "zoom",
+              "focus"
+            ]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "freed.decode"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "freed.encode"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "http.request.create"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "method": {
+                "type": "string",
+                "enum": ["GET", "POST"]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": ["method", "url"]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "http.request.encode"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "http.request.filter"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string",
+                "enum": ["GET", "POST"]
+              }
+            },
+            "required": ["path"]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "http.response.encode"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "int.parse"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "midi.message.create"
+          },
+          "params": {
+            "type": "object",
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["NoteOn", "noteon", "note_on"]
+                  },
+                  "channel": {
+                    "type": "string"
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "velocity": {
+                    "type": "string"
+                  }
+                },
+                "required": ["type", "channel", "note", "velocity"]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["NoteOff", "noteoff", "note_off"]
+                  },
+                  "channel": {
+                    "type": "string"
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "velocity": {
+                    "type": "string"
+                  }
+                },
+                "required": ["type", "channel", "note", "velocity"]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["ControlChange", "controlchange", "control_change"]
+                  },
+                  "channel": {
+                    "type": "string"
+                  },
+                  "controller": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "required": ["type", "channel", "controller", "value"]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["ProgramChange", "programchange", "program_change"]
+                  },
+                  "channel": {
+                    "type": "string"
+                  },
+                  "program": {
+                    "type": "string"
+                  }
+                },
+                "required": ["type", "channel", "program"]
+              }
+            ]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "midi.message.decode"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "midi.message.encode"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "midi.message.filter"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["NoteOn", "NoteOff", "ControlChange", "ProgramChange"]
+              }
+            },
+            "required": ["type"]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "midi.message.unpack"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "mqtt.message.create"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "topic": {
+                "type": "string"
+              },
+              "qos": {
+                "type": "number"
+              },
+              "retained": {
+                "type": "boolean"
+              },
+              "payload": {
+                "type": "string"
+              }
+            },
+            "required": ["topic", "qos", "retained", "payload"]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "mqtt.message.encode"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "nats.message.create"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "subject": {
+                "type": "string"
+              },
+              "payload": {
+                "type": "string"
+              }
+            },
+            "required": ["subject", "payload"]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "nats.message.encode"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "osc.message.create"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "address": {
+                "type": "string"
+              },
+              "args": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "types": {
+                "type": "string"
+              }
+            },
+            "required": ["address"]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "osc.message.decode"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "osc.message.encode"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "osc.message.filter"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "address": {
+                "type": "string"
+              }
+            },
+            "required": ["address"]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "osc.message.transform"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "address": {
+                "type": "string"
+              }
+            },
+            "required": ["address"]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "script.expr"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "expression": {
+                "type": "string"
+              }
+            },
+            "required": ["expression"]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "script.js"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "program": {
+                "type": "string"
+              }
+            },
+            "required": ["program"]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "string.create"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "template": {
+                "type": "string"
+              }
+            },
+            "required": ["template"]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "string.decode"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "string.encode"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "string.create"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "pattern": {
+                "type": "string"
+              }
+            },
+            "required": ["pattern"]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "string.split"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "separator": {
+                "type": "string"
+              }
+            },
+            "required": ["separator"]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "uint.parse"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      }
+    ]
+  }
+}

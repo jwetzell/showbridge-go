@@ -1,0 +1,481 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://showbridge.io/modules.schema.json",
+  "title": "Modules",
+  "description": "showbridge modules array",
+  "type": "array",
+  "items": {
+    "oneOf": [
+      {
+        "type": "object",
+        "title": "HTTPClientModule",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "http.client"
+          }
+        },
+        "required": ["id", "type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "title": "HTTPServerModule",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "http.server"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "port": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535
+              }
+            },
+            "required": ["port"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["id", "type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "title": "IntervalModule",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "gen.interval"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "duration": {
+                "type": "integer"
+              }
+            },
+            "required": ["duration"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["id", "type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "title": "TimerModule",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "gen.timer"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "duration": {
+                "type": "integer"
+              }
+            },
+            "required": ["duration"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["id", "type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "title": "MIDIInputModule",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "midi.input"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "port": {
+                "type": "string"
+              }
+            },
+            "required": ["port"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["id", "type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "title": "MIDIOutputModule",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "midi.output"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "port": {
+                "type": "string"
+              }
+            },
+            "required": ["port"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["id", "type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "title": "MQTTClientModule",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "mqtt.client"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "broker": {
+                "type": "string"
+              },
+              "topic": {
+                "type": "string"
+              },
+              "clientId": {
+                "type": "string"
+              }
+            },
+            "required": ["broker", "topic", "clientId"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["id", "type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "title": "NATSClientModule",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "nats.client"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              }
+            },
+            "required": ["url", "subject"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["id", "type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "title": "PSNClientModule",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "psn.client"
+          }
+        },
+        "required": ["id", "type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "title": "SerialClientModule",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "serial.client"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "port": {
+                "type": "string"
+              },
+              "baudRate": {
+                "type": "integer"
+              }
+            },
+            "required": ["port", "baudRate"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["id", "type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "title": "SIPCallServerModule",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "sip.call.server"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "ip": {
+                "type": "string",
+                "default": "0.0.0.0"
+              },
+              "port": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535,
+                "default": 5060
+              },
+              "transport": {
+                "type": "string",
+                "enum": ["udp", "tcp", "ws", "udp4", "tcp4"],
+                "default": "udp"
+              },
+              "userAgent": {
+                "type": "string",
+                "default": "showbridge"
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          }
+        },
+        "required": ["id", "type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "title": "SIPDTMFServerModule",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "sip.dtmf.server"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "ip": {
+                "type": "string",
+                "default": "0.0.0.0"
+              },
+              "port": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535,
+                "default": 5060
+              },
+              "transport": {
+                "type": "string",
+                "enum": ["udp", "tcp", "ws", "udp4", "tcp4"],
+                "default": "udp"
+              },
+              "separator": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1
+              }
+            },
+            "required": ["separator"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["id", "type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "title": "TCPClientModule",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "net.tcp.client"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "host": {
+                "type": "string"
+              },
+              "port": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535
+              },
+              "framing": {
+                "type": "string",
+                "enum": ["LF", "CR", "CRLF", "SLIP", "RAW"]
+              }
+            },
+            "required": ["host", "port", "framing"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["id", "type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "title": "TCPServerModule",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "net.tcp.server"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "ip": {
+                "type": "string",
+                "default": "0.0.0.0"
+              },
+              "port": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535
+              },
+              "framing": {
+                "type": "string",
+                "enum": ["LF", "CR", "CRLF", "SLIP", "RAW"]
+              }
+            },
+            "required": ["port", "framing"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["id", "type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "title": "UDPClientModule",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "net.udp.client"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "host": {
+                "type": "string"
+              },
+              "port": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535
+              }
+            },
+            "required": ["host", "port"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["id", "type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "title": "UDPMulticastModule",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "net.udp.multicast"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "ip": {
+                "type": "string"
+              },
+              "port": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535
+              }
+            },
+            "required": ["ip", "port"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["id", "type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "title": "UDPServerModule",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "net.udp.server"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "ip": {
+                "type": "string",
+                "default": "0.0.0.0"
+              },
+              "port": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535
+              }
+            },
+            "required": ["port"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["id", "type", "params"],
+        "additionalProperties": false
+      }
+    ]
+  }
+}
