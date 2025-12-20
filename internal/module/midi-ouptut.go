@@ -19,6 +19,7 @@ type MIDIOutput struct {
 	router   route.RouteIO
 	Port     string
 	SendFunc func(midi.Message) error
+	logger   *slog.Logger
 }
 
 func init() {
@@ -39,26 +40,26 @@ func init() {
 				return nil, fmt.Errorf("midi.output port must be a string")
 			}
 
-			return &MIDIOutput{config: config, Port: portString, ctx: ctx, router: router}, nil
+			return &MIDIOutput{config: config, Port: portString, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
 	})
 }
 
-func (mc *MIDIOutput) Id() string {
-	return mc.config.Id
+func (mo *MIDIOutput) Id() string {
+	return mo.config.Id
 }
 
-func (mc *MIDIOutput) Type() string {
-	return mc.config.Type
+func (mo *MIDIOutput) Type() string {
+	return mo.config.Type
 }
 
-func (mc *MIDIOutput) Run() error {
+func (mo *MIDIOutput) Run() error {
 	defer midi.CloseDriver()
 
-	out, err := midi.FindOutPort(mc.Port)
+	out, err := midi.FindOutPort(mo.Port)
 
 	if err != nil {
-		return fmt.Errorf("midi.output can't find output port: %s", mc.Port)
+		return fmt.Errorf("midi.output can't find output port: %s", mo.Port)
 	}
 
 	send, err := midi.SendTo(out)
@@ -66,15 +67,15 @@ func (mc *MIDIOutput) Run() error {
 		return err
 	}
 
-	mc.SendFunc = send
+	mo.SendFunc = send
 
-	<-mc.ctx.Done()
-	slog.Debug("router context done in module", "id", mc.Id())
+	<-mo.ctx.Done()
+	mo.logger.Debug("router context done in module")
 	return nil
 }
 
-func (mc *MIDIOutput) Output(payload any) error {
-	if mc.SendFunc == nil {
+func (mo *MIDIOutput) Output(payload any) error {
+	if mo.SendFunc == nil {
 		return fmt.Errorf("midi.output output is not setup")
 	}
 
@@ -84,5 +85,5 @@ func (mc *MIDIOutput) Output(payload any) error {
 		return fmt.Errorf("midi.output can only ouptut midi.Message")
 	}
 
-	return mc.SendFunc(payloadMessage)
+	return mo.SendFunc(payloadMessage)
 }

@@ -19,6 +19,7 @@ type TCPClient struct {
 	ctx    context.Context
 	router route.RouteIO
 	Addr   *net.TCPAddr
+	logger *slog.Logger
 }
 
 func init() {
@@ -73,7 +74,7 @@ func init() {
 				return nil, err
 			}
 
-			return &TCPClient{framer: framer, Addr: addr, config: config, ctx: ctx, router: router}, nil
+			return &TCPClient{framer: framer, Addr: addr, config: config, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
 	})
 }
@@ -91,7 +92,7 @@ func (tc *TCPClient) Run() error {
 	// TODO(jwetzell): shutdown with router.Context properly
 	go func() {
 		<-tc.ctx.Done()
-		slog.Debug("router context done in module", "id", tc.Id())
+		tc.logger.Debug("router context done in module")
 		if tc.conn != nil {
 			tc.conn.Close()
 		}
@@ -101,10 +102,10 @@ func (tc *TCPClient) Run() error {
 		err := tc.SetupConn()
 		if err != nil {
 			if tc.ctx.Err() != nil {
-				slog.Debug("router context done in module", "id", tc.Id())
+				tc.logger.Debug("router context done in module")
 				return nil
 			}
-			slog.Error("net.tcp.client", "id", tc.Id(), "error", err.Error())
+			tc.logger.Error("net.tcp.client", "error", err.Error())
 			time.Sleep(time.Second * 2)
 			continue
 		}
@@ -112,14 +113,14 @@ func (tc *TCPClient) Run() error {
 		buffer := make([]byte, 1024)
 		select {
 		case <-tc.ctx.Done():
-			slog.Debug("router context done in module", "id", tc.Id())
+			tc.logger.Debug("router context done in module")
 			return nil
 		default:
 		READ:
 			for {
 				select {
 				case <-tc.ctx.Done():
-					slog.Debug("router context done in module", "id", tc.Id())
+					tc.logger.Debug("router context done in module")
 					return nil
 				default:
 					byteCount, err := tc.conn.Read(buffer)
@@ -136,7 +137,7 @@ func (tc *TCPClient) Run() error {
 								if tc.router != nil {
 									tc.router.HandleInput(tc.Id(), message)
 								} else {
-									slog.Error("net.tcp.client has no router", "id", tc.Id())
+									tc.logger.Error("net.tcp.client has no router")
 								}
 							}
 						}

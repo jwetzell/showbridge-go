@@ -17,6 +17,7 @@ type UDPServer struct {
 	config config.ModuleConfig
 	ctx    context.Context
 	router route.RouteIO
+	logger *slog.Logger
 }
 
 func init() {
@@ -53,7 +54,7 @@ func init() {
 				log.Fatalf("error resolving UDP address: %v", err)
 			}
 
-			return &UDPServer{Addr: addr, config: config, ctx: ctx, router: router}, nil
+			return &UDPServer{Addr: addr, config: config, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
 	})
 }
@@ -81,7 +82,7 @@ func (us *UDPServer) Run() error {
 		select {
 		case <-us.ctx.Done():
 			// TODO(jwetzell): cleanup?
-			slog.Debug("router context done in module", "id", us.Id())
+			us.logger.Debug("router context done in module")
 			return nil
 		default:
 			listener.SetDeadline(time.Now().Add(time.Millisecond * 200))
@@ -98,7 +99,7 @@ func (us *UDPServer) Run() error {
 			if us.router != nil {
 				us.router.HandleInput(us.Id(), message)
 			} else {
-				slog.Error("net.udp.server has no router", "id", us.Id())
+				us.logger.Error("net.udp.server has no router")
 			}
 		}
 	}

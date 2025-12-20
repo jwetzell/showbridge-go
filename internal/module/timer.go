@@ -16,6 +16,7 @@ type Timer struct {
 	ctx      context.Context
 	router   route.RouteIO
 	timer    *time.Timer
+	logger   *slog.Logger
 }
 
 func init() {
@@ -35,7 +36,7 @@ func init() {
 				return nil, fmt.Errorf("gen.timer duration must be a number")
 			}
 
-			return &Timer{Duration: uint32(durationNum), config: config, ctx: ctx, router: router}, nil
+			return &Timer{Duration: uint32(durationNum), config: config, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
 	})
 }
@@ -55,7 +56,7 @@ func (t *Timer) Run() error {
 		select {
 		case <-t.ctx.Done():
 			t.timer.Stop()
-			slog.Debug("router context done in module", "id", t.Id())
+			t.logger.Debug("router context done in module")
 			return nil
 		case time := <-t.timer.C:
 			if t.router != nil {

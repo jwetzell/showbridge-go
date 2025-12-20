@@ -16,6 +16,7 @@ type Interval struct {
 	ctx      context.Context
 	router   route.RouteIO
 	ticker   *time.Ticker
+	logger   *slog.Logger
 }
 
 func init() {
@@ -35,7 +36,7 @@ func init() {
 				return nil, fmt.Errorf("gen.interval duration must be number")
 			}
 
-			return &Interval{Duration: uint32(durationNum), config: config, ctx: ctx, router: router}, nil
+			return &Interval{Duration: uint32(durationNum), config: config, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
 	})
 }
@@ -56,7 +57,7 @@ func (i *Interval) Run() error {
 	for {
 		select {
 		case <-i.ctx.Done():
-			slog.Debug("router context done in module", "id", i.Id())
+			i.logger.Debug("router context done in module")
 			return nil
 		case <-ticker.C:
 			if i.router != nil {

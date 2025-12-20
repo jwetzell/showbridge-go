@@ -24,6 +24,7 @@ type SIPCallServer struct {
 	Transport string
 	UserAgent string
 	dg        *diago.Diago
+	logger    *slog.Logger
 }
 
 type SIPCallMessage struct {
@@ -85,24 +86,24 @@ func init() {
 				}
 				userAgentString = specificTransportString
 			}
-			return &SIPCallServer{config: config, ctx: ctx, router: router, IP: ipString, Port: int(portNum), Transport: transportString, UserAgent: userAgentString}, nil
+			return &SIPCallServer{config: config, ctx: ctx, router: router, IP: ipString, Port: int(portNum), Transport: transportString, UserAgent: userAgentString, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
 	})
 }
 
-func (sds *SIPCallServer) Id() string {
-	return sds.config.Id
+func (scs *SIPCallServer) Id() string {
+	return scs.config.Id
 }
 
-func (sds *SIPCallServer) Type() string {
-	return sds.config.Type
+func (scs *SIPCallServer) Type() string {
+	return scs.config.Type
 }
 
-func (sds *SIPCallServer) Run() error {
+func (scs *SIPCallServer) Run() error {
 	diagoLogger := slog.New(slog.NewJSONHandler(io.Discard, nil))
 
 	ua, _ := sipgo.NewUA(
-		sipgo.WithUserAgent(sds.UserAgent),
+		sipgo.WithUserAgent(scs.UserAgent),
 		sipgo.WithUserAgentTransportLayerOptions(sip.WithTransportLayerLogger(diagoLogger)),
 		sipgo.WithUserAgentTransactionLayerOptions(sip.WithTransactionLayerLogger(diagoLogger)),
 	)
@@ -112,43 +113,43 @@ func (sds *SIPCallServer) Run() error {
 	media.SetDefaultLogger(diagoLogger)
 	dg := diago.NewDiago(ua, diago.WithLogger(diagoLogger), diago.WithTransport(
 		diago.Transport{
-			Transport: sds.Transport,
-			BindHost:  sds.IP,
-			BindPort:  sds.Port,
+			Transport: scs.Transport,
+			BindHost:  scs.IP,
+			BindPort:  scs.Port,
 		},
 	))
 
 	go func() {
-		dg.Serve(sds.ctx, func(inDialog *diago.DialogServerSession) {
-			sds.HandleCall(inDialog)
+		dg.Serve(scs.ctx, func(inDialog *diago.DialogServerSession) {
+			scs.HandleCall(inDialog)
 		})
 	}()
 
-	sds.dg = dg
+	scs.dg = dg
 
-	<-sds.ctx.Done()
-	slog.Debug("router context done in module", "id", sds.Id())
+	<-scs.ctx.Done()
+	scs.logger.Debug("router context done in module")
 	return nil
 }
 
-func (sds *SIPCallServer) HandleCall(inDialog *diago.DialogServerSession) {
+func (scs *SIPCallServer) HandleCall(inDialog *diago.DialogServerSession) {
 	inDialog.Trying()
 	inDialog.Ringing()
 	inDialog.Answer()
-	sds.router.HandleInput(sds.Id(), SIPCallMessage{
+	scs.router.HandleInput(scs.Id(), SIPCallMessage{
 		To: inDialog.ToUser(),
 	})
 	<-inDialog.Context().Done()
 }
 
-func (sds *SIPCallServer) Output(payload any) error {
+func (scs *SIPCallServer) Output(payload any) error {
 
 	payloadMsg, ok := payload.(string)
 	if !ok {
 		return fmt.Errorf("sip.call.server output payload must be of type string")
 	}
 
-	if sds.dg == nil {
+	if scs.dg == nil {
 		return fmt.Errorf("sip.call.server diago is not initialized")
 	}
 
@@ -157,27 +158,27 @@ func (sds *SIPCallServer) Output(payload any) error {
 	if err != nil {
 		return fmt.Errorf("sip.call.server output payload is not a valid SIP URI: %v", err)
 	}
-	outDialog, err := sds.dg.NewDialog(uri, diago.NewDialogOptions{
-		Transport: sds.Transport,
+	outDialog, err := scs.dg.NewDialog(uri, diago.NewDialogOptions{
+		Transport: scs.Transport,
 	})
 
 	if err != nil {
 		return fmt.Errorf("sip.call.server failed to create new dialog: %v", err)
 	}
 
-	err = outDialog.Invite(sds.ctx, diago.InviteClientOptions{})
+	err = outDialog.Invite(scs.ctx, diago.InviteClientOptions{})
 	if err != nil {
 		return fmt.Errorf("sip.call.server failed to send invite: %v", err)
 	}
 
-	err = outDialog.Ack(sds.ctx)
+	err = outDialog.Ack(scs.ctx)
 	if err != nil {
 		return fmt.Errorf("sip.call.server failed to send ack: %v", err)
 	}
 	// TODO(jwetzell): make this configurable
 	// NOTE(jwetzell): wait 5 seconds before hanging up the call
 	time.Sleep(5 * time.Second)
-	err = outDialog.Hangup(sds.ctx)
+	err = outDialog.Hangup(scs.ctx)
 	if err != nil {
 		return fmt.Errorf("sip.call.server failed to hangup call: %v", err)
 	}

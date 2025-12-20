@@ -26,6 +26,7 @@ type TCPServer struct {
 	wg            sync.WaitGroup
 	connections   []*net.TCPConn
 	connectionsMu sync.RWMutex
+	logger        *slog.Logger
 }
 
 func init() {
@@ -81,7 +82,7 @@ func init() {
 				return nil, err
 			}
 
-			return &TCPServer{Framer: framer, Addr: addr, config: config, quit: make(chan interface{}), ctx: ctx, router: router}, nil
+			return &TCPServer{Framer: framer, Addr: addr, config: config, quit: make(chan interface{}), ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
 	})
 }
@@ -98,7 +99,7 @@ func (ts *TCPServer) handleClient(client *net.TCPConn) {
 	ts.connectionsMu.Lock()
 	ts.connections = append(ts.connections, client)
 	ts.connectionsMu.Unlock()
-	slog.Debug("net.tcp.server connection accepted", "id", ts.Id(), "remoteAddr", client.RemoteAddr().String())
+	ts.logger.Debug("net.tcp.server connection accepted", "remoteAddr", client.RemoteAddr().String())
 	defer client.Close()
 
 	buffer := make([]byte, 1024)
@@ -125,7 +126,7 @@ ClientRead:
 								break
 							}
 						}
-						slog.Debug("net.tcp.server connection reset", "id", ts.Id(), "remoteAddr", client.RemoteAddr().String())
+						ts.logger.Debug("net.tcp.server connection reset", "remoteAddr", client.RemoteAddr().String())
 						ts.connectionsMu.Unlock()
 					}
 				}
@@ -138,7 +139,7 @@ ClientRead:
 							break
 						}
 					}
-					slog.Debug("net.tcp.server stream ended", "id", ts.Id(), "remoteAddr", client.RemoteAddr().String())
+					ts.logger.Debug("net.tcp.server stream ended", "remoteAddr", client.RemoteAddr().String())
 					ts.connectionsMu.Unlock()
 				}
 				return
@@ -150,7 +151,7 @@ ClientRead:
 						if ts.router != nil {
 							ts.router.HandleInput(ts.Id(), message)
 						} else {
-							slog.Error("net.tcp.server has no router", "id", ts.Id())
+							ts.logger.Error("net.tcp.server has no router")
 						}
 					}
 				}
@@ -170,7 +171,7 @@ func (ts *TCPServer) Run() error {
 		<-ts.ctx.Done()
 		close(ts.quit)
 		listener.Close()
-		slog.Debug("router context done in module", "id", ts.Id())
+		ts.logger.Debug("router context done in module")
 	}()
 
 AcceptLoop:
@@ -181,7 +182,7 @@ AcceptLoop:
 			case <-ts.quit:
 				break AcceptLoop
 			default:
-				slog.Debug("net.tcp.server problem with listener", "error", err)
+				ts.logger.Debug("net.tcp.server problem with listener", "error", err)
 			}
 		} else {
 			ts.wg.Add(1)

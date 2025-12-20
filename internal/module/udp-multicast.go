@@ -17,6 +17,7 @@ type UDPMulticast struct {
 	ctx    context.Context
 	router route.RouteIO
 	Addr   *net.UDPAddr
+	logger *slog.Logger
 }
 
 func init() {
@@ -51,7 +52,7 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			return &UDPMulticast{config: config, Addr: addr, ctx: ctx, router: router}, nil
+			return &UDPMulticast{config: config, Addr: addr, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
 	})
 }
@@ -79,7 +80,7 @@ func (um *UDPMulticast) Run() error {
 		select {
 		case <-um.ctx.Done():
 			// TODO(jwetzell): cleanup?
-			slog.Debug("router context done in module", "id", um.Id())
+			um.logger.Debug("router context done in module")
 			return nil
 		default:
 			um.conn.SetDeadline(time.Now().Add(time.Millisecond * 200))
@@ -99,7 +100,7 @@ func (um *UDPMulticast) Run() error {
 				if um.router != nil {
 					um.router.HandleInput(um.Id(), message)
 				} else {
-					slog.Error("net.udp.multicast has no router", "id", um.Id())
+					um.logger.Error("net.udp.multicast has no router")
 				}
 			}
 		}

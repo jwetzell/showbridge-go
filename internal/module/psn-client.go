@@ -18,6 +18,7 @@ type PSNClient struct {
 	ctx     context.Context
 	router  route.RouteIO
 	decoder *psn.Decoder
+	logger  *slog.Logger
 }
 
 func init() {
@@ -25,7 +26,7 @@ func init() {
 		Type: "psn.client",
 		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 
-			return &PSNClient{config: config, decoder: psn.NewDecoder(), ctx: ctx, router: router}, nil
+			return &PSNClient{config: config, decoder: psn.NewDecoder(), ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
 	})
 }
@@ -58,7 +59,7 @@ func (pc *PSNClient) Run() error {
 		select {
 		case <-pc.ctx.Done():
 			// TODO(jwetzell): cleanup?
-			slog.Debug("router context done in module", "id", pc.Id())
+			pc.logger.Debug("router context done in module")
 			return nil
 		default:
 			pc.conn.SetDeadline(time.Now().Add(time.Millisecond * 200))
@@ -76,7 +77,7 @@ func (pc *PSNClient) Run() error {
 				message := buffer[:numBytes]
 				err := pc.decoder.Decode(message)
 				if err != nil {
-					slog.Error("psn.client problem decoding psn traffic", "id", pc.Id(), "error", err)
+					pc.logger.Error("psn.client problem decoding psn traffic", "error", err)
 				}
 
 				if pc.router != nil {
@@ -84,7 +85,7 @@ func (pc *PSNClient) Run() error {
 						pc.router.HandleInput(pc.Id(), tracker)
 					}
 				} else {
-					slog.Error("psn.client has no router", "id", pc.Id())
+					pc.logger.Error("psn.client has no router")
 				}
 			}
 		}

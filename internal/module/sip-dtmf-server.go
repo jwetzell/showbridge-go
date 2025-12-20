@@ -24,6 +24,7 @@ type SIPDTMFServer struct {
 	Port      int
 	Transport string
 	Separator string
+	logger    *slog.Logger
 }
 
 type SIPDTMFMessage struct {
@@ -90,7 +91,7 @@ func init() {
 			if !strings.ContainsRune("0123456789*#ABCD", rune(separatorString[0])) {
 				return nil, fmt.Errorf("sip.dtmf.server separator must be a valid DTMF character")
 			}
-			return &SIPDTMFServer{config: config, ctx: ctx, router: router, IP: ipString, Port: int(portNum), Transport: transportString, Separator: separatorString}, nil
+			return &SIPDTMFServer{config: config, ctx: ctx, router: router, IP: ipString, Port: int(portNum), Transport: transportString, Separator: separatorString, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
 	})
 }
@@ -131,7 +132,7 @@ func (sds *SIPDTMFServer) Run() error {
 	}
 
 	<-sds.ctx.Done()
-	slog.Debug("router context done in module", "id", sds.Id())
+	sds.logger.Debug("router context done in module")
 	return nil
 }
 

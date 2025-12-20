@@ -16,6 +16,7 @@ type HTTPServer struct {
 	Port   uint16
 	ctx    context.Context
 	router route.RouteIO
+	logger *slog.Logger
 }
 
 type ResponseData struct {
@@ -39,7 +40,7 @@ func init() {
 				return nil, fmt.Errorf("http.server port must be uint16")
 			}
 
-			return &HTTPServer{Port: uint16(portNum), config: config, ctx: ctx, router: router}, nil
+			return &HTTPServer{Port: uint16(portNum), config: config, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
 	})
 }
@@ -89,12 +90,11 @@ func (hs *HTTPServer) Run() error {
 
 	go func() {
 		<-hs.ctx.Done()
-		slog.Debug("router context done in module", "id", hs.Id())
+		hs.logger.Debug("router context done in module")
 		httpServer.Close()
 	}()
 
 	err := httpServer.ListenAndServe()
-	slog.Debug("http.server closed", "id", hs.Id())
 	// TODO(jwetzell): handle server closed error differently
 	if err != nil {
 		return err

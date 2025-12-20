@@ -16,6 +16,7 @@ type HTTPClient struct {
 	ctx    context.Context
 	client *http.Client
 	router route.RouteIO
+	logger *slog.Logger
 }
 
 func init() {
@@ -23,7 +24,7 @@ func init() {
 		Type: "http.client",
 		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 
-			return &HTTPClient{config: config, ctx: ctx, router: router}, nil
+			return &HTTPClient{config: config, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
 	})
 }
@@ -43,7 +44,7 @@ func (hc *HTTPClient) Run() error {
 	}
 
 	<-hc.ctx.Done()
-	slog.Debug("router context done in module", "id", hc.Id())
+	hc.logger.Debug("router context done in module")
 	return nil
 }
 

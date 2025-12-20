@@ -18,6 +18,7 @@ type NATSClient struct {
 	URL     string
 	Subject string
 	client  *nats.Conn
+	logger  *slog.Logger
 }
 
 func init() {
@@ -49,7 +50,7 @@ func init() {
 				return nil, fmt.Errorf("nats.client subject must be string")
 			}
 
-			return &NATSClient{config: config, URL: urlString, Subject: subjectString, ctx: ctx, router: router}, nil
+			return &NATSClient{config: config, URL: urlString, Subject: subjectString, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
 	})
 }
@@ -87,7 +88,7 @@ func (nc *NATSClient) Run() error {
 	defer sub.Unsubscribe()
 
 	<-nc.ctx.Done()
-	slog.Debug("router context done in module", "id", nc.Id())
+	nc.logger.Debug("router context done in module")
 	return nil
 }
 

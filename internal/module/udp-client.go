@@ -17,6 +17,7 @@ type UDPClient struct {
 	conn   *net.UDPConn
 	ctx    context.Context
 	router route.RouteIO
+	logger *slog.Logger
 }
 
 func init() {
@@ -52,7 +53,7 @@ func init() {
 				return nil, err
 			}
 
-			return &UDPClient{Addr: addr, config: config, ctx: ctx, router: router}, nil
+			return &UDPClient{Addr: addr, config: config, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
 	})
 }
@@ -79,7 +80,7 @@ func (uc *UDPClient) Run() error {
 	}
 
 	<-uc.ctx.Done()
-	slog.Debug("router context done in module", "id", uc.Id())
+	uc.logger.Debug("router context done in module")
 	if uc.conn != nil {
 		uc.conn.Close()
 	}

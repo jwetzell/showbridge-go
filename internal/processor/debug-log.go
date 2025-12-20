@@ -10,10 +10,11 @@ import (
 
 type DebugLog struct {
 	config config.ProcessorConfig
+	logger *slog.Logger
 }
 
 func (dl *DebugLog) Process(ctx context.Context, payload any) (any, error) {
-	slog.Debug("debug.log", "payload", payload, "payloadType", fmt.Sprintf("%T", payload))
+	dl.logger.Debug("debug.log", "payload", payload, "payloadType", fmt.Sprintf("%T", payload))
 	return payload, nil
 }
 
@@ -25,7 +26,7 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type: "debug.log",
 		New: func(config config.ProcessorConfig) (Processor, error) {
-			return &DebugLog{config: config}, nil
+			return &DebugLog{config: config, logger: slog.Default().With("component", "processor")}, nil
 		},
 	})
 }

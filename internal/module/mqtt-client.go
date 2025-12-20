@@ -18,6 +18,7 @@ type MQTTClient struct {
 	ClientID string
 	Topic    string
 	client   mqtt.Client
+	logger   *slog.Logger
 }
 
 func init() {
@@ -61,7 +62,7 @@ func init() {
 				return nil, fmt.Errorf("mqtt.client clientId must be string")
 			}
 
-			return &MQTTClient{config: config, Broker: brokerString, Topic: topicString, ClientID: clientIdString, ctx: ctx, router: router}, nil
+			return &MQTTClient{config: config, Broker: brokerString, Topic: topicString, ClientID: clientIdString, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
 	})
 }
@@ -99,7 +100,7 @@ func (mc *MQTTClient) Run() error {
 	}
 
 	<-mc.ctx.Done()
-	slog.Debug("router context done in module", "id", mc.Id())
+	mc.logger.Debug("router context done in module")
 	return nil
 }
 

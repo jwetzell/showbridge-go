@@ -19,6 +19,7 @@ type MIDIInput struct {
 	router   route.RouteIO
 	Port     string
 	SendFunc func(midi.Message) error
+	logger   *slog.Logger
 }
 
 func init() {
@@ -38,30 +39,30 @@ func init() {
 				return nil, fmt.Errorf("midi.input port must be a string")
 			}
 
-			return &MIDIInput{config: config, Port: portString, ctx: ctx, router: router}, nil
+			return &MIDIInput{config: config, Port: portString, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
 	})
 }
 
-func (mc *MIDIInput) Id() string {
-	return mc.config.Id
+func (mi *MIDIInput) Id() string {
+	return mi.config.Id
 }
 
-func (mc *MIDIInput) Type() string {
-	return mc.config.Type
+func (mi *MIDIInput) Type() string {
+	return mi.config.Type
 }
 
-func (mc *MIDIInput) Run() error {
+func (mi *MIDIInput) Run() error {
 	defer midi.CloseDriver()
 
-	in, err := midi.FindInPort(mc.Port)
+	in, err := midi.FindInPort(mi.Port)
 	if err != nil {
-		return fmt.Errorf("midi.input can't find input port: %s", mc.Port)
+		return fmt.Errorf("midi.input can't find input port: %s", mi.Port)
 	}
 
 	stop, err := midi.ListenTo(in, func(msg midi.Message, timestampms int32) {
-		if mc.router != nil {
-			mc.router.HandleInput(mc.Id(), msg)
+		if mi.router != nil {
+			mi.router.HandleInput(mi.Id(), msg)
 		}
 	}, midi.UseSysEx())
 
@@ -71,11 +72,11 @@ func (mc *MIDIInput) Run() error {
 
 	defer stop()
 
-	<-mc.ctx.Done()
-	slog.Debug("router context done in module", "id", mc.Id())
+	<-mi.ctx.Done()
+	mi.logger.Debug("router context done in module")
 	return nil
 }
 
-func (mc *MIDIInput) Output(payload any) error {
+func (mi *MIDIInput) Output(payload any) error {
 	return fmt.Errorf("midi.input output is not implemented")
 }

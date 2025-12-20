@@ -22,6 +22,7 @@ type SerialClient struct {
 	Framer framer.Framer
 	Mode   *serial.Mode
 	port   serial.Port
+	logger *slog.Logger
 }
 
 func init() {
@@ -74,82 +75,82 @@ func init() {
 				BaudRate: int(baudRateNum),
 			}
 
-			return &SerialClient{config: config, Port: portString, Framer: framer, Mode: &mode, ctx: ctx, router: router}, nil
+			return &SerialClient{config: config, Port: portString, Framer: framer, Mode: &mode, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
 	})
 }
 
-func (mc *SerialClient) Id() string {
-	return mc.config.Id
+func (sc *SerialClient) Id() string {
+	return sc.config.Id
 }
 
-func (mc *SerialClient) Type() string {
-	return mc.config.Type
+func (sc *SerialClient) Type() string {
+	return sc.config.Type
 }
 
-func (mc *SerialClient) SetupPort() error {
+func (sc *SerialClient) SetupPort() error {
 
-	port, err := serial.Open(mc.Port, mc.Mode)
+	port, err := serial.Open(sc.Port, sc.Mode)
 	if err != nil {
-		return fmt.Errorf("serial.client can't open input port: %s", mc.Port)
+		return fmt.Errorf("serial.client can't open input port: %s", sc.Port)
 	}
 
-	mc.port = port
+	sc.port = port
 
 	return nil
 }
 
-func (mc *SerialClient) Run() error {
+func (sc *SerialClient) Run() error {
 
 	// TODO(jwetzell): shutdown with router.Context properly
 	go func() {
-		<-mc.ctx.Done()
-		slog.Debug("router context done in module", "id", mc.Id())
-		if mc.port != nil {
-			mc.port.Close()
+		<-sc.ctx.Done()
+		sc.logger.Debug("router context done in module")
+		if sc.port != nil {
+			sc.port.Close()
 		}
 	}()
 
 	for {
-		err := mc.SetupPort()
+		err := sc.SetupPort()
 		if err != nil {
-			if mc.ctx.Err() != nil {
-				slog.Debug("router context done in module", "id", mc.Id())
+			if sc.ctx.Err() != nil {
+				sc.logger.Debug("router context done in module")
 				return nil
 			}
-			slog.Error("serial.client", "id", mc.Id(), "error", err.Error())
+			sc.logger.Error("serial.client", "error", err.Error())
 			time.Sleep(time.Second * 2)
 			continue
 		}
 
 		buffer := make([]byte, 1024)
 		select {
-		case <-mc.ctx.Done():
-			slog.Debug("router context done in module", "id", mc.Id())
+		case <-sc.ctx.Done():
+			sc.logger.Debug("router context done in module")
 			return nil
 		default:
 		READ:
 			for {
 				select {
-				case <-mc.ctx.Done():
-					slog.Debug("router context done in module", "id", mc.Id())
+				case <-sc.ctx.Done():
+					sc.logger.Debug("router context done in module")
 					return nil
 				default:
-					byteCount, err := mc.port.Read(buffer)
+					byteCount, err := sc.port.Read(buffer)
 
 					if err != nil {
-						mc.Framer.Clear()
+						sc.Framer.Clear()
 						break READ
 					}
 
-					if mc.Framer != nil {
+					if sc.Framer != nil {
 						if byteCount > 0 {
-							messages := mc.Framer.Decode(buffer[0:byteCount])
+							messages := sc.Framer.Decode(buffer[0:byteCount])
 							for _, message := range messages {
-								if mc.router != nil {
-									mc.router.HandleInput(mc.Id(), message)
+								if sc.router != nil {
+									sc.router.HandleInput(sc.Id(), message)
 								} else {
-									slog.Error("serial.client has no router", "id", mc.Id())
+									sc.logger.Error("serial.client has no router")
 								}
 							}
 						}
@@ -160,7 +161,7 @@ func (mc *SerialClient) Run() error {
 	}
 }
 
-func (mc *SerialClient) Output(payload any) error {
+func (sc *SerialClient) Output(payload any) error {
 
 	payloadBytes, ok := payload.([]byte)
 
@@ -168,6 +169,6 @@ func (mc *SerialClient) Output(payload any) error {
 		return fmt.Errorf("serial.client can only ouptut bytes")
 	}
 
-	_, err := mc.port.Write(mc.Framer.Encode(payloadBytes))
+	_, err := sc.port.Write(sc.Framer.Encode(payloadBytes))
 	return err
 }
