@@ -13,6 +13,7 @@ import (
 	"gitlab.com/gomidi/midi/v2"
 )
 
+// TODO(jwetzell): support using numbers in config file treated as hardcoded values
 type MIDIMessageCreate struct {
 	config      config.ProcessorConfig
 	ProcessFunc func(ctx context.Context, payload any) (any, error)
