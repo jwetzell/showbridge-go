@@ -8,8 +8,8 @@ github.com/eclipse/paho.mqtt.golang v1.5.1 h1:/VSOv3oDLlpqR2Epjn1Q7b2bSTplJIeV2I
 github.com/eclipse/paho.mqtt.golang v1.5.1/go.mod h1:1/yJCneuyOoCOzKSsOTUc0AJfpsItBGWvYpBLimhArU=
 github.com/emiago/diago v0.23.1-0.20251211215055-e1d875617111 h1:jqhOZbH40pf2jiUhGaBNk334wOtNYvAaXg/mHOXhy/Y=
 github.com/emiago/diago v0.23.1-0.20251211215055-e1d875617111/go.mod h1:3vLCCq8/G/Ei5I64IHtrmBTag+nPLcgXcKeN1KkLtuc=
-github.com/emiago/sipgo v1.0.1-alpha.0.20251212165843-9c9bcdf9126f h1:n3wpx7ZyJBr0popXyATnTUZp/AdLIHjKbnKzr4ruF7g=
-github.com/emiago/sipgo v1.0.1-alpha.0.20251212165843-9c9bcdf9126f/go.mod h1:DuwAxBZhKMqIzQFPGZb1MVAGU6Wuxj64oTOhd5dx/FY=
+github.com/emiago/sipgo v1.0.1 h1:8eCZ6L/VX3isyByyv1RrBoQ5GyBoRXBHkNMYjwacRfk=
+github.com/emiago/sipgo v1.0.1/go.mod h1:DuwAxBZhKMqIzQFPGZb1MVAGU6Wuxj64oTOhd5dx/FY=
 github.com/expr-lang/expr v1.17.6 h1:1h6i8ONk9cexhDmowO/A64VPxHScu7qfSl2k8OlINec=
 github.com/expr-lang/expr v1.17.6/go.mod h1:8/vRC7+7HBzESEqt5kKpYXxrxkr31SaO8r40VO/1IT4=
 github.com/go-audio/riff v1.0.0 h1:d8iCGbDvox9BfLagY94fBynxSPHO80LmZCaOsmKxokA=
