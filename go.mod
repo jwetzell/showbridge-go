@@ -10,7 +10,7 @@ require (
 	github.com/jwetzell/free-d-go v0.1.0
 	github.com/jwetzell/osc-go v0.1.0
 	github.com/jwetzell/psn-go v0.3.0
-	github.com/nats-io/nats.go v1.47.0
+	github.com/nats-io/nats.go v1.48.0
 	github.com/urfave/cli/v3 v3.6.1
 	gitlab.com/gomidi/midi/v2 v2.3.18
 	go.bug.st/serial v1.6.4
