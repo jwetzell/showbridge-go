@@ -10,8 +10,8 @@ github.com/emiago/diago v0.23.1-0.20251211215055-e1d875617111 h1:jqhOZbH40pf2jiU
 github.com/emiago/diago v0.23.1-0.20251211215055-e1d875617111/go.mod h1:3vLCCq8/G/Ei5I64IHtrmBTag+nPLcgXcKeN1KkLtuc=
 github.com/emiago/sipgo v1.0.1 h1:8eCZ6L/VX3isyByyv1RrBoQ5GyBoRXBHkNMYjwacRfk=
 github.com/emiago/sipgo v1.0.1/go.mod h1:DuwAxBZhKMqIzQFPGZb1MVAGU6Wuxj64oTOhd5dx/FY=
-github.com/expr-lang/expr v1.17.6 h1:1h6i8ONk9cexhDmowO/A64VPxHScu7qfSl2k8OlINec=
-github.com/expr-lang/expr v1.17.6/go.mod h1:8/vRC7+7HBzESEqt5kKpYXxrxkr31SaO8r40VO/1IT4=
+github.com/expr-lang/expr v1.17.7 h1:Q0xY/e/2aCIp8g9s/LGvMDCC5PxYlvHgDZRQ4y16JX8=
+github.com/expr-lang/expr v1.17.7/go.mod h1:8/vRC7+7HBzESEqt5kKpYXxrxkr31SaO8r40VO/1IT4=
 github.com/go-audio/riff v1.0.0 h1:d8iCGbDvox9BfLagY94fBynxSPHO80LmZCaOsmKxokA=
 github.com/go-audio/riff v1.0.0/go.mod h1:l3cQwc85y79NQFCRB7TiPoNiaijp6q8Z0Uv38rVG498=
 github.com/gobwas/httphead v0.1.0 h1:exrUm0f4YX0L7EBwZHuCF4GDp8aJfVeBrlLQrs6NqWU=
