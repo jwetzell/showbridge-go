@@ -2,7 +2,7 @@ package module
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"log/slog"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -29,25 +29,25 @@ func init() {
 			url, ok := params["url"]
 
 			if !ok {
-				return nil, fmt.Errorf("nats.client requires a url parameter")
+				return nil, errors.New("nats.client requires a url parameter")
 			}
 
 			urlString, ok := url.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("nats.client url must be string")
+				return nil, errors.New("nats.client url must be string")
 			}
 
 			subject, ok := params["subject"]
 
 			if !ok {
-				return nil, fmt.Errorf("nats.client requires a subject parameter")
+				return nil, errors.New("nats.client requires a subject parameter")
 			}
 
 			subjectString, ok := subject.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("nats.client subject must be string")
+				return nil, errors.New("nats.client subject must be string")
 			}
 
 			return &NATSClient{config: config, URL: urlString, Subject: subjectString, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
@@ -97,15 +97,15 @@ func (nc *NATSClient) Output(payload any) error {
 	payloadMessage, ok := payload.(processor.NATSMessage)
 
 	if !ok {
-		return fmt.Errorf("nats.client is only able to output NATSMessage")
+		return errors.New("nats.client is only able to output NATSMessage")
 	}
 
 	if nc.client == nil {
-		return fmt.Errorf("nats.client client is not setup")
+		return errors.New("nats.client client is not setup")
 	}
 
 	if !nc.client.IsConnected() {
-		return fmt.Errorf("nats.client is not connected")
+		return errors.New("nats.client is not connected")
 	}
 
 	err := nc.client.Publish(payloadMessage.Subject, payloadMessage.Payload)

@@ -2,7 +2,7 @@ package module
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"io"
 	"log/slog"
 	"strings"
@@ -44,7 +44,7 @@ func init() {
 				specificPortNum, ok := port.(float64)
 
 				if !ok {
-					return nil, fmt.Errorf("sip.dtmf.server port must be a number")
+					return nil, errors.New("sip.dtmf.server port must be a number")
 				}
 				portNum = int(specificPortNum)
 			}
@@ -57,7 +57,7 @@ func init() {
 				specificIpString, ok := ip.(string)
 
 				if !ok {
-					return nil, fmt.Errorf("sip.dtmf.server ip must be a string")
+					return nil, errors.New("sip.dtmf.server ip must be a string")
 				}
 				ipString = specificIpString
 			}
@@ -70,26 +70,26 @@ func init() {
 				specificTransportString, ok := transport.(string)
 
 				if !ok {
-					return nil, fmt.Errorf("sip.dtmf.server transport must be a string")
+					return nil, errors.New("sip.dtmf.server transport must be a string")
 				}
 				transportString = specificTransportString
 			}
 
 			separator, ok := params["separator"]
 			if !ok {
-				return nil, fmt.Errorf("sip.dtmf.server requires a separator parameter")
+				return nil, errors.New("sip.dtmf.server requires a separator parameter")
 			}
 			separatorString, ok := separator.(string)
 			if !ok {
-				return nil, fmt.Errorf("sip.dtmf.server separator must be a string")
+				return nil, errors.New("sip.dtmf.server separator must be a string")
 			}
 
 			if len(separatorString) != 1 {
-				return nil, fmt.Errorf("sip.dtmf.server separator must be a single character")
+				return nil, errors.New("sip.dtmf.server separator must be a single character")
 			}
 
 			if !strings.ContainsRune("0123456789*#ABCD", rune(separatorString[0])) {
-				return nil, fmt.Errorf("sip.dtmf.server separator must be a valid DTMF character")
+				return nil, errors.New("sip.dtmf.server separator must be a valid DTMF character")
 			}
 			return &SIPDTMFServer{config: config, ctx: ctx, router: router, IP: ipString, Port: int(portNum), Transport: transportString, Separator: separatorString, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
@@ -160,5 +160,5 @@ func (sds *SIPDTMFServer) HandleCall(inDialog *diago.DialogServerSession) error 
 }
 
 func (sds *SIPDTMFServer) Output(payload any) error {
-	return fmt.Errorf("sip.dtmf.server output is not implemented")
+	return errors.New("sip.dtmf.server output is not implemented")
 }

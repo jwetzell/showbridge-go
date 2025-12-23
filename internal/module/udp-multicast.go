@@ -2,6 +2,7 @@ package module
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net"
@@ -28,24 +29,24 @@ func init() {
 			ip, ok := params["ip"]
 
 			if !ok {
-				return nil, fmt.Errorf("net.udp.multicast requires an ip parameter")
+				return nil, errors.New("net.udp.multicast requires an ip parameter")
 			}
 
 			ipString, ok := ip.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("net.udp.multicast ip must be a string")
+				return nil, errors.New("net.udp.multicast ip must be a string")
 			}
 
 			port, ok := params["port"]
 			if !ok {
-				return nil, fmt.Errorf("net.udp.multicast requires a port parameter")
+				return nil, errors.New("net.udp.multicast requires a port parameter")
 			}
 
 			portNum, ok := port.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("net.udp.multicast port must be a number")
+				return nil, errors.New("net.udp.multicast port must be a number")
 			}
 
 			addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", ipString, uint16(portNum)))
@@ -111,11 +112,11 @@ func (um *UDPMulticast) Output(payload any) error {
 
 	payloadBytes, ok := payload.([]byte)
 	if !ok {
-		return fmt.Errorf("net.udp.multicast can only output bytes")
+		return errors.New("net.udp.multicast can only output bytes")
 	}
 
 	if um.conn == nil {
-		return fmt.Errorf("net.udp.multicast connection is not setup")
+		return errors.New("net.udp.multicast connection is not setup")
 	}
 
 	_, err := um.conn.Write(payloadBytes)

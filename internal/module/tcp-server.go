@@ -36,13 +36,13 @@ func init() {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {
-				return nil, fmt.Errorf("net.tcp.server requires a port parameter")
+				return nil, errors.New("net.tcp.server requires a port parameter")
 			}
 
 			portNum, ok := port.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("net.tcp.server port must be a number")
+				return nil, errors.New("net.tcp.server port must be a number")
 			}
 
 			framingMethod := "RAW"
@@ -53,7 +53,7 @@ func init() {
 				framingMethodString, ok := framingMethodRaw.(string)
 
 				if !ok {
-					return nil, fmt.Errorf("misc.serial.client framing method must be a string")
+					return nil, errors.New("misc.serial.client framing method must be a string")
 				}
 				framingMethod = framingMethodString
 			}
@@ -72,7 +72,7 @@ func init() {
 				specificIpString, ok := ip.(string)
 
 				if !ok {
-					return nil, fmt.Errorf("net.tcp.server ip must be a string")
+					return nil, errors.New("net.tcp.server ip must be a string")
 				}
 				ipString = specificIpString
 			}
@@ -201,7 +201,7 @@ func (ts *TCPServer) Output(payload any) error {
 	payloadBytes, ok := payload.([]byte)
 
 	if !ok {
-		return fmt.Errorf("net.tcp.server is only able to output bytes")
+		return errors.New("net.tcp.server is only able to output bytes")
 	}
 	ts.connectionsMu.Lock()
 	errorString := ""
@@ -217,5 +217,5 @@ func (ts *TCPServer) Output(payload any) error {
 	if errorString == "" {
 		return nil
 	}
-	return fmt.Errorf("%s", errorString)
+	return fmt.Errorf("net.tcp.server error during output: %s", errorString)
 }

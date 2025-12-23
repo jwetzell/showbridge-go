@@ -4,6 +4,7 @@ package module
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 
@@ -31,13 +32,13 @@ func init() {
 			port, ok := params["port"]
 
 			if !ok {
-				return nil, fmt.Errorf("midi.output requires a port parameter")
+				return nil, errors.New("midi.output requires a port parameter")
 			}
 
 			portString, ok := port.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("midi.output port must be a string")
+				return nil, errors.New("midi.output port must be a string")
 			}
 
 			return &MIDIOutput{config: config, Port: portString, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
@@ -76,13 +77,13 @@ func (mo *MIDIOutput) Run() error {
 
 func (mo *MIDIOutput) Output(payload any) error {
 	if mo.SendFunc == nil {
-		return fmt.Errorf("midi.output output is not setup")
+		return errors.New("midi.output output is not setup")
 	}
 
 	payloadMessage, ok := payload.(midi.Message)
 
 	if !ok {
-		return fmt.Errorf("midi.output can only ouptut midi.Message")
+		return errors.New("midi.output can only ouptut midi.Message")
 	}
 
 	return mo.SendFunc(payloadMessage)

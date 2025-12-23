@@ -2,7 +2,7 @@ package module
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -27,13 +27,13 @@ func init() {
 
 			duration, ok := params["duration"]
 			if !ok {
-				return nil, fmt.Errorf("gen.interval requires a duration parameter")
+				return nil, errors.New("gen.interval requires a duration parameter")
 			}
 
 			durationNum, ok := duration.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("gen.interval duration must be number")
+				return nil, errors.New("gen.interval duration must be number")
 			}
 
 			return &Interval{Duration: uint32(durationNum), config: config, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil

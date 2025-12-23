@@ -2,6 +2,7 @@ package module
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 
@@ -29,37 +30,37 @@ func init() {
 			broker, ok := params["broker"]
 
 			if !ok {
-				return nil, fmt.Errorf("mqtt.client requires a broker parameter")
+				return nil, errors.New("mqtt.client requires a broker parameter")
 			}
 
 			brokerString, ok := broker.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("mqtt.client broker must be string")
+				return nil, errors.New("mqtt.client broker must be string")
 			}
 
 			topic, ok := params["topic"]
 
 			if !ok {
-				return nil, fmt.Errorf("mqtt.client requires a topic parameter")
+				return nil, errors.New("mqtt.client requires a topic parameter")
 			}
 
 			topicString, ok := topic.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("mqtt.client topic must be string")
+				return nil, errors.New("mqtt.client topic must be string")
 			}
 
 			clientId, ok := params["clientId"]
 
 			if !ok {
-				return nil, fmt.Errorf("mqtt.client requires a clientId parameter")
+				return nil, errors.New("mqtt.client requires a clientId parameter")
 			}
 
 			clientIdString, ok := clientId.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("mqtt.client clientId must be string")
+				return nil, errors.New("mqtt.client clientId must be string")
 			}
 
 			return &MQTTClient{config: config, Broker: brokerString, Topic: topicString, ClientID: clientIdString, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
@@ -110,15 +111,15 @@ func (mc *MQTTClient) Output(payload any) error {
 	fmt.Printf("payload type: %T\n", payload)
 
 	if !ok {
-		return fmt.Errorf("mqtt.client is only able to output a MQTTMessage")
+		return errors.New("mqtt.client is only able to output a MQTTMessage")
 	}
 
 	if mc.client == nil {
-		return fmt.Errorf("mqtt.client client is not setup")
+		return errors.New("mqtt.client client is not setup")
 	}
 
 	if !mc.client.IsConnected() {
-		return fmt.Errorf("mqtt.client is not connected")
+		return errors.New("mqtt.client is not connected")
 	}
 
 	token := mc.client.Publish(payloadMessage.Topic(), payloadMessage.Qos(), payloadMessage.Retained(), payloadMessage.Payload())

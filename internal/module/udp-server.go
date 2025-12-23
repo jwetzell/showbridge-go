@@ -2,6 +2,7 @@ package module
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"log/slog"
@@ -27,13 +28,13 @@ func init() {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {
-				return nil, fmt.Errorf("net.udp.server requires a port parameter")
+				return nil, errors.New("net.udp.server requires a port parameter")
 			}
 
 			portNum, ok := port.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("net.udp.server port must be a number")
+				return nil, errors.New("net.udp.server port must be a number")
 			}
 
 			ipString := "0.0.0.0"
@@ -44,7 +45,7 @@ func init() {
 				specificIpString, ok := ip.(string)
 
 				if !ok {
-					return nil, fmt.Errorf("net.udp.server ip must be a string")
+					return nil, errors.New("net.udp.server ip must be a string")
 				}
 				ipString = specificIpString
 			}
@@ -107,5 +108,5 @@ func (us *UDPServer) Run() error {
 }
 
 func (us *UDPServer) Output(payload any) error {
-	return fmt.Errorf("net.udp.server output is not implemented")
+	return errors.New("net.udp.server output is not implemented")
 }

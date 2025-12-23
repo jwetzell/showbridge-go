@@ -2,7 +2,7 @@ package processor
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/nats-io/nats.go"
@@ -16,7 +16,7 @@ func (nme *NATSMessageEncode) Process(ctx context.Context, payload any) (any, er
 	payloadMessage, ok := payload.(*nats.Msg)
 
 	if !ok {
-		return nil, fmt.Errorf("nats.message.encode processor only accepts an nats.Msg")
+		return nil, errors.New("nats.message.encode processor only accepts an nats.Msg")
 	}
 
 	return payloadMessage.Data, nil

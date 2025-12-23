@@ -2,6 +2,7 @@ package processor
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -20,7 +21,7 @@ func (hrf *HTTPRequestFilter) Process(ctx context.Context, payload any) (any, er
 	payloadRequest, ok := payload.(*http.Request)
 
 	if !ok {
-		return nil, fmt.Errorf("http.request.filter can only operate on http.Request payloads")
+		return nil, errors.New("http.request.filter can only operate on http.Request payloads")
 	}
 
 	if hrf.Method != "" {
@@ -48,13 +49,13 @@ func init() {
 			path, ok := params["path"]
 
 			if !ok {
-				return nil, fmt.Errorf("http.request.filter requires a path parameter")
+				return nil, errors.New("http.request.filter requires a path parameter")
 			}
 
 			pathString, ok := path.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("http.request.filter path must be a string")
+				return nil, errors.New("http.request.filter path must be a string")
 			}
 
 			pathRegexp, err := regexp.Compile(fmt.Sprintf("^%s$", pathString))
@@ -69,7 +70,7 @@ func init() {
 				methodString, ok := method.(string)
 
 				if !ok {
-					return nil, fmt.Errorf("http.request.filter method must be a string")
+					return nil, errors.New("http.request.filter method must be a string")
 				}
 				return &HTTPRequestFilter{config: config, Path: pathRegexp, Method: methodString}, nil
 			}

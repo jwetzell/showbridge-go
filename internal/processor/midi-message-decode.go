@@ -4,7 +4,7 @@ package processor
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"gitlab.com/gomidi/midi/v2"
@@ -18,7 +18,7 @@ func (mmd *MIDIMessageDecode) Process(ctx context.Context, payload any) (any, er
 	payloadBytes, ok := payload.([]byte)
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.decode processor only accepts a []byte")
+		return nil, errors.New("midi.message.decode processor only accepts a []byte")
 	}
 
 	payloadMessage := midi.Message(payloadBytes)

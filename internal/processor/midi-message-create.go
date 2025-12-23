@@ -5,6 +5,7 @@ package processor
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"text/template"
@@ -34,13 +35,13 @@ func newMidiNoteOnCreate(config config.ProcessorConfig) (Processor, error) {
 	channel, ok := params["channel"]
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create NoteOn requires a channel parameter")
+		return nil, errors.New("midi.message.create NoteOn requires a channel parameter")
 	}
 
 	channelString, ok := channel.(string)
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create NoteOn channel must be a string")
+		return nil, errors.New("midi.message.create NoteOn channel must be a string")
 	}
 
 	channelTemplate, err := template.New("channel").Parse(channelString)
@@ -52,13 +53,13 @@ func newMidiNoteOnCreate(config config.ProcessorConfig) (Processor, error) {
 	note, ok := params["note"]
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create NoteOn requires a note parameter")
+		return nil, errors.New("midi.message.create NoteOn requires a note parameter")
 	}
 
 	noteString, ok := note.(string)
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create NoteOn note must be a string")
+		return nil, errors.New("midi.message.create NoteOn note must be a string")
 	}
 
 	noteTemplate, err := template.New("note").Parse(noteString)
@@ -70,13 +71,13 @@ func newMidiNoteOnCreate(config config.ProcessorConfig) (Processor, error) {
 	velocity, ok := params["velocity"]
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create NoteOn requires a velocity parameter")
+		return nil, errors.New("midi.message.create NoteOn requires a velocity parameter")
 	}
 
 	velocityString, ok := velocity.(string)
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create NoteOn velocity must be a string")
+		return nil, errors.New("midi.message.create NoteOn velocity must be a string")
 	}
 
 	velocityTemplate, err := template.New("velocity").Parse(velocityString)
@@ -125,13 +126,13 @@ func newMidiNoteOffCreate(config config.ProcessorConfig) (Processor, error) {
 	channel, ok := params["channel"]
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create NoteOn requires a channel parameter")
+		return nil, errors.New("midi.message.create NoteOn requires a channel parameter")
 	}
 
 	channelString, ok := channel.(string)
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create NoteOn channel must be a string")
+		return nil, errors.New("midi.message.create NoteOn channel must be a string")
 	}
 
 	channelTemplate, err := template.New("channel").Parse(channelString)
@@ -143,13 +144,13 @@ func newMidiNoteOffCreate(config config.ProcessorConfig) (Processor, error) {
 	note, ok := params["note"]
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create NoteOn requires a note parameter")
+		return nil, errors.New("midi.message.create NoteOn requires a note parameter")
 	}
 
 	noteString, ok := note.(string)
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create NoteOn note must be a string")
+		return nil, errors.New("midi.message.create NoteOn note must be a string")
 	}
 
 	noteTemplate, err := template.New("note").Parse(noteString)
@@ -190,13 +191,13 @@ func newMidiControlChangeCreate(config config.ProcessorConfig) (Processor, error
 	channel, ok := params["channel"]
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create ControlChange requires a channel parameter")
+		return nil, errors.New("midi.message.create ControlChange requires a channel parameter")
 	}
 
 	channelString, ok := channel.(string)
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create ControlChange channel must be a string")
+		return nil, errors.New("midi.message.create ControlChange channel must be a string")
 	}
 
 	channelTemplate, err := template.New("channel").Parse(channelString)
@@ -208,13 +209,13 @@ func newMidiControlChangeCreate(config config.ProcessorConfig) (Processor, error
 	controller, ok := params["controller"]
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create ControlChange requires a controller parameter")
+		return nil, errors.New("midi.message.create ControlChange requires a controller parameter")
 	}
 
 	controllerString, ok := controller.(string)
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create ControlChange controller must be a string")
+		return nil, errors.New("midi.message.create ControlChange controller must be a string")
 	}
 
 	controllerTemplate, err := template.New("controller").Parse(controllerString)
@@ -226,13 +227,13 @@ func newMidiControlChangeCreate(config config.ProcessorConfig) (Processor, error
 	value, ok := params["value"]
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create ControlChange requires a value parameter")
+		return nil, errors.New("midi.message.create ControlChange requires a value parameter")
 	}
 
 	valueString, ok := value.(string)
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create ControlChange value must be a string")
+		return nil, errors.New("midi.message.create ControlChange value must be a string")
 	}
 
 	valueTemplate, err := template.New("value").Parse(valueString)
@@ -282,13 +283,13 @@ func newMidiProgramChangeCreate(config config.ProcessorConfig) (Processor, error
 	channel, ok := params["channel"]
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create ProgramChange requires a channel parameter")
+		return nil, errors.New("midi.message.create ProgramChange requires a channel parameter")
 	}
 
 	channelString, ok := channel.(string)
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create ProgramChange channel must be a string")
+		return nil, errors.New("midi.message.create ProgramChange channel must be a string")
 	}
 
 	channelTemplate, err := template.New("channel").Parse(channelString)
@@ -300,13 +301,13 @@ func newMidiProgramChangeCreate(config config.ProcessorConfig) (Processor, error
 	program, ok := params["program"]
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create ProgramChange requires a program parameter")
+		return nil, errors.New("midi.message.create ProgramChange requires a program parameter")
 	}
 
 	programString, ok := program.(string)
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.create ProgramChange program must be a string")
+		return nil, errors.New("midi.message.create ProgramChange program must be a string")
 	}
 
 	programTemplate, err := template.New("program").Parse(programString)
@@ -349,13 +350,13 @@ func init() {
 			msgType, ok := params["type"]
 
 			if !ok {
-				return nil, fmt.Errorf("midi.message.create requires a type parameter")
+				return nil, errors.New("midi.message.create requires a type parameter")
 			}
 
 			msgTypeString, ok := msgType.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("midi.message.create type parameter must be a string")
+				return nil, errors.New("midi.message.create type parameter must be a string")
 			}
 
 			switch msgTypeString {

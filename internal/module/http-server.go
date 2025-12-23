@@ -3,6 +3,7 @@ package module
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -31,13 +32,13 @@ func init() {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {
-				return nil, fmt.Errorf("http.server requires a port parameter")
+				return nil, errors.New("http.server requires a port parameter")
 			}
 
 			portNum, ok := port.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("http.server port must be uint16")
+				return nil, errors.New("http.server port must be uint16")
 			}
 
 			return &HTTPServer{Port: uint16(portNum), config: config, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
@@ -105,5 +106,5 @@ func (hs *HTTPServer) Run() error {
 }
 
 func (hs *HTTPServer) Output(payload any) error {
-	return fmt.Errorf("http.server output is not implemented")
+	return errors.New("http.server output is not implemented")
 }

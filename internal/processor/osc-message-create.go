@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"strconv"
 	"text/template"
@@ -31,11 +32,11 @@ func (o *OSCMessageCreate) Process(ctx context.Context, payload any) (any, error
 	addressString := addressBuffer.String()
 
 	if len(addressString) == 0 {
-		return nil, fmt.Errorf("osc.message.create address must not be empty")
+		return nil, errors.New("osc.message.create address must not be empty")
 	}
 
 	if addressString[0] != '/' {
-		return nil, fmt.Errorf("osc.message.create address must start with '/'")
+		return nil, errors.New("osc.message.create address must start with '/'")
 	}
 
 	payloadMessage := osc.OSCMessage{
@@ -82,13 +83,13 @@ func init() {
 			address, ok := params["address"]
 
 			if !ok {
-				return nil, fmt.Errorf("osc.message.create requires an address parameter")
+				return nil, errors.New("osc.message.create requires an address parameter")
 			}
 
 			addressString, ok := address.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("osc.message.create address must be a string")
+				return nil, errors.New("osc.message.create address must be a string")
 			}
 
 			addressTemplate, err := template.New("address").Parse(addressString)
@@ -109,17 +110,17 @@ func init() {
 				types, ok := params["types"]
 
 				if !ok {
-					return nil, fmt.Errorf("osc.message.create requires a types parameter with args")
+					return nil, errors.New("osc.message.create requires a types parameter with args")
 				}
 
 				typesString, ok := types.(string)
 
 				if !ok {
-					return nil, fmt.Errorf("osc.message.create types must be a string")
+					return nil, errors.New("osc.message.create types must be a string")
 				}
 
 				if len(rawArgs) != len(typesString) {
-					return nil, fmt.Errorf("osc.message.create args and types must be the same length")
+					return nil, errors.New("osc.message.create args and types must be the same length")
 				}
 
 				argTemplates := []*template.Template{}
@@ -128,7 +129,7 @@ func init() {
 					argString, ok := rawArg.(string)
 
 					if !ok {
-						return nil, fmt.Errorf("osc.message.create arg must be a string")
+						return nil, errors.New("osc.message.create arg must be a string")
 					}
 
 					argTemplate, err := template.New("arg").Parse(argString)

@@ -2,7 +2,7 @@ package processor
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -74,44 +74,44 @@ func init() {
 			topic, ok := params["topic"]
 
 			if !ok {
-				return nil, fmt.Errorf("mqtt.message.create requires a topic parameter")
+				return nil, errors.New("mqtt.message.create requires a topic parameter")
 			}
 
 			topicString, ok := topic.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("mqtt.message.create topic must be a string")
+				return nil, errors.New("mqtt.message.create topic must be a string")
 			}
 
 			qos, ok := params["qos"]
 
 			if !ok {
-				return nil, fmt.Errorf("mqtt.message.create requires a qos parameter")
+				return nil, errors.New("mqtt.message.create requires a qos parameter")
 			}
 
 			qosByte, ok := qos.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("mqtt.message.create qos must be a number")
+				return nil, errors.New("mqtt.message.create qos must be a number")
 			}
 
 			retained, ok := params["retained"]
 
 			if !ok {
-				return nil, fmt.Errorf("mqtt.message.create requires a retained parameter")
+				return nil, errors.New("mqtt.message.create requires a retained parameter")
 			}
 
 			retainedBool, ok := retained.(bool)
 
 			if !ok {
-				return nil, fmt.Errorf("mqtt.message.create retained must be a boolean")
+				return nil, errors.New("mqtt.message.create retained must be a boolean")
 			}
 
 			//TODO(jwetzell): convert payload into []byte or string for sending
 			payload, ok := params["payload"]
 
 			if !ok {
-				return nil, fmt.Errorf("mqtt.message.create requires a payload parameter")
+				return nil, errors.New("mqtt.message.create requires a payload parameter")
 			}
 
 			if payloadBytes, ok := payload.([]byte); ok {
@@ -121,7 +121,7 @@ func init() {
 			payloadString, ok := payload.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("mqtt.message.create payload must be a string or byte array")
+				return nil, errors.New("mqtt.message.create payload must be a string or byte array")
 			}
 
 			payloadBytes := []byte(payloadString)

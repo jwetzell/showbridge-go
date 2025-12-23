@@ -4,6 +4,7 @@ package module
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -33,13 +34,13 @@ func init() {
 			port, ok := params["port"]
 
 			if !ok {
-				return nil, fmt.Errorf("serial.client requires a port parameter")
+				return nil, errors.New("serial.client requires a port parameter")
 			}
 
 			portString, ok := port.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("serial.client port must be a string")
+				return nil, errors.New("serial.client port must be a string")
 			}
 
 			framingMethod := "RAW"
@@ -50,7 +51,7 @@ func init() {
 				framingMethodString, ok := framingMethodRaw.(string)
 
 				if !ok {
-					return nil, fmt.Errorf("serial.client framing method must be a string")
+					return nil, errors.New("serial.client framing method must be a string")
 				}
 				framingMethod = framingMethodString
 			}
@@ -63,12 +64,12 @@ func init() {
 
 			buadRate, ok := params["baudRate"]
 			if !ok {
-				return nil, fmt.Errorf("serial.client requires a baudRate parameter")
+				return nil, errors.New("serial.client requires a baudRate parameter")
 			}
 
 			baudRateNum, ok := buadRate.(float64)
 			if !ok {
-				return nil, fmt.Errorf("serial.client baudRate must be a number")
+				return nil, errors.New("serial.client baudRate must be a number")
 			}
 
 			mode := serial.Mode{
@@ -166,7 +167,7 @@ func (sc *SerialClient) Output(payload any) error {
 	payloadBytes, ok := payload.([]byte)
 
 	if !ok {
-		return fmt.Errorf("serial.client can only ouptut bytes")
+		return errors.New("serial.client can only ouptut bytes")
 	}
 
 	_, err := sc.port.Write(sc.Framer.Encode(payloadBytes))

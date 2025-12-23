@@ -3,7 +3,7 @@ package processor
 import (
 	"bytes"
 	"context"
-	"fmt"
+	"errors"
 	"strconv"
 	"text/template"
 
@@ -190,13 +190,13 @@ func init() {
 			id, ok := params["id"]
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create requires an id parameter")
+				return nil, errors.New("freed.create requires an id parameter")
 			}
 
 			idString, ok := id.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create id must be a string")
+				return nil, errors.New("freed.create id must be a string")
 			}
 
 			idTemplate, err := template.New("id").Parse(idString)
@@ -208,13 +208,13 @@ func init() {
 			pan, ok := params["pan"]
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create requires a pan parameter")
+				return nil, errors.New("freed.create requires a pan parameter")
 			}
 
 			panString, ok := pan.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create pan must be a string")
+				return nil, errors.New("freed.create pan must be a string")
 			}
 
 			panTemplate, err := template.New("pan").Parse(panString)
@@ -222,13 +222,13 @@ func init() {
 			tilt, ok := params["tilt"]
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create requires a tilt parameter")
+				return nil, errors.New("freed.create requires a tilt parameter")
 			}
 
 			tiltString, ok := tilt.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create tilt must be a string")
+				return nil, errors.New("freed.create tilt must be a string")
 			}
 
 			tiltTemplate, err := template.New("tilt").Parse(tiltString)
@@ -236,13 +236,13 @@ func init() {
 			roll, ok := params["roll"]
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create requires a roll parameter")
+				return nil, errors.New("freed.create requires a roll parameter")
 			}
 
 			rollString, ok := roll.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create roll must be a string")
+				return nil, errors.New("freed.create roll must be a string")
 			}
 
 			rollTemplate, err := template.New("roll").Parse(rollString)
@@ -254,13 +254,13 @@ func init() {
 			posX, ok := params["posX"]
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create requires a posX parameter")
+				return nil, errors.New("freed.create requires a posX parameter")
 			}
 
 			posXString, ok := posX.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create posX must be a string")
+				return nil, errors.New("freed.create posX must be a string")
 			}
 
 			posXTemplate, err := template.New("posX").Parse(posXString)
@@ -272,13 +272,13 @@ func init() {
 			posY, ok := params["posY"]
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create requires a posY parameter")
+				return nil, errors.New("freed.create requires a posY parameter")
 			}
 
 			posYString, ok := posY.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create posY must be a string")
+				return nil, errors.New("freed.create posY must be a string")
 			}
 
 			posYTemplate, err := template.New("posY").Parse(posYString)
@@ -290,13 +290,13 @@ func init() {
 			posZ, ok := params["posZ"]
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create requires a posZ parameter")
+				return nil, errors.New("freed.create requires a posZ parameter")
 			}
 
 			posZString, ok := posZ.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create posZ must be a string")
+				return nil, errors.New("freed.create posZ must be a string")
 			}
 
 			posZTemplate, err := template.New("posZ").Parse(posZString)
@@ -308,13 +308,13 @@ func init() {
 			zoom, ok := params["zoom"]
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create requires a zoom parameter")
+				return nil, errors.New("freed.create requires a zoom parameter")
 			}
 
 			zoomString, ok := zoom.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create zoom must be a string")
+				return nil, errors.New("freed.create zoom must be a string")
 			}
 
 			zoomTemplate, err := template.New("zoom").Parse(zoomString)
@@ -322,13 +322,13 @@ func init() {
 			focus, ok := params["focus"]
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create requires a focus parameter")
+				return nil, errors.New("freed.create requires a focus parameter")
 			}
 
 			focusString, ok := focus.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("freed.create focus must be a string")
+				return nil, errors.New("freed.create focus must be a string")
 			}
 
 			focusTemplate, err := template.New("focus").Parse(focusString)

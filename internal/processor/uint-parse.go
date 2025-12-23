@@ -2,7 +2,7 @@ package processor
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"strconv"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -16,7 +16,7 @@ func (up *UintParse) Process(ctx context.Context, payload any) (any, error) {
 	payloadString, ok := payload.(string)
 
 	if !ok {
-		return nil, fmt.Errorf("uint.parse processor only accepts a string")
+		return nil, errors.New("uint.parse processor only accepts a string")
 	}
 
 	// TODO(jwetzell): make base and bitSize configurable

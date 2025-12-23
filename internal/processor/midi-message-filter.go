@@ -4,7 +4,7 @@ package processor
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"gitlab.com/gomidi/midi/v2"
@@ -19,7 +19,7 @@ func (mmf *MIDIMessageFilter) Process(ctx context.Context, payload any) (any, er
 	payloadMessage, ok := payload.(midi.Message)
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.filter processor only accepts an midi.Message")
+		return nil, errors.New("midi.message.filter processor only accepts an midi.Message")
 	}
 
 	if payloadMessage.Type().String() != mmf.MIDIType {
@@ -41,12 +41,12 @@ func init() {
 			midiType, ok := params["type"]
 
 			if !ok {
-				return nil, fmt.Errorf("midi.message.filter requires a type parameter")
+				return nil, errors.New("midi.message.filter requires a type parameter")
 			}
 			midiTypeString, ok := midiType.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("midi.message.filter type must be a string")
+				return nil, errors.New("midi.message.filter type must be a string")
 			}
 
 			return &MIDIMessageFilter{config: config, MIDIType: midiTypeString}, nil

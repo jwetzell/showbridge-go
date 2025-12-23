@@ -4,6 +4,7 @@ package processor
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -47,7 +48,7 @@ func (mmu *MIDIMessageUnpack) Process(ctx context.Context, payload any) (any, er
 	payloadMidi, ok := payload.(midi.Message)
 
 	if !ok {
-		return nil, fmt.Errorf("midi.message.unpack processor only accepts a midi.Message")
+		return nil, errors.New("midi.message.unpack processor only accepts a midi.Message")
 	}
 
 	switch payloadMidi.Type() {

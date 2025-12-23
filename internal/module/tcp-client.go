@@ -2,6 +2,7 @@ package module
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net"
@@ -30,24 +31,24 @@ func init() {
 			host, ok := params["host"]
 
 			if !ok {
-				return nil, fmt.Errorf("net.tcp.client requires a host parameter")
+				return nil, errors.New("net.tcp.client requires a host parameter")
 			}
 
 			hostString, ok := host.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("net.tcp.client host must be string")
+				return nil, errors.New("net.tcp.client host must be string")
 			}
 
 			port, ok := params["port"]
 			if !ok {
-				return nil, fmt.Errorf("net.tcp.client requires a port parameter")
+				return nil, errors.New("net.tcp.client requires a port parameter")
 			}
 
 			portNum, ok := port.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("net.tcp.client port must be a number")
+				return nil, errors.New("net.tcp.client port must be a number")
 			}
 
 			addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", hostString, uint16(portNum)))
@@ -63,7 +64,7 @@ func init() {
 				framingMethodString, ok := framingMethodRaw.(string)
 
 				if !ok {
-					return nil, fmt.Errorf("misc.serial.client framing method must be a string")
+					return nil, errors.New("misc.serial.client framing method must be a string")
 				}
 				framingMethod = framingMethodString
 			}
@@ -164,7 +165,7 @@ func (tc *TCPClient) Output(payload any) error {
 	}
 	payloadBytes, ok := payload.([]byte)
 	if !ok {
-		return fmt.Errorf("net.tcp.client is only able to output bytes")
+		return errors.New("net.tcp.client is only able to output bytes")
 	}
 	_, err := tc.conn.Write(tc.framer.Encode(payloadBytes))
 	return err

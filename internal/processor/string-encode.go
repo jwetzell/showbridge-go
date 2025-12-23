@@ -2,7 +2,7 @@ package processor
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -15,7 +15,7 @@ func (se *StringEncode) Process(ctx context.Context, payload any) (any, error) {
 	payloadString, ok := payload.(string)
 
 	if !ok {
-		return nil, fmt.Errorf("string.encode processor only accepts a string")
+		return nil, errors.New("string.encode processor only accepts a string")
 	}
 
 	payloadBytes := []byte(payloadString)

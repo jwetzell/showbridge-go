@@ -2,7 +2,7 @@ package processor
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	osc "github.com/jwetzell/osc-go"
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -16,7 +16,7 @@ func (o *OSCMessageEncode) Process(ctx context.Context, payload any) (any, error
 	payloadMessage, ok := payload.(osc.OSCMessage)
 
 	if !ok {
-		return nil, fmt.Errorf("osc.message.encode processor only accepts an OSCMessage")
+		return nil, errors.New("osc.message.encode processor only accepts an OSCMessage")
 	}
 
 	bytes := payloadMessage.ToBytes()

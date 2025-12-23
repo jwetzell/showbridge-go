@@ -2,6 +2,7 @@ package showbridge
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"sync"
@@ -45,7 +46,7 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []module.Mod
 			moduleErrors = append(moduleErrors, module.ModuleError{
 				Index:  moduleIndex,
 				Config: moduleDecl,
-				Error:  fmt.Errorf("module type not defined"),
+				Error:  errors.New("module type not defined"),
 			})
 			continue
 		}
@@ -60,7 +61,7 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []module.Mod
 				moduleErrors = append(moduleErrors, module.ModuleError{
 					Index:  moduleIndex,
 					Config: moduleDecl,
-					Error:  fmt.Errorf("duplicate module id"),
+					Error:  errors.New("duplicate module id"),
 				})
 				break
 			}

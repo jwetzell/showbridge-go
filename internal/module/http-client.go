@@ -2,7 +2,7 @@ package module
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"log/slog"
 	"net/http"
 	"time"
@@ -53,11 +53,11 @@ func (hc *HTTPClient) Output(payload any) error {
 	payloadRequest, ok := payload.(*http.Request)
 
 	if !ok {
-		return fmt.Errorf("http.client is only able to output an http.Request")
+		return errors.New("http.client is only able to output an http.Request")
 	}
 
 	if hc.client == nil {
-		return fmt.Errorf("http.client client is nil")
+		return errors.New("http.client client is nil")
 	}
 
 	response, err := hc.client.Do(payloadRequest)

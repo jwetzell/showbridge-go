@@ -2,6 +2,7 @@ package module
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -43,7 +44,7 @@ func init() {
 				specificPortNum, ok := port.(float64)
 
 				if !ok {
-					return nil, fmt.Errorf("sip.call.server port must be a number")
+					return nil, errors.New("sip.call.server port must be a number")
 				}
 				portNum = int(specificPortNum)
 			}
@@ -56,7 +57,7 @@ func init() {
 				specificIpString, ok := ip.(string)
 
 				if !ok {
-					return nil, fmt.Errorf("sip.call.server ip must be a string")
+					return nil, errors.New("sip.call.server ip must be a string")
 				}
 				ipString = specificIpString
 			}
@@ -69,7 +70,7 @@ func init() {
 				specificTransportString, ok := transport.(string)
 
 				if !ok {
-					return nil, fmt.Errorf("sip.call.server transport must be a string")
+					return nil, errors.New("sip.call.server transport must be a string")
 				}
 				transportString = specificTransportString
 			}
@@ -82,7 +83,7 @@ func init() {
 				specificTransportString, ok := userAgent.(string)
 
 				if !ok {
-					return nil, fmt.Errorf("sip.call.server userAgent must be a string")
+					return nil, errors.New("sip.call.server userAgent must be a string")
 				}
 				userAgentString = specificTransportString
 			}
@@ -146,41 +147,41 @@ func (scs *SIPCallServer) Output(payload any) error {
 
 	payloadMsg, ok := payload.(string)
 	if !ok {
-		return fmt.Errorf("sip.call.server output payload must be of type string")
+		return errors.New("sip.call.server output payload must be of type string")
 	}
 
 	if scs.dg == nil {
-		return fmt.Errorf("sip.call.server diago is not initialized")
+		return errors.New("sip.call.server diago is not initialized")
 	}
 
 	var uri sip.Uri
 	err := sip.ParseUri(payloadMsg, &uri)
 	if err != nil {
-		return fmt.Errorf("sip.call.server output payload is not a valid SIP URI: %v", err)
+		return fmt.Errorf("sip.call.server output payload is not a valid SIP URI: %s", err)
 	}
 	outDialog, err := scs.dg.NewDialog(uri, diago.NewDialogOptions{
 		Transport: scs.Transport,
 	})
 
 	if err != nil {
-		return fmt.Errorf("sip.call.server failed to create new dialog: %v", err)
+		return fmt.Errorf("sip.call.server failed to create new dialog: %s", err)
 	}
 
 	err = outDialog.Invite(scs.ctx, diago.InviteClientOptions{})
 	if err != nil {
-		return fmt.Errorf("sip.call.server failed to send invite: %v", err)
+		return fmt.Errorf("sip.call.server failed to send invite: %s", err)
 	}
 
 	err = outDialog.Ack(scs.ctx)
 	if err != nil {
-		return fmt.Errorf("sip.call.server failed to send ack: %v", err)
+		return fmt.Errorf("sip.call.server failed to send ack: %s", err)
 	}
 	// TODO(jwetzell): make this configurable
 	// NOTE(jwetzell): wait 5 seconds before hanging up the call
 	time.Sleep(5 * time.Second)
 	err = outDialog.Hangup(scs.ctx)
 	if err != nil {
-		return fmt.Errorf("sip.call.server failed to hangup call: %v", err)
+		return fmt.Errorf("sip.call.server failed to hangup call: %s", err)
 	}
 	return nil
 }

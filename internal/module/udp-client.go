@@ -2,6 +2,7 @@ package module
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net"
@@ -28,24 +29,24 @@ func init() {
 			host, ok := params["host"]
 
 			if !ok {
-				return nil, fmt.Errorf("net.udp.client requires a host parameter")
+				return nil, errors.New("net.udp.client requires a host parameter")
 			}
 
 			hostString, ok := host.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("net.udp.client host must be a string")
+				return nil, errors.New("net.udp.client host must be a string")
 			}
 
 			port, ok := params["port"]
 			if !ok {
-				return nil, fmt.Errorf("net.udp.client requires a port parameter")
+				return nil, errors.New("net.udp.client requires a port parameter")
 			}
 
 			portNum, ok := port.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("net.udp.client port must be a number")
+				return nil, errors.New("net.udp.client port must be a number")
 			}
 
 			addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", hostString, uint16(portNum)))
@@ -91,7 +92,7 @@ func (uc *UDPClient) Output(payload any) error {
 
 	payloadBytes, ok := payload.([]byte)
 	if !ok {
-		return fmt.Errorf("net.udp.client is only able to output bytes")
+		return errors.New("net.udp.client is only able to output bytes")
 	}
 	if uc.conn != nil {
 		_, err := uc.conn.Write(payloadBytes)
@@ -100,7 +101,7 @@ func (uc *UDPClient) Output(payload any) error {
 			return err
 		}
 	} else {
-		return fmt.Errorf("net.udp.client client is not setup")
+		return errors.New("net.udp.client client is not setup")
 	}
 	return nil
 }

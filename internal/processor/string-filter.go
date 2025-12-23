@@ -2,7 +2,7 @@ package processor
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"regexp"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -17,7 +17,7 @@ func (se *StringFilter) Process(ctx context.Context, payload any) (any, error) {
 	payloadString, ok := payload.(string)
 
 	if !ok {
-		return nil, fmt.Errorf("string.filter processor only accepts a string")
+		return nil, errors.New("string.filter processor only accepts a string")
 	}
 
 	if !se.Pattern.MatchString(payloadString) {
@@ -40,13 +40,13 @@ func init() {
 			pattern, ok := params["pattern"]
 
 			if !ok {
-				return nil, fmt.Errorf("http.request.filter requires a pattern parameter")
+				return nil, errors.New("string.filter requires a pattern parameter")
 			}
 
 			patternString, ok := pattern.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("http.request.filter pattern must be a string")
+				return nil, errors.New("string.filter pattern must be a string")
 			}
 
 			patternRegexp, err := regexp.Compile(patternString)

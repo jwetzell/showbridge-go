@@ -2,7 +2,7 @@ package module
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -27,13 +27,13 @@ func init() {
 
 			duration, ok := params["duration"]
 			if !ok {
-				return nil, fmt.Errorf("gen.timer requires a duration parameter")
+				return nil, errors.New("gen.timer requires a duration parameter")
 			}
 
 			durationNum, ok := duration.(float64)
 
 			if !ok {
-				return nil, fmt.Errorf("gen.timer duration must be a number")
+				return nil, errors.New("gen.timer duration must be a number")
 			}
 
 			return &Timer{Duration: uint32(durationNum), config: config, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil

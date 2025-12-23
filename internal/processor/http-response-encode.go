@@ -2,7 +2,7 @@ package processor
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"io"
 	"net/http"
 
@@ -17,7 +17,7 @@ func (hre *HTTPResponseEncode) Process(ctx context.Context, payload any) (any, e
 	payloadResponse, ok := payload.(*http.Response)
 
 	if !ok {
-		return nil, fmt.Errorf("http.response.encode processor only accepts an http.Response")
+		return nil, errors.New("http.response.encode processor only accepts an http.Response")
 	}
 	defer payloadResponse.Body.Close()
 

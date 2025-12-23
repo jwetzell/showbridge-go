@@ -3,7 +3,7 @@ package processor
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"errors"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"modernc.org/quickjs"
@@ -74,13 +74,13 @@ func init() {
 			program, ok := params["program"]
 
 			if !ok {
-				return nil, fmt.Errorf("script.js requires a program parameter")
+				return nil, errors.New("script.js requires a program parameter")
 			}
 
 			programString, ok := program.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("script.js program must be a string")
+				return nil, errors.New("script.js program must be a string")
 			}
 
 			return &ScriptJS{config: config, Program: programString}, nil

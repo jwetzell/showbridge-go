@@ -4,6 +4,7 @@ package module
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 
@@ -30,13 +31,13 @@ func init() {
 			port, ok := params["port"]
 
 			if !ok {
-				return nil, fmt.Errorf("midi.input requires a port parameter")
+				return nil, errors.New("midi.input requires a port parameter")
 			}
 
 			portString, ok := port.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("midi.input port must be a string")
+				return nil, errors.New("midi.input port must be a string")
 			}
 
 			return &MIDIInput{config: config, Port: portString, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
@@ -78,5 +79,5 @@ func (mi *MIDIInput) Run() error {
 }
 
 func (mi *MIDIInput) Output(payload any) error {
-	return fmt.Errorf("midi.input output is not implemented")
+	return errors.New("midi.input output is not implemented")
 }

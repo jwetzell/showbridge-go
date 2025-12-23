@@ -3,7 +3,7 @@ package processor
 import (
 	"bytes"
 	"context"
-	"fmt"
+	"errors"
 	"text/template"
 
 	osc "github.com/jwetzell/osc-go"
@@ -19,7 +19,7 @@ func (o *OSCMessageTransform) Process(ctx context.Context, payload any) (any, er
 	payloadMessage, ok := payload.(osc.OSCMessage)
 
 	if !ok {
-		return nil, fmt.Errorf("osc.message.transform processor only accepts an OSCMessage")
+		return nil, errors.New("osc.message.transform processor only accepts an OSCMessage")
 	}
 
 	var addressBuffer bytes.Buffer
@@ -33,11 +33,11 @@ func (o *OSCMessageTransform) Process(ctx context.Context, payload any) (any, er
 	addressString := addressBuffer.String()
 
 	if len(addressString) == 0 {
-		return nil, fmt.Errorf("osc.message.transform address must not be empty")
+		return nil, errors.New("osc.message.transform address must not be empty")
 	}
 
 	if addressString[0] != '/' {
-		return nil, fmt.Errorf("osc.message.transform address must start with '/'")
+		return nil, errors.New("osc.message.transform address must start with '/'")
 	}
 
 	payloadMessage.Address = addressString
@@ -57,13 +57,13 @@ func init() {
 			address, ok := params["address"]
 
 			if !ok {
-				return nil, fmt.Errorf("osc.message.transform requires an address parameter")
+				return nil, errors.New("osc.message.transform requires an address parameter")
 			}
 
 			addressString, ok := address.(string)
 
 			if !ok {
-				return nil, fmt.Errorf("osc.message.transform address must be a string")
+				return nil, errors.New("osc.message.transform address must be a string")
 			}
 
 			addressTemplate, err := template.New("address").Parse(addressString)

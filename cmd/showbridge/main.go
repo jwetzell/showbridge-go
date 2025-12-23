@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -42,7 +42,7 @@ func main() {
 		Action: func(ctx context.Context, c *cli.Command) error {
 			configPath := c.String("config")
 			if configPath == "" {
-				return fmt.Errorf("config value cannot be empty")
+				return errors.New("config value cannot be empty")
 			}
 
 			config, err := readConfig(configPath)

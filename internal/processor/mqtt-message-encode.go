@@ -2,7 +2,7 @@ package processor
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -16,7 +16,7 @@ func (mme *MQTTMessageEncode) Process(ctx context.Context, payload any) (any, er
 	payloadMessage, ok := payload.(mqtt.Message)
 
 	if !ok {
-		return nil, fmt.Errorf("mqtt.message.encode processor only accepts an mqtt.Message")
+		return nil, errors.New("mqtt.message.encode processor only accepts an mqtt.Message")
 	}
 
 	return payloadMessage.Payload(), nil
