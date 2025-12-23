@@ -5,7 +5,7 @@ go 1.25.3
 require (
 	github.com/eclipse/paho.mqtt.golang v1.5.1
 	github.com/emiago/diago v0.23.1-0.20251211215055-e1d875617111
-	github.com/emiago/sipgo v1.0.1-alpha.0.20251212165843-9c9bcdf9126f
+	github.com/emiago/sipgo v1.0.1
 	github.com/expr-lang/expr v1.17.6
 	github.com/jwetzell/free-d-go v0.1.0
 	github.com/jwetzell/osc-go v0.1.0
