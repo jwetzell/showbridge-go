@@ -12,7 +12,7 @@ type OSCMessageDecode struct {
 	config config.ProcessorConfig
 }
 
-func (o *OSCMessageDecode) Process(ctx context.Context, payload any) (any, error) {
+func (omd *OSCMessageDecode) Process(ctx context.Context, payload any) (any, error) {
 	payloadBytes, ok := payload.([]byte)
 
 	if !ok {
@@ -34,8 +34,8 @@ func (o *OSCMessageDecode) Process(ctx context.Context, payload any) (any, error
 	return message, nil
 }
 
-func (o *OSCMessageDecode) Type() string {
-	return o.config.Type
+func (omd *OSCMessageDecode) Type() string {
+	return omd.config.Type
 }
 
 func init() {

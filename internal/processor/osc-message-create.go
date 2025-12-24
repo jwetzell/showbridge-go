@@ -20,10 +20,10 @@ type OSCMessageCreate struct {
 	Types   string
 }
 
-func (o *OSCMessageCreate) Process(ctx context.Context, payload any) (any, error) {
+func (omc *OSCMessageCreate) Process(ctx context.Context, payload any) (any, error) {
 
 	var addressBuffer bytes.Buffer
-	err := o.Address.Execute(&addressBuffer, payload)
+	err := omc.Address.Execute(&addressBuffer, payload)
 
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func (o *OSCMessageCreate) Process(ctx context.Context, payload any) (any, error
 
 	args := []osc.OSCArg{}
 
-	for argIndex, argTemplate := range o.Args {
+	for argIndex, argTemplate := range omc.Args {
 		var argBuffer bytes.Buffer
 		err := argTemplate.Execute(&argBuffer, payload)
 
@@ -55,7 +55,7 @@ func (o *OSCMessageCreate) Process(ctx context.Context, payload any) (any, error
 
 		argString := argBuffer.String()
 
-		typedArg, err := argToTypedArg(argString, o.Types[argIndex])
+		typedArg, err := argToTypedArg(argString, omc.Types[argIndex])
 
 		if err != nil {
 			return nil, err
@@ -71,8 +71,8 @@ func (o *OSCMessageCreate) Process(ctx context.Context, payload any) (any, error
 	return payloadMessage, nil
 }
 
-func (o *OSCMessageCreate) Type() string {
-	return o.config.Type
+func (omc *OSCMessageCreate) Type() string {
+	return omc.config.Type
 }
 
 func init() {

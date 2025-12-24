@@ -13,20 +13,20 @@ type StringSplit struct {
 	Separator string
 }
 
-func (se *StringSplit) Process(ctx context.Context, payload any) (any, error) {
+func (ss *StringSplit) Process(ctx context.Context, payload any) (any, error) {
 	payloadString, ok := payload.(string)
 
 	if !ok {
 		return nil, errors.New("string.split only accepts a string")
 	}
 
-	payloadParts := strings.Split(payloadString, se.Separator)
+	payloadParts := strings.Split(payloadString, ss.Separator)
 
 	return payloadParts, nil
 }
 
-func (se *StringSplit) Type() string {
-	return se.config.Type
+func (ss *StringSplit) Type() string {
+	return ss.config.Type
 }
 
 func init() {

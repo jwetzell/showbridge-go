@@ -12,7 +12,7 @@ type OSCMessageEncode struct {
 	config config.ProcessorConfig
 }
 
-func (o *OSCMessageEncode) Process(ctx context.Context, payload any) (any, error) {
+func (ome *OSCMessageEncode) Process(ctx context.Context, payload any) (any, error) {
 	payloadMessage, ok := payload.(osc.OSCMessage)
 
 	if !ok {
@@ -23,8 +23,8 @@ func (o *OSCMessageEncode) Process(ctx context.Context, payload any) (any, error
 	return bytes, nil
 }
 
-func (o *OSCMessageEncode) Type() string {
-	return o.config.Type
+func (ome *OSCMessageEncode) Type() string {
+	return ome.config.Type
 }
 
 func init() {

@@ -13,22 +13,22 @@ type StringFilter struct {
 	Pattern *regexp.Regexp
 }
 
-func (se *StringFilter) Process(ctx context.Context, payload any) (any, error) {
+func (sf *StringFilter) Process(ctx context.Context, payload any) (any, error) {
 	payloadString, ok := payload.(string)
 
 	if !ok {
 		return nil, errors.New("string.filter processor only accepts a string")
 	}
 
-	if !se.Pattern.MatchString(payloadString) {
+	if !sf.Pattern.MatchString(payloadString) {
 		return nil, nil
 	}
 
 	return payloadString, nil
 }
 
-func (se *StringFilter) Type() string {
-	return se.config.Type
+func (sf *StringFilter) Type() string {
+	return sf.config.Type
 }
 
 func init() {

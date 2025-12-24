@@ -16,7 +16,7 @@ type OSCMessageFilter struct {
 	Address *regexp.Regexp
 }
 
-func (o *OSCMessageFilter) Process(ctx context.Context, payload any) (any, error) {
+func (omf *OSCMessageFilter) Process(ctx context.Context, payload any) (any, error) {
 
 	payloadMessage, ok := payload.(osc.OSCMessage)
 
@@ -24,15 +24,15 @@ func (o *OSCMessageFilter) Process(ctx context.Context, payload any) (any, error
 		return nil, errors.New("osc.message.filter can only operate on OSCMessage payloads")
 	}
 
-	if !o.Address.MatchString(payloadMessage.Address) {
+	if !omf.Address.MatchString(payloadMessage.Address) {
 		return nil, nil
 	}
 
 	return payloadMessage, nil
 }
 
-func (o *OSCMessageFilter) Type() string {
-	return o.config.Type
+func (omf *OSCMessageFilter) Type() string {
+	return omf.config.Type
 }
 
 func init() {

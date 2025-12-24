@@ -15,7 +15,7 @@ type OSCMessageTransform struct {
 	Address *template.Template
 }
 
-func (o *OSCMessageTransform) Process(ctx context.Context, payload any) (any, error) {
+func (omt *OSCMessageTransform) Process(ctx context.Context, payload any) (any, error) {
 	payloadMessage, ok := payload.(osc.OSCMessage)
 
 	if !ok {
@@ -23,7 +23,7 @@ func (o *OSCMessageTransform) Process(ctx context.Context, payload any) (any, er
 	}
 
 	var addressBuffer bytes.Buffer
-	err := o.Address.Execute(&addressBuffer, payloadMessage)
+	err := omt.Address.Execute(&addressBuffer, payloadMessage)
 
 	if err != nil {
 		return nil, err
@@ -44,8 +44,8 @@ func (o *OSCMessageTransform) Process(ctx context.Context, payload any) (any, er
 	return payloadMessage, nil
 }
 
-func (o *OSCMessageTransform) Type() string {
-	return o.config.Type
+func (omt *OSCMessageTransform) Type() string {
+	return omt.config.Type
 }
 
 func init() {

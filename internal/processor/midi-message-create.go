@@ -20,12 +20,12 @@ type MIDIMessageCreate struct {
 	ProcessFunc func(ctx context.Context, payload any) (any, error)
 }
 
-func (mmd *MIDIMessageCreate) Process(ctx context.Context, payload any) (any, error) {
-	return mmd.ProcessFunc(ctx, payload)
+func (mmc *MIDIMessageCreate) Process(ctx context.Context, payload any) (any, error) {
+	return mmc.ProcessFunc(ctx, payload)
 }
 
-func (mmd *MIDIMessageCreate) Type() string {
-	return mmd.config.Type
+func (mmc *MIDIMessageCreate) Type() string {
+	return mmc.config.Type
 }
 
 func newMidiNoteOnCreate(config config.ProcessorConfig) (Processor, error) {
