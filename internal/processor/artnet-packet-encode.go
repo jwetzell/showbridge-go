@@ -8,15 +8,15 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type ArtNetEncode struct {
+type ArtNetPacketEncode struct {
 	config config.ProcessorConfig
 }
 
-func (ad *ArtNetEncode) Process(ctx context.Context, payload any) (any, error) {
+func (ape *ArtNetPacketEncode) Process(ctx context.Context, payload any) (any, error) {
 	payloadPacket, ok := payload.(artnet.ArtNetPacket)
 
 	if !ok {
-		return nil, fmt.Errorf("artnet.encode processor only accepts an ArtNetPacket")
+		return nil, fmt.Errorf("artnet.packet.encode processor only accepts an ArtNetPacket")
 	}
 
 	payloadBytes, err := payloadPacket.MarshalBinary()
@@ -27,15 +27,15 @@ func (ad *ArtNetEncode) Process(ctx context.Context, payload any) (any, error) {
 	return payloadBytes, nil
 }
 
-func (ad *ArtNetEncode) Type() string {
-	return ad.config.Type
+func (ape *ArtNetPacketEncode) Type() string {
+	return ape.config.Type
 }
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "artnet.encode",
+		Type: "artnet.packet.encode",
 		New: func(config config.ProcessorConfig) (Processor, error) {
-			return &ArtNetEncode{config: config}, nil
+			return &ArtNetPacketEncode{config: config}, nil
 		},
 	})
 }

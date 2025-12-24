@@ -8,15 +8,15 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type ArtNetDecode struct {
+type ArtNetPacketDecode struct {
 	config config.ProcessorConfig
 }
 
-func (ad *ArtNetDecode) Process(ctx context.Context, payload any) (any, error) {
+func (apd *ArtNetPacketDecode) Process(ctx context.Context, payload any) (any, error) {
 	payloadBytes, ok := payload.([]byte)
 
 	if !ok {
-		return nil, fmt.Errorf("artnet.decode processor only accepts a []byte")
+		return nil, fmt.Errorf("artnet.packet.decode processor only accepts a []byte")
 	}
 
 	payloadMessage, err := artnet.Decode(payloadBytes)
@@ -28,15 +28,15 @@ func (ad *ArtNetDecode) Process(ctx context.Context, payload any) (any, error) {
 	return payloadMessage, nil
 }
 
-func (ad *ArtNetDecode) Type() string {
-	return ad.config.Type
+func (apd *ArtNetPacketDecode) Type() string {
+	return apd.config.Type
 }
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "artnet.decode",
+		Type: "artnet.packet.decode",
 		New: func(config config.ProcessorConfig) (Processor, error) {
-			return &ArtNetDecode{config: config}, nil
+			return &ArtNetPacketDecode{config: config}, nil
 		},
 	})
 }
