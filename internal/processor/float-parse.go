@@ -9,7 +9,8 @@ import (
 )
 
 type FloatParse struct {
-	config config.ProcessorConfig
+	BitSize int
+	config  config.ProcessorConfig
 }
 
 func (fp *FloatParse) Process(ctx context.Context, payload any) (any, error) {
@@ -19,8 +20,7 @@ func (fp *FloatParse) Process(ctx context.Context, payload any) (any, error) {
 		return nil, errors.New("float.parse processor only accepts a string")
 	}
 
-	// TODO(jwetzell): make bitSize configurable
-	payloadFloat, err := strconv.ParseFloat(payloadString, 64)
+	payloadFloat, err := strconv.ParseFloat(payloadString, fp.BitSize)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,19 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type: "float.parse",
 		New: func(config config.ProcessorConfig) (Processor, error) {
-			return &FloatParse{config: config}, nil
+			params := config.Params
+			bitSizeNum := 64
+			bitSize, ok := params["bitSize"]
+			if ok {
+				bitSizeFloat, ok := bitSize.(float64)
+
+				if !ok {
+					return nil, errors.New("float.parse bitSize must be a number")
+				}
+
+				bitSizeNum = int(bitSizeFloat)
+			}
+			return &FloatParse{config: config, BitSize: bitSizeNum}, nil
 		},
 	})
 }

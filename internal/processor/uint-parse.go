@@ -9,7 +9,9 @@ import (
 )
 
 type UintParse struct {
-	config config.ProcessorConfig
+	Base    int
+	BitSize int
+	config  config.ProcessorConfig
 }
 
 func (up *UintParse) Process(ctx context.Context, payload any) (any, error) {
@@ -19,8 +21,7 @@ func (up *UintParse) Process(ctx context.Context, payload any) (any, error) {
 		return nil, errors.New("uint.parse processor only accepts a string")
 	}
 
-	// TODO(jwetzell): make base and bitSize configurable
-	payloadUint, err := strconv.ParseUint(payloadString, 10, 64)
+	payloadUint, err := strconv.ParseUint(payloadString, up.Base, up.BitSize)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +36,31 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type: "uint.parse",
 		New: func(config config.ProcessorConfig) (Processor, error) {
-			return &UintParse{config: config}, nil
+			params := config.Params
+			baseNum := 10
+			base, ok := params["base"]
+			if ok {
+				baseFloat, ok := base.(float64)
+
+				if !ok {
+					return nil, errors.New("uint.parse base must be a number")
+				}
+
+				baseNum = int(baseFloat)
+			}
+
+			bitSizeNum := 64
+			bitSize, ok := params["bitSize"]
+			if ok {
+				bitSizeFloat, ok := bitSize.(float64)
+
+				if !ok {
+					return nil, errors.New("uint.parse bitSize must be a number")
+				}
+
+				bitSizeNum = int(bitSizeFloat)
+			}
+			return &UintParse{config: config, Base: baseNum, BitSize: bitSizeNum}, nil
 		},
 	})
 }
