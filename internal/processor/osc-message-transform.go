@@ -23,7 +23,6 @@ func (o *OSCMessageTransform) Process(ctx context.Context, payload any) (any, er
 	}
 
 	var addressBuffer bytes.Buffer
-	//TODO(jwetzell): actually inject data into template
 	err := o.Address.Execute(&addressBuffer, payloadMessage)
 
 	if err != nil {
