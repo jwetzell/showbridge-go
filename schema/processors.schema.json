@@ -620,6 +620,26 @@
         "properties": {
           "type": {
             "type": "string",
+            "const": "time.sleep"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "duration": {
+                "type": "integer"
+              }
+            },
+            "required": ["duration"]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
             "const": "uint.parse"
           }
         },
