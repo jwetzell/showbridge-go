@@ -16,10 +16,10 @@ type HTTPRequestCreate struct {
 	URL    *template.Template
 }
 
-func (hre *HTTPRequestCreate) Process(ctx context.Context, payload any) (any, error) {
+func (hrc *HTTPRequestCreate) Process(ctx context.Context, payload any) (any, error) {
 
 	var urlBuffer bytes.Buffer
-	err := hre.URL.Execute(&urlBuffer, payload)
+	err := hrc.URL.Execute(&urlBuffer, payload)
 
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func (hre *HTTPRequestCreate) Process(ctx context.Context, payload any) (any, er
 	urlString := urlBuffer.String()
 
 	//TODO(jwetzell): support body
-	request, err := http.NewRequest(hre.Method, urlString, bytes.NewBuffer([]byte{}))
+	request, err := http.NewRequest(hrc.Method, urlString, bytes.NewBuffer([]byte{}))
 
 	if err != nil {
 		return nil, err
@@ -37,8 +37,8 @@ func (hre *HTTPRequestCreate) Process(ctx context.Context, payload any) (any, er
 	return request, nil
 }
 
-func (hre *HTTPRequestCreate) Type() string {
-	return hre.config.Type
+func (hrc *HTTPRequestCreate) Type() string {
+	return hrc.config.Type
 }
 
 func init() {
