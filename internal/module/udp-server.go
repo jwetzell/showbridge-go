@@ -14,11 +14,12 @@ import (
 )
 
 type UDPServer struct {
-	Addr   *net.UDPAddr
-	config config.ModuleConfig
-	ctx    context.Context
-	router route.RouteIO
-	logger *slog.Logger
+	Addr       *net.UDPAddr
+	BufferSize int
+	config     config.ModuleConfig
+	ctx        context.Context
+	router     route.RouteIO
+	logger     *slog.Logger
 }
 
 func init() {
@@ -55,7 +56,19 @@ func init() {
 				log.Fatalf("error resolving UDP address: %v", err)
 			}
 
-			return &UDPServer{Addr: addr, config: config, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
+			bufferSizeNum := 2048
+			bufferSize, ok := params["bufferSize"]
+
+			if ok {
+				bufferSizeFloat, ok := bufferSize.(float64)
+
+				if !ok {
+					return nil, errors.New("net.udp.server bufferSize must be a number")
+				}
+				bufferSizeNum = int(bufferSizeFloat)
+			}
+
+			return &UDPServer{Addr: addr, BufferSize: bufferSizeNum, config: config, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
 		},
 	})
 }
@@ -77,8 +90,7 @@ func (us *UDPServer) Run() error {
 
 	defer listener.Close()
 
-	// TODO(jwetzell): make buffer size configurable
-	buffer := make([]byte, 65535)
+	buffer := make([]byte, us.BufferSize)
 	for {
 		select {
 		case <-us.ctx.Done():
