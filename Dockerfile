@@ -1,4 +1,4 @@
-ARG GO_VERSION=1.25.3
+ARG GO_VERSION=1.25.5
 FROM golang:${GO_VERSION}-alpine AS build
 RUN apk --no-cache add ca-certificates tzdata
 WORKDIR /build
