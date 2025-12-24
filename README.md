@@ -6,29 +6,37 @@ Simple protocol router _/s_
 
 </div>
 
+<p align="center">
+	<a href="https://github.com/jwetzell/showbridge-go/releases">Releases</a> ·
+	<a href="https://docs.showbridge.io">Documentation</a>
+</p>
+
 ### Supported Protocols
 - HTTP
-  - client
-  - server
 - UDP
-  - client
-  - server
 - TCP
-  - client
-  - server
 - [MQTT](https://mqtt.org/)
-  - client
 - [NATS](https://nats.io/)
-  - client
 - [PosiStageNet](https://posistage.net/)
-  - client
 - MIDI (not included in pre-built binaries yet)
-  - input
-  - output
+- Serial (not included in pre-built binaries yet)
+- [OSC](https://opensoundcontrol.stanford.edu/spec-1_0.html)
+- [FreeD](https://ptzoptics.com/freed/)
 - [SIP](https://en.wikipedia.org/wiki/Session_Initiation_Protocol)
-  - call server
-  - [DTMF](https://en.wikipedia.org/wiki/Dual-tone_multi-frequency_signaling) server
-
-
   
-  
+### CLI Usage
+
+```
+NAME:
+   showbridge - Simple protocol router /s
+
+USAGE:
+   showbridge [global options]
+
+GLOBAL OPTIONS:
+   --config string  path to config file (default: "./config.yaml")
+   --debug          set log level to DEBUG
+   --json           log using JSON
+   --help, -h       show help
+   --version, -v    print the version
+```
