@@ -166,17 +166,30 @@ func TestBadUintParse(t *testing.T) {
 		processor   processor.Processor
 		name        string
 		payload     any
+		base        int
+		bitSize     int
 		errorString string
 	}{
 		{
 			name:        "non-string input",
 			payload:     []byte{0x01},
+			base:        10,
+			bitSize:     64,
 			errorString: "uint.parse processor only accepts a string",
 		},
 		{
 			name:        "not uint string",
 			payload:     "-1234",
+			base:        10,
+			bitSize:     64,
 			errorString: "strconv.ParseUint: parsing \"-1234\": invalid syntax",
+		},
+		{
+			name:        "bit overflow",
+			payload:     "123456789012345678901234567",
+			base:        10,
+			bitSize:     32,
+			errorString: "strconv.ParseUint: parsing \"123456789012345678901234567\": value out of range",
 		},
 	}
 
