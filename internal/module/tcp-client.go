@@ -64,15 +64,15 @@ func init() {
 				framingMethodString, ok := framingMethodRaw.(string)
 
 				if !ok {
-					return nil, errors.New("misc.serial.client framing method must be a string")
+					return nil, errors.New("net.tcp.client framing method must be a string")
 				}
 				framingMethod = framingMethodString
 			}
 
-			framer, err := framer.GetFramer(framingMethod)
+			framer := framer.GetFramer(framingMethod)
 
-			if err != nil {
-				return nil, err
+			if framer == nil {
+				return nil, fmt.Errorf("net.tcp.client unknown framing method: %s", framingMethod)
 			}
 
 			return &TCPClient{framer: framer, Addr: addr, config: config, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil

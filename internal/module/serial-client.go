@@ -56,10 +56,10 @@ func init() {
 				framingMethod = framingMethodString
 			}
 
-			framer, err := framer.GetFramer(framingMethod)
+			framer := framer.GetFramer(framingMethod)
 
-			if err != nil {
-				return nil, err
+			if framer == nil {
+				return nil, fmt.Errorf("serial.client unknown framing method: %s", framingMethod)
 			}
 
 			buadRate, ok := params["baudRate"]

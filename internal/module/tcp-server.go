@@ -53,15 +53,15 @@ func init() {
 				framingMethodString, ok := framingMethodRaw.(string)
 
 				if !ok {
-					return nil, errors.New("misc.serial.client framing method must be a string")
+					return nil, errors.New("net.tcp.server framing method must be a string")
 				}
 				framingMethod = framingMethodString
 			}
 
-			framer, err := framer.GetFramer(framingMethod)
+			framer := framer.GetFramer(framingMethod)
 
-			if err != nil {
-				return nil, err
+			if framer == nil {
+				return nil, fmt.Errorf("net.tcp.server unknown framing method: %s", framingMethod)
 			}
 
 			ipString := "0.0.0.0"

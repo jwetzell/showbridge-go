@@ -1,9 +1,5 @@
 package framer
 
-import (
-	"fmt"
-)
-
 type Framer interface {
 	Decode([]byte) [][]byte
 	Encode([]byte) []byte
@@ -11,19 +7,19 @@ type Framer interface {
 	Buffer() []byte
 }
 
-func GetFramer(framingType string) (Framer, error) {
+func GetFramer(framingType string) Framer {
 	switch framingType {
 	case "CR":
-		return NewByteSeparatorFramer([]byte{'\r'}), nil
+		return NewByteSeparatorFramer([]byte{'\r'})
 	case "LF":
-		return NewByteSeparatorFramer([]byte{'\n'}), nil
+		return NewByteSeparatorFramer([]byte{'\n'})
 	case "CRLF":
-		return NewByteSeparatorFramer([]byte{'\r', '\n'}), nil
+		return NewByteSeparatorFramer([]byte{'\r', '\n'})
 	case "SLIP":
-		return NewSlipFramer(), nil
+		return NewSlipFramer()
 	case "RAW":
-		return NewRawFramer(), nil
+		return NewRawFramer()
 	default:
-		return nil, fmt.Errorf("unknown framing method: %s", framingType)
+		return nil
 	}
 }
