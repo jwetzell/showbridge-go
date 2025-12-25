@@ -28,13 +28,13 @@ func TestGoodStringDecode(t *testing.T) {
 
 			gotString, ok := got.(string)
 			if !ok {
-				t.Errorf("string.decode returned a %T payload: %s", got, got)
+				t.Fatalf("string.decode returned a %T payload: %s", got, got)
 			}
 			if err != nil {
-				t.Errorf("string.decode failed: %s", err)
+				t.Fatalf("string.decode failed: %s", err)
 			}
 			if gotString != test.expected {
-				t.Errorf("string.decode got %s, expected %s", got, test.expected)
+				t.Fatalf("string.decode got %s, expected %s", got, test.expected)
 			}
 		})
 	}
@@ -61,10 +61,10 @@ func TestBadStringDecode(t *testing.T) {
 			got, err := test.processor.Process(t.Context(), test.payload)
 
 			if err == nil {
-				t.Errorf("string.decode expected to fail but got payload: %s", got)
+				t.Fatalf("string.decode expected to fail but got payload: %s", got)
 			}
 			if err.Error() != test.errorString {
-				t.Errorf("string.decode got error '%s', expected '%s'", err.Error(), test.errorString)
+				t.Fatalf("string.decode got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
 	}

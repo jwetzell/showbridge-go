@@ -37,13 +37,13 @@ func TestGoodIntParse(t *testing.T) {
 
 			gotInt, ok := got.(int64)
 			if !ok {
-				t.Errorf("int.parse returned a %T payload: %s", got, got)
+				t.Fatalf("int.parse returned a %T payload: %s", got, got)
 			}
 			if err != nil {
-				t.Errorf("int.parse failed: %s", err)
+				t.Fatalf("int.parse failed: %s", err)
 			}
 			if gotInt != test.expected {
-				t.Errorf("int.parse got %d, expected %d", gotInt, test.expected)
+				t.Fatalf("int.parse got %d, expected %d", gotInt, test.expected)
 			}
 		})
 	}
@@ -74,11 +74,11 @@ func TestBadIntParse(t *testing.T) {
 			got, err := intParser.Process(t.Context(), test.payload)
 
 			if err == nil {
-				t.Errorf("int.parse expected to fail but succeeded, got: %v", got)
+				t.Fatalf("int.parse expected to fail but succeeded, got: %v", got)
 
 			}
 			if err.Error() != test.errorString {
-				t.Errorf("int.parse got error '%s', expected '%s'", err.Error(), test.errorString)
+				t.Fatalf("int.parse got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
 	}

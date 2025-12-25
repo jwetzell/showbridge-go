@@ -29,13 +29,13 @@ func TestGoodStringEncode(t *testing.T) {
 
 			gotBytes, ok := got.([]byte)
 			if !ok {
-				t.Errorf("string.encode returned a %T payload: %s", got, got)
+				t.Fatalf("string.encode returned a %T payload: %s", got, got)
 			}
 			if err != nil {
-				t.Errorf("string.encode failed: %s", err)
+				t.Fatalf("string.encode failed: %s", err)
 			}
 			if !slices.Equal(gotBytes, test.expected) {
-				t.Errorf("string.encode got %s, expected %s", got, test.expected)
+				t.Fatalf("string.encode got %s, expected %s", got, test.expected)
 			}
 		})
 	}
@@ -62,10 +62,10 @@ func TestBadStringEncode(t *testing.T) {
 			got, err := test.processor.Process(t.Context(), test.payload)
 
 			if err == nil {
-				t.Errorf("string.encode expected to fail but got payload: %s", got)
+				t.Fatalf("string.encode expected to fail but got payload: %s", got)
 			}
 			if err.Error() != test.errorString {
-				t.Errorf("string.encode got error '%s', expected '%s'", err.Error(), test.errorString)
+				t.Fatalf("string.encode got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
 	}

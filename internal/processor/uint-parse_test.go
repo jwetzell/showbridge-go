@@ -32,13 +32,13 @@ func TestGoodUintParse(t *testing.T) {
 
 			gotUint, ok := got.(uint64)
 			if !ok {
-				t.Errorf("uint.parse returned a %T payload: %s", got, got)
+				t.Fatalf("uint.parse returned a %T payload: %s", got, got)
 			}
 			if err != nil {
-				t.Errorf("uint.parse failed: %s", err)
+				t.Fatalf("uint.parse failed: %s", err)
 			}
 			if gotUint != test.expected {
-				t.Errorf("uint.parse got %d, expected %d", gotUint, test.expected)
+				t.Fatalf("uint.parse got %d, expected %d", gotUint, test.expected)
 			}
 		})
 	}
@@ -69,11 +69,11 @@ func TestBadUintParse(t *testing.T) {
 			got, err := uintParser.Process(t.Context(), test.payload)
 
 			if err == nil {
-				t.Errorf("uint.parse expected to fail but succeeded, got: %v", got)
+				t.Fatalf("uint.parse expected to fail but succeeded, got: %v", got)
 
 			}
 			if err.Error() != test.errorString {
-				t.Errorf("uint.parse got error '%s', expected '%s'", err.Error(), test.errorString)
+				t.Fatalf("uint.parse got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
 	}

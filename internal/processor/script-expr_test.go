@@ -38,7 +38,7 @@ func TestGoodScriptExpr(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			program, err := expr.Compile(test.program)
 			if err != nil {
-				t.Errorf("script.expr failed to compile program: %s", err)
+				t.Fatalf("script.expr failed to compile program: %s", err)
 			}
 
 			exprProcessor := &processor.ScriptExpr{Program: program}
@@ -46,12 +46,12 @@ func TestGoodScriptExpr(t *testing.T) {
 			got, err := exprProcessor.Process(t.Context(), test.payload)
 
 			if err != nil {
-				t.Errorf("script.expr failed: %s", err)
+				t.Fatalf("script.expr failed: %s", err)
 			}
 
 			//TODO(jwetzell): work out better way to compare the any/any
 			if got != test.expected {
-				t.Errorf("script.expr got %+v (%T), expected %+v (%T)", got, got, test.expected, test.expected)
+				t.Fatalf("script.expr got %+v (%T), expected %+v (%T)", got, got, test.expected, test.expected)
 			}
 		})
 	}

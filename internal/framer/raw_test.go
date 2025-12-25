@@ -28,7 +28,7 @@ func TestGoodRawFramerDecode(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			frames := test.framer.Decode(test.input)
 			if len(frames) != len(test.expected) {
-				t.Errorf("raw framer got %d frames, expected %d", len(frames), len(test.expected))
+				t.Fatalf("raw framer got %d frames, expected %d", len(frames), len(test.expected))
 			}
 			for i, frame := range frames {
 				if !slices.Equal(frame, test.expected[i]) {
@@ -57,11 +57,8 @@ func TestGoodRawFramerEncode(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			frame := test.framer.Encode(test.input)
-			if len(frame) != len(test.expected) {
-				t.Errorf("raw framer got %d frames, expected %d", len(frame), len(test.expected))
-			}
 			if !slices.Equal(frame, test.expected) {
-				t.Errorf("raw frame got %s, expected %s", frame, test.expected)
+				t.Fatalf("raw frame encode got %s, expected %s", frame, test.expected)
 			}
 		})
 	}
@@ -72,10 +69,10 @@ func TestRawFramerBuffer(t *testing.T) {
 	framer.Decode([]byte("Hello, World!"))
 
 	if !slices.Equal(framer.Buffer(), []byte{}) {
-		t.Errorf("raw framer buffer got %s, expected empty", framer.Buffer())
+		t.Fatalf("raw framer buffer got %s, expected empty", framer.Buffer())
 	}
 	framer.Clear()
 	if !slices.Equal(framer.Buffer(), []byte{}) {
-		t.Errorf("raw framer buffer got %s, expected empty after clear", framer.Buffer())
+		t.Fatalf("raw framer buffer got %s, expected empty after clear", framer.Buffer())
 	}
 }

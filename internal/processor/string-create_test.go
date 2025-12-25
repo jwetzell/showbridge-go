@@ -59,7 +59,7 @@ func TestGoodStringCreate(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			template, err := template.New("template").Parse(test.template)
 			if err != nil {
-				t.Errorf("string.create template parsing failed: %s", err)
+				t.Fatalf("string.create template parsing failed: %s", err)
 			}
 
 			processor := &processor.StringCreate{Template: template}
@@ -68,13 +68,13 @@ func TestGoodStringCreate(t *testing.T) {
 
 			gotStrings, ok := got.(string)
 			if !ok {
-				t.Errorf("string.create returned a %T payload: %s", got, got)
+				t.Fatalf("string.create returned a %T payload: %s", got, got)
 			}
 			if err != nil {
-				t.Errorf("string.create failed: %s", err)
+				t.Fatalf("string.create failed: %s", err)
 			}
 			if gotStrings != test.expected {
-				t.Errorf("string.create got %s, expected %s", got, test.expected)
+				t.Fatalf("string.create got %s, expected %s", got, test.expected)
 			}
 		})
 	}

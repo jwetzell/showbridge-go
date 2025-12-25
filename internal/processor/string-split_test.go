@@ -28,13 +28,13 @@ func TestGoodStringSplit(t *testing.T) {
 
 			gotStrings, ok := got.([]string)
 			if !ok {
-				t.Errorf("string.split returned a %T payload: %s", got, got)
+				t.Fatalf("string.split returned a %T payload: %s", got, got)
 			}
 			if err != nil {
-				t.Errorf("string.split failed: %s", err)
+				t.Fatalf("string.split failed: %s", err)
 			}
 			if !slices.Equal(gotStrings, test.expected) {
-				t.Errorf("string.split got %s, expected %s", got, test.expected)
+				t.Fatalf("string.split got %s, expected %s", got, test.expected)
 			}
 		})
 	}
@@ -60,10 +60,10 @@ func TestBadStringSplit(t *testing.T) {
 			got, err := test.processor.Process(t.Context(), test.payload)
 
 			if err == nil {
-				t.Errorf("string.split expected error but got none, payload: %s", got)
+				t.Fatalf("string.split expected error but got none, payload: %s", got)
 			}
 			if err.Error() != test.errorString {
-				t.Errorf("string.split got error '%s', expected '%s'", err.Error(), test.errorString)
+				t.Fatalf("string.split got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
 	}

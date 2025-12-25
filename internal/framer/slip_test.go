@@ -44,7 +44,7 @@ func TestGoodSLIPFramerDecode(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			frames := test.framer.Decode(test.input)
 			if len(frames) != len(test.expected) {
-				t.Errorf("SLIP framer got %d frames, expected %d", len(frames), len(test.expected))
+				t.Fatalf("SLIP framer got %d frames, expected %d", len(frames), len(test.expected))
 			}
 			for i, frame := range frames {
 				if !slices.Equal(frame, test.expected[i]) {
@@ -52,7 +52,7 @@ func TestGoodSLIPFramerDecode(t *testing.T) {
 				}
 			}
 			if !slices.Equal(test.framer.Buffer(), test.buffer) {
-				t.Errorf("SLIP framer buffer got %s, expected %s", test.framer.Buffer(), test.buffer)
+				t.Fatalf("SLIP framer buffer got %s, expected %s", test.framer.Buffer(), test.buffer)
 			}
 		})
 	}
@@ -91,7 +91,7 @@ func TestGoodSLIPFramerEncode(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			frame := test.framer.Encode(test.input)
 			if !slices.Equal(frame, test.expected) {
-				t.Errorf("SLIP framer frame got %s, expected %s", frame, test.expected)
+				t.Fatalf("SLIP framer frame got %s, expected %s", frame, test.expected)
 			}
 		})
 	}
@@ -101,10 +101,10 @@ func TestSlipFramerBuffer(t *testing.T) {
 	framer := framer.GetFramer("SLIP")
 	framer.Decode([]byte{0xc0, 0x2f, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x00, 0x00, 0x2c, 0x00, 0x00, 0x00, 0xc0, 0xc0, 0x45})
 	if !slices.Equal(framer.Buffer(), []byte{0x45}) {
-		t.Errorf("SLIP framer buffer got %s, expected %s", framer.Buffer(), []byte{0x45})
+		t.Fatalf("SLIP framer buffer got %s, expected %s", framer.Buffer(), []byte{0x45})
 	}
 	framer.Clear()
 	if !slices.Equal(framer.Buffer(), []byte{}) {
-		t.Errorf("SLIP framer buffer got %s, expected empty slice", framer.Buffer())
+		t.Fatalf("SLIP framer buffer got %s, expected empty slice", framer.Buffer())
 	}
 }

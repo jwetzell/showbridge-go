@@ -10,6 +10,6 @@ func TestNilGetFramer(t *testing.T) {
 	nilFramer := framer.GetFramer("asldfiudchuehrkbjbkjrbb")
 
 	if nilFramer != nil {
-		t.Errorf("Expected nil framer, got %v", nilFramer)
+		t.Fatalf("Expected nil framer, got %v", nilFramer)
 	}
 }

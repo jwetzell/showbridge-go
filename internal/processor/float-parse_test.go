@@ -37,13 +37,13 @@ func TestGoodFloatParse(t *testing.T) {
 
 			gotFloat, ok := got.(float64)
 			if !ok {
-				t.Errorf("float.parse returned a %T payload: %s", got, got)
+				t.Fatalf("float.parse returned a %T payload: %s", got, got)
 			}
 			if err != nil {
-				t.Errorf("float.parse failed: %s", err)
+				t.Fatalf("float.parse failed: %s", err)
 			}
 			if gotFloat != test.expected {
-				t.Errorf("float.parse got %f, expected %f", gotFloat, test.expected)
+				t.Fatalf("float.parse got %f, expected %f", gotFloat, test.expected)
 			}
 		})
 	}
@@ -74,11 +74,11 @@ func TestBadFloatParse(t *testing.T) {
 			got, err := floatParser.Process(t.Context(), test.payload)
 
 			if err == nil {
-				t.Errorf("float.parse expected to fail but succeeded, got: %v", got)
+				t.Fatalf("float.parse expected to fail but succeeded, got: %v", got)
 
 			}
 			if err.Error() != test.errorString {
-				t.Errorf("float.parse got error '%s', expected '%s'", err.Error(), test.errorString)
+				t.Fatalf("float.parse got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
 	}
