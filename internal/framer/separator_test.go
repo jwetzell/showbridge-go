@@ -17,7 +17,7 @@ func TestGoodSeparatorFramer(t *testing.T) {
 	}{
 		{
 			name:   "new line separator",
-			framer: framer.NewByteSeparatorFramer([]byte{0x0a}),
+			framer: framer.GetFramer("LF"),
 			input:  []byte("Hello\nWorld\nThis is a test\n"),
 			expected: [][]byte{
 				[]byte("Hello"),
@@ -27,8 +27,19 @@ func TestGoodSeparatorFramer(t *testing.T) {
 			buffer: []byte{},
 		},
 		{
+			name:   "CR separator",
+			framer: framer.GetFramer("CR"),
+			input:  []byte("Hello\rWorld\rThis is a test\r"),
+			expected: [][]byte{
+				[]byte("Hello"),
+				[]byte("World"),
+				[]byte("This is a test"),
+			},
+			buffer: []byte{},
+		},
+		{
 			name:   "CRLF separator",
-			framer: framer.NewByteSeparatorFramer([]byte{0x0d, 0x0a}),
+			framer: framer.GetFramer("CRLF"),
 			input:  []byte("Hello\r\nWorld\r\nThis is a test\r\n"),
 			expected: [][]byte{
 				[]byte("Hello"),
@@ -39,7 +50,7 @@ func TestGoodSeparatorFramer(t *testing.T) {
 		},
 		{
 			name:   "extra data after separator",
-			framer: framer.NewByteSeparatorFramer([]byte{0x0d, 0x0a}),
+			framer: framer.GetFramer("CRLF"),
 			input:  []byte("Hello\r\nWorld\r\nThis is a test\r\nextra"),
 			expected: [][]byte{
 				[]byte("Hello"),
