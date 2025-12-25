@@ -59,7 +59,7 @@ func TestScriptJSNoProgram(t *testing.T) {
 	}
 }
 
-func TestScriptJSBadConfig(t *testing.T) {
+func TestScriptJSBadConfigWrongProgramType(t *testing.T) {
 	registration, ok := processor.ProcessorRegistry["script.js"]
 	if !ok {
 		t.Fatalf("script.js processor not registered")
@@ -143,6 +143,36 @@ func TestGoodScriptJS(t *testing.T) {
 				if got != test.expected {
 					t.Fatalf("script.js got %+v, expected %+v", got, test.expected)
 				}
+			}
+		})
+	}
+}
+
+func TestBadScriptJS(t *testing.T) {
+	tests := []struct {
+		name        string
+		processor   processor.Processor
+		payload     any
+		errorString string
+	}{
+		{
+			name:        "accessing not defined variable",
+			processor:   &processor.ScriptJS{Program: `paylod = foo`},
+			payload:     0,
+			errorString: "ReferenceError: 'foo' is not defined",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := test.processor.Process(t.Context(), test.payload)
+
+			if err == nil {
+				t.Fatalf("script.js expected to fail but succeeded, got: %v", got)
+			}
+
+			if err.Error() != test.errorString {
+				t.Fatalf("script.js got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
 	}
