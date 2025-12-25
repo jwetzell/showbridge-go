@@ -3,8 +3,100 @@ package processor_test
 import (
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
+
+func TestIntParseFromRegistry(t *testing.T) {
+	registration, ok := processor.ProcessorRegistry["int.parse"]
+	if !ok {
+		t.Fatalf("int.parse processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "int.parse",
+	})
+
+	if err != nil {
+		t.Fatalf("failed to create int.parse processor: %s", err)
+	}
+
+	if processorInstance.Type() != "int.parse" {
+		t.Fatalf("int.parse processor has wrong type: %s", processorInstance.Type())
+	}
+}
+
+func TestIntParseBadConfigBaseString(t *testing.T) {
+	registration, ok := processor.ProcessorRegistry["int.parse"]
+	if !ok {
+		t.Fatalf("int.parse processor not registered")
+	}
+
+	_, err := registration.New(config.ProcessorConfig{
+		Type: "int.parse",
+		Params: map[string]any{
+			"base": "10",
+		},
+	})
+
+	if err == nil {
+		t.Fatalf("int.parse should have returned an error for bad base config")
+	}
+}
+
+func TestIntParseBadConfigBitSizeString(t *testing.T) {
+	registration, ok := processor.ProcessorRegistry["int.parse"]
+	if !ok {
+		t.Fatalf("int.parse processor not registered")
+	}
+
+	_, err := registration.New(config.ProcessorConfig{
+		Type: "int.parse",
+		Params: map[string]any{
+			"bitSize": "64",
+		},
+	})
+
+	if err == nil {
+		t.Fatalf("int.parse should have returned an error for bad bitSize config")
+	}
+}
+
+func TestIntParseGoodConfig(t *testing.T) {
+	registration, ok := processor.ProcessorRegistry["int.parse"]
+	if !ok {
+		t.Fatalf("int.parse processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "int.parse",
+		Params: map[string]any{
+			"base":    10.0,
+			"bitSize": 64.0,
+		},
+	})
+
+	if err != nil {
+		t.Fatalf("int.parse should have created processor but got error: %s", err)
+	}
+
+	payload := "12345"
+	expected := int64(12345)
+
+	got, err := processorInstance.Process(t.Context(), payload)
+	if err != nil {
+		t.Fatalf("int.parse processing failed: %s", err)
+	}
+
+	gotInt, ok := got.(int64)
+	if !ok {
+		t.Fatalf("int.parse returned a %T payload: %s", got, got)
+	}
+
+	if gotInt != expected {
+		t.Fatalf("int.parse got %d, expected %d", gotInt, expected)
+	}
+}
 
 func TestGoodIntParse(t *testing.T) {
 	intParser := processor.IntParse{}
