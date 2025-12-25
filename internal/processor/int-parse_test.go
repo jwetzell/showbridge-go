@@ -99,32 +99,58 @@ func TestIntParseGoodConfig(t *testing.T) {
 }
 
 func TestGoodIntParse(t *testing.T) {
-	intParser := processor.IntParse{}
 	tests := []struct {
 		processor processor.Processor
 		name      string
 		payload   any
 		expected  int64
+		base      int
+		bitSize   int
 	}{
 		{
 			name:     "positive number",
 			payload:  "12345",
 			expected: 12345,
+			base:     10,
+			bitSize:  64,
 		},
 		{
 			name:     "negative number",
 			payload:  "-12345",
 			expected: -12345,
+			base:     10,
+			bitSize:  64,
 		},
 		{
 			name:     "zero",
 			payload:  "0",
 			expected: 0,
+			base:     10,
+			bitSize:  64,
+		},
+		{
+			name:     "binary",
+			payload:  "1010101",
+			expected: 85,
+			base:     2,
+			bitSize:  64,
+		},
+		{
+			name:     "hex",
+			payload:  "15F",
+			expected: 351,
+			base:     16,
+			bitSize:  64,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			intParser := processor.IntParse{
+				Base:    test.base,
+				BitSize: test.bitSize,
+			}
+
 			got, err := intParser.Process(t.Context(), test.payload)
 
 			gotInt, ok := got.(int64)
@@ -142,27 +168,43 @@ func TestGoodIntParse(t *testing.T) {
 }
 
 func TestBadIntParse(t *testing.T) {
-	intParser := processor.IntParse{}
 	tests := []struct {
 		processor   processor.Processor
 		name        string
 		payload     any
+		base        int
+		bitSize     int
 		errorString string
 	}{
 		{
 			name:        "non-string input",
 			payload:     []byte{0x01},
+			base:        10,
+			bitSize:     64,
 			errorString: "int.parse processor only accepts a string",
 		},
 		{
 			name:        "not int string",
 			payload:     "123.46",
+			base:        10,
+			bitSize:     64,
 			errorString: "strconv.ParseInt: parsing \"123.46\": invalid syntax",
+		},
+		{
+			name:        "bit overflow",
+			payload:     "12345678901234567890",
+			base:        10,
+			bitSize:     32,
+			errorString: "strconv.ParseInt: parsing \"12345678901234567890\": value out of range",
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			intParser := processor.IntParse{
+				Base:    test.base,
+				BitSize: test.bitSize,
+			}
 			got, err := intParser.Process(t.Context(), test.payload)
 
 			if err == nil {
