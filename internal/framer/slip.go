@@ -59,9 +59,9 @@ func (sf *SlipFramer) Encode(data []byte) []byte {
 	for _, byteToEncode := range data {
 		switch byteToEncode {
 		case END:
-			encodedBytes = append(encodedBytes, ESC_END)
+			encodedBytes = append(encodedBytes, ESC, ESC_END)
 		case ESC:
-			encodedBytes = append(encodedBytes, ESC_ESC)
+			encodedBytes = append(encodedBytes, ESC, ESC_ESC)
 		default:
 			encodedBytes = append(encodedBytes, byteToEncode)
 		}
