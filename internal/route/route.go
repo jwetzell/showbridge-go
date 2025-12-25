@@ -28,7 +28,6 @@ type Route interface {
 	Input() string
 	Output() string
 	HandleInput(ctx context.Context, sourceId string, payload any, router RouteIO) error
-	HandleOutput(ctx context.Context, sourceId string, payload any, router RouteIO) error
 }
 
 type ProcessorRoute struct {
@@ -78,9 +77,5 @@ func (r *ProcessorRoute) HandleInput(ctx context.Context, sourceId string, paylo
 			return nil
 		}
 	}
-	return r.HandleOutput(ctx, sourceId, payload, router)
-}
-
-func (r *ProcessorRoute) HandleOutput(ctx context.Context, sourceId string, payload any, router RouteIO) error {
 	return router.HandleOutput(sourceId, r.output, payload)
 }
