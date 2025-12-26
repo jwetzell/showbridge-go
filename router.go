@@ -123,6 +123,7 @@ func (r *Router) Run() {
 }
 
 func (r *Router) Stop() {
+	r.logger.Debug("stopping")
 	r.contextCancel()
 }
 
