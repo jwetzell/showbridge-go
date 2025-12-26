@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"sync"
 
 	"github.com/jwetzell/showbridge-go"
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -39,54 +40,10 @@ func main() {
 				Usage: "log using JSON",
 			},
 		},
-		Action: func(ctx context.Context, c *cli.Command) error {
-			configPath := c.String("config")
-			if configPath == "" {
-				return errors.New("config value cannot be empty")
-			}
-
-			config, err := readConfig(configPath)
-			if err != nil {
-				return err
-			}
-
-			logLevel := slog.LevelInfo
-
-			if c.Bool("debug") {
-				logLevel = slog.LevelDebug
-			}
-
-			logHandlerOptions := &slog.HandlerOptions{
-				Level: logLevel,
-			}
-
-			logOutput := os.Stderr
-
-			var logHandler slog.Handler = slog.NewTextHandler(logOutput, logHandlerOptions)
-
-			if c.Bool("json") {
-				logHandler = slog.NewJSONHandler(logOutput, logHandlerOptions)
-			}
-
-			logger := slog.New(logHandler)
-
-			slog.SetDefault(logger)
-
-			router, moduleErrors, routeErrors := showbridge.NewRouter(ctx, config)
-
-			for _, moduleError := range moduleErrors {
-				logger.Error("problem initializing module", "index", moduleError.Index, "error", moduleError.Error)
-			}
-
-			for _, routeError := range routeErrors {
-				logger.Error("problem initializing route", "index", routeError.Index, "error", routeError.Error)
-			}
-			router.Run()
-			return nil
-		},
+		Action: run,
 	}
 
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Interrupt)
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 	err := cmd.Run(ctx, os.Args)
 
@@ -111,4 +68,63 @@ func readConfig(configPath string) (config.Config, error) {
 	}
 
 	return cfg, nil
+}
+
+func run(ctx context.Context, c *cli.Command) error {
+	configPath := c.String("config")
+	if configPath == "" {
+		return errors.New("config value cannot be empty")
+	}
+
+	config, err := readConfig(configPath)
+	if err != nil {
+		return err
+	}
+
+	logLevel := slog.LevelInfo
+
+	if c.Bool("debug") {
+		logLevel = slog.LevelDebug
+	}
+
+	logHandlerOptions := &slog.HandlerOptions{
+		Level: logLevel,
+	}
+
+	logOutput := os.Stderr
+
+	var logHandler slog.Handler = slog.NewTextHandler(logOutput, logHandlerOptions)
+
+	if c.Bool("json") {
+		logHandler = slog.NewJSONHandler(logOutput, logHandlerOptions)
+	}
+
+	slog.SetDefault(slog.New(logHandler))
+
+	commandLogger := slog.Default().With("component", "cmd")
+
+	routerContext, routerCancel := context.WithCancel(context.Background())
+
+	router, moduleErrors, routeErrors := showbridge.NewRouter(routerContext, config)
+
+	for _, moduleError := range moduleErrors {
+		commandLogger.Error("problem initializing module", "index", moduleError.Index, "error", moduleError.Error)
+	}
+
+	for _, routeError := range routeErrors {
+		commandLogger.Error("problem initializing route", "index", routeError.Index, "error", routeError.Error)
+	}
+
+	routerRunner := sync.WaitGroup{}
+
+	routerRunner.Go(func() {
+		router.Run()
+	})
+
+	<-ctx.Done()
+	commandLogger.Debug("shutting down router")
+	routerCancel()
+	commandLogger.Debug("waiting for router to exit")
+	routerRunner.Wait()
+	return nil
 }
