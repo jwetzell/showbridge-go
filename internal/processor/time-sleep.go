@@ -3,7 +3,6 @@ package processor
 import (
 	"context"
 	"errors"
-	"log/slog"
 	"time"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -11,7 +10,6 @@ import (
 
 type MetaDelay struct {
 	config   config.ProcessorConfig
-	logger   *slog.Logger
 	Duration time.Duration
 }
 
@@ -41,7 +39,7 @@ func init() {
 				return nil, errors.New("time.sleep duration must be number")
 			}
 
-			return &MetaDelay{config: config, Duration: time.Millisecond * time.Duration(durationNum), logger: slog.Default().With("component", "processor")}, nil
+			return &MetaDelay{config: config, Duration: time.Millisecond * time.Duration(durationNum)}, nil
 		},
 	})
 }
