@@ -56,7 +56,7 @@ func (t *Timer) Run() error {
 		select {
 		case <-t.ctx.Done():
 			t.timer.Stop()
-			t.logger.Debug("router context done in module")
+			t.logger.Debug("done")
 			return nil
 		case time := <-t.timer.C:
 			if t.router != nil {

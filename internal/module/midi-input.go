@@ -74,7 +74,7 @@ func (mi *MIDIInput) Run() error {
 	defer stop()
 
 	<-mi.ctx.Done()
-	mi.logger.Debug("router context done in module")
+	mi.logger.Debug("done")
 	return nil
 }
 

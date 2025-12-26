@@ -106,7 +106,7 @@ func (sc *SerialClient) Run() error {
 	// TODO(jwetzell): shutdown with router.Context properly
 	go func() {
 		<-sc.ctx.Done()
-		sc.logger.Debug("router context done in module")
+		sc.logger.Debug("done")
 		if sc.port != nil {
 			sc.port.Close()
 		}
@@ -116,10 +116,10 @@ func (sc *SerialClient) Run() error {
 		err := sc.SetupPort()
 		if err != nil {
 			if sc.ctx.Err() != nil {
-				sc.logger.Debug("router context done in module")
+				sc.logger.Debug("done")
 				return nil
 			}
-			sc.logger.Error("serial.client", "error", err.Error())
+			sc.logger.Error("port setup error", "error", err.Error())
 			time.Sleep(time.Second * 2)
 			continue
 		}
@@ -127,14 +127,14 @@ func (sc *SerialClient) Run() error {
 		buffer := make([]byte, 1024)
 		select {
 		case <-sc.ctx.Done():
-			sc.logger.Debug("router context done in module")
+			sc.logger.Debug("done")
 			return nil
 		default:
 		READ:
 			for {
 				select {
 				case <-sc.ctx.Done():
-					sc.logger.Debug("router context done in module")
+					sc.logger.Debug("done")
 					return nil
 				default:
 					byteCount, err := sc.port.Read(buffer)
@@ -151,7 +151,7 @@ func (sc *SerialClient) Run() error {
 								if sc.router != nil {
 									sc.router.HandleInput(sc.Id(), message)
 								} else {
-									sc.logger.Error("serial.client has no router")
+									sc.logger.Error("input received but no router is configured")
 								}
 							}
 						}

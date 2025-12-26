@@ -59,7 +59,7 @@ func (pc *PSNClient) Run() error {
 		select {
 		case <-pc.ctx.Done():
 			// TODO(jwetzell): cleanup?
-			pc.logger.Debug("router context done in module")
+			pc.logger.Debug("done")
 			return nil
 		default:
 			pc.conn.SetDeadline(time.Now().Add(time.Millisecond * 200))

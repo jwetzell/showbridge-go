@@ -88,7 +88,7 @@ func (nc *NATSClient) Run() error {
 	defer sub.Unsubscribe()
 
 	<-nc.ctx.Done()
-	nc.logger.Debug("router context done in module")
+	nc.logger.Debug("done")
 	return nil
 }
 

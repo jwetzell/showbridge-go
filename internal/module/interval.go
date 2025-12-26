@@ -57,7 +57,7 @@ func (i *Interval) Run() error {
 	for {
 		select {
 		case <-i.ctx.Done():
-			i.logger.Debug("router context done in module")
+			i.logger.Debug("done")
 			return nil
 		case <-ticker.C:
 			if i.router != nil {

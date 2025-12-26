@@ -129,7 +129,7 @@ func (scs *SIPCallServer) Run() error {
 	scs.dg = dg
 
 	<-scs.ctx.Done()
-	scs.logger.Debug("router context done in module")
+	scs.logger.Debug("done")
 	return nil
 }
 

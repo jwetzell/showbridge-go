@@ -93,7 +93,7 @@ func (tc *TCPClient) Run() error {
 	// TODO(jwetzell): shutdown with router.Context properly
 	go func() {
 		<-tc.ctx.Done()
-		tc.logger.Debug("router context done in module")
+		tc.logger.Debug("done")
 		if tc.conn != nil {
 			tc.conn.Close()
 		}
@@ -103,10 +103,10 @@ func (tc *TCPClient) Run() error {
 		err := tc.SetupConn()
 		if err != nil {
 			if tc.ctx.Err() != nil {
-				tc.logger.Debug("router context done in module")
+				tc.logger.Debug("done")
 				return nil
 			}
-			tc.logger.Error("net.tcp.client", "error", err.Error())
+			tc.logger.Error("connection error", "error", err.Error())
 			time.Sleep(time.Second * 2)
 			continue
 		}
@@ -114,14 +114,14 @@ func (tc *TCPClient) Run() error {
 		buffer := make([]byte, 1024)
 		select {
 		case <-tc.ctx.Done():
-			tc.logger.Debug("router context done in module")
+			tc.logger.Debug("done")
 			return nil
 		default:
 		READ:
 			for {
 				select {
 				case <-tc.ctx.Done():
-					tc.logger.Debug("router context done in module")
+					tc.logger.Debug("done")
 					return nil
 				default:
 					byteCount, err := tc.conn.Read(buffer)
@@ -138,7 +138,7 @@ func (tc *TCPClient) Run() error {
 								if tc.router != nil {
 									tc.router.HandleInput(tc.Id(), message)
 								} else {
-									tc.logger.Error("net.tcp.client has no router")
+									tc.logger.Error("input received but no router is configured")
 								}
 							}
 						}

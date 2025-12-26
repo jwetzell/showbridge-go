@@ -44,7 +44,7 @@ func (hc *HTTPClient) Run() error {
 	}
 
 	<-hc.ctx.Done()
-	hc.logger.Debug("router context done in module")
+	hc.logger.Debug("done")
 	return nil
 }
 

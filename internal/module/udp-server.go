@@ -95,7 +95,7 @@ func (us *UDPServer) Run() error {
 		select {
 		case <-us.ctx.Done():
 			// TODO(jwetzell): cleanup?
-			us.logger.Debug("router context done in module")
+			us.logger.Debug("done")
 			return nil
 		default:
 			listener.SetDeadline(time.Now().Add(time.Millisecond * 200))
@@ -112,7 +112,7 @@ func (us *UDPServer) Run() error {
 			if us.router != nil {
 				us.router.HandleInput(us.Id(), message)
 			} else {
-				us.logger.Error("net.udp.server has no router")
+				us.logger.Error("input received but no router is configured")
 			}
 		}
 	}

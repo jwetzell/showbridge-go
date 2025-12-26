@@ -132,7 +132,7 @@ func (sds *SIPDTMFServer) Run() error {
 	}
 
 	<-sds.ctx.Done()
-	sds.logger.Debug("router context done in module")
+	sds.logger.Debug("done")
 	return nil
 }
 

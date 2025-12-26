@@ -91,17 +91,19 @@ func (hs *HTTPServer) Run() error {
 
 	go func() {
 		<-hs.ctx.Done()
-		hs.logger.Debug("router context done in module")
 		httpServer.Close()
 	}()
 
 	err := httpServer.ListenAndServe()
 	// TODO(jwetzell): handle server closed error differently
 	if err != nil {
-		return err
+		if err.Error() != "http: Server closed" {
+			return err
+		}
 	}
 
 	<-hs.ctx.Done()
+	hs.logger.Debug("done")
 	return nil
 }
 

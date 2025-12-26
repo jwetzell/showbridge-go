@@ -81,7 +81,7 @@ func (uc *UDPClient) Run() error {
 	}
 
 	<-uc.ctx.Done()
-	uc.logger.Debug("router context done in module")
+	uc.logger.Debug("done")
 	if uc.conn != nil {
 		uc.conn.Close()
 	}

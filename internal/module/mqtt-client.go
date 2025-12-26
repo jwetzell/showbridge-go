@@ -3,7 +3,6 @@ package module
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -101,14 +100,12 @@ func (mc *MQTTClient) Run() error {
 	}
 
 	<-mc.ctx.Done()
-	mc.logger.Debug("router context done in module")
+	mc.logger.Debug("done")
 	return nil
 }
 
 func (mc *MQTTClient) Output(payload any) error {
 	payloadMessage, ok := payload.(mqtt.Message)
-
-	fmt.Printf("payload type: %T\n", payload)
 
 	if !ok {
 		return errors.New("mqtt.client is only able to output a MQTTMessage")

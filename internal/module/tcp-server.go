@@ -126,7 +126,7 @@ ClientRead:
 								break
 							}
 						}
-						ts.logger.Debug("net.tcp.server connection reset", "remoteAddr", client.RemoteAddr().String())
+						ts.logger.Debug("connection reset", "remoteAddr", client.RemoteAddr().String())
 						ts.connectionsMu.Unlock()
 					}
 				}
@@ -139,7 +139,7 @@ ClientRead:
 							break
 						}
 					}
-					ts.logger.Debug("net.tcp.server stream ended", "remoteAddr", client.RemoteAddr().String())
+					ts.logger.Debug("stream ended", "remoteAddr", client.RemoteAddr().String())
 					ts.connectionsMu.Unlock()
 				}
 				return
@@ -151,7 +151,7 @@ ClientRead:
 						if ts.router != nil {
 							ts.router.HandleInput(ts.Id(), message)
 						} else {
-							ts.logger.Error("net.tcp.server has no router")
+							ts.logger.Error("input received but no router is configured")
 						}
 					}
 				}
@@ -171,7 +171,7 @@ func (ts *TCPServer) Run() error {
 		<-ts.ctx.Done()
 		close(ts.quit)
 		listener.Close()
-		ts.logger.Debug("router context done in module")
+		ts.logger.Debug("done")
 	}()
 
 AcceptLoop:
@@ -182,7 +182,7 @@ AcceptLoop:
 			case <-ts.quit:
 				break AcceptLoop
 			default:
-				ts.logger.Debug("net.tcp.server problem with listener", "error", err)
+				ts.logger.Debug("problem with listener", "error", err)
 			}
 		} else {
 			ts.wg.Add(1)

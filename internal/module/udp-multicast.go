@@ -81,7 +81,7 @@ func (um *UDPMulticast) Run() error {
 		select {
 		case <-um.ctx.Done():
 			// TODO(jwetzell): cleanup?
-			um.logger.Debug("router context done in module")
+			um.logger.Debug("done")
 			return nil
 		default:
 			um.conn.SetDeadline(time.Now().Add(time.Millisecond * 200))
@@ -101,7 +101,7 @@ func (um *UDPMulticast) Run() error {
 				if um.router != nil {
 					um.router.HandleInput(um.Id(), message)
 				} else {
-					um.logger.Error("net.udp.multicast has no router")
+					um.logger.Error("input received but no router is configured")
 				}
 			}
 		}

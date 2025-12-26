@@ -71,7 +71,7 @@ func (mo *MIDIOutput) Run() error {
 	mo.SendFunc = send
 
 	<-mo.ctx.Done()
-	mo.logger.Debug("router context done in module")
+	mo.logger.Debug("done")
 	return nil
 }
 
