@@ -48,13 +48,13 @@
       },
       {
         "type": "object",
-        "title": "IntervalModule",
+        "title": "TimeIntervalModule",
         "properties": {
           "id": {
             "type": "string"
           },
           "type": {
-            "const": "gen.interval"
+            "const": "time.interval"
           },
           "params": {
             "type": "object",
@@ -72,13 +72,13 @@
       },
       {
         "type": "object",
-        "title": "TimerModule",
+        "title": "TimeTimerModule",
         "properties": {
           "id": {
             "type": "string"
           },
           "type": {
-            "const": "gen.timer"
+            "const": "time.timer"
           },
           "params": {
             "type": "object",
