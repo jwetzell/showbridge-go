@@ -32,7 +32,7 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []module.Mod
 		logger:          slog.Default().With("component", "router"),
 	}
 
-	router.logger.Debug("creating router")
+	router.logger.Debug("creating")
 
 	var moduleErrors []module.ModuleError
 
@@ -107,7 +107,7 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []module.Mod
 }
 
 func (r *Router) Run() {
-	r.logger.Info("running router")
+	r.logger.Info("running")
 	for _, moduleInstance := range r.ModuleInstances {
 		r.moduleWait.Add(1)
 		go func() {
@@ -120,7 +120,7 @@ func (r *Router) Run() {
 	}
 	<-r.Context.Done()
 	r.moduleWait.Wait()
-	r.logger.Info("router done")
+	r.logger.Info("done")
 }
 
 func (r *Router) Stop() {
@@ -140,7 +140,7 @@ func (r *Router) HandleInput(sourceId string, payload any) []route.RouteIOError 
 					Index: routeIndex,
 					Error: err,
 				})
-				r.logger.Error("router unable to route input", "route", routeIndex, "source", sourceId, "error", err)
+				r.logger.Error("unable to route input", "route", routeIndex, "source", sourceId, "error", err)
 			}
 		}
 	}
