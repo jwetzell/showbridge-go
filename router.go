@@ -109,14 +109,12 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []module.Mod
 func (r *Router) Run() {
 	r.logger.Info("running")
 	for _, moduleInstance := range r.ModuleInstances {
-		r.moduleWait.Add(1)
-		go func() {
+		r.moduleWait.Go(func() {
 			err := moduleInstance.Run()
 			if err != nil {
 				r.logger.Error("error encountered running module", "error", err)
 			}
-			r.moduleWait.Done()
-		}()
+		})
 	}
 	<-r.Context.Done()
 	r.moduleWait.Wait()
