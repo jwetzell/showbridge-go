@@ -14,7 +14,7 @@ type DebugLog struct {
 }
 
 func (dl *DebugLog) Process(ctx context.Context, payload any) (any, error) {
-	dl.logger.Debug("debug.log", "payload", payload, "payloadType", fmt.Sprintf("%T", payload))
+	dl.logger.Debug("", "payload", payload, "payloadType", fmt.Sprintf("%T", payload))
 	return payload, nil
 }
 
@@ -26,7 +26,7 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type: "debug.log",
 		New: func(config config.ProcessorConfig) (Processor, error) {
-			return &DebugLog{config: config, logger: slog.Default().With("component", "processor")}, nil
+			return &DebugLog{config: config, logger: slog.Default().With("component", "processor", "type", config.Type)}, nil
 		},
 	})
 }
