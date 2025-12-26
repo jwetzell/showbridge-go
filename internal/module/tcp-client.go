@@ -75,7 +75,7 @@ func init() {
 				return nil, fmt.Errorf("net.tcp.client unknown framing method: %s", framingMethod)
 			}
 
-			return &TCPClient{framer: framer, Addr: addr, config: config, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
+			return &TCPClient{framer: framer, Addr: addr, config: config, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
 		},
 	})
 }

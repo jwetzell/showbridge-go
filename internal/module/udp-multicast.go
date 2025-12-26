@@ -53,7 +53,7 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			return &UDPMulticast{config: config, Addr: addr, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
+			return &UDPMulticast{config: config, Addr: addr, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
 		},
 	})
 }

@@ -3,6 +3,7 @@ package module
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"sync"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -49,3 +50,7 @@ var (
 	moduleRegistryMu sync.RWMutex
 	ModuleRegistry   = make(map[string]ModuleRegistration)
 )
+
+func CreateLogger(config config.ModuleConfig) *slog.Logger {
+	return slog.Default().With("component", "module", "id", config.Id, "type", config.Type)
+}

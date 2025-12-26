@@ -87,7 +87,7 @@ func init() {
 				}
 				userAgentString = specificTransportString
 			}
-			return &SIPCallServer{config: config, ctx: ctx, router: router, IP: ipString, Port: int(portNum), Transport: transportString, UserAgent: userAgentString, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
+			return &SIPCallServer{config: config, ctx: ctx, router: router, IP: ipString, Port: int(portNum), Transport: transportString, UserAgent: userAgentString, logger: CreateLogger(config)}, nil
 		},
 	})
 }

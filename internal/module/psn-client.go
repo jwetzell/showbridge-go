@@ -26,7 +26,7 @@ func init() {
 		Type: "psn.client",
 		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 
-			return &PSNClient{config: config, decoder: psn.NewDecoder(), ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
+			return &PSNClient{config: config, decoder: psn.NewDecoder(), ctx: ctx, router: router, logger: CreateLogger(config)}, nil
 		},
 	})
 }
@@ -77,7 +77,7 @@ func (pc *PSNClient) Run() error {
 				message := buffer[:numBytes]
 				err := pc.decoder.Decode(message)
 				if err != nil {
-					pc.logger.Error("psn.client problem decoding psn traffic", "error", err)
+					pc.logger.Error("problem decoding psn traffic", "error", err)
 				}
 
 				if pc.router != nil {
@@ -85,7 +85,7 @@ func (pc *PSNClient) Run() error {
 						pc.router.HandleInput(pc.Id(), tracker)
 					}
 				} else {
-					pc.logger.Error("psn.client has no router")
+					pc.logger.Error("has no router")
 				}
 			}
 		}

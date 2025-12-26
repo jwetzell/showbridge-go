@@ -41,7 +41,7 @@ func init() {
 				return nil, errors.New("http.server port must be uint16")
 			}
 
-			return &HTTPServer{Port: uint16(portNum), config: config, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
+			return &HTTPServer{Port: uint16(portNum), config: config, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
 		},
 	})
 }

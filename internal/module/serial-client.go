@@ -76,7 +76,7 @@ func init() {
 				BaudRate: int(baudRateNum),
 			}
 
-			return &SerialClient{config: config, Port: portString, Framer: framer, Mode: &mode, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
+			return &SerialClient{config: config, Port: portString, Framer: framer, Mode: &mode, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
 		},
 	})
 }

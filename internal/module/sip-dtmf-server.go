@@ -91,7 +91,7 @@ func init() {
 			if !strings.ContainsRune("0123456789*#ABCD", rune(separatorString[0])) {
 				return nil, errors.New("sip.dtmf.server separator must be a valid DTMF character")
 			}
-			return &SIPDTMFServer{config: config, ctx: ctx, router: router, IP: ipString, Port: int(portNum), Transport: transportString, Separator: separatorString, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
+			return &SIPDTMFServer{config: config, ctx: ctx, router: router, IP: ipString, Port: int(portNum), Transport: transportString, Separator: separatorString, logger: CreateLogger(config)}, nil
 		},
 	})
 }

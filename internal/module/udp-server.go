@@ -68,7 +68,7 @@ func init() {
 				bufferSizeNum = int(bufferSizeFloat)
 			}
 
-			return &UDPServer{Addr: addr, BufferSize: bufferSizeNum, config: config, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
+			return &UDPServer{Addr: addr, BufferSize: bufferSizeNum, config: config, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
 		},
 	})
 }

@@ -41,7 +41,7 @@ func init() {
 				return nil, errors.New("midi.output port must be a string")
 			}
 
-			return &MIDIOutput{config: config, Port: portString, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
+			return &MIDIOutput{config: config, Port: portString, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
 		},
 	})
 }

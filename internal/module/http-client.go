@@ -24,7 +24,7 @@ func init() {
 		Type: "http.client",
 		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 
-			return &HTTPClient{config: config, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
+			return &HTTPClient{config: config, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
 		},
 	})
 }

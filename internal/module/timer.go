@@ -36,7 +36,7 @@ func init() {
 				return nil, errors.New("gen.timer duration must be a number")
 			}
 
-			return &Timer{Duration: uint32(durationNum), config: config, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
+			return &Timer{Duration: uint32(durationNum), config: config, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
 		},
 	})
 }

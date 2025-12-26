@@ -50,7 +50,7 @@ func init() {
 				return nil, errors.New("nats.client subject must be string")
 			}
 
-			return &NATSClient{config: config, URL: urlString, Subject: subjectString, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
+			return &NATSClient{config: config, URL: urlString, Subject: subjectString, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
 		},
 	})
 }

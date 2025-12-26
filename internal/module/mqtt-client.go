@@ -63,7 +63,7 @@ func init() {
 				return nil, errors.New("mqtt.client clientId must be string")
 			}
 
-			return &MQTTClient{config: config, Broker: brokerString, Topic: topicString, ClientID: clientIdString, ctx: ctx, router: router, logger: slog.Default().With("component", "module", "id", config.Id)}, nil
+			return &MQTTClient{config: config, Broker: brokerString, Topic: topicString, ClientID: clientIdString, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
 		},
 	})
 }
