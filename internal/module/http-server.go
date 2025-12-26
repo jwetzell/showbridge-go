@@ -54,7 +54,7 @@ func (hs *HTTPServer) Type() string {
 	return hs.config.Type
 }
 
-func (hs *HTTPServer) HandleDefault(w http.ResponseWriter, r *http.Request) {
+func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	response := ResponseData{
@@ -82,11 +82,9 @@ func (hs *HTTPServer) HandleDefault(w http.ResponseWriter, r *http.Request) {
 }
 
 func (hs *HTTPServer) Run() error {
-	http.HandleFunc("/", hs.HandleDefault)
-
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", hs.Port),
-		Handler: http.DefaultServeMux,
+		Handler: hs,
 	}
 
 	go func() {
