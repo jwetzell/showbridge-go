@@ -10,7 +10,7 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
-type Interval struct {
+type TimeInterval struct {
 	config   config.ModuleConfig
 	Duration uint32
 	ctx      context.Context
@@ -21,35 +21,35 @@ type Interval struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "gen.interval",
+		Type: "time.interval",
 		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params
 
 			duration, ok := params["duration"]
 			if !ok {
-				return nil, errors.New("gen.interval requires a duration parameter")
+				return nil, errors.New("time.interval requires a duration parameter")
 			}
 
 			durationNum, ok := duration.(float64)
 
 			if !ok {
-				return nil, errors.New("gen.interval duration must be number")
+				return nil, errors.New("time.interval duration must be number")
 			}
 
-			return &Interval{Duration: uint32(durationNum), config: config, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
+			return &TimeInterval{Duration: uint32(durationNum), config: config, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
 		},
 	})
 }
 
-func (i *Interval) Id() string {
+func (i *TimeInterval) Id() string {
 	return i.config.Id
 }
 
-func (i *Interval) Type() string {
+func (i *TimeInterval) Type() string {
 	return i.config.Type
 }
 
-func (i *Interval) Run() error {
+func (i *TimeInterval) Run() error {
 	ticker := time.NewTicker(time.Millisecond * time.Duration(i.Duration))
 	i.ticker = ticker
 	defer ticker.Stop()
@@ -68,7 +68,7 @@ func (i *Interval) Run() error {
 
 }
 
-func (i *Interval) Output(payload any) error {
+func (i *TimeInterval) Output(payload any) error {
 	i.ticker.Reset(time.Millisecond * time.Duration(i.Duration))
 	return nil
 }

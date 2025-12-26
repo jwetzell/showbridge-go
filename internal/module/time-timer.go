@@ -10,7 +10,7 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
-type Timer struct {
+type TimeTimer struct {
 	config   config.ModuleConfig
 	Duration uint32
 	ctx      context.Context
@@ -21,35 +21,35 @@ type Timer struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "gen.timer",
+		Type: "time.timer",
 		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
 			params := config.Params
 
 			duration, ok := params["duration"]
 			if !ok {
-				return nil, errors.New("gen.timer requires a duration parameter")
+				return nil, errors.New("time.timer requires a duration parameter")
 			}
 
 			durationNum, ok := duration.(float64)
 
 			if !ok {
-				return nil, errors.New("gen.timer duration must be a number")
+				return nil, errors.New("time.timer duration must be a number")
 			}
 
-			return &Timer{Duration: uint32(durationNum), config: config, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
+			return &TimeTimer{Duration: uint32(durationNum), config: config, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
 		},
 	})
 }
 
-func (t *Timer) Id() string {
+func (t *TimeTimer) Id() string {
 	return t.config.Id
 }
 
-func (t *Timer) Type() string {
+func (t *TimeTimer) Type() string {
 	return t.config.Type
 }
 
-func (t *Timer) Run() error {
+func (t *TimeTimer) Run() error {
 	t.timer = time.NewTimer(time.Millisecond * time.Duration(t.Duration))
 	defer t.timer.Stop()
 	for {
@@ -66,7 +66,7 @@ func (t *Timer) Run() error {
 	}
 }
 
-func (t *Timer) Output(payload any) error {
+func (t *TimeTimer) Output(payload any) error {
 	t.timer.Reset(time.Millisecond * time.Duration(t.Duration))
 	return nil
 }
