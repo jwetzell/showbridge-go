@@ -117,6 +117,7 @@ func (r *Router) Run() {
 		})
 	}
 	<-r.Context.Done()
+	r.logger.Debug("waiting for modules to exit")
 	r.moduleWait.Wait()
 	r.logger.Info("done")
 }
