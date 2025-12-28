@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
@@ -27,10 +28,27 @@ type ResponseIOError struct {
 	InputError   *string  `json:"inputError"`
 }
 
-type ResponseData struct {
+type IOResponseData struct {
 	IOErrors []ResponseIOError `json:"ioErrors"`
 	Message  string            `json:"message"`
 	Status   string            `json:"status"`
+}
+
+type httpServerContextKey string
+
+type HTTPServerResponseWriter struct {
+	http.ResponseWriter
+	done bool
+}
+
+func (hsrw *HTTPServerResponseWriter) WriteHeader(status int) {
+	hsrw.done = true
+	hsrw.ResponseWriter.WriteHeader(status)
+}
+
+func (hsrw *HTTPServerResponseWriter) Write(data []byte) (int, error) {
+	hsrw.done = true
+	return hsrw.ResponseWriter.Write(data)
 }
 
 func init() {
@@ -69,66 +87,74 @@ func (hs *HTTPServer) Type() string {
 }
 
 func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	responseWriter := HTTPServerResponseWriter{ResponseWriter: w}
 
-	response := ResponseData{
+	response := IOResponseData{
 		Message: "routing successful",
 		Status:  "ok",
 	}
-
 	if hs.router != nil {
-		aRouteFound, routingErrors := hs.router.HandleInput(hs.ctx, hs.Id(), r)
-		if aRouteFound {
-			if routingErrors != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				response.Status = "error"
-				response.Message = "routing failed"
+		inputContext := context.WithValue(hs.ctx, httpServerContextKey("responseWriter"), &responseWriter)
+		aRouteFound, routingErrors := hs.router.HandleInput(inputContext, hs.Id(), r)
+		if !responseWriter.done {
+			if aRouteFound {
+				if routingErrors != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					response.Status = "error"
+					response.Message = "routing failed"
 
-				response.IOErrors = []ResponseIOError{}
-				for _, responseIOError := range routingErrors {
-					errorToAdd := ResponseIOError{
-						Index: responseIOError.Index,
-					}
-
-					if responseIOError.InputError != nil {
-						errorMsg := responseIOError.InputError.Error()
-						errorToAdd.InputError = &errorMsg
-					}
-
-					if responseIOError.ProcessError != nil {
-						errorMsg := responseIOError.ProcessError.Error()
-						errorToAdd.ProcessError = &errorMsg
-					}
-
-					if responseIOError.OutputErrors != nil {
-						outputErrorMsgs := []string{}
-
-						for _, outputError := range responseIOError.OutputErrors {
-							outputErrorMsgs = append(outputErrorMsgs, outputError.Error())
+					response.IOErrors = []ResponseIOError{}
+					for _, responseIOError := range routingErrors {
+						errorToAdd := ResponseIOError{
+							Index: responseIOError.Index,
 						}
 
-						errorToAdd.OutputErrors = outputErrorMsgs
+						if responseIOError.InputError != nil {
+							errorMsg := responseIOError.InputError.Error()
+							errorToAdd.InputError = &errorMsg
+						}
+
+						if responseIOError.ProcessError != nil {
+							errorMsg := responseIOError.ProcessError.Error()
+							errorToAdd.ProcessError = &errorMsg
+						}
+
+						if responseIOError.OutputErrors != nil {
+							outputErrorMsgs := []string{}
+
+							for _, outputError := range responseIOError.OutputErrors {
+								outputErrorMsgs = append(outputErrorMsgs, outputError.Error())
+							}
+
+							errorToAdd.OutputErrors = outputErrorMsgs
+						}
+
+						response.IOErrors = append(response.IOErrors, errorToAdd)
+
 					}
-
-					response.IOErrors = append(response.IOErrors, errorToAdd)
-
+					json.NewEncoder(w).Encode(response)
+					return
+				} else {
+					w.WriteHeader(http.StatusOK)
+					response.Message = "routing successful"
+					json.NewEncoder(w).Encode(response)
+					return
 				}
 			} else {
-				w.WriteHeader(http.StatusOK)
-				response.Message = "routing successful"
+				w.WriteHeader(http.StatusNotFound)
+				response.Status = "error"
+				response.Message = "no matching routes found"
+				json.NewEncoder(w).Encode(response)
+				return
 			}
-		} else {
-			w.WriteHeader(http.StatusNotFound)
-			response.Status = "error"
-			response.Message = "no matching routes found"
 		}
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
 		response.Message = "no router registered"
 		response.Status = "error"
+		json.NewEncoder(w).Encode(response)
+		return
 	}
-
-	json.NewEncoder(w).Encode(response)
 }
 
 func (hs *HTTPServer) Run() error {
@@ -156,5 +182,21 @@ func (hs *HTTPServer) Run() error {
 }
 
 func (hs *HTTPServer) Output(ctx context.Context, payload any) error {
-	return errors.New("http.server output is not implemented")
+	responseWriter, ok := ctx.Value(httpServerContextKey("responseWriter")).(*HTTPServerResponseWriter)
+
+	if !ok {
+		return errors.New("http.server output must originate from an http.server input")
+	}
+
+	payloadResponse, ok := payload.(processor.HTTPResponse)
+
+	if !ok {
+		return errors.New("http.server is only able to output HTTPResponse")
+	}
+
+	responseWriter.WriteHeader(payloadResponse.Status)
+
+	responseWriter.Write(payloadResponse.Body)
+
+	return nil
 }
