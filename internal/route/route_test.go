@@ -33,7 +33,7 @@ func (mr *MockRouter) HandleInput(sourceId string, payload any) []route.RouteIOE
 	return nil
 }
 
-func (mr *MockRouter) HandleOutput(sourceId string, destinationId string, payload any) error {
+func (mr *MockRouter) HandleOutput(ctx context.Context, destinationId string, payload any) error {
 	return nil
 }
 
