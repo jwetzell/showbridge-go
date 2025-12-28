@@ -21,7 +21,11 @@ func (je *JsonEncode) Process(ctx context.Context, payload any) (any, error) {
 		return nil, err
 	}
 
-	return payloadBuffer.Bytes(), nil
+	payloadBytes := payloadBuffer.Bytes()
+
+	payloadBytes = payloadBytes[0 : len(payloadBytes)-1]
+
+	return payloadBytes, nil
 }
 
 func (je *JsonEncode) Type() string {
