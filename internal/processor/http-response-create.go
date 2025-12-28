@@ -10,9 +10,9 @@ import (
 )
 
 type HTTPResponseCreate struct {
-	Status int
-	Body   *template.Template
-	config config.ProcessorConfig
+	Status   int
+	BodyTmpl *template.Template
+	config   config.ProcessorConfig
 }
 
 type HTTPResponse struct {
@@ -22,7 +22,7 @@ type HTTPResponse struct {
 
 func (hre *HTTPResponseCreate) Process(ctx context.Context, payload any) (any, error) {
 	var bodyBuffer bytes.Buffer
-	err := hre.Body.Execute(&bodyBuffer, payload)
+	err := hre.BodyTmpl.Execute(&bodyBuffer, payload)
 
 	if err != nil {
 		return nil, err
@@ -53,29 +53,29 @@ func init() {
 			statusNum, ok := status.(float64)
 
 			if !ok {
-				return nil, errors.New("http.resposne.create status must be a number")
+				return nil, errors.New("http.response.create status must be a number")
 			}
 
-			body, ok := params["body"]
+			bodyTmpl, ok := params["bodyTemplate"]
 
 			if !ok {
-				return nil, errors.New("osc.message.create requires an body parameter")
+				return nil, errors.New("http.response.create requires a bodyTemplate parameter")
 			}
 
-			bodyString, ok := body.(string)
+			bodyTemplateString, ok := bodyTmpl.(string)
 
 			if !ok {
-				return nil, errors.New("osc.message.create body must be a string")
+				return nil, errors.New("http.response.create bodyTemplate must be a string")
 			}
 
-			bodyTemplate, err := template.New("body").Parse(bodyString)
+			bodyTemplate, err := template.New("body").Parse(bodyTemplateString)
 
 			if err != nil {
 				return nil, err
 			}
 
 			// TODO(jwetzell): support other body kind (direct bytes from input, from file?)
-			return &HTTPResponseCreate{config: config, Status: int(statusNum), Body: bodyTemplate}, nil
+			return &HTTPResponseCreate{config: config, Status: int(statusNum), BodyTmpl: bodyTemplate}, nil
 		},
 	})
 }
