@@ -20,13 +20,15 @@ type RouteError struct {
 }
 
 type RouteIOError struct {
-	Index int
-	Error error
+	Index        int
+	OutputErrors []error
+	ProcessError error
+	InputError   error
 }
 
 type RouteIO interface {
-	HandleInput(sourceId string, payload any) []RouteIOError
-	HandleOutput(ctx context.Context, destinationId string, payload any) error
+	HandleInput(sourceId string, payload any) (bool, []RouteIOError)
+	HandleOutput(ctx context.Context, destinationId string, payload any) []error
 }
 
 type Route interface {
