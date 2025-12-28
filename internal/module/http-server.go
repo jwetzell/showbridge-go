@@ -194,9 +194,11 @@ func (hs *HTTPServer) Output(ctx context.Context, payload any) error {
 		return errors.New("http.server is only able to output HTTPResponse")
 	}
 
+	if responseWriter.done {
+		return errors.New("http.server response writer has already been written to")
+	}
+
 	responseWriter.WriteHeader(payloadResponse.Status)
-
 	responseWriter.Write(payloadResponse.Body)
-
 	return nil
 }
