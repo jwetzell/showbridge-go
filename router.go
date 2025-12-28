@@ -24,13 +24,15 @@ type Router struct {
 func NewRouter(ctx context.Context, config config.Config) (*Router, []module.ModuleError, []route.RouteError) {
 
 	routerContext, cancel := context.WithCancel(ctx)
+
 	router := Router{
-		Context:         routerContext,
 		contextCancel:   cancel,
 		ModuleInstances: []module.Module{},
 		RouteInstances:  []route.Route{},
 		logger:          slog.Default().With("component", "router"),
 	}
+
+	router.Context = context.WithValue(routerContext, route.RouterContextKey, &router)
 
 	router.logger.Debug("creating")
 
@@ -68,7 +70,7 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []module.Mod
 		}
 
 		if !moduleInstanceExists {
-			moduleInstance, err := moduleInfo.New(router.Context, moduleDecl, &router)
+			moduleInstance, err := moduleInfo.New(router.Context, moduleDecl)
 			if err != nil {
 				if moduleErrors == nil {
 					moduleErrors = []module.ModuleError{}
@@ -131,7 +133,7 @@ func (r *Router) HandleInput(sourceId string, payload any) []route.RouteIOError 
 	var routingErrors []route.RouteIOError
 	for routeIndex, routeInstance := range r.RouteInstances {
 		if routeInstance.Input() == sourceId {
-			err := routeInstance.HandleInput(r.Context, sourceId, payload, r)
+			err := routeInstance.HandleInput(context.WithValue(r.Context, route.SourceContextKey, sourceId), payload)
 			if err != nil {
 				if routingErrors == nil {
 					routingErrors = []route.RouteIOError{}
@@ -147,10 +149,10 @@ func (r *Router) HandleInput(sourceId string, payload any) []route.RouteIOError 
 	return routingErrors
 }
 
-func (r *Router) HandleOutput(sourceId string, destinationId string, payload any) error {
+func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload any) error {
 	for _, moduleInstance := range r.ModuleInstances {
 		if moduleInstance.Id() == destinationId {
-			return moduleInstance.Output(payload)
+			return moduleInstance.Output(ctx, payload)
 		}
 	}
 	return fmt.Errorf("router could not find module instance for destination %s", destinationId)

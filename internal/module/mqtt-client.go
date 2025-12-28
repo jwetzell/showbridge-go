@@ -24,7 +24,7 @@ type MQTTClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "mqtt.client",
-		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			broker, ok := params["broker"]
 
@@ -60,6 +60,12 @@ func init() {
 
 			if !ok {
 				return nil, errors.New("mqtt.client clientId must be string")
+			}
+
+			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+			if !ok {
+				return nil, errors.New("mqtt.client unable to get router from context")
 			}
 
 			return &MQTTClient{config: config, Broker: brokerString, Topic: topicString, ClientID: clientIdString, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
@@ -104,7 +110,7 @@ func (mc *MQTTClient) Run() error {
 	return nil
 }
 
-func (mc *MQTTClient) Output(payload any) error {
+func (mc *MQTTClient) Output(ctx context.Context, payload any) error {
 	payloadMessage, ok := payload.(mqtt.Message)
 
 	if !ok {

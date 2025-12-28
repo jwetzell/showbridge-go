@@ -28,7 +28,7 @@ type ResponseData struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "http.server",
-		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {
@@ -39,6 +39,12 @@ func init() {
 
 			if !ok {
 				return nil, errors.New("http.server port must be uint16")
+			}
+
+			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+			if !ok {
+				return nil, errors.New("http.server unable to get router from context")
 			}
 
 			return &HTTPServer{Port: uint16(portNum), config: config, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
@@ -105,6 +111,6 @@ func (hs *HTTPServer) Run() error {
 	return nil
 }
 
-func (hs *HTTPServer) Output(payload any) error {
+func (hs *HTTPServer) Output(ctx context.Context, payload any) error {
 	return errors.New("http.server output is not implemented")
 }

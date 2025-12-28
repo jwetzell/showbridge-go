@@ -1,6 +1,7 @@
 package route_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -51,7 +52,7 @@ func TestGoodRouteHandleInput(t *testing.T) {
 	}
 
 	inputData := "test input data"
-	err = testRoute.HandleInput(t.Context(), "input", inputData, &MockRouter{})
+	err = testRoute.HandleInput(context.WithValue(t.Context(), route.RouterContextKey, &MockRouter{}), inputData)
 	if err != nil {
 		t.Fatalf("route HandleOutput returned error: %v", err)
 	}
@@ -72,7 +73,7 @@ func TestRouteHandleInputWithProcessorError(t *testing.T) {
 	}
 
 	inputData := "test input data"
-	err = testRoute.HandleInput(t.Context(), "input", inputData, &MockRouter{})
+	err = testRoute.HandleInput(context.WithValue(t.Context(), route.RouterContextKey, &MockRouter{}), inputData)
 	if err == nil {
 		t.Fatalf("route HandleOutput did not return error for bad processor")
 	}
@@ -91,7 +92,7 @@ func TestRouteHandleNilPayload(t *testing.T) {
 		return
 	}
 
-	err = testRoute.HandleInput(t.Context(), "input", nil, &MockRouter{})
+	err = testRoute.HandleInput(context.WithValue(t.Context(), route.RouterContextKey, &MockRouter{}), nil)
 	if err != nil {
 		t.Fatalf("route HandleOutput returned error for nil payload: %v", err)
 	}
@@ -111,7 +112,7 @@ func TestRouteHandleNilPayloadFromProcessor(t *testing.T) {
 		t.Fatalf("route failed to create: %v", err)
 	}
 
-	err = testRoute.HandleInput(t.Context(), "input", nil, &MockRouter{})
+	err = testRoute.HandleInput(context.WithValue(t.Context(), route.RouterContextKey, &MockRouter{}), nil)
 	if err != nil {
 		t.Fatalf("route HandleOutput returned error for nil payload: %v", err)
 	}

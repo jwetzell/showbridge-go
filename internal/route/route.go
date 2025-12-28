@@ -2,11 +2,17 @@ package route
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
+
+type routeContextKey string
+
+var RouterContextKey routeContextKey = routeContextKey("router")
+var SourceContextKey routeContextKey = routeContextKey("source")
 
 type RouteError struct {
 	Index  int
@@ -21,13 +27,13 @@ type RouteIOError struct {
 
 type RouteIO interface {
 	HandleInput(sourceId string, payload any) []RouteIOError
-	HandleOutput(sourceId string, destinationId string, payload any) error
+	HandleOutput(ctx context.Context, destinationId string, payload any) error
 }
 
 type Route interface {
 	Input() string
 	Output() string
-	HandleInput(ctx context.Context, sourceId string, payload any, router RouteIO) error
+	HandleInput(ctx context.Context, payload any) error
 }
 
 type ProcessorRoute struct {
@@ -65,17 +71,24 @@ func (r *ProcessorRoute) Output() string {
 	return r.output
 }
 
-func (r *ProcessorRoute) HandleInput(ctx context.Context, sourceId string, payload any, router RouteIO) error {
-	var err error
+func (r *ProcessorRoute) HandleInput(ctx context.Context, payload any) error {
+	router, ok := ctx.Value(RouterContextKey).(RouteIO)
+
+	if !ok {
+		return errors.New("unable to get router from context")
+	}
+
 	for _, processor := range r.processors {
-		payload, err = processor.Process(ctx, payload)
+		processedPayload, err := processor.Process(ctx, payload)
 		if err != nil {
 			return err
 		}
 		//NOTE(jwetzell) nil payload will result in the route being "terminated"
-		if payload == nil {
+		if processedPayload == nil {
 			return nil
 		}
+		payload = processedPayload
 	}
-	return router.HandleOutput(sourceId, r.output, payload)
+
+	return router.HandleOutput(ctx, r.output, payload)
 }

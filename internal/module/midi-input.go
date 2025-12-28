@@ -26,7 +26,7 @@ type MIDIInput struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "midi.input",
-		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 
@@ -38,6 +38,12 @@ func init() {
 
 			if !ok {
 				return nil, errors.New("midi.input port must be a string")
+			}
+
+			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+			if !ok {
+				return nil, errors.New("midi.input unable to get router from context")
 			}
 
 			return &MIDIInput{config: config, Port: portString, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
@@ -78,6 +84,6 @@ func (mi *MIDIInput) Run() error {
 	return nil
 }
 
-func (mi *MIDIInput) Output(payload any) error {
+func (mi *MIDIInput) Output(ctx context.Context, payload any) error {
 	return errors.New("midi.input output is not implemented")
 }

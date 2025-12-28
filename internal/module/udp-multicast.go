@@ -24,7 +24,7 @@ type UDPMulticast struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.udp.multicast",
-		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			ip, ok := params["ip"]
 
@@ -52,6 +52,12 @@ func init() {
 			addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", ipString, uint16(portNum)))
 			if err != nil {
 				return nil, err
+			}
+
+			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+			if !ok {
+				return nil, errors.New("net.udp.multicast unable to get router from context")
 			}
 			return &UDPMulticast{config: config, Addr: addr, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
 		},
@@ -108,7 +114,7 @@ func (um *UDPMulticast) Run() error {
 	}
 }
 
-func (um *UDPMulticast) Output(payload any) error {
+func (um *UDPMulticast) Output(ctx context.Context, payload any) error {
 
 	payloadBytes, ok := payload.([]byte)
 	if !ok {

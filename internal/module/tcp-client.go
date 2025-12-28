@@ -26,7 +26,7 @@ type TCPClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.tcp.client",
-		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			host, ok := params["host"]
 
@@ -73,6 +73,12 @@ func init() {
 
 			if framer == nil {
 				return nil, fmt.Errorf("net.tcp.client unknown framing method: %s", framingMethod)
+			}
+
+			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+			if !ok {
+				return nil, errors.New("net.tcp.client unable to get router from context")
 			}
 
 			return &TCPClient{framer: framer, Addr: addr, config: config, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
@@ -155,7 +161,7 @@ func (tc *TCPClient) SetupConn() error {
 	return err
 }
 
-func (tc *TCPClient) Output(payload any) error {
+func (tc *TCPClient) Output(ctx context.Context, payload any) error {
 	// NOTE(jwetzell): not sure how this would occur but
 	if tc.conn == nil {
 		err := tc.SetupConn()

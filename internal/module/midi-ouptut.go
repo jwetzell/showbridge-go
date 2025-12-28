@@ -26,7 +26,7 @@ type MIDIOutput struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "midi.output",
-		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
 			params := config.Params
 
 			port, ok := params["port"]
@@ -39,6 +39,12 @@ func init() {
 
 			if !ok {
 				return nil, errors.New("midi.output port must be a string")
+			}
+
+			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+			if !ok {
+				return nil, errors.New("midi.output unable to get router from context")
 			}
 
 			return &MIDIOutput{config: config, Port: portString, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
@@ -75,7 +81,7 @@ func (mo *MIDIOutput) Run() error {
 	return nil
 }
 
-func (mo *MIDIOutput) Output(payload any) error {
+func (mo *MIDIOutput) Output(ctx context.Context, payload any) error {
 	if mo.SendFunc == nil {
 		return errors.New("midi.output output is not setup")
 	}

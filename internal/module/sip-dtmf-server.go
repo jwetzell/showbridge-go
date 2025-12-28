@@ -35,7 +35,7 @@ type SIPDTMFMessage struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "sip.dtmf.server",
-		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			portNum := 5060
 
@@ -90,6 +90,11 @@ func init() {
 
 			if !strings.ContainsRune("0123456789*#ABCD", rune(separatorString[0])) {
 				return nil, errors.New("sip.dtmf.server separator must be a valid DTMF character")
+			}
+			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+			if !ok {
+				return nil, errors.New("sip.dtmf.server unable to get router from context")
 			}
 			return &SIPDTMFServer{config: config, ctx: ctx, router: router, IP: ipString, Port: int(portNum), Transport: transportString, Separator: separatorString, logger: CreateLogger(config)}, nil
 		},
@@ -159,6 +164,6 @@ func (sds *SIPDTMFServer) HandleCall(inDialog *diago.DialogServerSession) error 
 	}, 5*time.Second)
 }
 
-func (sds *SIPDTMFServer) Output(payload any) error {
+func (sds *SIPDTMFServer) Output(ctx context.Context, payload any) error {
 	return errors.New("sip.dtmf.server output is not implemented")
 }

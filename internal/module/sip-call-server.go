@@ -35,7 +35,7 @@ type SIPCallMessage struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "sip.call.server",
-		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			portNum := 5060
 
@@ -86,6 +86,12 @@ func init() {
 					return nil, errors.New("sip.call.server userAgent must be a string")
 				}
 				userAgentString = specificTransportString
+			}
+
+			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+			if !ok {
+				return nil, errors.New("sip.call.server unable to get router from context")
 			}
 			return &SIPCallServer{config: config, ctx: ctx, router: router, IP: ipString, Port: int(portNum), Transport: transportString, UserAgent: userAgentString, logger: CreateLogger(config)}, nil
 		},
@@ -143,7 +149,7 @@ func (scs *SIPCallServer) HandleCall(inDialog *diago.DialogServerSession) {
 	<-inDialog.Context().Done()
 }
 
-func (scs *SIPCallServer) Output(payload any) error {
+func (scs *SIPCallServer) Output(ctx context.Context, payload any) error {
 
 	payloadMsg, ok := payload.(string)
 	if !ok {

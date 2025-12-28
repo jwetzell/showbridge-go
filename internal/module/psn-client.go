@@ -2,6 +2,7 @@ package module
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net"
@@ -24,8 +25,12 @@ type PSNClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "psn.client",
-		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
+			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 
+			if !ok {
+				return nil, errors.New("psn.client unable to get router from context")
+			}
 			return &PSNClient{config: config, decoder: psn.NewDecoder(), ctx: ctx, router: router, logger: CreateLogger(config)}, nil
 		},
 	})
@@ -92,6 +97,6 @@ func (pc *PSNClient) Run() error {
 	}
 }
 
-func (pc *PSNClient) Output(payload any) error {
+func (pc *PSNClient) Output(ctx context.Context, payload any) error {
 	return fmt.Errorf("psn.client output is not implemented")
 }

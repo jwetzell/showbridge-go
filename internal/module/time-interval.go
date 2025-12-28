@@ -22,7 +22,7 @@ type TimeInterval struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "time.interval",
-		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
 			params := config.Params
 
 			duration, ok := params["duration"]
@@ -34,6 +34,12 @@ func init() {
 
 			if !ok {
 				return nil, errors.New("time.interval duration must be number")
+			}
+
+			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+			if !ok {
+				return nil, errors.New("time.interval unable to get router from context")
 			}
 
 			return &TimeInterval{Duration: uint32(durationNum), config: config, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
@@ -68,7 +74,7 @@ func (i *TimeInterval) Run() error {
 
 }
 
-func (i *TimeInterval) Output(payload any) error {
+func (i *TimeInterval) Output(ctx context.Context, payload any) error {
 	i.ticker.Reset(time.Millisecond * time.Duration(i.Duration))
 	return nil
 }

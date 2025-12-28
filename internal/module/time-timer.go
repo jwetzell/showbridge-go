@@ -22,7 +22,7 @@ type TimeTimer struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "time.timer",
-		New: func(ctx context.Context, config config.ModuleConfig, router route.RouteIO) (Module, error) {
+		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
 			params := config.Params
 
 			duration, ok := params["duration"]
@@ -34,6 +34,12 @@ func init() {
 
 			if !ok {
 				return nil, errors.New("time.timer duration must be a number")
+			}
+
+			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+			if !ok {
+				return nil, errors.New("net.tcp.client unable to get router from context")
 			}
 
 			return &TimeTimer{Duration: uint32(durationNum), config: config, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
@@ -66,7 +72,7 @@ func (t *TimeTimer) Run() error {
 	}
 }
 
-func (t *TimeTimer) Output(payload any) error {
+func (t *TimeTimer) Output(ctx context.Context, payload any) error {
 	t.timer.Reset(time.Millisecond * time.Duration(t.Duration))
 	return nil
 }

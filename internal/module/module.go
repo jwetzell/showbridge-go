@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
-	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type ModuleError struct {
@@ -20,12 +19,12 @@ type Module interface {
 	Id() string
 	Type() string
 	Run() error
-	Output(any) error
+	Output(context.Context, any) error
 }
 
 type ModuleRegistration struct {
 	Type string `json:"type"`
-	New  func(context.Context, config.ModuleConfig, route.RouteIO) (Module, error)
+	New  func(context.Context, config.ModuleConfig) (Module, error)
 }
 
 func RegisterModule(mod ModuleRegistration) {
