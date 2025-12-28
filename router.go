@@ -149,6 +149,11 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 				continue
 			}
 
+			if payload == nil {
+				r.logger.Error("no input after processing", "route", routeIndex, "source", sourceId)
+				continue
+			}
+
 			outputErrors := r.HandleOutput(routeContext, routeInstance.Output(), payload)
 			if outputErrors != nil {
 				if routeIOErrors == nil {
