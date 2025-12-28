@@ -51,8 +51,6 @@ func init() {
 
 			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 
-			fmt.Printf("%+T", ctx.Value(route.RouterContextKey))
-
 			if !ok {
 				return nil, errors.New("http.server unable to get router from context")
 			}

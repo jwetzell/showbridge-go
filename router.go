@@ -181,6 +181,5 @@ func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload
 			// r.logger.Error("unable to route output", "module", moduleInstance.Id(), "error", err)
 		}
 	}
-	fmt.Println(len(outputErrors))
 	return outputErrors
 }
