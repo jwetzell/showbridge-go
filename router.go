@@ -133,7 +133,9 @@ func (r *Router) HandleInput(sourceId string, payload any) []route.RouteIOError 
 	var routingErrors []route.RouteIOError
 	for routeIndex, routeInstance := range r.RouteInstances {
 		if routeInstance.Input() == sourceId {
-			err := routeInstance.HandleInput(context.WithValue(r.Context, route.SourceContextKey, sourceId), payload)
+			routeContext := context.WithValue(r.Context, route.SourceContextKey, sourceId)
+
+			payload, err := routeInstance.ProcessPayload(routeContext, payload)
 			if err != nil {
 				if routingErrors == nil {
 					routingErrors = []route.RouteIOError{}
@@ -144,6 +146,7 @@ func (r *Router) HandleInput(sourceId string, payload any) []route.RouteIOError 
 				})
 				r.logger.Error("unable to route input", "route", routeIndex, "source", sourceId, "error", err)
 			}
+			r.HandleOutput(routeContext, routeInstance.Output(), payload)
 		}
 	}
 	return routingErrors

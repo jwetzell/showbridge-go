@@ -2,6 +2,7 @@ package route_test
 
 import (
 	"context"
+	"slices"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -52,9 +53,18 @@ func TestGoodRouteHandleInput(t *testing.T) {
 	}
 
 	inputData := "test input data"
-	err = testRoute.HandleInput(context.WithValue(t.Context(), route.RouterContextKey, &MockRouter{}), inputData)
+	payload, err := testRoute.ProcessPayload(context.WithValue(t.Context(), route.RouterContextKey, &MockRouter{}), inputData)
 	if err != nil {
-		t.Fatalf("route HandleOutput returned error: %v", err)
+		t.Fatalf("route ProcessPayload returned error: %v", err)
+	}
+
+	payloadBytes, ok := payload.([]byte)
+	if !ok {
+		t.Fatalf("payload should be []byte got %T", payload)
+	}
+
+	if !slices.Equal([]byte(inputData), payloadBytes) {
+		t.Fatalf("route returned the wrong payload. expected: %+v got %+v", inputData, payloadBytes)
 	}
 }
 
@@ -73,7 +83,7 @@ func TestRouteHandleInputWithProcessorError(t *testing.T) {
 	}
 
 	inputData := "test input data"
-	err = testRoute.HandleInput(context.WithValue(t.Context(), route.RouterContextKey, &MockRouter{}), inputData)
+	_, err = testRoute.ProcessPayload(context.WithValue(t.Context(), route.RouterContextKey, &MockRouter{}), inputData)
 	if err == nil {
 		t.Fatalf("route HandleOutput did not return error for bad processor")
 	}
@@ -92,9 +102,12 @@ func TestRouteHandleNilPayload(t *testing.T) {
 		return
 	}
 
-	err = testRoute.HandleInput(context.WithValue(t.Context(), route.RouterContextKey, &MockRouter{}), nil)
+	payload, err := testRoute.ProcessPayload(context.WithValue(t.Context(), route.RouterContextKey, &MockRouter{}), nil)
 	if err != nil {
-		t.Fatalf("route HandleOutput returned error for nil payload: %v", err)
+		t.Fatalf("route ProcessPayload returned error: %v", err)
+	}
+	if payload != nil {
+		t.Fatalf("route returned the wrong payload")
 	}
 }
 
@@ -112,9 +125,13 @@ func TestRouteHandleNilPayloadFromProcessor(t *testing.T) {
 		t.Fatalf("route failed to create: %v", err)
 	}
 
-	err = testRoute.HandleInput(context.WithValue(t.Context(), route.RouterContextKey, &MockRouter{}), nil)
+	payload, err := testRoute.ProcessPayload(context.WithValue(t.Context(), route.RouterContextKey, &MockRouter{}), "test")
 	if err != nil {
 		t.Fatalf("route HandleOutput returned error for nil payload: %v", err)
+	}
+
+	if payload != nil {
+		t.Fatalf("route returned the wrong payload")
 	}
 }
 

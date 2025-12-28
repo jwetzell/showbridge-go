@@ -2,7 +2,6 @@ package route
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -33,7 +32,7 @@ type RouteIO interface {
 type Route interface {
 	Input() string
 	Output() string
-	HandleInput(ctx context.Context, payload any) error
+	ProcessPayload(ctx context.Context, payload any) (any, error)
 }
 
 type ProcessorRoute struct {
@@ -71,24 +70,18 @@ func (r *ProcessorRoute) Output() string {
 	return r.output
 }
 
-func (r *ProcessorRoute) HandleInput(ctx context.Context, payload any) error {
-	router, ok := ctx.Value(RouterContextKey).(RouteIO)
-
-	if !ok {
-		return errors.New("unable to get router from context")
-	}
-
+func (r *ProcessorRoute) ProcessPayload(ctx context.Context, payload any) (any, error) {
 	for _, processor := range r.processors {
 		processedPayload, err := processor.Process(ctx, payload)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		//NOTE(jwetzell) nil payload will result in the route being "terminated"
 		if processedPayload == nil {
-			return nil
+			return nil, nil
 		}
 		payload = processedPayload
 	}
 
-	return router.HandleOutput(ctx, r.output, payload)
+	return payload, nil
 }
