@@ -20,9 +20,17 @@ type HTTPServer struct {
 	logger *slog.Logger
 }
 
+type ResponseIOError struct {
+	Index        int      `json:"index"`
+	OutputErrors []string `json:"outputErrors"`
+	ProcessError *string  `json:"processError"`
+	InputError   *string  `json:"inputError"`
+}
+
 type ResponseData struct {
-	Message string `json:"message"`
-	Status  string `json:"status"`
+	IOErrors []ResponseIOError `json:"ioErrors"`
+	Message  string            `json:"message"`
+	Status   string            `json:"status"`
 }
 
 func init() {
@@ -42,6 +50,8 @@ func init() {
 			}
 
 			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+			fmt.Printf("%+T", ctx.Value(route.RouterContextKey))
 
 			if !ok {
 				return nil, errors.New("http.server unable to get router from context")
@@ -69,14 +79,50 @@ func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if hs.router != nil {
-		routingErrors := hs.router.HandleInput(hs.Id(), r)
-		if routingErrors != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			response.Status = "error"
-			response.Message = "routing failed"
+		aRouteFound, routingErrors := hs.router.HandleInput(hs.Id(), r)
+		if aRouteFound {
+			if routingErrors != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				response.Status = "error"
+				response.Message = "routing failed"
+
+				response.IOErrors = []ResponseIOError{}
+				for _, responseIOError := range routingErrors {
+					errorToAdd := ResponseIOError{
+						Index: responseIOError.Index,
+					}
+
+					if responseIOError.InputError != nil {
+						errorMsg := responseIOError.InputError.Error()
+						errorToAdd.InputError = &errorMsg
+					}
+
+					if responseIOError.ProcessError != nil {
+						errorMsg := responseIOError.ProcessError.Error()
+						errorToAdd.ProcessError = &errorMsg
+					}
+
+					if responseIOError.OutputErrors != nil {
+						outputErrorMsgs := []string{}
+
+						for _, outputError := range responseIOError.OutputErrors {
+							outputErrorMsgs = append(outputErrorMsgs, outputError.Error())
+						}
+
+						errorToAdd.OutputErrors = outputErrorMsgs
+					}
+
+					response.IOErrors = append(response.IOErrors, errorToAdd)
+
+				}
+			} else {
+				w.WriteHeader(http.StatusOK)
+				response.Message = "routing successful"
+			}
 		} else {
-			w.WriteHeader(http.StatusOK)
-			response.Message = "routing successful"
+			w.WriteHeader(http.StatusNotFound)
+			response.Status = "error"
+			response.Message = "no matching routes found"
 		}
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)

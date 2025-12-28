@@ -129,34 +129,58 @@ func (r *Router) Stop() {
 	r.contextCancel()
 }
 
-func (r *Router) HandleInput(sourceId string, payload any) []route.RouteIOError {
-	var routingErrors []route.RouteIOError
+func (r *Router) HandleInput(sourceId string, payload any) (bool, []route.RouteIOError) {
+	var routeIOErrors []route.RouteIOError
+	routeFound := false
 	for routeIndex, routeInstance := range r.RouteInstances {
 		if routeInstance.Input() == sourceId {
+			routeFound = true
 			routeContext := context.WithValue(r.Context, route.SourceContextKey, sourceId)
 
 			payload, err := routeInstance.ProcessPayload(routeContext, payload)
 			if err != nil {
-				if routingErrors == nil {
-					routingErrors = []route.RouteIOError{}
+				if routeIOErrors == nil {
+					routeIOErrors = []route.RouteIOError{}
 				}
-				routingErrors = append(routingErrors, route.RouteIOError{
-					Index: routeIndex,
-					Error: err,
+				r.logger.Error("unable to process input", "route", routeIndex, "source", sourceId, "error", err)
+				routeIOErrors = append(routeIOErrors, route.RouteIOError{
+					Index:        routeIndex,
+					ProcessError: err,
 				})
-				r.logger.Error("unable to route input", "route", routeIndex, "source", sourceId, "error", err)
+				continue
 			}
-			r.HandleOutput(routeContext, routeInstance.Output(), payload)
+
+			outputErrors := r.HandleOutput(routeContext, routeInstance.Output(), payload)
+			if outputErrors != nil {
+				if routeIOErrors == nil {
+					routeIOErrors = []route.RouteIOError{}
+				}
+				routeIOErrors = append(routeIOErrors, route.RouteIOError{
+					Index:        routeIndex,
+					OutputErrors: outputErrors,
+				})
+			}
+
 		}
 	}
-	return routingErrors
+	return routeFound, routeIOErrors
 }
 
-func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload any) error {
+func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload any) []error {
+
+	var outputErrors []error
 	for _, moduleInstance := range r.ModuleInstances {
 		if moduleInstance.Id() == destinationId {
-			return moduleInstance.Output(ctx, payload)
+			err := moduleInstance.Output(ctx, payload)
+			if err != nil {
+				if outputErrors == nil {
+					outputErrors = []error{}
+				}
+				outputErrors = append(outputErrors, err)
+			}
+			// r.logger.Error("unable to route output", "module", moduleInstance.Id(), "error", err)
 		}
 	}
-	return fmt.Errorf("router could not find module instance for destination %s", destinationId)
+	fmt.Println(len(outputErrors))
+	return outputErrors
 }
