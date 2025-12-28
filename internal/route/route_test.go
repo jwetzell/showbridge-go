@@ -30,8 +30,8 @@ func TestRouteCreate(t *testing.T) {
 
 type MockRouter struct{}
 
-func (mr *MockRouter) HandleInput(sourceId string, payload any) []route.RouteIOError {
-	return nil
+func (mr *MockRouter) HandleInput(ctx context.Context, sourceId string, payload any) (bool, []route.RouteIOError) {
+	return false, []route.RouteIOError{}
 }
 
 func (mr *MockRouter) HandleOutput(ctx context.Context, destinationId string, payload any) error {

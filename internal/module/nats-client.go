@@ -83,7 +83,7 @@ func (nc *NATSClient) Run() error {
 
 	sub, err := nc.client.Subscribe(nc.Subject, func(msg *nats.Msg) {
 		if nc.router != nil {
-			nc.router.HandleInput(nc.Id(), msg)
+			nc.router.HandleInput(nc.ctx, nc.Id(), msg)
 		}
 	})
 

@@ -105,7 +105,7 @@ func (um *UDPMulticast) Run() error {
 				message := buffer[:numBytes]
 
 				if um.router != nil {
-					um.router.HandleInput(um.Id(), message)
+					um.router.HandleInput(um.ctx, um.Id(), message)
 				} else {
 					um.logger.Error("input received but no router is configured")
 				}

@@ -3,7 +3,6 @@ package showbridge
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 	"sync"
 
@@ -129,13 +128,13 @@ func (r *Router) Stop() {
 	r.contextCancel()
 }
 
-func (r *Router) HandleInput(sourceId string, payload any) (bool, []route.RouteIOError) {
+func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) (bool, []route.RouteIOError) {
 	var routeIOErrors []route.RouteIOError
 	routeFound := false
 	for routeIndex, routeInstance := range r.RouteInstances {
 		if routeInstance.Input() == sourceId {
 			routeFound = true
-			routeContext := context.WithValue(r.Context, route.SourceContextKey, sourceId)
+			routeContext := context.WithValue(ctx, route.SourceContextKey, sourceId)
 
 			payload, err := routeInstance.ProcessPayload(routeContext, payload)
 			if err != nil {
@@ -177,8 +176,8 @@ func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload
 					outputErrors = []error{}
 				}
 				outputErrors = append(outputErrors, err)
+				r.logger.Error("unable to route output", "module", moduleInstance.Id(), "error", err)
 			}
-			// r.logger.Error("unable to route output", "module", moduleInstance.Id(), "error", err)
 		}
 	}
 	return outputErrors

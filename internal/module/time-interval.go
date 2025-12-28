@@ -67,7 +67,7 @@ func (i *TimeInterval) Run() error {
 			return nil
 		case <-ticker.C:
 			if i.router != nil {
-				i.router.HandleInput(i.Id(), time.Now())
+				i.router.HandleInput(i.ctx, i.Id(), time.Now())
 			}
 		}
 	}

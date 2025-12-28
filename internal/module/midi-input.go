@@ -69,7 +69,7 @@ func (mi *MIDIInput) Run() error {
 
 	stop, err := midi.ListenTo(in, func(msg midi.Message, timestampms int32) {
 		if mi.router != nil {
-			mi.router.HandleInput(mi.Id(), msg)
+			mi.router.HandleInput(mi.ctx, mi.Id(), msg)
 		}
 	}, midi.UseSysEx())
 

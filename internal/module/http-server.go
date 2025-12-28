@@ -77,7 +77,7 @@ func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if hs.router != nil {
-		aRouteFound, routingErrors := hs.router.HandleInput(hs.Id(), r)
+		aRouteFound, routingErrors := hs.router.HandleInput(hs.ctx, hs.Id(), r)
 		if aRouteFound {
 			if routingErrors != nil {
 				w.WriteHeader(http.StatusInternalServerError)

@@ -73,7 +73,7 @@ func (hc *HTTPClient) Output(ctx context.Context, payload any) error {
 	}
 
 	if hc.router != nil {
-		hc.router.HandleInput(hc.Id(), response)
+		hc.router.HandleInput(hc.ctx, hc.Id(), response)
 	}
 
 	return nil

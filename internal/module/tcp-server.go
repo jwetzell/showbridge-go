@@ -155,7 +155,7 @@ ClientRead:
 					messages := ts.Framer.Decode(buffer[0:byteCount])
 					for _, message := range messages {
 						if ts.router != nil {
-							ts.router.HandleInput(ts.Id(), message)
+							ts.router.HandleInput(ts.ctx, ts.Id(), message)
 						} else {
 							ts.logger.Error("input received but no router is configured")
 						}

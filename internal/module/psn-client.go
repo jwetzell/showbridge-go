@@ -87,7 +87,7 @@ func (pc *PSNClient) Run() error {
 
 				if pc.router != nil {
 					for _, tracker := range pc.decoder.Trackers {
-						pc.router.HandleInput(pc.Id(), tracker)
+						pc.router.HandleInput(pc.ctx, pc.Id(), tracker)
 					}
 				} else {
 					pc.logger.Error("has no router")

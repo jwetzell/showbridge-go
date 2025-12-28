@@ -143,7 +143,7 @@ func (scs *SIPCallServer) HandleCall(inDialog *diago.DialogServerSession) {
 	inDialog.Trying()
 	inDialog.Ringing()
 	inDialog.Answer()
-	scs.router.HandleInput(scs.Id(), SIPCallMessage{
+	scs.router.HandleInput(scs.ctx, scs.Id(), SIPCallMessage{
 		To: inDialog.ToUser(),
 	})
 	<-inDialog.Context().Done()

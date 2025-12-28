@@ -142,7 +142,7 @@ func (tc *TCPClient) Run() error {
 							messages := tc.framer.Decode(buffer[0:byteCount])
 							for _, message := range messages {
 								if tc.router != nil {
-									tc.router.HandleInput(tc.Id(), message)
+									tc.router.HandleInput(tc.ctx, tc.Id(), message)
 								} else {
 									tc.logger.Error("input received but no router is configured")
 								}

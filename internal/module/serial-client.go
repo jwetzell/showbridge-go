@@ -155,7 +155,7 @@ func (sc *SerialClient) Run() error {
 							messages := sc.Framer.Decode(buffer[0:byteCount])
 							for _, message := range messages {
 								if sc.router != nil {
-									sc.router.HandleInput(sc.Id(), message)
+									sc.router.HandleInput(sc.ctx, sc.Id(), message)
 								} else {
 									sc.logger.Error("input received but no router is configured")
 								}

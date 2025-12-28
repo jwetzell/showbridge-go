@@ -66,7 +66,7 @@ func (t *TimeTimer) Run() error {
 			return nil
 		case time := <-t.timer.C:
 			if t.router != nil {
-				t.router.HandleInput(t.Id(), time)
+				t.router.HandleInput(t.ctx, t.Id(), time)
 			}
 		}
 	}

@@ -115,7 +115,7 @@ func (us *UDPServer) Run() error {
 			}
 			message := buffer[:numBytes]
 			if us.router != nil {
-				us.router.HandleInput(us.Id(), message)
+				us.router.HandleInput(us.ctx, us.Id(), message)
 			} else {
 				us.logger.Error("input received but no router is configured")
 			}

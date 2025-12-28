@@ -151,7 +151,7 @@ func (sds *SIPDTMFServer) HandleCall(inDialog *diago.DialogServerSession) error 
 	return reader.Listen(func(dtmf rune) error {
 		if dtmf == rune(sds.Separator[0]) {
 			if sds.router != nil {
-				sds.router.HandleInput(sds.Id(), SIPDTMFMessage{
+				sds.router.HandleInput(sds.ctx, sds.Id(), SIPDTMFMessage{
 					To:     inDialog.ToUser(),
 					Digits: userString,
 				})

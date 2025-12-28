@@ -90,7 +90,7 @@ func (mc *MQTTClient) Run() error {
 
 	opts.OnConnect = func(c mqtt.Client) {
 		token := mc.client.Subscribe(mc.Topic, 1, func(c mqtt.Client, m mqtt.Message) {
-			mc.router.HandleInput(mc.Id(), m)
+			mc.router.HandleInput(mc.ctx, mc.Id(), m)
 		})
 		token.Wait()
 	}
