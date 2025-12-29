@@ -60,6 +60,7 @@ func TestNewRouter(t *testing.T) {
 	routerConfig := config.Config{
 		Modules: []config.ModuleConfig{
 			{
+				Id:   "mock",
 				Type: "mock.counter",
 			},
 		},
@@ -73,6 +74,44 @@ func TestNewRouter(t *testing.T) {
 
 	if routeErrors != nil {
 		t.Fatalf("router should not have returned any route errors: %v", routeErrors)
+	}
+}
+
+func TestNewRouterUnknownModuleType(t *testing.T) {
+	routerConfig := config.Config{
+		Modules: []config.ModuleConfig{
+			{
+				Id:   "mock",
+				Type: "asd.fjlkj23oiu4ksldj",
+			},
+		},
+	}
+
+	_, moduleErrors, _ := showbridge.NewRouter(t.Context(), routerConfig)
+
+	if moduleErrors == nil {
+		t.Fatalf("router should have returned 'unknown module' module errors")
+	}
+}
+
+func TestNewRouterDuplicateModuleId(t *testing.T) {
+	routerConfig := config.Config{
+		Modules: []config.ModuleConfig{
+			{
+				Id:   "mock",
+				Type: "mock.counter",
+			},
+			{
+				Id:   "mock",
+				Type: "mock.counter",
+			},
+		},
+	}
+
+	_, moduleErrors, _ := showbridge.NewRouter(t.Context(), routerConfig)
+
+	if moduleErrors == nil {
+		t.Fatalf("router should have returned 'duplicate id' module error")
 	}
 }
 
