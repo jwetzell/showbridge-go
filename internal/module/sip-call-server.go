@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"os"
+	"sync"
 	"time"
 
 	"github.com/emiago/diago"
@@ -13,6 +15,7 @@ import (
 	"github.com/emiago/sipgo"
 	"github.com/emiago/sipgo/sip"
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
@@ -31,6 +34,13 @@ type SIPCallServer struct {
 type SIPCallMessage struct {
 	To string
 }
+
+type SIPCall struct {
+	inDialog *diago.DialogServerSession
+	lock     sync.Mutex
+}
+
+type sipCallContextKey string
 
 func init() {
 	RegisterModule(ModuleRegistration{
@@ -143,51 +153,76 @@ func (scs *SIPCallServer) HandleCall(inDialog *diago.DialogServerSession) {
 	inDialog.Trying()
 	inDialog.Ringing()
 	inDialog.Answer()
-	scs.router.HandleInput(scs.ctx, scs.Id(), SIPCallMessage{
+
+	dialogContext := context.WithValue(scs.ctx, sipCallContextKey("call"), &SIPCall{
+		inDialog: inDialog,
+	})
+	scs.router.HandleInput(dialogContext, scs.Id(), SIPCallMessage{
 		To: inDialog.ToUser(),
 	})
-	<-inDialog.Context().Done()
+	fmt.Println(inDialog.LoadState())
 }
 
 func (scs *SIPCallServer) Output(ctx context.Context, payload any) error {
 
-	payloadMsg, ok := payload.(string)
+	call, ok := ctx.Value(sipCallContextKey("call")).(*SIPCall)
+
 	if !ok {
-		return errors.New("sip.call.server output payload must be of type string")
+		return errors.New("sip.call.server output must originate from sip.call.server input")
 	}
 
-	if scs.dg == nil {
-		return errors.New("sip.call.server diago is not initialized")
+	gotLock := call.lock.TryLock()
+
+	if !gotLock {
+		return errors.New("sip.call.server call is already locked")
 	}
 
-	var uri sip.Uri
-	err := sip.ParseUri(payloadMsg, &uri)
-	if err != nil {
-		return fmt.Errorf("sip.call.server output payload is not a valid SIP URI: %s", err)
-	}
-	outDialog, err := scs.dg.NewDialog(uri, diago.NewDialogOptions{
-		Transport: scs.Transport,
-	})
-
-	if err != nil {
-		return fmt.Errorf("sip.call.server failed to create new dialog: %s", err)
+	if call.inDialog.LoadState() == sip.DialogStateEnded {
+		return errors.New("sip.call.server inDialog already ended")
 	}
 
-	err = outDialog.Invite(scs.ctx, diago.InviteClientOptions{})
-	if err != nil {
-		return fmt.Errorf("sip.call.server failed to send invite: %s", err)
+	payloadDTMFResponse, ok := payload.(processor.SipDTMFResponse)
+
+	if ok {
+		dtmfWriter := call.inDialog.AudioWriterDTMF()
+
+		time.Sleep(time.Millisecond * time.Duration(payloadDTMFResponse.PreWait))
+		for i, dtmfRune := range payloadDTMFResponse.Digits {
+			err := dtmfWriter.WriteDTMF(dtmfRune)
+
+			if err != nil {
+				return fmt.Errorf("sip.dtmf.server error output dtmf digit at index %d", i)
+			}
+		}
+		time.Sleep(time.Millisecond * time.Duration(payloadDTMFResponse.PreWait))
+		return nil
 	}
 
-	err = outDialog.Ack(scs.ctx)
-	if err != nil {
-		return fmt.Errorf("sip.call.server failed to send ack: %s", err)
+	payloadAudioFileResponse, ok := payload.(processor.SipAudioFileResponse)
+
+	if ok {
+		audioFile, err := os.Open(payloadAudioFileResponse.AudioFile)
+		if err != nil {
+			return err
+		}
+		defer audioFile.Close()
+
+		playback, err := call.inDialog.PlaybackCreate()
+
+		if err != nil {
+			return err
+		}
+
+		time.Sleep(time.Millisecond * time.Duration(payloadAudioFileResponse.PreWait))
+
+		_, err = playback.Play(audioFile, "audio/wav")
+
+		time.Sleep(time.Millisecond * time.Duration(payloadAudioFileResponse.PostWait))
+
+		if err != nil {
+			return err
+		}
+		return nil
 	}
-	// TODO(jwetzell): make this configurable
-	// NOTE(jwetzell): wait 5 seconds before hanging up the call
-	time.Sleep(5 * time.Second)
-	err = outDialog.Hangup(scs.ctx)
-	if err != nil {
-		return fmt.Errorf("sip.call.server failed to hangup call: %s", err)
-	}
-	return nil
+	return errors.New("sip.dtmf.server can only output SipDTMFResponse or SipAudioFileResponse")
 }
