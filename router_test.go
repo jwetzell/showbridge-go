@@ -1,0 +1,302 @@
+package showbridge_test
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"log/slog"
+	"sync"
+	"testing"
+
+	"github.com/jwetzell/showbridge-go"
+	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/module"
+	"github.com/jwetzell/showbridge-go/internal/route"
+)
+
+type MockModule struct {
+	config      config.ModuleConfig
+	ctx         context.Context
+	outputCount int
+	router      route.RouteIO
+	logger      *slog.Logger
+}
+
+func (m *MockModule) Id() string {
+	return m.config.Id
+}
+
+func (m *MockModule) Output(context.Context, any) error {
+	m.outputCount += 1
+	return nil
+}
+
+func (m *MockModule) Run() error {
+	<-m.ctx.Done()
+	return nil
+}
+
+func (m *MockModule) Type() string {
+	return m.config.Type
+}
+
+func init() {
+	module.RegisterModule(module.ModuleRegistration{
+		Type: "mock.counter",
+		New: func(ctx context.Context, config config.ModuleConfig) (module.Module, error) {
+
+			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+			if !ok {
+				return nil, errors.New("mock.counter unable to get router from context")
+			}
+
+			return &MockModule{config: config, ctx: ctx, router: router, logger: slog.Default()}, nil
+		},
+	})
+}
+
+func TestNewRouter(t *testing.T) {
+	routerConfig := config.Config{
+		Modules: []config.ModuleConfig{
+			{
+				Type: "mock.counter",
+			},
+		},
+	}
+
+	_, moduleErrors, routeErrors := showbridge.NewRouter(t.Context(), routerConfig)
+
+	if moduleErrors != nil {
+		t.Fatalf("router should not have returned any module errors: %v", moduleErrors)
+	}
+
+	if routeErrors != nil {
+		t.Fatalf("router should not have returned any route errors: %v", routeErrors)
+	}
+}
+
+func TestRouterInputSingleRoute(t *testing.T) {
+	routerConfig := config.Config{
+		Modules: []config.ModuleConfig{
+			{
+				Id:   "mock",
+				Type: "mock.counter",
+			},
+		},
+		Routes: []config.RouteConfig{
+			{
+				Input:  "mock",
+				Output: "mock",
+			},
+		},
+	}
+
+	router, moduleErrors, routeErrors := showbridge.NewRouter(t.Context(), routerConfig)
+
+	if moduleErrors != nil {
+		t.Fatalf("router should not have returned any module errors: %v", moduleErrors)
+	}
+
+	if routeErrors != nil {
+		t.Fatalf("router should not have returned any route errors: %v", routeErrors)
+	}
+
+	routerRunner := sync.WaitGroup{}
+
+	routerRunner.Go(func() {
+		router.Run()
+	})
+
+	defer router.Stop()
+
+	mockModuleInputCount := 3
+	for i := range mockModuleInputCount {
+		aRouteFound, routingErrors := router.HandleInput(t.Context(), "mock", fmt.Sprintf("test %d", i))
+
+		if routingErrors != nil {
+			t.Fatalf("router should not have encountered routing errors")
+		}
+
+		if !aRouteFound {
+			t.Fatalf("router should have found a valid route for the input")
+		}
+	}
+
+	for _, moduleInstance := range router.ModuleInstances {
+		if moduleInstance.Id() == "mock" {
+			mockModuleInstance, ok := moduleInstance.(*MockModule)
+			if !ok {
+				t.Fatalf("couldn't get mock module")
+			}
+
+			if mockModuleInstance.outputCount != mockModuleInputCount {
+				t.Fatalf("mock module output count did not matched expected: %d got: %d", mockModuleInputCount, mockModuleInstance.outputCount)
+			}
+		}
+	}
+}
+
+func TestRouterInputMultipleRoutes(t *testing.T) {
+	routerConfig := config.Config{
+		Modules: []config.ModuleConfig{
+			{
+				Id:   "mock",
+				Type: "mock.counter",
+			},
+		},
+		Routes: []config.RouteConfig{
+			{
+				Input:  "mock",
+				Output: "mock",
+			},
+			{
+				Input:  "mock",
+				Output: "mock",
+			},
+			{
+				Input:  "mock",
+				Output: "mock",
+			},
+		},
+	}
+
+	router, moduleErrors, routeErrors := showbridge.NewRouter(t.Context(), routerConfig)
+
+	if moduleErrors != nil {
+		t.Fatalf("router should not have returned any module errors: %v", moduleErrors)
+	}
+
+	if routeErrors != nil {
+		t.Fatalf("router should not have returned any route errors: %v", routeErrors)
+	}
+
+	routerRunner := sync.WaitGroup{}
+
+	routerRunner.Go(func() {
+		router.Run()
+	})
+
+	defer router.Stop()
+
+	mockModuleInputCount := 3
+	for i := range mockModuleInputCount {
+		aRouteFound, routingErrors := router.HandleInput(t.Context(), "mock", fmt.Sprintf("test %d", i))
+
+		if routingErrors != nil {
+			t.Fatalf("router should not have encountered routing errors")
+		}
+
+		if !aRouteFound {
+			t.Fatalf("router should have found a valid route for the input")
+		}
+	}
+
+	for _, moduleInstance := range router.ModuleInstances {
+		if moduleInstance.Id() == "mock" {
+			mockModuleInstance, ok := moduleInstance.(*MockModule)
+			if !ok {
+				t.Fatalf("couldn't get mock module")
+			}
+
+			if mockModuleInstance.outputCount != len(router.RouteInstances)*mockModuleInputCount {
+				t.Fatalf("mock module output count did not matched expected: %d got: %d", len(router.RouteInstances)*mockModuleInputCount, mockModuleInstance.outputCount)
+			}
+			break
+		}
+	}
+}
+
+func TestRouterInputMultipleModules(t *testing.T) {
+	routerConfig := config.Config{
+		Modules: []config.ModuleConfig{
+			{
+				Id:   "mock1",
+				Type: "mock.counter",
+			},
+			{
+				Id:   "mock2",
+				Type: "mock.counter",
+			},
+		},
+		Routes: []config.RouteConfig{
+			{
+				Input:  "mock1",
+				Output: "mock1",
+			},
+			{
+				Input:  "mock2",
+				Output: "mock2",
+			},
+		},
+	}
+
+	router, moduleErrors, routeErrors := showbridge.NewRouter(t.Context(), routerConfig)
+
+	if moduleErrors != nil {
+		t.Fatalf("router should not have returned any module errors: %v", moduleErrors)
+	}
+
+	if routeErrors != nil {
+		t.Fatalf("router should not have returned any route errors: %v", routeErrors)
+	}
+
+	routerRunner := sync.WaitGroup{}
+
+	routerRunner.Go(func() {
+		router.Run()
+	})
+
+	defer router.Stop()
+
+	mock1ModuleInputCount := 3
+	for i := range mock1ModuleInputCount {
+		aRouteFound, routingErrors := router.HandleInput(t.Context(), "mock1", fmt.Sprintf("test %d", i))
+
+		if routingErrors != nil {
+			t.Fatalf("router should not have encountered routing errors")
+		}
+
+		if !aRouteFound {
+			t.Fatalf("router should have found a valid route for the input")
+		}
+	}
+
+	mock2ModuleInputCount := 2
+	for i := range mock2ModuleInputCount {
+		aRouteFound, routingErrors := router.HandleInput(t.Context(), "mock2", fmt.Sprintf("test %d", i))
+
+		if routingErrors != nil {
+			t.Fatalf("router should not have encountered routing errors")
+		}
+
+		if !aRouteFound {
+			t.Fatalf("router should have found a valid route for the input")
+		}
+	}
+
+	for _, moduleInstance := range router.ModuleInstances {
+		if moduleInstance.Id() == "mock1" {
+			mockModuleInstance, ok := moduleInstance.(*MockModule)
+			if !ok {
+				t.Fatalf("couldn't get mock module")
+			}
+
+			if mockModuleInstance.outputCount != mock1ModuleInputCount {
+				t.Fatalf("mock module output count did not matched expected: %d got: %d", mock1ModuleInputCount, mockModuleInstance.outputCount)
+			}
+			break
+		}
+		if moduleInstance.Id() == "mock2" {
+			mockModuleInstance, ok := moduleInstance.(*MockModule)
+			if !ok {
+				t.Fatalf("couldn't get mock module")
+			}
+
+			if mockModuleInstance.outputCount != mock2ModuleInputCount {
+				t.Fatalf("mock module output count did not matched expected: %d got: %d", mock2ModuleInputCount, mockModuleInstance.outputCount)
+			}
+			break
+		}
+	}
+}
