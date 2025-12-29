@@ -3,9 +3,9 @@ package module
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"log/slog"
+	"os"
 	"time"
 
 	"github.com/emiago/diago"
@@ -13,6 +13,7 @@ import (
 	"github.com/emiago/sipgo"
 	"github.com/emiago/sipgo/sip"
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
@@ -31,6 +32,8 @@ type SIPCallServer struct {
 type SIPCallMessage struct {
 	To string
 }
+
+type sipCallContextKey string
 
 func init() {
 	RegisterModule(ModuleRegistration{
@@ -143,51 +146,93 @@ func (scs *SIPCallServer) HandleCall(inDialog *diago.DialogServerSession) {
 	inDialog.Trying()
 	inDialog.Ringing()
 	inDialog.Answer()
-	scs.router.HandleInput(scs.ctx, scs.Id(), SIPCallMessage{
+
+	dialogContext := context.WithValue(scs.ctx, sipCallContextKey("inDialog"), inDialog)
+	scs.router.HandleInput(dialogContext, scs.Id(), SIPCallMessage{
 		To: inDialog.ToUser(),
 	})
-	<-inDialog.Context().Done()
+	inDialog.Hangup(dialogContext)
 }
 
 func (scs *SIPCallServer) Output(ctx context.Context, payload any) error {
 
-	payloadMsg, ok := payload.(string)
+	inDialog, ok := ctx.Value(sipCallContextKey("inDialog")).(*diago.DialogServerSession)
+
 	if !ok {
-		return errors.New("sip.call.server output payload must be of type string")
+		return errors.New("sip.call.server output must originate from sip.call.server input")
 	}
 
-	if scs.dg == nil {
-		return errors.New("sip.call.server diago is not initialized")
+	// _, ok := payload.([]byte)
+
+	// if !ok {
+	// 	return errors.New("sip.call.server is only able to output bytes")
+	// }
+
+	payloadResponse, ok := payload.(processor.SipAudioFileResponse)
+
+	if !ok {
+		return errors.New("sip.call.server is only able to handle SipCallResponse")
 	}
 
-	var uri sip.Uri
-	err := sip.ParseUri(payloadMsg, &uri)
+	audioFile, err := os.Open(payloadResponse.AudioFile)
 	if err != nil {
-		return fmt.Errorf("sip.call.server output payload is not a valid SIP URI: %s", err)
+		return err
 	}
-	outDialog, err := scs.dg.NewDialog(uri, diago.NewDialogOptions{
-		Transport: scs.Transport,
-	})
+	defer audioFile.Close()
+
+	playback, err := inDialog.PlaybackCreate()
 
 	if err != nil {
-		return fmt.Errorf("sip.call.server failed to create new dialog: %s", err)
+		return err
 	}
 
-	err = outDialog.Invite(scs.ctx, diago.InviteClientOptions{})
+	time.Sleep(time.Millisecond * time.Duration(payloadResponse.PreWait))
+
+	_, err = playback.Play(audioFile, "audio/wav")
+
+	time.Sleep(time.Millisecond * time.Duration(payloadResponse.PostWait))
+
 	if err != nil {
-		return fmt.Errorf("sip.call.server failed to send invite: %s", err)
+		return err
 	}
 
-	err = outDialog.Ack(scs.ctx)
-	if err != nil {
-		return fmt.Errorf("sip.call.server failed to send ack: %s", err)
-	}
-	// TODO(jwetzell): make this configurable
-	// NOTE(jwetzell): wait 5 seconds before hanging up the call
-	time.Sleep(5 * time.Second)
-	err = outDialog.Hangup(scs.ctx)
-	if err != nil {
-		return fmt.Errorf("sip.call.server failed to hangup call: %s", err)
-	}
+	// payloadMsg, ok := payload.(string)
+	// if !ok {
+	// 	return errors.New("sip.call.server output payload must be of type string")
+	// }
+
+	// if scs.dg == nil {
+	// 	return errors.New("sip.call.server diago is not initialized")
+	// }
+
+	// var uri sip.Uri
+	// err := sip.ParseUri(payloadMsg, &uri)
+	// if err != nil {
+	// 	return fmt.Errorf("sip.call.server output payload is not a valid SIP URI: %s", err)
+	// }
+	// outDialog, err := scs.dg.NewDialog(uri, diago.NewDialogOptions{
+	// 	Transport: scs.Transport,
+	// })
+
+	// if err != nil {
+	// 	return fmt.Errorf("sip.call.server failed to create new dialog: %s", err)
+	// }
+
+	// err = outDialog.Invite(scs.ctx, diago.InviteClientOptions{})
+	// if err != nil {
+	// 	return fmt.Errorf("sip.call.server failed to send invite: %s", err)
+	// }
+
+	// err = outDialog.Ack(scs.ctx)
+	// if err != nil {
+	// 	return fmt.Errorf("sip.call.server failed to send ack: %s", err)
+	// }
+	// // TODO(jwetzell): make this configurable
+	// // NOTE(jwetzell): wait 5 seconds before hanging up the call
+	// time.Sleep(5 * time.Second)
+	// err = outDialog.Hangup(scs.ctx)
+	// if err != nil {
+	// 	return fmt.Errorf("sip.call.server failed to hangup call: %s", err)
+	// }
 	return nil
 }
