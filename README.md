@@ -34,9 +34,9 @@ USAGE:
    showbridge [global options]
 
 GLOBAL OPTIONS:
-   --config string  path to config file (default: "./config.yaml")
-   --debug          set log level to DEBUG
-   --json           log using JSON
-   --help, -h       show help
-   --version, -v    print the version
+   --config string      path to config file (default: "./config.yaml")
+   --log-level string   set log level (default: "info")
+   --log-format string  log format to use (default: "text")
+   --help, -h           show help
+   --version, -v        print the version
 ```
