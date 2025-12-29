@@ -15,7 +15,7 @@ require (
 	github.com/urfave/cli/v3 v3.6.1
 	gitlab.com/gomidi/midi/v2 v2.3.18
 	go.bug.st/serial v1.6.4
-	modernc.org/quickjs v0.17.0
+	modernc.org/quickjs v0.17.1
 	sigs.k8s.io/yaml v1.6.0
 )
 
@@ -33,7 +33,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/nats-io/nkeys v0.4.11 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
-	github.com/ncruces/go-strftime v0.1.9 // indirect
+	github.com/ncruces/go-strftime v1.0.0 // indirect
 	github.com/pion/logging v0.2.4 // indirect
 	github.com/pion/randutil v0.1.0 // indirect
 	github.com/pion/rtcp v1.2.16 // indirect
@@ -44,13 +44,13 @@ require (
 	github.com/zaf/g711 v1.4.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	golang.org/x/crypto v0.42.0 // indirect
-	golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b // indirect
+	golang.org/x/exp v0.0.0-20251023183803-a4bb9ffd2546 // indirect
 	golang.org/x/net v0.44.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.39.0 // indirect
 	gopkg.in/hraban/opus.v2 v2.0.0-20230925203106-0188a62cb302 // indirect
-	modernc.org/libc v1.66.10 // indirect
-	modernc.org/libquickjs v0.12.2 // indirect
+	modernc.org/libc v1.67.1 // indirect
+	modernc.org/libquickjs v0.12.3 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 )
