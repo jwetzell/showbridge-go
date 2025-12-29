@@ -9,7 +9,7 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type SipResponseCreate struct {
+type SipResponseAudioCreate struct {
 	config    config.ProcessorConfig
 	PreWait   int
 	PostWait  int
@@ -22,7 +22,7 @@ type SipAudioFileResponse struct {
 	AudioFile string
 }
 
-func (scc *SipResponseCreate) Process(ctx context.Context, payload any) (any, error) {
+func (scc *SipResponseAudioCreate) Process(ctx context.Context, payload any) (any, error) {
 
 	var audioFileBuffer bytes.Buffer
 	err := scc.AudioFile.Execute(&audioFileBuffer, payload)
@@ -40,50 +40,50 @@ func (scc *SipResponseCreate) Process(ctx context.Context, payload any) (any, er
 	}, nil
 }
 
-func (scc *SipResponseCreate) Type() string {
+func (scc *SipResponseAudioCreate) Type() string {
 	return scc.config.Type
 }
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "sip.response.create",
+		Type: "sip.response.audio.create",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 
 			preWait, ok := params["preWait"]
 
 			if !ok {
-				return nil, errors.New("sip.response.create requires a preWait parameter")
+				return nil, errors.New("sip.response.audio.create requires a preWait parameter")
 			}
 
 			preWaitNum, ok := preWait.(float64)
 
 			if !ok {
-				return nil, errors.New("sip.response.create preWait must be a number")
+				return nil, errors.New("sip.response.audio.create preWait must be a number")
 			}
 
 			postWait, ok := params["postWait"]
 
 			if !ok {
-				return nil, errors.New("sip.response.create requires a postWait parameter")
+				return nil, errors.New("sip.response.audio.create requires a postWait parameter")
 			}
 
 			postWaitNum, ok := postWait.(float64)
 
 			if !ok {
-				return nil, errors.New("sip.response.create postWait must be a number")
+				return nil, errors.New("sip.response.audio.create postWait must be a number")
 			}
 
 			audioFile, ok := params["audioFile"]
 
 			if !ok {
-				return nil, errors.New("sip.response.create requires a audioFile parameter")
+				return nil, errors.New("sip.response.audio.create requires a audioFile parameter")
 			}
 
 			audioFileString, ok := audioFile.(string)
 
 			if !ok {
-				return nil, errors.New("sip.response.create audioFile must be a string")
+				return nil, errors.New("sip.response.audio.create audioFile must be a string")
 			}
 
 			audioFileTemplate, err := template.New("audioFile").Parse(audioFileString)
@@ -91,7 +91,7 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			return &SipResponseCreate{config: config, AudioFile: audioFileTemplate, PreWait: int(preWaitNum), PostWait: int(postWaitNum)}, nil
+			return &SipResponseAudioCreate{config: config, AudioFile: audioFileTemplate, PreWait: int(preWaitNum), PostWait: int(postWaitNum)}, nil
 		},
 	})
 }

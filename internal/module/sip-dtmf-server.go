@@ -3,9 +3,12 @@ package module
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
+	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/emiago/diago"
@@ -13,6 +16,7 @@ import (
 	"github.com/emiago/sipgo"
 	"github.com/emiago/sipgo/sip"
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
@@ -30,6 +34,11 @@ type SIPDTMFServer struct {
 type SIPDTMFMessage struct {
 	To     string
 	Digits string
+}
+
+type SIPDTMFCall struct {
+	inDialog *diago.DialogServerSession
+	lock     sync.Mutex
 }
 
 func init() {
@@ -148,10 +157,14 @@ func (sds *SIPDTMFServer) HandleCall(inDialog *diago.DialogServerSession) error 
 
 	reader := inDialog.AudioReaderDTMF()
 	userString := ""
+
 	return reader.Listen(func(dtmf rune) error {
 		if dtmf == rune(sds.Separator[0]) {
 			if sds.router != nil {
-				sds.router.HandleInput(sds.ctx, sds.Id(), SIPDTMFMessage{
+				dialogContext := context.WithValue(sds.ctx, sipCallContextKey("call"), &SIPDTMFCall{
+					inDialog: inDialog,
+				})
+				sds.router.HandleInput(dialogContext, sds.Id(), SIPDTMFMessage{
 					To:     inDialog.ToUser(),
 					Digits: userString,
 				})
@@ -165,5 +178,65 @@ func (sds *SIPDTMFServer) HandleCall(inDialog *diago.DialogServerSession) error 
 }
 
 func (sds *SIPDTMFServer) Output(ctx context.Context, payload any) error {
-	return errors.New("sip.dtmf.server output is not implemented")
+	call, ok := ctx.Value(sipCallContextKey("call")).(*SIPDTMFCall)
+
+	if !ok {
+		return errors.New("sip.dtmf.server output must originate from sip.dtmf.server input")
+	}
+
+	gotLock := call.lock.TryLock()
+
+	if !gotLock {
+		return errors.New("sip.dtmf.server call is already locked")
+	}
+
+	if call.inDialog.LoadState() == sip.DialogStateEnded {
+		return errors.New("sip.dtmf.server inDialog already ended")
+	}
+
+	payloadDTMFResponse, ok := payload.(processor.SipDTMFResponse)
+
+	if ok {
+		dtmfWriter := call.inDialog.AudioWriterDTMF()
+
+		time.Sleep(time.Millisecond * time.Duration(payloadDTMFResponse.PreWait))
+		for i, dtmfRune := range payloadDTMFResponse.Digits {
+			err := dtmfWriter.WriteDTMF(dtmfRune)
+
+			if err != nil {
+				return fmt.Errorf("sip.dtmf.server error output dtmf digit at index %d", i)
+			}
+		}
+		time.Sleep(time.Millisecond * time.Duration(payloadDTMFResponse.PreWait))
+		return nil
+	}
+
+	payloadAudioFileResponse, ok := payload.(processor.SipAudioFileResponse)
+
+	if ok {
+		audioFile, err := os.Open(payloadAudioFileResponse.AudioFile)
+		if err != nil {
+			return err
+		}
+		defer audioFile.Close()
+
+		playback, err := call.inDialog.PlaybackCreate()
+
+		if err != nil {
+			return err
+		}
+
+		time.Sleep(time.Millisecond * time.Duration(payloadAudioFileResponse.PreWait))
+
+		_, err = playback.Play(audioFile, "audio/wav")
+
+		time.Sleep(time.Millisecond * time.Duration(payloadAudioFileResponse.PostWait))
+
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	return errors.New("sip.dtmf.server can only output SipDTMFResponse or SipAudioFileResponse")
 }
