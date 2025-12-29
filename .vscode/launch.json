@@ -11,7 +11,7 @@
             "request": "launch",
             "mode": "auto",
             "program": "cmd/showbridge",
-            "args": ["--debug"],
+            "args": ["--log-level", "debug"],
             "cwd": "./"
         }
     ]

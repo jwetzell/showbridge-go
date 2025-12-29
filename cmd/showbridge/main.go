@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
+	"slices"
 	"sync"
 
 	"github.com/jwetzell/showbridge-go"
@@ -29,15 +31,29 @@ func main() {
 				Value: "./config.yaml",
 				Usage: "path to config file",
 			},
-			&cli.BoolFlag{
-				Name:  "debug",
-				Value: false,
+			&cli.StringFlag{
+				Name:  "log-level",
+				Value: "debug",
 				Usage: "set log level to DEBUG",
+				Validator: func(level string) error {
+					levels := []string{"debug", "info", "warn", "error"}
+					if !slices.Contains(levels, level) {
+						return fmt.Errorf("unknown log level: %s", level)
+					}
+					return nil
+				},
 			},
-			&cli.BoolFlag{
-				Name:  "json",
-				Value: false,
-				Usage: "log using JSON",
+			&cli.StringFlag{
+				Name:  "log-format",
+				Value: "text",
+				Usage: "log format to use",
+				Validator: func(format string) error {
+					formats := []string{"text", "json"}
+					if !slices.Contains(formats, format) {
+						return fmt.Errorf("unknown log format: %s", format)
+					}
+					return nil
+				},
 			},
 		},
 		Action: run,
@@ -83,8 +99,19 @@ func run(ctx context.Context, c *cli.Command) error {
 
 	logLevel := slog.LevelInfo
 
-	if c.Bool("debug") {
+	logLevelFromFlag := c.String("log-level")
+
+	switch logLevelFromFlag {
+	case "debug":
 		logLevel = slog.LevelDebug
+	case "info":
+		logLevel = slog.LevelInfo
+	case "warn":
+		logLevel = slog.LevelWarn
+	case "error":
+		logLevel = slog.LevelError
+	default:
+		logLevel = slog.LevelInfo
 	}
 
 	logHandlerOptions := &slog.HandlerOptions{
@@ -93,10 +120,17 @@ func run(ctx context.Context, c *cli.Command) error {
 
 	logOutput := os.Stderr
 
-	var logHandler slog.Handler = slog.NewTextHandler(logOutput, logHandlerOptions)
+	var logHandler slog.Handler
 
-	if c.Bool("json") {
+	logFormat := c.String("log-format")
+
+	switch logFormat {
+	case "json":
 		logHandler = slog.NewJSONHandler(logOutput, logHandlerOptions)
+	case "text":
+		logHandler = slog.NewTextHandler(logOutput, logHandlerOptions)
+	default:
+		logHandler = slog.NewTextHandler(logOutput, logHandlerOptions)
 	}
 
 	slog.SetDefault(slog.New(logHandler))
