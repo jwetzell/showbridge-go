@@ -33,8 +33,8 @@ func main() {
 			},
 			&cli.StringFlag{
 				Name:  "log-level",
-				Value: "debug",
-				Usage: "set log level to DEBUG",
+				Value: "info",
+				Usage: "set log level",
 				Validator: func(level string) error {
 					levels := []string{"debug", "info", "warn", "error"}
 					if !slices.Contains(levels, level) {
