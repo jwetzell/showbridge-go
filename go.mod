@@ -7,7 +7,7 @@ require (
 	github.com/emiago/diago v0.23.1-0.20251211215055-e1d875617111
 	github.com/emiago/sipgo v1.0.1
 	github.com/expr-lang/expr v1.17.7
-	github.com/jwetzell/artnet-go v0.0.0-20251223201031-5097901aa9db
+	github.com/jwetzell/artnet-go v0.0.0-20251230175746-f0d13f7744db
 	github.com/jwetzell/free-d-go v0.1.0
 	github.com/jwetzell/osc-go v0.1.0
 	github.com/jwetzell/psn-go v0.3.0
