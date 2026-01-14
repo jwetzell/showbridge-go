@@ -160,7 +160,6 @@ func (scs *SIPCallServer) HandleCall(inDialog *diago.DialogServerSession) {
 	scs.router.HandleInput(dialogContext, scs.Id(), SIPCallMessage{
 		To: inDialog.ToUser(),
 	})
-	fmt.Println(inDialog.LoadState())
 }
 
 func (scs *SIPCallServer) Output(ctx context.Context, payload any) error {
