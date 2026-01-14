@@ -9,8 +9,9 @@ import (
 )
 
 type ScriptWASM struct {
-	config  config.ProcessorConfig
-	Program *extism.CompiledPlugin
+	config   config.ProcessorConfig
+	Program  *extism.CompiledPlugin
+	Function string
 }
 
 func (se *ScriptWASM) Process(ctx context.Context, payload any) (any, error) {
@@ -27,7 +28,7 @@ func (se *ScriptWASM) Process(ctx context.Context, payload any) (any, error) {
 		return nil, err
 	}
 
-	_, output, err := program.Call("process", payloadBytes)
+	_, output, err := program.Call(se.Function, payloadBytes)
 
 	if err != nil {
 		return nil, err
@@ -58,6 +59,19 @@ func init() {
 				return nil, fmt.Errorf("script.wasm path must be a string")
 			}
 
+			functionString := "process"
+
+			function, ok := params["function"]
+
+			if ok {
+				specificFunctionString, ok := function.(string)
+
+				if !ok {
+					return nil, fmt.Errorf("script.wasm function must be a string")
+				}
+				functionString = specificFunctionString
+			}
+
 			manifest := extism.Manifest{
 				Wasm: []extism.Wasm{
 					extism.WasmFile{
@@ -72,7 +86,7 @@ func init() {
 				return nil, err
 			}
 
-			return &ScriptWASM{config: config, Program: program}, nil
+			return &ScriptWASM{config: config, Program: program, Function: functionString}, nil
 		},
 	})
 }
