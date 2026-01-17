@@ -44,7 +44,7 @@ type SIPDTMFCall struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "sip.dtmf.server",
-		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			portNum := 5060
 
@@ -100,12 +100,7 @@ func init() {
 			if !strings.ContainsRune("0123456789*#ABCD", rune(separatorString[0])) {
 				return nil, errors.New("sip.dtmf.server separator must be a valid DTMF character")
 			}
-			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
-
-			if !ok {
-				return nil, errors.New("sip.dtmf.server unable to get router from context")
-			}
-			return &SIPDTMFServer{config: config, ctx: ctx, router: router, IP: ipString, Port: int(portNum), Transport: transportString, Separator: separatorString, logger: CreateLogger(config)}, nil
+			return &SIPDTMFServer{config: config, IP: ipString, Port: int(portNum), Transport: transportString, Separator: separatorString, logger: CreateLogger(config)}, nil
 		},
 	})
 }
@@ -118,7 +113,15 @@ func (sds *SIPDTMFServer) Type() string {
 	return sds.config.Type
 }
 
-func (sds *SIPDTMFServer) Run() error {
+func (sds *SIPDTMFServer) Run(ctx context.Context) error {
+	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+	if !ok {
+		return errors.New("sip.dtmf.server unable to get router from context")
+	}
+	sds.router = router
+	sds.ctx = ctx
+
 	diagoLogger := slog.New(slog.NewJSONHandler(io.Discard, nil))
 
 	ua, _ := sipgo.NewUA(

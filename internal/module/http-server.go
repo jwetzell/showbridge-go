@@ -54,7 +54,7 @@ func (hsrw *HTTPServerResponseWriter) Write(data []byte) (int, error) {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "http.server",
-		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {
@@ -67,13 +67,7 @@ func init() {
 				return nil, errors.New("http.server port must be uint16")
 			}
 
-			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
-
-			if !ok {
-				return nil, errors.New("http.server unable to get router from context")
-			}
-
-			return &HTTPServer{Port: uint16(portNum), config: config, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
+			return &HTTPServer{Port: uint16(portNum), config: config, logger: CreateLogger(config)}, nil
 		},
 	})
 }
@@ -157,7 +151,15 @@ func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (hs *HTTPServer) Run() error {
+func (hs *HTTPServer) Run(ctx context.Context) error {
+	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+	if !ok {
+		return errors.New("http.server unable to get router from context")
+	}
+	hs.router = router
+	hs.ctx = ctx
+
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", hs.Port),
 		Handler: hs,

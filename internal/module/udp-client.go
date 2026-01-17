@@ -24,7 +24,7 @@ type UDPClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.udp.client",
-		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			host, ok := params["host"]
 
@@ -53,14 +53,7 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-
-			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
-
-			if !ok {
-				return nil, errors.New("net.udp.client unable to get router from context")
-			}
-
-			return &UDPClient{Addr: addr, config: config, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
+			return &UDPClient{Addr: addr, config: config, logger: CreateLogger(config)}, nil
 		},
 	})
 }
@@ -79,7 +72,15 @@ func (uc *UDPClient) SetupConn() error {
 	return err
 }
 
-func (uc *UDPClient) Run() error {
+func (uc *UDPClient) Run(ctx context.Context) error {
+
+	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+	if !ok {
+		return errors.New("net.udp.client unable to get router from context")
+	}
+	uc.router = router
+	uc.ctx = ctx
 
 	err := uc.SetupConn()
 	if err != nil {

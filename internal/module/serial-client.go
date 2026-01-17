@@ -29,7 +29,7 @@ type SerialClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "serial.client",
-		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 
@@ -76,13 +76,7 @@ func init() {
 				BaudRate: int(baudRateNum),
 			}
 
-			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
-
-			if !ok {
-				return nil, errors.New("serial.client unable to get router from context")
-			}
-
-			return &SerialClient{config: config, Port: portString, Framer: framer, Mode: &mode, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
+			return &SerialClient{config: config, Port: portString, Framer: framer, Mode: &mode, logger: CreateLogger(config)}, nil
 		},
 	})
 }
@@ -107,7 +101,15 @@ func (sc *SerialClient) SetupPort() error {
 	return nil
 }
 
-func (sc *SerialClient) Run() error {
+func (sc *SerialClient) Run(ctx context.Context) error {
+	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+	if !ok {
+		return errors.New("serial.client unable to get router from context")
+	}
+
+	sc.router = router
+	sc.ctx = ctx
 
 	// TODO(jwetzell): shutdown with router.Context properly
 	go func() {

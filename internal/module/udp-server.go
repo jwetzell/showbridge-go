@@ -25,7 +25,7 @@ type UDPServer struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.udp.server",
-		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {
@@ -67,13 +67,7 @@ func init() {
 				}
 				bufferSizeNum = int(bufferSizeFloat)
 			}
-
-			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
-
-			if !ok {
-				return nil, errors.New("net.udp.server unable to get router from context")
-			}
-			return &UDPServer{Addr: addr, BufferSize: bufferSizeNum, config: config, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
+			return &UDPServer{Addr: addr, BufferSize: bufferSizeNum, config: config, logger: CreateLogger(config)}, nil
 		},
 	})
 }
@@ -86,7 +80,15 @@ func (us *UDPServer) Type() string {
 	return us.config.Id
 }
 
-func (us *UDPServer) Run() error {
+func (us *UDPServer) Run(ctx context.Context) error {
+
+	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+	if !ok {
+		return errors.New("net.udp.server unable to get router from context")
+	}
+	us.router = router
+	us.ctx = ctx
 
 	listener, err := net.ListenUDP("udp", us.Addr)
 	if err != nil {

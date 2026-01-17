@@ -25,13 +25,9 @@ type PSNClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "psn.client",
-		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
-			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+		New: func(config config.ModuleConfig) (Module, error) {
 
-			if !ok {
-				return nil, errors.New("psn.client unable to get router from context")
-			}
-			return &PSNClient{config: config, decoder: psn.NewDecoder(), ctx: ctx, router: router, logger: CreateLogger(config)}, nil
+			return &PSNClient{config: config, decoder: psn.NewDecoder(), logger: CreateLogger(config)}, nil
 		},
 	})
 }
@@ -44,7 +40,14 @@ func (pc *PSNClient) Type() string {
 	return pc.config.Type
 }
 
-func (pc *PSNClient) Run() error {
+func (pc *PSNClient) Run(ctx context.Context) error {
+	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+	if !ok {
+		return errors.New("psn.client unable to get router from context")
+	}
+	pc.router = router
+	pc.ctx = ctx
 
 	addr, err := net.ResolveUDPAddr("udp", "236.10.10.10:56565")
 	if err != nil {

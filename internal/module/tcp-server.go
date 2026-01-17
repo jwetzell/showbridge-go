@@ -32,7 +32,7 @@ type TCPServer struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.tcp.server",
-		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			port, ok := params["port"]
 			if !ok {
@@ -81,14 +81,7 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-
-			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
-
-			if !ok {
-				return nil, errors.New("net.tcp.server unable to get router from context")
-			}
-
-			return &TCPServer{Framer: framer, Addr: addr, config: config, quit: make(chan interface{}), ctx: ctx, router: router, logger: CreateLogger(config)}, nil
+			return &TCPServer{Framer: framer, Addr: addr, config: config, quit: make(chan interface{}), logger: CreateLogger(config)}, nil
 		},
 	})
 }
@@ -166,7 +159,16 @@ ClientRead:
 	}
 }
 
-func (ts *TCPServer) Run() error {
+func (ts *TCPServer) Run(ctx context.Context) error {
+
+	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+	if !ok {
+		return errors.New("net.tcp.server unable to get router from context")
+	}
+	ts.router = router
+	ts.ctx = ctx
+
 	listener, err := net.ListenTCP("tcp", ts.Addr)
 	if err != nil {
 		return err

@@ -2,11 +2,11 @@ package showbridge_test
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log/slog"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/jwetzell/showbridge-go"
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -31,7 +31,8 @@ func (m *MockModule) Output(context.Context, any) error {
 	return nil
 }
 
-func (m *MockModule) Run() error {
+func (m *MockModule) Run(ctx context.Context) error {
+	m.ctx = ctx
 	<-m.ctx.Done()
 	return nil
 }
@@ -43,15 +44,9 @@ func (m *MockModule) Type() string {
 func init() {
 	module.RegisterModule(module.ModuleRegistration{
 		Type: "mock.counter",
-		New: func(ctx context.Context, config config.ModuleConfig) (module.Module, error) {
+		New: func(config config.ModuleConfig) (module.Module, error) {
 
-			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
-
-			if !ok {
-				return nil, errors.New("mock.counter unable to get router from context")
-			}
-
-			return &MockModule{config: config, ctx: ctx, router: router, logger: slog.Default()}, nil
+			return &MockModule{config: config, logger: slog.Default()}, nil
 		},
 	})
 }
@@ -66,7 +61,7 @@ func TestNewRouter(t *testing.T) {
 		},
 	}
 
-	_, moduleErrors, routeErrors := showbridge.NewRouter(t.Context(), routerConfig)
+	_, moduleErrors, routeErrors := showbridge.NewRouter(routerConfig)
 
 	if moduleErrors != nil {
 		t.Fatalf("router should not have returned any module errors: %v", moduleErrors)
@@ -87,7 +82,7 @@ func TestNewRouterUnknownModuleType(t *testing.T) {
 		},
 	}
 
-	_, moduleErrors, _ := showbridge.NewRouter(t.Context(), routerConfig)
+	_, moduleErrors, _ := showbridge.NewRouter(routerConfig)
 
 	if moduleErrors == nil {
 		t.Fatalf("router should have returned 'unknown module' module errors")
@@ -108,7 +103,7 @@ func TestNewRouterDuplicateModuleId(t *testing.T) {
 		},
 	}
 
-	_, moduleErrors, _ := showbridge.NewRouter(t.Context(), routerConfig)
+	_, moduleErrors, _ := showbridge.NewRouter(routerConfig)
 
 	if moduleErrors == nil {
 		t.Fatalf("router should have returned 'duplicate id' module error")
@@ -131,7 +126,7 @@ func TestRouterInputSingleRoute(t *testing.T) {
 		},
 	}
 
-	router, moduleErrors, routeErrors := showbridge.NewRouter(t.Context(), routerConfig)
+	router, moduleErrors, routeErrors := showbridge.NewRouter(routerConfig)
 
 	if moduleErrors != nil {
 		t.Fatalf("router should not have returned any module errors: %v", moduleErrors)
@@ -144,8 +139,10 @@ func TestRouterInputSingleRoute(t *testing.T) {
 	routerRunner := sync.WaitGroup{}
 
 	routerRunner.Go(func() {
-		router.Run()
+		router.Run(t.Context())
 	})
+
+	time.Sleep(time.Second * 1)
 
 	defer router.Stop()
 
@@ -200,7 +197,7 @@ func TestRouterInputMultipleRoutes(t *testing.T) {
 		},
 	}
 
-	router, moduleErrors, routeErrors := showbridge.NewRouter(t.Context(), routerConfig)
+	router, moduleErrors, routeErrors := showbridge.NewRouter(routerConfig)
 
 	if moduleErrors != nil {
 		t.Fatalf("router should not have returned any module errors: %v", moduleErrors)
@@ -213,8 +210,9 @@ func TestRouterInputMultipleRoutes(t *testing.T) {
 	routerRunner := sync.WaitGroup{}
 
 	routerRunner.Go(func() {
-		router.Run()
+		router.Run(t.Context())
 	})
+	time.Sleep(time.Second * 1)
 
 	defer router.Stop()
 
@@ -270,7 +268,7 @@ func TestRouterInputMultipleModules(t *testing.T) {
 		},
 	}
 
-	router, moduleErrors, routeErrors := showbridge.NewRouter(t.Context(), routerConfig)
+	router, moduleErrors, routeErrors := showbridge.NewRouter(routerConfig)
 
 	if moduleErrors != nil {
 		t.Fatalf("router should not have returned any module errors: %v", moduleErrors)
@@ -283,8 +281,10 @@ func TestRouterInputMultipleModules(t *testing.T) {
 	routerRunner := sync.WaitGroup{}
 
 	routerRunner.Go(func() {
-		router.Run()
+		router.Run(t.Context())
 	})
+
+	time.Sleep(time.Second * 1)
 
 	defer router.Stop()
 
