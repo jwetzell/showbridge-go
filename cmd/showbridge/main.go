@@ -137,7 +137,7 @@ func run(ctx context.Context, c *cli.Command) error {
 
 	commandLogger := slog.Default().With("component", "cmd")
 
-	router, moduleErrors, routeErrors := showbridge.NewRouter(context.Background(), config)
+	router, moduleErrors, routeErrors := showbridge.NewRouter(config)
 
 	for _, moduleError := range moduleErrors {
 		commandLogger.Error("problem initializing module", "index", moduleError.Index, "error", moduleError.Error)
@@ -150,7 +150,7 @@ func run(ctx context.Context, c *cli.Command) error {
 	routerRunner := sync.WaitGroup{}
 
 	routerRunner.Go(func() {
-		router.Run()
+		router.Run(context.Background())
 	})
 
 	<-ctx.Done()

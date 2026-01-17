@@ -26,7 +26,7 @@ type TCPClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.tcp.client",
-		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			host, ok := params["host"]
 
@@ -74,14 +74,7 @@ func init() {
 			if framer == nil {
 				return nil, fmt.Errorf("net.tcp.client unknown framing method: %s", framingMethod)
 			}
-
-			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
-
-			if !ok {
-				return nil, errors.New("net.tcp.client unable to get router from context")
-			}
-
-			return &TCPClient{framer: framer, Addr: addr, config: config, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
+			return &TCPClient{framer: framer, Addr: addr, config: config, logger: CreateLogger(config)}, nil
 		},
 	})
 }
@@ -94,7 +87,15 @@ func (tc *TCPClient) Type() string {
 	return tc.config.Type
 }
 
-func (tc *TCPClient) Run() error {
+func (tc *TCPClient) Run(ctx context.Context) error {
+
+	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+	if !ok {
+		return errors.New("net.tcp.client unable to get router from context")
+	}
+	tc.router = router
+	tc.ctx = ctx
 
 	// TODO(jwetzell): shutdown with router.Context properly
 	go func() {

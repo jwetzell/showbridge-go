@@ -24,7 +24,7 @@ type NATSClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "nats.client",
-		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			url, ok := params["url"]
 
@@ -50,13 +50,7 @@ func init() {
 				return nil, errors.New("nats.client subject must be string")
 			}
 
-			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
-
-			if !ok {
-				return nil, errors.New("nats.client unable to get router from context")
-			}
-
-			return &NATSClient{config: config, URL: urlString, Subject: subjectString, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
+			return &NATSClient{config: config, URL: urlString, Subject: subjectString, logger: CreateLogger(config)}, nil
 		},
 	})
 }
@@ -69,7 +63,16 @@ func (nc *NATSClient) Type() string {
 	return nc.config.Type
 }
 
-func (nc *NATSClient) Run() error {
+func (nc *NATSClient) Run(ctx context.Context) error {
+	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+	if !ok {
+		return errors.New("nats.client unable to get router from context")
+	}
+
+	nc.router = router
+	nc.ctx = ctx
+
 	client, err := nats.Connect(nc.URL, nats.RetryOnFailedConnect(true))
 
 	if err != nil {

@@ -22,15 +22,9 @@ type HTTPClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "http.client",
-		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 
-			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
-
-			if !ok {
-				return nil, errors.New("http.client unable to get router from context")
-			}
-
-			return &HTTPClient{config: config, ctx: ctx, router: router, logger: CreateLogger(config)}, nil
+			return &HTTPClient{config: config, logger: CreateLogger(config)}, nil
 		},
 	})
 }
@@ -43,7 +37,14 @@ func (hc *HTTPClient) Type() string {
 	return hc.config.Type
 }
 
-func (hc *HTTPClient) Run() error {
+func (hc *HTTPClient) Run(ctx context.Context) error {
+	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+	if !ok {
+		return errors.New("http.client unable to get router from context")
+	}
+	hc.router = router
+	hc.ctx = ctx
 
 	hc.client = &http.Client{
 		Timeout: 10 * time.Second,

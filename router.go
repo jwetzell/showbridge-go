@@ -20,18 +20,13 @@ type Router struct {
 	logger          *slog.Logger
 }
 
-func NewRouter(ctx context.Context, config config.Config) (*Router, []module.ModuleError, []route.RouteError) {
-
-	routerContext, cancel := context.WithCancel(ctx)
+func NewRouter(config config.Config) (*Router, []module.ModuleError, []route.RouteError) {
 
 	router := Router{
-		contextCancel:   cancel,
 		ModuleInstances: []module.Module{},
 		RouteInstances:  []route.Route{},
 		logger:          slog.Default().With("component", "router"),
 	}
-
-	router.Context = context.WithValue(routerContext, route.RouterContextKey, &router)
 
 	router.logger.Debug("creating")
 
@@ -69,7 +64,7 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []module.Mod
 		}
 
 		if !moduleInstanceExists {
-			moduleInstance, err := moduleInfo.New(router.Context, moduleDecl)
+			moduleInstance, err := moduleInfo.New(moduleDecl)
 			if err != nil {
 				if moduleErrors == nil {
 					moduleErrors = []module.ModuleError{}
@@ -107,11 +102,16 @@ func NewRouter(ctx context.Context, config config.Config) (*Router, []module.Mod
 	return &router, moduleErrors, routeErrors
 }
 
-func (r *Router) Run() {
+func (r *Router) Run(ctx context.Context) {
 	r.logger.Info("running")
+	routerContext, cancel := context.WithCancel(ctx)
+	r.Context = routerContext
+	r.contextCancel = cancel
+	contextWithRouter := context.WithValue(routerContext, route.RouterContextKey, r)
+
 	for _, moduleInstance := range r.ModuleInstances {
 		r.moduleWait.Go(func() {
-			err := moduleInstance.Run()
+			err := moduleInstance.Run(contextWithRouter)
 			if err != nil {
 				r.logger.Error("error encountered running module", "error", err)
 			}
@@ -124,7 +124,7 @@ func (r *Router) Run() {
 }
 
 func (r *Router) Stop() {
-	r.logger.Debug("stopping")
+	r.logger.Info("stopping")
 	r.contextCancel()
 }
 

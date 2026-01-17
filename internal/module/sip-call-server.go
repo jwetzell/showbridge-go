@@ -45,7 +45,7 @@ type sipCallContextKey string
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "sip.call.server",
-		New: func(ctx context.Context, config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 			portNum := 5060
 
@@ -98,12 +98,7 @@ func init() {
 				userAgentString = specificTransportString
 			}
 
-			router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
-
-			if !ok {
-				return nil, errors.New("sip.call.server unable to get router from context")
-			}
-			return &SIPCallServer{config: config, ctx: ctx, router: router, IP: ipString, Port: int(portNum), Transport: transportString, UserAgent: userAgentString, logger: CreateLogger(config)}, nil
+			return &SIPCallServer{config: config, IP: ipString, Port: int(portNum), Transport: transportString, UserAgent: userAgentString, logger: CreateLogger(config)}, nil
 		},
 	})
 }
@@ -116,7 +111,15 @@ func (scs *SIPCallServer) Type() string {
 	return scs.config.Type
 }
 
-func (scs *SIPCallServer) Run() error {
+func (scs *SIPCallServer) Run(ctx context.Context) error {
+	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+
+	if !ok {
+		return errors.New("sip.call.server unable to get router from context")
+	}
+	scs.router = router
+	scs.ctx = ctx
+
 	diagoLogger := slog.New(slog.NewJSONHandler(io.Discard, nil))
 
 	ua, _ := sipgo.NewUA(

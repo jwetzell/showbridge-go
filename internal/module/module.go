@@ -18,13 +18,13 @@ type ModuleError struct {
 type Module interface {
 	Id() string
 	Type() string
-	Run() error
+	Run(context.Context) error
 	Output(context.Context, any) error
 }
 
 type ModuleRegistration struct {
 	Type string `json:"type"`
-	New  func(context.Context, config.ModuleConfig) (Module, error)
+	New  func(config.ModuleConfig) (Module, error)
 }
 
 func RegisterModule(mod ModuleRegistration) {
