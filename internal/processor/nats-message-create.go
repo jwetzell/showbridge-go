@@ -16,7 +16,7 @@ type NATSMessage struct {
 
 type NATSMessageCreate struct {
 	config  config.ProcessorConfig
-	Subject string
+	Subject *template.Template
 	Payload *template.Template
 }
 
@@ -31,8 +31,17 @@ func (nmc *NATSMessageCreate) Process(ctx context.Context, payload any) (any, er
 
 	payloadString := payloadBuffer.String()
 
+	var subjectBuffer bytes.Buffer
+	err = nmc.Subject.Execute(&subjectBuffer, payload)
+
+	if err != nil {
+		return nil, err
+	}
+
+	subjectString := subjectBuffer.String()
+
 	message := NATSMessage{
-		Subject: nmc.Subject,
+		Subject: subjectString,
 		Payload: []byte(payloadString),
 	}
 
@@ -48,7 +57,6 @@ func init() {
 		Type: "nats.message.create",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
-			// TODO(jwetzell): support template for subject
 			subject, ok := params["subject"]
 
 			if !ok {
@@ -59,6 +67,12 @@ func init() {
 
 			if !ok {
 				return nil, errors.New("nats.message.create subject must be a string")
+			}
+
+			subjectTemplate, err := template.New("subject").Parse(subjectString)
+
+			if err != nil {
+				return nil, err
 			}
 
 			payload, ok := params["payload"]
@@ -79,7 +93,7 @@ func init() {
 				return nil, err
 			}
 
-			return &NATSMessageCreate{config: config, Subject: subjectString, Payload: payloadTemplate}, nil
+			return &NATSMessageCreate{config: config, Subject: subjectTemplate, Payload: payloadTemplate}, nil
 		},
 	})
 }
