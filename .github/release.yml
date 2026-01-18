@@ -22,7 +22,7 @@ changelog:
         - route
     - title: CLI ⌨️
       labels:
-        - cmd
+        - cli
     - title: Other Changes
       labels:
         - '*'
