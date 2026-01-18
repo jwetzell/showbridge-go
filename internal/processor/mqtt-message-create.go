@@ -51,6 +51,7 @@ func (mm MQTTMessage) Payload() []byte {
 func (mm MQTTMessage) Ack() {}
 
 func (mmc *MQTTMessageCreate) Process(ctx context.Context, payload any) (any, error) {
+	// TODO(jwetzell): support templating
 
 	message := MQTTMessage{
 		topic:    mmc.Topic,
