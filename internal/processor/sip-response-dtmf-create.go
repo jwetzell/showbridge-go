@@ -4,16 +4,18 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"regexp"
 	"text/template"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
 type SipResponseDTMFCreate struct {
-	config   config.ProcessorConfig
-	PreWait  int
-	PostWait int
-	Digits   *template.Template
+	config    config.ProcessorConfig
+	PreWait   int
+	PostWait  int
+	Digits    *template.Template
+	validDTMF *regexp.Regexp
 }
 
 type SipDTMFResponse struct {
@@ -32,6 +34,10 @@ func (scc *SipResponseDTMFCreate) Process(ctx context.Context, payload any) (any
 	}
 
 	digitsString := digitsBuffer.String()
+
+	if !scc.validDTMF.MatchString(digitsString) {
+		return nil, errors.New("sip.response.dtmf.create result of digits template contains invalid characters")
+	}
 
 	return SipDTMFResponse{
 		PreWait:  scc.PreWait,
@@ -91,7 +97,7 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			return &SipResponseDTMFCreate{config: config, Digits: digitsTemplate, PreWait: int(preWaitNum), PostWait: int(postWaitNum)}, nil
+			return &SipResponseDTMFCreate{config: config, Digits: digitsTemplate, PreWait: int(preWaitNum), PostWait: int(postWaitNum), validDTMF: regexp.MustCompile(`^[0-9*#A-Da-d]+$`)}, nil
 		},
 	})
 }
