@@ -4,8 +4,45 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
+
+func TestStringEncodeFromRegistry(t *testing.T) {
+	registration, ok := processor.ProcessorRegistry["string.encode"]
+	if !ok {
+		t.Fatalf("string.encode processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "string.encode",
+	})
+	if err != nil {
+		t.Fatalf("failed to create string.encode processor: %s", err)
+	}
+
+	if processorInstance.Type() != "string.encode" {
+		t.Fatalf("string.encode processor has wrong type: %s", processorInstance.Type())
+	}
+
+	payload := "hello"
+	expected := []byte{'h', 'e', 'l', 'l', 'o'}
+
+	got, err := processorInstance.Process(t.Context(), payload)
+	if err != nil {
+		t.Fatalf("string.encode processing failed: %s", err)
+	}
+
+	gotBytes, ok := got.([]byte)
+
+	if !ok {
+		t.Fatalf("string.encode should return byte slice")
+	}
+
+	if !slices.Equal(gotBytes, expected) {
+		t.Fatalf("string.encode got %+v, expected %+v", got, expected)
+	}
+}
 
 func TestGoodStringEncode(t *testing.T) {
 	stringEncoder := processor.StringEncode{}
