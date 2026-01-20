@@ -8,8 +8,8 @@ github.com/dylibso/observe-sdk/go v0.0.0-20240819160327-2d926c5d788a h1:UwSIFv5g
 github.com/dylibso/observe-sdk/go v0.0.0-20240819160327-2d926c5d788a/go.mod h1:C8DzXehI4zAbrdlbtOByKX6pfivJTBiV9Jjqv56Yd9Q=
 github.com/eclipse/paho.mqtt.golang v1.5.1 h1:/VSOv3oDLlpqR2Epjn1Q7b2bSTplJIeV2ISgCl2W7nE=
 github.com/eclipse/paho.mqtt.golang v1.5.1/go.mod h1:1/yJCneuyOoCOzKSsOTUc0AJfpsItBGWvYpBLimhArU=
-github.com/emiago/diago v0.24.0 h1:NJ94m/h04SPIDet9x19IZoMDss+fRJ58HHqUqfHI4GY=
-github.com/emiago/diago v0.24.0/go.mod h1:MwO7aQbGtgOdfm0Soj6XqEfAcskstixiS9gnxMV9xeo=
+github.com/emiago/diago v0.25.0 h1:YkjHahAMyIhvk5TKTMYoFJvsbNaJhyMBAiGggc97HDc=
+github.com/emiago/diago v0.25.0/go.mod h1:HQNLzmwucATviInW5OqpnpqFjtz2jAtxKKWx8Nh98wo=
 github.com/emiago/sipgo v1.1.1 h1:egwB7o9b3QpeTbqRFT9ECOYcWT/rw2UVTWA1qYG1HBs=
 github.com/emiago/sipgo v1.1.1/go.mod h1:DuwAxBZhKMqIzQFPGZb1MVAGU6Wuxj64oTOhd5dx/FY=
 github.com/expr-lang/expr v1.17.7 h1:Q0xY/e/2aCIp8g9s/LGvMDCC5PxYlvHgDZRQ4y16JX8=
