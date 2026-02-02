@@ -89,6 +89,7 @@ func (pc *PSNClient) Run(ctx context.Context) error {
 				}
 
 				if pc.router != nil {
+					// TODO(jwetzell): better input handling
 					for _, tracker := range pc.decoder.Trackers {
 						pc.router.HandleInput(pc.ctx, pc.Id(), tracker)
 					}
