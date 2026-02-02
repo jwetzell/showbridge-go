@@ -4,8 +4,8 @@ go 1.25.5
 
 require (
 	github.com/eclipse/paho.mqtt.golang v1.5.1
-	github.com/emiago/diago v0.25.0
-	github.com/emiago/sipgo v1.1.1
+	github.com/emiago/diago v0.26.2
+	github.com/emiago/sipgo v1.1.2
 	github.com/expr-lang/expr v1.17.7
 	github.com/extism/go-sdk v1.7.1
 	github.com/jwetzell/artnet-go v0.2.1
@@ -24,6 +24,7 @@ require (
 	github.com/creack/goselect v0.1.2 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/dylibso/observe-sdk/go v0.0.0-20240819160327-2d926c5d788a // indirect
+	github.com/emiago/dtls/v3 v3.0.0-20260122183559-8b8d23e359c0 // indirect
 	github.com/go-audio/riff v1.0.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
@@ -44,6 +45,7 @@ require (
 	github.com/pion/rtp v1.8.26 // indirect
 	github.com/pion/srtp/v3 v3.0.9 // indirect
 	github.com/pion/transport/v3 v3.1.1 // indirect
+	github.com/pion/transport/v4 v4.0.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/tetratelabs/wabin v0.0.0-20230304001439-f6f874872834 // indirect
 	github.com/tetratelabs/wazero v1.9.0 // indirect
