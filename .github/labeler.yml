@@ -14,11 +14,14 @@ processor:
   - changed-files:
       - any-glob-to-any-file: 'internal/processor/**'
 
-routing:
+router:
+  - changed-files:
+      - any-glob-to-any-file: 'router*'
+      
+route:
   - changed-files:
       - any-glob-to-any-file: 'internal/route/**'
-      - any-glob-to-any-file: 'router*'
-
+      
 cli:
   - changed-files:
       - any-glob-to-any-file: 'cmd/showbridge/**'
