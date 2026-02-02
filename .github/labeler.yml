@@ -18,6 +18,10 @@ route:
   - changed-files:
       - any-glob-to-any-file: 'internal/route/**'
 
+routr:
+  - changed-files:
+      - any-glob-to-any-file: 'router*'
+
 cli:
   - changed-files:
       - any-glob-to-any-file: 'cmd/showbridge/**'
