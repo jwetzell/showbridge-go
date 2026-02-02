@@ -14,12 +14,9 @@ processor:
   - changed-files:
       - any-glob-to-any-file: 'internal/processor/**'
 
-route:
+routing:
   - changed-files:
       - any-glob-to-any-file: 'internal/route/**'
-
-routr:
-  - changed-files:
       - any-glob-to-any-file: 'router*'
 
 cli:

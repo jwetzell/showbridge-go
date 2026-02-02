@@ -17,8 +17,9 @@ changelog:
     - title: Processor 🏭
       labels:
         - processor
-    - title: Route 🛣️
+    - title: Routing 🛣️
       labels:
+        - router
         - route
     - title: CLI ⌨️
       labels:
