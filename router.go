@@ -34,6 +34,18 @@ func NewRouter(config config.Config) (*Router, []module.ModuleError, []route.Rou
 
 	for moduleIndex, moduleDecl := range config.Modules {
 
+		if moduleDecl.Id == "" {
+			if moduleErrors == nil {
+				moduleErrors = []module.ModuleError{}
+			}
+			moduleErrors = append(moduleErrors, module.ModuleError{
+				Index:  moduleIndex,
+				Config: moduleDecl,
+				Error:  errors.New("module id cannot be empty"),
+			})
+			continue
+		}
+
 		moduleInfo, ok := module.ModuleRegistry[moduleDecl.Type]
 		if !ok {
 			if moduleErrors == nil {
