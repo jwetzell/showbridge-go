@@ -56,20 +56,19 @@ func init() {
 				return nil, err
 			}
 
-			framingMethod := "RAW"
+			framingMethod, ok := params["framing"]
 
-			framingMethodRaw, ok := params["framing"]
-
-			if ok {
-				framingMethodString, ok := framingMethodRaw.(string)
-
-				if !ok {
-					return nil, errors.New("net.tcp.client framing method must be a string")
-				}
-				framingMethod = framingMethodString
+			if !ok {
+				return nil, errors.New("net.tcp.client requires a framing parameter")
 			}
 
-			framer := framer.GetFramer(framingMethod)
+			framingMethodString, ok := framingMethod.(string)
+
+			if !ok {
+				return nil, errors.New("net.tcp.client framing method must be a string")
+			}
+
+			framer := framer.GetFramer(framingMethodString)
 
 			if framer == nil {
 				return nil, fmt.Errorf("net.tcp.client unknown framing method: %s", framingMethod)
