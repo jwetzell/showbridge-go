@@ -6,6 +6,9 @@ import (
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type routeContextKey string
@@ -73,17 +76,32 @@ func (r *ProcessorRoute) Output() string {
 }
 
 func (r *ProcessorRoute) ProcessPayload(ctx context.Context, payload any) (any, error) {
-	for _, processor := range r.processors {
-		processedPayload, err := processor.Process(ctx, payload)
+	parentSpan := trace.SpanFromContext(ctx)
+	tracer := parentSpan.TracerProvider().Tracer("route.ProcessPayload")
+	processCtx, processSpan := tracer.Start(ctx, "route.process")
+	defer processSpan.End()
+	for processorIndex, processor := range r.processors {
+		processorCtx, processorSpan := tracer.Start(processCtx, "route.processor", trace.WithAttributes(attribute.Int("processor.index", processorIndex), attribute.String("processor.type", processor.Type())))
+		processedPayload, err := processor.Process(processorCtx, payload)
 		if err != nil {
+			processorSpan.SetStatus(codes.Error, "route processor error")
+			processorSpan.RecordError(err)
+			processorSpan.End()
+			processSpan.SetStatus(codes.Error, "route processing error")
+			processSpan.RecordError(err)
 			return nil, err
 		}
+		processorSpan.SetStatus(codes.Ok, "processor successful")
 		//NOTE(jwetzell) nil payload will result in the route being "terminated"
 		if processedPayload == nil {
+			processSpan.SetStatus(codes.Ok, "route processing terminated early due to nil payload")
+			processorSpan.End()
 			return nil, nil
 		}
 		payload = processedPayload
+		processorSpan.End()
 	}
+	processSpan.SetStatus(codes.Ok, "route processing successful")
 
 	return payload, nil
 }

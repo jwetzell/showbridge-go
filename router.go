@@ -160,10 +160,8 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 				routeFound = true
 				routeContext := context.WithValue(spanCtx, route.SourceContextKey, sourceId)
 
-				routeSpanCtx, routeSpan := r.tracer.Start(routeContext, "route.input", trace.WithAttributes(attribute.Int("route.index", routeIndex)))
-				defer routeSpan.End()
-				routeProcessCtx, routeSpan := r.tracer.Start(routeSpanCtx, "route.process")
-				payload, err := routeInstance.ProcessPayload(routeProcessCtx, payload)
+				routeCtx, routeSpan := r.tracer.Start(routeContext, "route", trace.WithAttributes(attribute.Int("route.index", routeIndex), attribute.String("route.input", routeInstance.Input()), attribute.String("route.output", routeInstance.Output())))
+				payload, err := routeInstance.ProcessPayload(routeCtx, payload)
 				if err != nil {
 					if routeIOErrors == nil {
 						routeIOErrors = []route.RouteIOError{}
@@ -173,13 +171,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 						Index:        routeIndex,
 						ProcessError: err,
 					})
-					routeSpan.SetStatus(codes.Error, err.Error())
-					routeSpan.RecordError(err)
-					routeSpan.End()
 					return
-				} else {
-					routeSpan.SetStatus(codes.Ok, "route processing successful")
-					routeSpan.End()
 				}
 
 				if payload == nil {
@@ -187,8 +179,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 					return
 				}
 
-				routeOutputCtx, routeOutputSpan := r.tracer.Start(routeSpanCtx, "route.output", trace.WithAttributes(attribute.String("destination.id", routeInstance.Output())))
-				outputErrors := r.HandleOutput(routeOutputCtx, routeInstance.Output(), payload)
+				outputErrors := r.HandleOutput(routeCtx, routeInstance.Output(), payload)
 				if outputErrors != nil {
 					if routeIOErrors == nil {
 						routeIOErrors = []route.RouteIOError{}
@@ -197,14 +188,8 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 						Index:        routeIndex,
 						OutputErrors: outputErrors,
 					})
-					routeOutputSpan.SetStatus(codes.Error, "route output error")
-					for _, outputError := range outputErrors {
-						routeOutputSpan.RecordError(outputError)
-					}
-				} else {
-					routeOutputSpan.SetStatus(codes.Ok, "route output successful")
 				}
-				routeOutputSpan.End()
+				routeSpan.End()
 			})
 		}
 	}
