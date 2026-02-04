@@ -13,6 +13,12 @@ import (
 	"github.com/jwetzell/showbridge-go"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/urfave/cli/v3"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.39.0"
+	"go.opentelemetry.io/otel/trace"
 	"sigs.k8s.io/yaml"
 )
 
@@ -54,6 +60,11 @@ func main() {
 					}
 					return nil
 				},
+			},
+			&cli.BoolFlag{
+				Name:  "trace",
+				Value: false,
+				Usage: "enable OpenTelemetry tracing",
 			},
 		},
 		Action: run,
@@ -137,7 +148,23 @@ func run(ctx context.Context, c *cli.Command) error {
 
 	commandLogger := slog.Default().With("component", "cmd")
 
-	router, moduleErrors, routeErrors := showbridge.NewRouter(config)
+	var tracer trace.Tracer
+	if c.Bool("trace") {
+		exporter, err := otlptracehttp.New(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to create trace exporter: %w", err)
+		}
+
+		tracerProvider := newTracerProvider(exporter)
+		otel.SetTracerProvider(tracerProvider)
+		defer tracerProvider.Shutdown(ctx)
+
+		tracer = tracerProvider.Tracer("showbridge")
+	} else {
+		tracer = otel.Tracer("showbridge")
+	}
+
+	router, moduleErrors, routeErrors := showbridge.NewRouter(config, tracer)
 
 	for _, moduleError := range moduleErrors {
 		commandLogger.Error("problem initializing module", "index", moduleError.Index, "error", moduleError.Error)
@@ -159,4 +186,24 @@ func run(ctx context.Context, c *cli.Command) error {
 	commandLogger.Debug("waiting for router to exit")
 	routerRunner.Wait()
 	return nil
+}
+
+func newTracerProvider(exp sdktrace.SpanExporter) *sdktrace.TracerProvider {
+	r, err := resource.Merge(
+		resource.Default(),
+		resource.NewWithAttributes(
+			semconv.SchemaURL,
+			semconv.ServiceName("showbridge"),
+			semconv.ServiceVersion(version),
+		),
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return sdktrace.NewTracerProvider(
+		sdktrace.WithBatcher(exp),
+		sdktrace.WithResource(r),
+	)
 }

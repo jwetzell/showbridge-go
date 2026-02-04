@@ -9,6 +9,10 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
 	"github.com/jwetzell/showbridge-go/internal/route"
+
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Router struct {
@@ -18,16 +22,17 @@ type Router struct {
 	RouteInstances  []route.Route
 	moduleWait      sync.WaitGroup
 	logger          *slog.Logger
+	tracer          trace.Tracer
 }
 
-func NewRouter(config config.Config) (*Router, []module.ModuleError, []route.RouteError) {
+func NewRouter(config config.Config, tracer trace.Tracer) (*Router, []module.ModuleError, []route.RouteError) {
 
 	router := Router{
 		ModuleInstances: []module.Module{},
 		RouteInstances:  []route.Route{},
 		logger:          slog.Default().With("component", "router"),
+		tracer:          tracer,
 	}
-
 	router.logger.Debug("creating")
 
 	var moduleErrors []module.ModuleError
@@ -141,6 +146,8 @@ func (r *Router) Stop() {
 }
 
 func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) (bool, []route.RouteIOError) {
+	spanCtx, span := r.tracer.Start(ctx, "router.input", trace.WithAttributes(attribute.String("source.id", sourceId)), trace.WithNewRoot())
+	defer span.End()
 	var routeIOErrors []route.RouteIOError
 	routeFound := false
 
@@ -151,9 +158,12 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 			routeWaitGroup.Go(func() {
 
 				routeFound = true
-				routeContext := context.WithValue(ctx, route.SourceContextKey, sourceId)
+				routeContext := context.WithValue(spanCtx, route.SourceContextKey, sourceId)
 
-				payload, err := routeInstance.ProcessPayload(routeContext, payload)
+				routeSpanCtx, routeSpan := r.tracer.Start(routeContext, "route.input", trace.WithAttributes(attribute.Int("route.index", routeIndex)))
+				defer routeSpan.End()
+				routeProcessCtx, routeSpan := r.tracer.Start(routeSpanCtx, "route.process")
+				payload, err := routeInstance.ProcessPayload(routeProcessCtx, payload)
 				if err != nil {
 					if routeIOErrors == nil {
 						routeIOErrors = []route.RouteIOError{}
@@ -163,7 +173,13 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 						Index:        routeIndex,
 						ProcessError: err,
 					})
+					routeSpan.SetStatus(codes.Error, err.Error())
+					routeSpan.RecordError(err)
+					routeSpan.End()
 					return
+				} else {
+					routeSpan.SetStatus(codes.Ok, "route processing successful")
+					routeSpan.End()
 				}
 
 				if payload == nil {
@@ -171,7 +187,8 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 					return
 				}
 
-				outputErrors := r.HandleOutput(routeContext, routeInstance.Output(), payload)
+				routeOutputCtx, routeOutputSpan := r.tracer.Start(routeSpanCtx, "route.output", trace.WithAttributes(attribute.String("destination.id", routeInstance.Output())))
+				outputErrors := r.HandleOutput(routeOutputCtx, routeInstance.Output(), payload)
 				if outputErrors != nil {
 					if routeIOErrors == nil {
 						routeIOErrors = []route.RouteIOError{}
@@ -180,9 +197,15 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 						Index:        routeIndex,
 						OutputErrors: outputErrors,
 					})
+					routeOutputSpan.SetStatus(codes.Error, "route output error")
+					for _, outputError := range outputErrors {
+						routeOutputSpan.RecordError(outputError)
+					}
+				} else {
+					routeOutputSpan.SetStatus(codes.Ok, "route output successful")
 				}
+				routeOutputSpan.End()
 			})
-
 		}
 	}
 	routeWaitGroup.Wait()
@@ -190,19 +213,35 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 }
 
 func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload any) []error {
-
+	spanCtx, span := r.tracer.Start(ctx, "router.output", trace.WithAttributes(attribute.String("destination.id", destinationId)))
+	defer span.End()
 	var outputErrors []error
 	for _, moduleInstance := range r.ModuleInstances {
 		if moduleInstance.Id() == destinationId {
-			err := moduleInstance.Output(ctx, payload)
+			moduleSpanCtx, moduleSpan := r.tracer.Start(spanCtx, "module.output", trace.WithAttributes(attribute.String("module.id", moduleInstance.Id()), attribute.String("module.type", moduleInstance.Type())))
+			err := moduleInstance.Output(moduleSpanCtx, payload)
 			if err != nil {
 				if outputErrors == nil {
 					outputErrors = []error{}
 				}
 				outputErrors = append(outputErrors, err)
-				r.logger.Error("unable to route output", "module", moduleInstance.Id(), "error", err)
+				moduleSpan.SetStatus(codes.Error, err.Error())
+				moduleSpan.RecordError(err)
+				r.logger.Error("module output encountered error", "module", moduleInstance.Id(), "error", err)
+			} else {
+				moduleSpan.SetStatus(codes.Ok, "module output successful")
 			}
+			moduleSpan.End()
 		}
+	}
+
+	if outputErrors != nil {
+		span.SetStatus(codes.Error, "router output error")
+		for _, outputError := range outputErrors {
+			span.RecordError(outputError)
+		}
+	} else {
+		span.SetStatus(codes.Ok, "router output successful")
 	}
 	return outputErrors
 }

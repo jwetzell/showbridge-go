@@ -12,6 +12,11 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
 	"github.com/jwetzell/showbridge-go/internal/route"
+	"go.opentelemetry.io/otel"
+)
+
+var (
+	tracer = otel.Tracer("showbridge.test")
 )
 
 type MockModule struct {
@@ -61,7 +66,7 @@ func TestNewRouter(t *testing.T) {
 		},
 	}
 
-	_, moduleErrors, routeErrors := showbridge.NewRouter(routerConfig)
+	_, moduleErrors, routeErrors := showbridge.NewRouter(routerConfig, tracer)
 
 	if moduleErrors != nil {
 		t.Fatalf("router should not have returned any module errors: %v", moduleErrors)
@@ -99,7 +104,7 @@ func TestNewRouterUnknownModuleType(t *testing.T) {
 		},
 	}
 
-	_, moduleErrors, _ := showbridge.NewRouter(routerConfig)
+	_, moduleErrors, _ := showbridge.NewRouter(routerConfig, tracer)
 
 	if moduleErrors == nil {
 		t.Fatalf("router should have returned 'unknown module' module errors")
@@ -120,7 +125,7 @@ func TestNewRouterDuplicateModuleId(t *testing.T) {
 		},
 	}
 
-	_, moduleErrors, _ := showbridge.NewRouter(routerConfig)
+	_, moduleErrors, _ := showbridge.NewRouter(routerConfig, tracer)
 
 	if moduleErrors == nil {
 		t.Fatalf("router should have returned 'duplicate id' module error")
@@ -143,7 +148,7 @@ func TestRouterInputSingleRoute(t *testing.T) {
 		},
 	}
 
-	router, moduleErrors, routeErrors := showbridge.NewRouter(routerConfig)
+	router, moduleErrors, routeErrors := showbridge.NewRouter(routerConfig, tracer)
 
 	if moduleErrors != nil {
 		t.Fatalf("router should not have returned any module errors: %v", moduleErrors)
@@ -214,7 +219,7 @@ func TestRouterInputMultipleRoutes(t *testing.T) {
 		},
 	}
 
-	router, moduleErrors, routeErrors := showbridge.NewRouter(routerConfig)
+	router, moduleErrors, routeErrors := showbridge.NewRouter(routerConfig, tracer)
 
 	if moduleErrors != nil {
 		t.Fatalf("router should not have returned any module errors: %v", moduleErrors)
@@ -285,7 +290,7 @@ func TestRouterInputMultipleModules(t *testing.T) {
 		},
 	}
 
-	router, moduleErrors, routeErrors := showbridge.NewRouter(routerConfig)
+	router, moduleErrors, routeErrors := showbridge.NewRouter(routerConfig, tracer)
 
 	if moduleErrors != nil {
 		t.Fatalf("router should not have returned any module errors: %v", moduleErrors)
