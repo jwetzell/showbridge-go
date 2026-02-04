@@ -14,7 +14,9 @@ type DebugLog struct {
 }
 
 func (dl *DebugLog) Process(ctx context.Context, payload any) (any, error) {
-	dl.logger.Debug("", "payload", payload, "payloadType", fmt.Sprintf("%T", payload))
+	payloadString := fmt.Sprintf("%+v", payload)
+	payloadType := fmt.Sprintf("%T", payload)
+	dl.logger.Debug("", "payload", payloadString, "payloadType", payloadType)
 	return payload, nil
 }
 
