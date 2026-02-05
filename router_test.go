@@ -72,6 +72,23 @@ func TestNewRouter(t *testing.T) {
 	}
 }
 
+func TestNewRouterNoModuleId(t *testing.T) {
+	routerConfig := config.Config{
+		Modules: []config.ModuleConfig{
+			{
+				Id:   "",
+				Type: "mock.counter",
+			},
+		},
+	}
+
+	_, moduleErrors, _ := showbridge.NewRouter(routerConfig)
+
+	if moduleErrors == nil {
+		t.Fatalf("router should have returned 'unknown module' module errors")
+	}
+}
+
 func TestNewRouterUnknownModuleType(t *testing.T) {
 	routerConfig := config.Config{
 		Modules: []config.ModuleConfig{
