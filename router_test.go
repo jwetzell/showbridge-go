@@ -87,7 +87,7 @@ func TestNewRouterNoModuleId(t *testing.T) {
 		},
 	}
 
-	_, moduleErrors, _ := showbridge.NewRouter(routerConfig)
+	_, moduleErrors, _ := showbridge.NewRouter(routerConfig, tracer)
 
 	if moduleErrors == nil {
 		t.Fatalf("router should have returned 'unknown module' module errors")
