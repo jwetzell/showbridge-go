@@ -127,6 +127,7 @@ func (r *Router) Run(ctx context.Context) {
 		r.moduleWait.Go(func() {
 			err := moduleInstance.Run(contextWithRouter)
 			if err != nil {
+				// TODO(jwetzell): handle module run errors better
 				r.logger.Error("error encountered running module", "error", err)
 			}
 		})
