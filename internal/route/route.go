@@ -31,7 +31,7 @@ type RouteIOError struct {
 
 type RouteIO interface {
 	HandleInput(ctx context.Context, sourceId string, payload any) (bool, []RouteIOError)
-	HandleOutput(ctx context.Context, destinationId string, payload any) []error
+	HandleOutput(ctx context.Context, destinationId string, payload any) error
 }
 
 type Route interface {
