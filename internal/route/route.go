@@ -24,7 +24,7 @@ type RouteError struct {
 
 type RouteIOError struct {
 	Index        int
-	OutputErrors []error
+	OutputError  error
 	ProcessError error
 	InputError   error
 }
