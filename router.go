@@ -16,16 +16,17 @@ import (
 )
 
 type Router struct {
-	contextCancel context.CancelFunc
-	Context       context.Context
-	// TODO(jwetzell): change to map for faster lookup
-	ModuleInstances []module.Module
-	RouteInstances  []route.Route
-	moduleWait      sync.WaitGroup
-	logger          *slog.Logger
-	tracer          trace.Tracer
+	contextCancel   context.CancelFunc
+	Context         context.Context
+	ModuleInstances map[string]module.Module
+	// TODO(jwetzell): change to something easier to lookup
+	RouteInstances []route.Route
+	moduleWait     sync.WaitGroup
+	logger         *slog.Logger
+	tracer         trace.Tracer
 }
 
+// TODO(jwetzell): support removing module
 func (r *Router) addModule(moduleDecl config.ModuleConfig) error {
 	if moduleDecl.Id == "" {
 		return errors.New("module id cannot be empty")
@@ -35,25 +36,21 @@ func (r *Router) addModule(moduleDecl config.ModuleConfig) error {
 		return errors.New("module type not defined")
 	}
 
-	moduleInstanceExists := false
-	for _, moduleInstance := range r.ModuleInstances {
-		if moduleInstance.Id() == moduleDecl.Id {
-			moduleInstanceExists = true
-			return errors.New("duplicate module id")
-		}
+	_, ok = r.ModuleInstances[moduleDecl.Id]
+	if ok {
+		return errors.New("module id already exists")
 	}
 
-	if !moduleInstanceExists {
-		moduleInstance, err := moduleInfo.New(moduleDecl)
-		if err != nil {
-			return err
-		}
-
-		r.ModuleInstances = append(r.ModuleInstances, moduleInstance)
+	moduleInstance, err := moduleInfo.New(moduleDecl)
+	if err != nil {
+		return err
 	}
+
+	r.ModuleInstances[moduleDecl.Id] = moduleInstance
 	return nil
 }
 
+// TODO(jwetzell): support removing route
 func (r *Router) addRoute(routeDecl config.RouteConfig) error {
 	routeInstance, err := route.NewRoute(routeDecl)
 	if err != nil {
@@ -64,18 +61,17 @@ func (r *Router) addRoute(routeDecl config.RouteConfig) error {
 }
 
 func (r *Router) getModule(moduleId string) module.Module {
-	for _, moduleInstance := range r.ModuleInstances {
-		if moduleInstance.Id() == moduleId {
-			return moduleInstance
-		}
+	moduleInstance, ok := r.ModuleInstances[moduleId]
+	if !ok {
+		return nil
 	}
-	return nil
+	return moduleInstance
 }
 
 func NewRouter(config config.Config, tracer trace.Tracer) (*Router, []module.ModuleError, []route.RouteError) {
 
 	router := Router{
-		ModuleInstances: []module.Module{},
+		ModuleInstances: make(map[string]module.Module),
 		RouteInstances:  []route.Route{},
 		logger:          slog.Default().With("component", "router"),
 		tracer:          tracer,
