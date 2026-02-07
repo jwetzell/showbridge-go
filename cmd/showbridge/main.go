@@ -91,6 +91,7 @@ type showbridgeApp struct {
 	router       *showbridge.Router
 	routerRunner *sync.WaitGroup
 	tracer       trace.Tracer
+	routerMutex  sync.Mutex
 }
 
 func readConfig(configPath string) (config.Config, error) {
@@ -182,11 +183,13 @@ func run(ctx context.Context, c *cli.Command) error {
 	if err != nil {
 		return fmt.Errorf("failed to initialize router: %w", err)
 	}
+	showbridgeApp.routerMutex.Lock()
 	showbridgeApp.router = router
 
 	showbridgeApp.routerRunner.Go(func() {
 		router.Start(context.Background())
 	})
+	showbridgeApp.routerMutex.Unlock()
 
 	go showbridgeApp.handleHangup()
 
@@ -208,6 +211,7 @@ func (app *showbridgeApp) handleHangup() {
 				app.logger.Error("failed to reload configuration", "error", err)
 				continue
 			}
+			app.routerMutex.Lock()
 			app.router.Stop()
 			app.routerRunner.Wait()
 			app.router = newRouter
@@ -215,6 +219,7 @@ func (app *showbridgeApp) handleHangup() {
 				app.router.Start(context.Background())
 			})
 			app.logger.Info("configuration reloaded successfully")
+			app.routerMutex.Unlock()
 		case <-app.ctx.Done():
 			return
 		}
