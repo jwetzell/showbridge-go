@@ -26,7 +26,6 @@ type Router struct {
 	tracer         trace.Tracer
 }
 
-// TODO(jwetzell): support removing module
 func (r *Router) addModule(moduleDecl config.ModuleConfig) error {
 	if moduleDecl.Id == "" {
 		return errors.New("module id cannot be empty")
@@ -47,6 +46,16 @@ func (r *Router) addModule(moduleDecl config.ModuleConfig) error {
 	}
 
 	r.ModuleInstances[moduleDecl.Id] = moduleInstance
+	return nil
+}
+
+func (r *Router) removeModule(moduleId string) error {
+	moduleInstance, ok := r.ModuleInstances[moduleId]
+	if !ok {
+		return errors.New("module id not found")
+	}
+	moduleInstance.Stop()
+	delete(r.ModuleInstances, moduleId)
 	return nil
 }
 
