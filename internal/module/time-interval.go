@@ -17,6 +17,7 @@ type TimeInterval struct {
 	router   route.RouteIO
 	ticker   *time.Ticker
 	logger   *slog.Logger
+	cancel   context.CancelFunc
 }
 
 func init() {
@@ -56,7 +57,9 @@ func (i *TimeInterval) Run(ctx context.Context) error {
 		return errors.New("time.interval unable to get router from context")
 	}
 	i.router = router
-	i.ctx = ctx
+	moduleContext, cancel := context.WithCancel(ctx)
+	i.ctx = moduleContext
+	i.cancel = cancel
 
 	ticker := time.NewTicker(time.Millisecond * time.Duration(i.Duration))
 	i.ticker = ticker
@@ -79,4 +82,8 @@ func (i *TimeInterval) Run(ctx context.Context) error {
 func (i *TimeInterval) Output(ctx context.Context, payload any) error {
 	i.ticker.Reset(time.Millisecond * time.Duration(i.Duration))
 	return nil
+}
+
+func (i *TimeInterval) Stop() {
+	i.cancel()
 }

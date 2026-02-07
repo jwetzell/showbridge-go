@@ -19,6 +19,7 @@ type UDPClient struct {
 	ctx    context.Context
 	router route.RouteIO
 	logger *slog.Logger
+	cancel context.CancelFunc
 }
 
 func init() {
@@ -80,7 +81,9 @@ func (uc *UDPClient) Run(ctx context.Context) error {
 		return errors.New("net.udp.client unable to get router from context")
 	}
 	uc.router = router
-	uc.ctx = ctx
+	moduleContext, cancel := context.WithCancel(ctx)
+	uc.ctx = moduleContext
+	uc.cancel = cancel
 
 	err := uc.SetupConn()
 	if err != nil {
@@ -111,4 +114,8 @@ func (uc *UDPClient) Output(ctx context.Context, payload any) error {
 		return errors.New("net.udp.client client is not setup")
 	}
 	return nil
+}
+
+func (uc *UDPClient) Stop() {
+	uc.cancel()
 }

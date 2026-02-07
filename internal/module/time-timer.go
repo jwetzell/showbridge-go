@@ -17,6 +17,7 @@ type TimeTimer struct {
 	router   route.RouteIO
 	timer    *time.Timer
 	logger   *slog.Logger
+	cancel   context.CancelFunc
 }
 
 func init() {
@@ -57,7 +58,9 @@ func (t *TimeTimer) Run(ctx context.Context) error {
 		return errors.New("net.tcp.client unable to get router from context")
 	}
 	t.router = router
-	t.ctx = ctx
+	moduleContext, cancel := context.WithCancel(ctx)
+	t.ctx = moduleContext
+	t.cancel = cancel
 
 	t.timer = time.NewTimer(time.Millisecond * time.Duration(t.Duration))
 	defer t.timer.Stop()
@@ -78,4 +81,8 @@ func (t *TimeTimer) Run(ctx context.Context) error {
 func (t *TimeTimer) Output(ctx context.Context, payload any) error {
 	t.timer.Reset(time.Millisecond * time.Duration(t.Duration))
 	return nil
+}
+
+func (t *TimeTimer) Stop() {
+	t.cancel()
 }

@@ -19,6 +19,7 @@ type Module interface {
 	Id() string
 	Type() string
 	Run(context.Context) error
+	Stop()
 	Output(context.Context, any) error
 }
 

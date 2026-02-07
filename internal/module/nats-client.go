@@ -19,6 +19,7 @@ type NATSClient struct {
 	Subject string
 	client  *nats.Conn
 	logger  *slog.Logger
+	cancel  context.CancelFunc
 }
 
 func init() {
@@ -71,7 +72,9 @@ func (nc *NATSClient) Run(ctx context.Context) error {
 	}
 
 	nc.router = router
-	nc.ctx = ctx
+	moduleContext, cancel := context.WithCancel(ctx)
+	nc.ctx = moduleContext
+	nc.cancel = cancel
 
 	client, err := nats.Connect(nc.URL, nats.RetryOnFailedConnect(true))
 
@@ -120,4 +123,8 @@ func (nc *NATSClient) Output(ctx context.Context, payload any) error {
 	err := nc.client.Publish(payloadMessage.Subject, payloadMessage.Payload)
 
 	return err
+}
+
+func (nc *NATSClient) Stop() {
+	nc.cancel()
 }

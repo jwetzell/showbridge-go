@@ -20,6 +20,7 @@ type UDPServer struct {
 	ctx        context.Context
 	router     route.RouteIO
 	logger     *slog.Logger
+	cancel     context.CancelFunc
 }
 
 func init() {
@@ -88,7 +89,9 @@ func (us *UDPServer) Run(ctx context.Context) error {
 		return errors.New("net.udp.server unable to get router from context")
 	}
 	us.router = router
-	us.ctx = ctx
+	moduleContext, cancel := context.WithCancel(ctx)
+	us.ctx = moduleContext
+	us.cancel = cancel
 
 	listener, err := net.ListenUDP("udp", us.Addr)
 	if err != nil {
@@ -128,4 +131,8 @@ func (us *UDPServer) Run(ctx context.Context) error {
 
 func (us *UDPServer) Output(ctx context.Context, payload any) error {
 	return errors.New("net.udp.server output is not implemented")
+}
+
+func (us *UDPServer) Stop() {
+	us.cancel()
 }

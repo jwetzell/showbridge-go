@@ -27,6 +27,7 @@ type TCPServer struct {
 	connections   []*net.TCPConn
 	connectionsMu sync.RWMutex
 	logger        *slog.Logger
+	cancel        context.CancelFunc
 }
 
 func init() {
@@ -105,6 +106,15 @@ ClientRead:
 	for {
 		select {
 		case <-ts.quit:
+			client.Close()
+			ts.connectionsMu.Lock()
+			for i := 0; i < len(ts.connections); i++ {
+				if ts.connections[i] == client {
+					ts.connections = slices.Delete(ts.connections, i, i+1)
+					break
+				}
+			}
+			ts.connectionsMu.Unlock()
 			return
 		default:
 			client.SetDeadline(time.Now().Add(time.Millisecond * 200))
@@ -166,7 +176,9 @@ func (ts *TCPServer) Run(ctx context.Context) error {
 		return errors.New("net.tcp.server unable to get router from context")
 	}
 	ts.router = router
-	ts.ctx = ctx
+	moduleContext, cancel := context.WithCancel(ctx)
+	ts.ctx = moduleContext
+	ts.cancel = cancel
 
 	listener, err := net.ListenTCP("tcp", ts.Addr)
 	if err != nil {
@@ -225,4 +237,9 @@ func (ts *TCPServer) Output(ctx context.Context, payload any) error {
 		return nil
 	}
 	return fmt.Errorf("net.tcp.server error during output: %s", errorString)
+}
+
+func (ts *TCPServer) Stop() {
+	ts.cancel()
+	ts.wg.Wait()
 }

@@ -17,6 +17,7 @@ type HTTPClient struct {
 	client *http.Client
 	router route.RouteIO
 	logger *slog.Logger
+	cancel context.CancelFunc
 }
 
 func init() {
@@ -44,7 +45,9 @@ func (hc *HTTPClient) Run(ctx context.Context) error {
 		return errors.New("http.client unable to get router from context")
 	}
 	hc.router = router
-	hc.ctx = ctx
+	moduleContext, cancel := context.WithCancel(ctx)
+	hc.ctx = moduleContext
+	hc.cancel = cancel
 
 	hc.client = &http.Client{
 		Timeout: 10 * time.Second,
@@ -78,4 +81,8 @@ func (hc *HTTPClient) Output(ctx context.Context, payload any) error {
 	}
 
 	return nil
+}
+
+func (hc *HTTPClient) Stop() {
+	hc.cancel()
 }

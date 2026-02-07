@@ -19,6 +19,7 @@ type UDPMulticast struct {
 	router route.RouteIO
 	Addr   *net.UDPAddr
 	logger *slog.Logger
+	cancel context.CancelFunc
 }
 
 func init() {
@@ -74,7 +75,9 @@ func (um *UDPMulticast) Run(ctx context.Context) error {
 		return errors.New("net.udp.multicast unable to get router from context")
 	}
 	um.router = router
-	um.ctx = ctx
+	moduleContext, cancel := context.WithCancel(ctx)
+	um.ctx = moduleContext
+	um.cancel = cancel
 
 	client, err := net.ListenMulticastUDP("udp", nil, um.Addr)
 	if err != nil {
@@ -129,4 +132,8 @@ func (um *UDPMulticast) Output(ctx context.Context, payload any) error {
 
 	_, err := um.conn.Write(payloadBytes)
 	return err
+}
+
+func (um *UDPMulticast) Stop() {
+	um.cancel()
 }

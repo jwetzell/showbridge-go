@@ -29,6 +29,7 @@ type SIPCallServer struct {
 	UserAgent string
 	dg        *diago.Diago
 	logger    *slog.Logger
+	cancel    context.CancelFunc
 }
 
 type SIPCallMessage struct {
@@ -118,7 +119,9 @@ func (scs *SIPCallServer) Run(ctx context.Context) error {
 		return errors.New("sip.call.server unable to get router from context")
 	}
 	scs.router = router
-	scs.ctx = ctx
+	moduleContext, cancel := context.WithCancel(ctx)
+	scs.ctx = moduleContext
+	scs.cancel = cancel
 
 	diagoLogger := slog.New(slog.NewJSONHandler(io.Discard, nil))
 
@@ -227,4 +230,8 @@ func (scs *SIPCallServer) Output(ctx context.Context, payload any) error {
 		return nil
 	}
 	return errors.New("sip.dtmf.server can only output SipDTMFResponse or SipAudioFileResponse")
+}
+
+func (scs *SIPCallServer) Stop() {
+	scs.cancel()
 }

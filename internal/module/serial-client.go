@@ -24,6 +24,7 @@ type SerialClient struct {
 	Mode   *serial.Mode
 	port   serial.Port
 	logger *slog.Logger
+	cancel context.CancelFunc
 }
 
 func init() {
@@ -108,7 +109,9 @@ func (sc *SerialClient) Run(ctx context.Context) error {
 	}
 
 	sc.router = router
-	sc.ctx = ctx
+	moduleContext, cancel := context.WithCancel(ctx)
+	sc.ctx = moduleContext
+	sc.cancel = cancel
 
 	// TODO(jwetzell): shutdown with router.Context properly
 	go func() {
@@ -179,4 +182,8 @@ func (sc *SerialClient) Output(ctx context.Context, payload any) error {
 
 	_, err := sc.port.Write(sc.Framer.Encode(payloadBytes))
 	return err
+}
+
+func (sc *SerialClient) Stop() {
+	sc.cancel()
 }

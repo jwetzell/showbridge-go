@@ -29,6 +29,7 @@ type SIPDTMFServer struct {
 	Transport string
 	Separator string
 	logger    *slog.Logger
+	cancel    context.CancelFunc
 }
 
 type SIPDTMFMessage struct {
@@ -120,7 +121,9 @@ func (sds *SIPDTMFServer) Run(ctx context.Context) error {
 		return errors.New("sip.dtmf.server unable to get router from context")
 	}
 	sds.router = router
-	sds.ctx = ctx
+	moduleContext, cancel := context.WithCancel(ctx)
+	sds.ctx = moduleContext
+	sds.cancel = cancel
 
 	diagoLogger := slog.New(slog.NewJSONHandler(io.Discard, nil))
 
@@ -242,4 +245,8 @@ func (sds *SIPDTMFServer) Output(ctx context.Context, payload any) error {
 	}
 
 	return errors.New("sip.dtmf.server can only output SipDTMFResponse or SipAudioFileResponse")
+}
+
+func (sds *SIPDTMFServer) Stop() {
+	sds.cancel()
 }

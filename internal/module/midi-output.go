@@ -21,6 +21,7 @@ type MIDIOutput struct {
 	Port     string
 	SendFunc func(midi.Message) error
 	logger   *slog.Logger
+	cancel   context.CancelFunc
 }
 
 func init() {
@@ -62,7 +63,9 @@ func (mo *MIDIOutput) Run(ctx context.Context) error {
 		return errors.New("midi.output unable to get router from context")
 	}
 	mo.router = router
-	mo.ctx = ctx
+	moduleContext, cancel := context.WithCancel(ctx)
+	mo.ctx = moduleContext
+	mo.cancel = cancel
 
 	out, err := midi.FindOutPort(mo.Port)
 
@@ -94,4 +97,8 @@ func (mo *MIDIOutput) Output(ctx context.Context, payload any) error {
 	}
 
 	return mo.SendFunc(payloadMessage)
+}
+
+func (mo *MIDIOutput) Stop() {
+	mo.cancel()
 }

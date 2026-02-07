@@ -20,6 +20,7 @@ type PSNClient struct {
 	router  route.RouteIO
 	decoder *psn.Decoder
 	logger  *slog.Logger
+	cancel  context.CancelFunc
 }
 
 func init() {
@@ -47,7 +48,9 @@ func (pc *PSNClient) Run(ctx context.Context) error {
 		return errors.New("psn.client unable to get router from context")
 	}
 	pc.router = router
-	pc.ctx = ctx
+	moduleContext, cancel := context.WithCancel(ctx)
+	pc.ctx = moduleContext
+	pc.cancel = cancel
 
 	addr, err := net.ResolveUDPAddr("udp", "236.10.10.10:56565")
 	if err != nil {
@@ -103,4 +106,8 @@ func (pc *PSNClient) Run(ctx context.Context) error {
 
 func (pc *PSNClient) Output(ctx context.Context, payload any) error {
 	return fmt.Errorf("psn.client output is not implemented")
+}
+
+func (pc *PSNClient) Stop() {
+	pc.cancel()
 }

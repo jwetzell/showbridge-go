@@ -19,6 +19,7 @@ type HTTPServer struct {
 	ctx    context.Context
 	router route.RouteIO
 	logger *slog.Logger
+	cancel context.CancelFunc
 }
 
 type ResponseIOError struct {
@@ -153,7 +154,9 @@ func (hs *HTTPServer) Run(ctx context.Context) error {
 		return errors.New("http.server unable to get router from context")
 	}
 	hs.router = router
-	hs.ctx = ctx
+	moduleContext, cancel := context.WithCancel(ctx)
+	hs.ctx = moduleContext
+	hs.cancel = cancel
 
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", hs.Port),
@@ -198,4 +201,8 @@ func (hs *HTTPServer) Output(ctx context.Context, payload any) error {
 	responseWriter.WriteHeader(payloadResponse.Status)
 	responseWriter.Write(payloadResponse.Body)
 	return nil
+}
+
+func (hs *HTTPServer) Stop() {
+	hs.cancel()
 }

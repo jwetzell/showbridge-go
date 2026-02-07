@@ -21,6 +21,7 @@ type TCPClient struct {
 	router route.RouteIO
 	Addr   *net.TCPAddr
 	logger *slog.Logger
+	cancel context.CancelFunc
 }
 
 func init() {
@@ -94,7 +95,9 @@ func (tc *TCPClient) Run(ctx context.Context) error {
 		return errors.New("net.tcp.client unable to get router from context")
 	}
 	tc.router = router
-	tc.ctx = ctx
+	moduleContext, cancel := context.WithCancel(ctx)
+	tc.ctx = moduleContext
+	tc.cancel = cancel
 
 	// TODO(jwetzell): shutdown with router.Context properly
 	go func() {
@@ -175,4 +178,8 @@ func (tc *TCPClient) Output(ctx context.Context, payload any) error {
 	}
 	_, err := tc.conn.Write(tc.framer.Encode(payloadBytes))
 	return err
+}
+
+func (tc *TCPClient) Stop() {
+	tc.cancel()
 }

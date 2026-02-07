@@ -19,6 +19,7 @@ type MQTTClient struct {
 	Topic    string
 	client   mqtt.Client
 	logger   *slog.Logger
+	cancel   context.CancelFunc
 }
 
 func init() {
@@ -82,7 +83,9 @@ func (mc *MQTTClient) Run(ctx context.Context) error {
 		return errors.New("mqtt.client unable to get router from context")
 	}
 	mc.router = router
-	mc.ctx = ctx
+	moduleContext, cancel := context.WithCancel(ctx)
+	mc.ctx = moduleContext
+	mc.cancel = cancel
 
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(mc.Broker)
@@ -98,6 +101,7 @@ func (mc *MQTTClient) Run(ctx context.Context) error {
 	}
 
 	mc.client = mqtt.NewClient(opts)
+	defer mc.client.Disconnect(250)
 
 	token := mc.client.Connect()
 
@@ -132,4 +136,8 @@ func (mc *MQTTClient) Output(ctx context.Context, payload any) error {
 	token.Wait()
 
 	return token.Error()
+}
+
+func (mc *MQTTClient) Stop() {
+	mc.cancel()
 }

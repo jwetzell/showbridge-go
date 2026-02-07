@@ -25,6 +25,7 @@ type MockCounterModule struct {
 	outputCount int
 	router      route.RouteIO
 	logger      *slog.Logger
+	cancel      context.CancelFunc
 }
 
 func (mcm *MockCounterModule) Id() string {
@@ -43,13 +44,19 @@ func (mcm *MockCounterModule) Run(ctx context.Context) error {
 		return fmt.Errorf("mock.counter could not get router from context")
 	}
 	mcm.router = router
-	mcm.ctx = ctx
+	moduleContext, cancel := context.WithCancel(ctx)
+	mcm.ctx = moduleContext
+	mcm.cancel = cancel
 	<-mcm.ctx.Done()
 	return nil
 }
 
 func (mcm *MockCounterModule) Type() string {
 	return mcm.config.Type
+}
+
+func (mcm *MockCounterModule) Stop() {
+	mcm.cancel()
 }
 
 func init() {
