@@ -222,6 +222,7 @@ func (app *showbridgeApp) handleHangup() {
 }
 
 func (app *showbridgeApp) getNewRouter() (*showbridge.Router, error) {
+	// TODO(jwetzell): what should happen when the config file is unchanged?
 	config, err := readConfig(app.configPath)
 	if err != nil {
 		return nil, err
