@@ -84,6 +84,15 @@ func main() {
 
 }
 
+type showbridgeApp struct {
+	ctx          context.Context
+	configPath   string
+	logger       *slog.Logger
+	router       *showbridge.Router
+	routerRunner *sync.WaitGroup
+	tracer       trace.Tracer
+}
+
 func readConfig(configPath string) (config.Config, error) {
 	cfg := config.Config{}
 
@@ -104,12 +113,7 @@ func readConfig(configPath string) (config.Config, error) {
 func run(ctx context.Context, c *cli.Command) error {
 	configPath := c.String("config")
 	if configPath == "" {
-		return errors.New("config value cannot be empty")
-	}
-
-	config, err := readConfig(configPath)
-	if err != nil {
-		return err
+		return errors.New("config path cannot be empty")
 	}
 
 	logLevel := slog.LevelInfo
@@ -150,8 +154,6 @@ func run(ctx context.Context, c *cli.Command) error {
 
 	slog.SetDefault(slog.New(logHandler))
 
-	commandLogger := slog.Default().With("component", "cmd")
-
 	var tracer trace.Tracer
 	if c.Bool("trace") {
 		exporter, err := otlptracehttp.New(ctx)
@@ -168,62 +170,78 @@ func run(ctx context.Context, c *cli.Command) error {
 		tracer = otel.Tracer("showbridge")
 	}
 
-	router, moduleErrors, routeErrors := showbridge.NewRouter(config, tracer)
-
-	for _, moduleError := range moduleErrors {
-		commandLogger.Error("problem initializing module", "index", moduleError.Index, "error", moduleError.Error)
+	showbridgeApp := &showbridgeApp{
+		ctx:          ctx,
+		configPath:   configPath,
+		logger:       slog.Default().With("component", "cmd"),
+		routerRunner: &sync.WaitGroup{},
+		tracer:       tracer,
 	}
 
-	for _, routeError := range routeErrors {
-		commandLogger.Error("problem initializing route", "index", routeError.Index, "error", routeError.Error)
+	router, err := showbridgeApp.getNewRouter()
+	if err != nil {
+		return fmt.Errorf("failed to initialize router: %w", err)
 	}
+	showbridgeApp.router = router
 
-	routerRunner := sync.WaitGroup{}
-
-	routerRunner.Go(func() {
+	showbridgeApp.routerRunner.Go(func() {
 		router.Start(context.Background())
 	})
 
-	go func() {
-		for {
-			select {
-			case <-sigHangup:
-				commandLogger.Info("received SIGHUP, reloading configuration")
-				newConfig, err := readConfig(configPath)
-				if err != nil {
-					commandLogger.Error("error reading config file", "error", err)
-					continue
-				}
-				newRouter, moduleErrors, routeErrors := showbridge.NewRouter(newConfig, tracer)
+	go showbridgeApp.handleHangup()
 
-				for _, moduleError := range moduleErrors {
-					commandLogger.Error("problem initializing module", "index", moduleError.Index, "error", moduleError.Error)
-				}
-
-				for _, routeError := range routeErrors {
-					commandLogger.Error("problem initializing route", "index", routeError.Index, "error", routeError.Error)
-				}
-
-				if moduleErrors == nil && routeErrors == nil {
-					router.Stop()
-					routerRunner.Wait()
-					router = newRouter
-					routerRunner.Go(func() {
-						router.Start(context.Background())
-					})
-				}
-			case <-ctx.Done():
-				return
-			}
-		}
-	}()
-
-	<-ctx.Done()
-	commandLogger.Debug("shutting down router")
-	router.Stop()
-	commandLogger.Debug("waiting for router to exit")
-	routerRunner.Wait()
+	<-showbridgeApp.ctx.Done()
+	showbridgeApp.logger.Debug("shutting down router")
+	showbridgeApp.router.Stop()
+	showbridgeApp.logger.Debug("waiting for router to exit")
+	showbridgeApp.routerRunner.Wait()
 	return nil
+}
+
+func (app *showbridgeApp) handleHangup() {
+	for {
+		select {
+		case <-sigHangup:
+			app.logger.Info("received SIGHUP, reloading configuration")
+			newRouter, err := app.getNewRouter()
+			if err != nil {
+				app.logger.Error("failed to reload configuration", "error", err)
+				continue
+			}
+			app.router.Stop()
+			app.routerRunner.Wait()
+			app.router = newRouter
+			app.routerRunner.Go(func() {
+				app.router.Start(context.Background())
+			})
+			app.logger.Info("configuration reloaded successfully")
+		case <-app.ctx.Done():
+			return
+		}
+	}
+}
+
+func (app *showbridgeApp) getNewRouter() (*showbridge.Router, error) {
+	config, err := readConfig(app.configPath)
+	if err != nil {
+		return nil, err
+	}
+
+	router, moduleErrors, routeErrors := showbridge.NewRouter(config, app.tracer)
+
+	for _, moduleError := range moduleErrors {
+		app.logger.Error("problem initializing module", "index", moduleError.Index, "error", moduleError.Error)
+	}
+
+	for _, routeError := range routeErrors {
+		app.logger.Error("problem initializing route", "index", routeError.Index, "error", routeError.Error)
+	}
+
+	if moduleErrors != nil || routeErrors != nil {
+		return nil, fmt.Errorf("errors initializing modules or routes")
+	}
+
+	return router, nil
 }
 
 func newTracerProvider(exp sdktrace.SpanExporter) *sdktrace.TracerProvider {
