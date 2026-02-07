@@ -88,7 +88,7 @@ func (tc *TCPClient) Type() string {
 }
 
 func (tc *TCPClient) Run(ctx context.Context) error {
-
+	tc.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 
 	if !ok {

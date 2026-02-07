@@ -51,7 +51,7 @@ func (t *TimeTimer) Type() string {
 }
 
 func (t *TimeTimer) Run(ctx context.Context) error {
-
+	t.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 
 	if !ok {

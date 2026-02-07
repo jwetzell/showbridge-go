@@ -39,6 +39,7 @@ func (hc *HTTPClient) Type() string {
 }
 
 func (hc *HTTPClient) Run(ctx context.Context) error {
+	hc.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 
 	if !ok {

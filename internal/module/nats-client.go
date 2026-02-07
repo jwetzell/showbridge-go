@@ -65,6 +65,7 @@ func (nc *NATSClient) Type() string {
 }
 
 func (nc *NATSClient) Run(ctx context.Context) error {
+	nc.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 
 	if !ok {

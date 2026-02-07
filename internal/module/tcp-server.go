@@ -169,7 +169,7 @@ ClientRead:
 }
 
 func (ts *TCPServer) Run(ctx context.Context) error {
-
+	ts.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 
 	if !ok {

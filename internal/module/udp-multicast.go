@@ -68,7 +68,7 @@ func (um *UDPMulticast) Type() string {
 }
 
 func (um *UDPMulticast) Run(ctx context.Context) error {
-
+	um.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 
 	if !ok {

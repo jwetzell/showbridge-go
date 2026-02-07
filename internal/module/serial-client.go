@@ -102,6 +102,7 @@ func (sc *SerialClient) SetupPort() error {
 }
 
 func (sc *SerialClient) Run(ctx context.Context) error {
+	sc.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 
 	if !ok {

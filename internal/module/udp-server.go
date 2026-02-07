@@ -82,7 +82,7 @@ func (us *UDPServer) Type() string {
 }
 
 func (us *UDPServer) Run(ctx context.Context) error {
-
+	us.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 
 	if !ok {

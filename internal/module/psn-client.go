@@ -42,6 +42,7 @@ func (pc *PSNClient) Type() string {
 }
 
 func (pc *PSNClient) Run(ctx context.Context) error {
+	pc.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 
 	if !ok {

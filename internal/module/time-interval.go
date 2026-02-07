@@ -50,7 +50,7 @@ func (i *TimeInterval) Type() string {
 }
 
 func (i *TimeInterval) Run(ctx context.Context) error {
-
+	i.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 
 	if !ok {
