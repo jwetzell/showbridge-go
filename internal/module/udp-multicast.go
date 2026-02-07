@@ -67,7 +67,7 @@ func (um *UDPMulticast) Type() string {
 	return um.config.Type
 }
 
-func (um *UDPMulticast) Run(ctx context.Context) error {
+func (um *UDPMulticast) Start(ctx context.Context) error {
 	um.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 

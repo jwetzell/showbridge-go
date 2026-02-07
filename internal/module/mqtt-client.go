@@ -76,7 +76,7 @@ func (mc *MQTTClient) Type() string {
 	return mc.config.Type
 }
 
-func (mc *MQTTClient) Run(ctx context.Context) error {
+func (mc *MQTTClient) Start(ctx context.Context) error {
 	mc.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 

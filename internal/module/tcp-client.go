@@ -87,7 +87,7 @@ func (tc *TCPClient) Type() string {
 	return tc.config.Type
 }
 
-func (tc *TCPClient) Run(ctx context.Context) error {
+func (tc *TCPClient) Start(ctx context.Context) error {
 	tc.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 

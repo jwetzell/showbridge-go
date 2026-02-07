@@ -18,7 +18,7 @@ type ModuleError struct {
 type Module interface {
 	Id() string
 	Type() string
-	Run(context.Context) error
+	Start(context.Context) error
 	Stop()
 	Output(context.Context, any) error
 }

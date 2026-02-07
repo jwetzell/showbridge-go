@@ -49,7 +49,7 @@ func (i *TimeInterval) Type() string {
 	return i.config.Type
 }
 
-func (i *TimeInterval) Run(ctx context.Context) error {
+func (i *TimeInterval) Start(ctx context.Context) error {
 	i.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 

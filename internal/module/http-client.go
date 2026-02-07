@@ -38,7 +38,7 @@ func (hc *HTTPClient) Type() string {
 	return hc.config.Type
 }
 
-func (hc *HTTPClient) Run(ctx context.Context) error {
+func (hc *HTTPClient) Start(ctx context.Context) error {
 	hc.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 

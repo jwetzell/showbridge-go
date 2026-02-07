@@ -58,13 +58,13 @@ func (r *Router) removeModule(moduleId string) error {
 	return nil
 }
 
-func (r *Router) runModule(ctx context.Context, moduleId string) error {
+func (r *Router) startModule(ctx context.Context, moduleId string) error {
 	moduleInstance := r.getModule(moduleId)
 	if moduleInstance == nil {
 		return errors.New("module id not found")
 	}
 	r.moduleWait.Go(func() {
-		err := moduleInstance.Run(ctx)
+		err := moduleInstance.Start(ctx)
 		if err != nil {
 			// TODO(jwetzell): propagate module run errors better
 			r.logger.Error("error encountered running module", "moduleId", moduleId, "error", err)
@@ -148,7 +148,7 @@ func NewRouter(config config.Config, tracer trace.Tracer) (*Router, []module.Mod
 	return &router, moduleErrors, routeErrors
 }
 
-func (r *Router) Run(ctx context.Context) {
+func (r *Router) Start(ctx context.Context) {
 	r.logger.Info("running")
 	routerContext, cancel := context.WithCancel(ctx)
 	r.Context = routerContext
@@ -157,7 +157,7 @@ func (r *Router) Run(ctx context.Context) {
 
 	for moduleId := range r.ModuleInstances {
 		// TODO(jwetzell): handle module run errors
-		r.runModule(contextWithRouter, moduleId)
+		r.startModule(contextWithRouter, moduleId)
 	}
 	<-r.Context.Done()
 	r.logger.Debug("waiting for modules to exit")

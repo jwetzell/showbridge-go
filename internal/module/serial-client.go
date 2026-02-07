@@ -101,7 +101,7 @@ func (sc *SerialClient) SetupPort() error {
 	return nil
 }
 
-func (sc *SerialClient) Run(ctx context.Context) error {
+func (sc *SerialClient) Start(ctx context.Context) error {
 	sc.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 

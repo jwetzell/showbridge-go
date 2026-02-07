@@ -54,7 +54,7 @@ func (mi *MIDIInput) Type() string {
 	return mi.config.Type
 }
 
-func (mi *MIDIInput) Run(ctx context.Context) error {
+func (mi *MIDIInput) Start(ctx context.Context) error {
 	mi.logger.Debug("running")
 	defer midi.CloseDriver()
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)

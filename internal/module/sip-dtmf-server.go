@@ -114,7 +114,7 @@ func (sds *SIPDTMFServer) Type() string {
 	return sds.config.Type
 }
 
-func (sds *SIPDTMFServer) Run(ctx context.Context) error {
+func (sds *SIPDTMFServer) Start(ctx context.Context) error {
 	sds.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 

@@ -55,7 +55,7 @@ func (mo *MIDIOutput) Type() string {
 	return mo.config.Type
 }
 
-func (mo *MIDIOutput) Run(ctx context.Context) error {
+func (mo *MIDIOutput) Start(ctx context.Context) error {
 	mo.logger.Debug("running")
 	defer midi.CloseDriver()
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)

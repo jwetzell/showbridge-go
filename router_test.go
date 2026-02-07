@@ -37,7 +37,7 @@ func (mcm *MockCounterModule) Output(context.Context, any) error {
 	return nil
 }
 
-func (mcm *MockCounterModule) Run(ctx context.Context) error {
+func (mcm *MockCounterModule) Start(ctx context.Context) error {
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 
 	if !ok {
@@ -173,7 +173,7 @@ func TestRouterInputSingleRoute(t *testing.T) {
 	routerRunner := sync.WaitGroup{}
 
 	routerRunner.Go(func() {
-		router.Run(t.Context())
+		router.Start(t.Context())
 		fmt.Println("router stopped")
 	})
 
@@ -245,7 +245,7 @@ func TestRouterInputMultipleRoutes(t *testing.T) {
 	routerRunner := sync.WaitGroup{}
 
 	routerRunner.Go(func() {
-		router.Run(t.Context())
+		router.Start(t.Context())
 	})
 	time.Sleep(time.Second * 1)
 
@@ -316,7 +316,7 @@ func TestRouterInputMultipleModules(t *testing.T) {
 	routerRunner := sync.WaitGroup{}
 
 	routerRunner.Go(func() {
-		router.Run(t.Context())
+		router.Start(t.Context())
 	})
 
 	time.Sleep(time.Second * 1)

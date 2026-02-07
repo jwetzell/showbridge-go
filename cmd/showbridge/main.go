@@ -177,7 +177,7 @@ func run(ctx context.Context, c *cli.Command) error {
 	routerRunner := sync.WaitGroup{}
 
 	routerRunner.Go(func() {
-		router.Run(context.Background())
+		router.Start(context.Background())
 	})
 
 	<-ctx.Done()

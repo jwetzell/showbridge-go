@@ -73,7 +73,7 @@ func (uc *UDPClient) SetupConn() error {
 	return err
 }
 
-func (uc *UDPClient) Run(ctx context.Context) error {
+func (uc *UDPClient) Start(ctx context.Context) error {
 	uc.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 

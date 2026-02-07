@@ -112,7 +112,7 @@ func (scs *SIPCallServer) Type() string {
 	return scs.config.Type
 }
 
-func (scs *SIPCallServer) Run(ctx context.Context) error {
+func (scs *SIPCallServer) Start(ctx context.Context) error {
 	scs.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 

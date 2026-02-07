@@ -64,7 +64,7 @@ func (nc *NATSClient) Type() string {
 	return nc.config.Type
 }
 
-func (nc *NATSClient) Run(ctx context.Context) error {
+func (nc *NATSClient) Start(ctx context.Context) error {
 	nc.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 

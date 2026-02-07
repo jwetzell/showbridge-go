@@ -147,7 +147,7 @@ func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (hs *HTTPServer) Run(ctx context.Context) error {
+func (hs *HTTPServer) Start(ctx context.Context) error {
 	hs.logger.Debug("running")
 	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
 
