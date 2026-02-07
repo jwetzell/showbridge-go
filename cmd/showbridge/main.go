@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"slices"
 	"sync"
+	"syscall"
 
 	"github.com/jwetzell/showbridge-go"
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -23,7 +24,8 @@ import (
 )
 
 var (
-	version = "dev"
+	version   = "dev"
+	sigHangup = make(chan os.Signal, 1)
 )
 
 func main() {
@@ -71,6 +73,8 @@ func main() {
 	}
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+
+	signal.Notify(sigHangup, syscall.SIGHUP)
 	defer cancel()
 	err := cmd.Run(ctx, os.Args)
 
@@ -179,6 +183,40 @@ func run(ctx context.Context, c *cli.Command) error {
 	routerRunner.Go(func() {
 		router.Start(context.Background())
 	})
+
+	go func() {
+		for {
+			select {
+			case <-sigHangup:
+				commandLogger.Info("received SIGHUP, reloading configuration")
+				newConfig, err := readConfig(configPath)
+				if err != nil {
+					commandLogger.Error("error reading config file", "error", err)
+					continue
+				}
+				newRouter, moduleErrors, routeErrors := showbridge.NewRouter(newConfig, tracer)
+
+				for _, moduleError := range moduleErrors {
+					commandLogger.Error("problem initializing module", "index", moduleError.Index, "error", moduleError.Error)
+				}
+
+				for _, routeError := range routeErrors {
+					commandLogger.Error("problem initializing route", "index", routeError.Index, "error", routeError.Error)
+				}
+
+				if moduleErrors == nil && routeErrors == nil {
+					router.Stop()
+					routerRunner.Wait()
+					router = newRouter
+					routerRunner.Go(func() {
+						router.Start(context.Background())
+					})
+				}
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
 
 	<-ctx.Done()
 	commandLogger.Debug("shutting down router")
