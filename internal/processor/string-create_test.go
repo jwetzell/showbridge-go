@@ -168,7 +168,7 @@ func TestBadStringCreate(t *testing.T) {
 
 			if err != nil {
 				if test.errorString != err.Error() {
-					t.Fatalf("string.encode got error '%s', expected '%s'", err.Error(), test.errorString)
+					t.Fatalf("string.create got error '%s', expected '%s'", err.Error(), test.errorString)
 				}
 				return
 			}
@@ -176,11 +176,11 @@ func TestBadStringCreate(t *testing.T) {
 			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			if err == nil {
-				t.Fatalf("string.encode expected to fail but got payload: %s", got)
+				t.Fatalf("string.create expected to fail but got payload: %s", got)
 			}
 
 			if err.Error() != test.errorString {
-				t.Fatalf("string.encode got error '%s', expected '%s'", err.Error(), test.errorString)
+				t.Fatalf("string.create got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
 	}
