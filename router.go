@@ -24,6 +24,7 @@ type Router struct {
 	moduleWait     sync.WaitGroup
 	logger         *slog.Logger
 	tracer         trace.Tracer
+	runningConfig  config.Config
 }
 
 func (r *Router) addModule(moduleDecl config.ModuleConfig) error {
@@ -107,6 +108,7 @@ func NewRouter(config config.Config, tracer trace.Tracer) (*Router, []module.Mod
 		RouteInstances:  []route.Route{},
 		logger:          slog.Default().With("component", "router"),
 		tracer:          tracer,
+		runningConfig:   config,
 	}
 	router.logger.Debug("creating")
 
@@ -249,4 +251,8 @@ func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload
 	}
 
 	return nil
+}
+
+func (r *Router) RunningConfig() config.Config {
+	return r.runningConfig
 }
