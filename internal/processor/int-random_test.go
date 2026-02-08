@@ -101,3 +101,75 @@ func TestGoodIntRandom(t *testing.T) {
 		})
 	}
 }
+
+func TestBadIntRandom(t *testing.T) {
+	tests := []struct {
+		name        string
+		params      map[string]any
+		payload     any
+		errorString string
+	}{
+		{
+			name:        "no min param",
+			payload:     "hello",
+			params:      map[string]any{"max": 10.0},
+			errorString: "int.random requires a min parameter",
+		},
+		{
+			name:        "no max param",
+			payload:     "hello",
+			params:      map[string]any{"min": 1.0},
+			errorString: "int.random requires a max parameter",
+		},
+		{
+			name:        "min param not a number",
+			payload:     "hello",
+			params:      map[string]any{"min": "1", "max": 10.0},
+			errorString: "int.random min must be a number",
+		},
+		{
+			name:        "max param not a number",
+			payload:     "hello",
+			params:      map[string]any{"min": 1.0, "max": "10"},
+			errorString: "int.random max must be a number",
+		},
+		{
+			name:        "max less than min",
+			payload:     "hello",
+			params:      map[string]any{"min": 1.0, "max": 0.0},
+			errorString: "int.random max must be greater than min",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+
+			registration, ok := processor.ProcessorRegistry["int.random"]
+			if !ok {
+				t.Fatalf("int.random processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "int.random",
+				Params: test.params,
+			})
+
+			if err != nil {
+				if test.errorString != err.Error() {
+					t.Fatalf("int.random got error '%s', expected '%s'", err.Error(), test.errorString)
+				}
+				return
+			}
+
+			got, err := processorInstance.Process(t.Context(), test.payload)
+
+			if err == nil {
+				t.Fatalf("int.random expected to fail but got payload: %s", got)
+			}
+
+			if err.Error() != test.errorString {
+				t.Fatalf("int.random got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+		})
+	}
+}
