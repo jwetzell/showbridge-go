@@ -5,8 +5,50 @@ import (
 	"testing"
 
 	"github.com/jwetzell/osc-go"
+	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
+
+func TestJsonEncodeFromRegistry(t *testing.T) {
+	registration, ok := processor.ProcessorRegistry["json.encode"]
+	if !ok {
+		t.Fatalf("json.encode processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "json.encode",
+	})
+	if err != nil {
+		t.Fatalf("failed to create json.encode processor: %s", err)
+	}
+
+	if processorInstance.Type() != "json.encode" {
+		t.Fatalf("json.encode processor has wrong type: %s", processorInstance.Type())
+	}
+
+	payload := struct {
+		Property string `json:"property"`
+	}{
+		Property: "hello",
+	}
+
+	expected := []byte("{\"property\":\"hello\"}")
+
+	got, err := processorInstance.Process(t.Context(), payload)
+	if err != nil {
+		t.Fatalf("json.encode processing failed: %s", err)
+	}
+
+	gotBytes, ok := got.([]byte)
+
+	if !ok {
+		t.Fatalf("json.encode should return byte slice")
+	}
+
+	if !slices.Equal(gotBytes, expected) {
+		t.Fatalf("json.encode got %+v, expected %+v", got, expected)
+	}
+}
 
 func TestGoodJsonEncode(t *testing.T) {
 	jsonEncoder := processor.JsonEncode{}
