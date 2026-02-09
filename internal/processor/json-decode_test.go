@@ -4,8 +4,48 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
+
+func TestJsonDecodeFromRegistry(t *testing.T) {
+	registration, ok := processor.ProcessorRegistry["json.decode"]
+	if !ok {
+		t.Fatalf("json.decode processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "json.decode",
+	})
+	if err != nil {
+		t.Fatalf("failed to create json.decode processor: %s", err)
+	}
+
+	if processorInstance.Type() != "json.decode" {
+		t.Fatalf("json.decode processor has wrong type: %s", processorInstance.Type())
+	}
+
+	payload := "{\"property\":\"hello\"}"
+
+	expected := map[string]any{
+		"property": "hello",
+	}
+
+	got, err := processorInstance.Process(t.Context(), payload)
+	if err != nil {
+		t.Fatalf("json.decode processing failed: %s", err)
+	}
+
+	gotMap, ok := got.(map[string]any)
+
+	if !ok {
+		t.Fatalf("json.decode should return byte slice")
+	}
+
+	if !reflect.DeepEqual(gotMap, expected) {
+		t.Fatalf("json.decode got %+v, expected %+v", got, expected)
+	}
+}
 
 func TestGoodJsonDecode(t *testing.T) {
 	jsonDecoder := processor.JsonDecode{}
