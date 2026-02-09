@@ -214,7 +214,7 @@ func (sds *SIPDTMFServer) Output(ctx context.Context, payload any) error {
 				return fmt.Errorf("sip.dtmf.server error output dtmf digit at index %d", i)
 			}
 		}
-		time.Sleep(time.Millisecond * time.Duration(payloadDTMFResponse.PreWait))
+		time.Sleep(time.Millisecond * time.Duration(payloadDTMFResponse.PostWait))
 		return nil
 	}
 
