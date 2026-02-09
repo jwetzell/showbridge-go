@@ -1,7 +1,9 @@
 <div align="center">
 
-  # showbridge (go edition)
+# showbridge (go edition)
 
+[![Coverage](https://github.com/jwetzell/showbridge-go/wiki/coverage.svg)](https://raw.githack.com/wiki/jwetzell/showbridge-go/coverage.html)
+	
 Simple protocol router _/s_
 
 </div>
