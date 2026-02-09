@@ -80,7 +80,6 @@ func TestBadStringDecode(t *testing.T) {
 		errorString string
 	}{
 		{
-			processor:   &stringDecoder,
 			name:        "non-[]byte input",
 			payload:     "hello",
 			errorString: "string.decode processor only accepts a []byte",
@@ -89,7 +88,7 @@ func TestBadStringDecode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := test.processor.Process(t.Context(), test.payload)
+			got, err := stringDecoder.Process(t.Context(), test.payload)
 
 			if err == nil {
 				t.Fatalf("string.decode expected to fail but got payload: %s", got)

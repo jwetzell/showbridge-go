@@ -47,22 +47,20 @@ func TestStringEncodeFromRegistry(t *testing.T) {
 func TestGoodStringEncode(t *testing.T) {
 	stringEncoder := processor.StringEncode{}
 	tests := []struct {
-		processor processor.Processor
-		name      string
-		payload   any
-		expected  []byte
+		name     string
+		payload  any
+		expected []byte
 	}{
 		{
-			processor: &stringEncoder,
-			name:      "hello",
-			payload:   "hello",
-			expected:  []byte{0x68, 0x65, 0x6c, 0x6c, 0x6f},
+			name:     "hello",
+			payload:  "hello",
+			expected: []byte{0x68, 0x65, 0x6c, 0x6c, 0x6f},
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := test.processor.Process(t.Context(), test.payload)
+			got, err := stringEncoder.Process(t.Context(), test.payload)
 
 			gotBytes, ok := got.([]byte)
 			if !ok {
