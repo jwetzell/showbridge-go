@@ -7,6 +7,7 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"path"
 	"sync"
 	"time"
 
@@ -20,16 +21,17 @@ import (
 )
 
 type SIPCallServer struct {
-	config    config.ModuleConfig
-	ctx       context.Context
-	router    route.RouteIO
-	IP        string
-	Port      int
-	Transport string
-	UserAgent string
-	dg        *diago.Diago
-	logger    *slog.Logger
-	cancel    context.CancelFunc
+	config        config.ModuleConfig
+	ctx           context.Context
+	router        route.RouteIO
+	IP            string
+	Port          int
+	Transport     string
+	UserAgent     string
+	RecordingPath string
+	dg            *diago.Diago
+	logger        *slog.Logger
+	cancel        context.CancelFunc
 }
 
 type SIPCallMessage struct {
@@ -99,7 +101,19 @@ func init() {
 				userAgentString = specificTransportString
 			}
 
-			return &SIPCallServer{config: config, IP: ipString, Port: int(portNum), Transport: transportString, UserAgent: userAgentString, logger: CreateLogger(config)}, nil
+			recordingPathString := ""
+
+			recordingPath, ok := params["recordingPath"]
+			if ok {
+				specificRecordingPath, ok := recordingPath.(string)
+
+				if !ok {
+					return nil, errors.New("sip.call.server recordingPath must be a string")
+				}
+				recordingPathString = specificRecordingPath
+			}
+
+			return &SIPCallServer{config: config, IP: ipString, Port: int(portNum), Transport: transportString, UserAgent: userAgentString, RecordingPath: recordingPathString, logger: CreateLogger(config)}, nil
 		},
 	})
 }
@@ -164,6 +178,41 @@ func (scs *SIPCallServer) HandleCall(inDialog *diago.DialogServerSession) {
 	dialogContext := context.WithValue(scs.ctx, sipCallContextKey("call"), &SIPCall{
 		inDialog: inDialog,
 	})
+
+	if scs.RecordingPath != "" {
+		filename := path.Join(scs.RecordingPath, fmt.Sprintf("%s-%d.wav", inDialog.ToUser(), time.Now().Unix()))
+		wavFile, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE, 0755)
+		if err != nil {
+			scs.logger.Error("error creating recording file", "error", err, "filename", filename)
+		} else {
+			recorder, err := inDialog.AudioStereoRecordingCreate(wavFile)
+			if err != nil {
+				scs.logger.Error("error creating recording", "error", err)
+				wavFile.Close()
+			} else {
+				go func() {
+					<-inDialog.Context().Done()
+					err := recorder.Close()
+					if err != nil {
+						scs.logger.Error("error closing recording", "error", err)
+					}
+					wavFile.Close()
+					scs.logger.Debug("finished recording", "filename", filename)
+				}()
+
+				go func() {
+					bytes, err := media.Copy(recorder.AudioReader(), recorder.AudioWriter())
+					fmt.Println("recorded bytes", bytes)
+					if err != nil {
+						if !errors.Is(err, io.EOF) {
+							scs.logger.Error("error while recording", "error", err)
+						}
+					}
+				}()
+			}
+		}
+	}
+
 	scs.router.HandleInput(dialogContext, scs.Id(), SIPCallMessage{
 		To: inDialog.ToUser(),
 	})
