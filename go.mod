@@ -5,7 +5,7 @@ go 1.25.5
 require (
 	github.com/eclipse/paho.mqtt.golang v1.5.1
 	github.com/emiago/diago v0.26.2
-	github.com/emiago/sipgo v1.1.2
+	github.com/emiago/sipgo v1.2.0
 	github.com/expr-lang/expr v1.17.7
 	github.com/extism/go-sdk v1.7.1
 	github.com/jwetzell/artnet-go v0.2.1
