@@ -72,6 +72,18 @@ func init() {
 				functionString = specificFunctionString
 			}
 
+			enableWasiBool := false
+
+			enableWasi, ok := params["enableWasi"]
+
+			if ok {
+				specificEnableWasi, ok := enableWasi.(bool)
+				if !ok {
+					return nil, fmt.Errorf("script.wasm enableWasi must be a boolean")
+				}
+				enableWasiBool = specificEnableWasi
+			}
+
 			manifest := extism.Manifest{
 				Wasm: []extism.Wasm{
 					extism.WasmFile{
@@ -80,7 +92,9 @@ func init() {
 				},
 			}
 
-			program, err := extism.NewCompiledPlugin(context.Background(), manifest, extism.PluginConfig{}, []extism.HostFunction{})
+			program, err := extism.NewCompiledPlugin(context.Background(), manifest, extism.PluginConfig{
+				EnableWasi: enableWasiBool,
+			}, []extism.HostFunction{})
 
 			if err != nil {
 				return nil, err

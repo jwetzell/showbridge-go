@@ -654,6 +654,10 @@
               "function": {
                 "type": "string",
                 "default": "process"
+              },
+              "enableWasi": {
+                "type": "boolean",
+                "default": false
               }
             },
             "required": ["path"],
