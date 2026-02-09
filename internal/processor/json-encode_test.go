@@ -9,16 +9,14 @@ import (
 )
 
 func TestGoodJsonEncode(t *testing.T) {
-	stringEncoder := processor.JsonEncode{}
+	jsonEncoder := processor.JsonEncode{}
 	tests := []struct {
-		processor processor.Processor
-		name      string
-		payload   any
-		expected  []byte
+		name     string
+		payload  any
+		expected []byte
 	}{
 		{
-			processor: &stringEncoder,
-			name:      "hello",
+			name: "hello",
 			payload: osc.OSCMessage{
 				Address: "/hello",
 			},
@@ -28,7 +26,7 @@ func TestGoodJsonEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := test.processor.Process(t.Context(), test.payload)
+			got, err := jsonEncoder.Process(t.Context(), test.payload)
 
 			gotBytes, ok := got.([]byte)
 			if !ok {
