@@ -35,3 +35,12 @@ jobs:
 
       - name: run tests
         run: go test ./...
+        
+      - name: Update coverage report
+        uses: ncruces/go-coverage-report@v0.3.2
+        with:
+          report: true
+          chart: true
+          amend: true
+        if: github.event_name == 'push'  
+        continue-on-error: true
