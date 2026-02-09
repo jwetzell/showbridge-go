@@ -136,6 +136,22 @@ func TestBadStringFilter(t *testing.T) {
 			},
 			errorString: "string.filter processor only accepts a string",
 		},
+		{
+			name:    "non-string pattern param",
+			payload: "hello",
+			params: map[string]any{
+				"pattern": 123,
+			},
+			errorString: "string.filter pattern must be a string",
+		},
+		{
+			name:    "invalid regex pattern",
+			payload: "hello",
+			params: map[string]any{
+				"pattern": "*invalid",
+			},
+			errorString: "error parsing regexp: missing argument to repetition operator: `*`",
+		},
 	}
 
 	for _, test := range tests {
