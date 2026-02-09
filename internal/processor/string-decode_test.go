@@ -45,7 +45,7 @@ func TestGoodStringDecode(t *testing.T) {
 		expected string
 	}{
 		{
-			name:     "hello",
+			name:     "basic string",
 			payload:  []byte{0x68, 0x65, 0x6c, 0x6c, 0x6f},
 			expected: "hello",
 		},

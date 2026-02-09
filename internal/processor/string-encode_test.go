@@ -52,7 +52,7 @@ func TestGoodStringEncode(t *testing.T) {
 		expected []byte
 	}{
 		{
-			name:     "hello",
+			name:     "basic string",
 			payload:  "hello",
 			expected: []byte{0x68, 0x65, 0x6c, 0x6c, 0x6f},
 		},
