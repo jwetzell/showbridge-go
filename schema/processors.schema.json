@@ -282,6 +282,17 @@
         "properties": {
           "type": {
             "type": "string",
+            "const": "json.decode"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
             "const": "json.encode"
           }
         },
