@@ -1,0 +1,127 @@
+package processor_test
+
+import (
+	"slices"
+	"testing"
+
+	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/processor"
+)
+
+func TestScriptWASMFromRegistry(t *testing.T) {
+	registration, ok := processor.ProcessorRegistry["script.wasm"]
+	if !ok {
+		t.Fatalf("script.wasm processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "script.wasm",
+		Params: map[string]any{
+			"path": "good.wasm",
+		},
+	})
+	if err != nil {
+		t.Fatalf("failed to create script.wasm processor: %s", err)
+	}
+
+	if processorInstance.Type() != "script.wasm" {
+		t.Fatalf("script.wasm processor has wrong type: %s", processorInstance.Type())
+	}
+
+}
+
+func TestScriptWASMNoPath(t *testing.T) {
+	registration, ok := processor.ProcessorRegistry["script.wasm"]
+	if !ok {
+		t.Fatalf("script.wasm processor not registered")
+	}
+
+	_, err := registration.New(config.ProcessorConfig{
+		Type:   "script.wasm",
+		Params: map[string]any{},
+	})
+
+	if err == nil {
+		t.Fatalf("script.wasm processor should have thrown an error when creating")
+	}
+}
+
+func TestScriptWASMBadConfigWrongPathType(t *testing.T) {
+	registration, ok := processor.ProcessorRegistry["script.wasm"]
+	if !ok {
+		t.Fatalf("script.wasm processor not registered")
+	}
+
+	_, err := registration.New(config.ProcessorConfig{
+		Type: "script.wasm",
+		Params: map[string]any{
+			"path": 12345,
+		},
+	})
+
+	if err == nil {
+		t.Fatalf("script.wasm processor should have thrown an error when creating with non-string path")
+	}
+}
+
+func TestGoodScriptWASM(t *testing.T) {
+	tests := []struct {
+		name     string
+		payload  []byte
+		params   map[string]any
+		expected []byte
+	}{
+		{
+			name: "number",
+			params: map[string]any{
+				"path":       "good.wasm",
+				"enableWasi": true,
+			},
+			payload:  []byte("hello"),
+			expected: []byte("Processed: hello"),
+		},
+		{
+			name: "number",
+			params: map[string]any{
+				"path":       "good.wasm",
+				"enableWasi": true,
+				"function":   "greet",
+			},
+			payload:  []byte("world"),
+			expected: []byte("Hello, world"),
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			registration, ok := processor.ProcessorRegistry["script.wasm"]
+			if !ok {
+				t.Fatalf("script.wasm processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "script.wasm",
+				Params: test.params,
+			})
+
+			if err != nil {
+				t.Fatalf("script.wasm failed to create processor: %s", err)
+			}
+
+			got, err := processorInstance.Process(t.Context(), test.payload)
+
+			if err != nil {
+				t.Fatalf("script.wasm process failed: %s", err)
+			}
+
+			gotBytes, ok := got.([]byte)
+			if !ok {
+				t.Fatalf("script.wasm returned a %T payload: %s", got, got)
+			}
+
+			if !slices.Equal(gotBytes, test.expected) {
+				t.Fatalf("script.wasm got %+v, expected %+v", gotBytes, test.expected)
+			}
+		})
+	}
+}
