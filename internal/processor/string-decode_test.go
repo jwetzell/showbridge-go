@@ -40,22 +40,20 @@ func TestStringDecodeFromRegistry(t *testing.T) {
 func TestGoodStringDecode(t *testing.T) {
 	stringDecoder := processor.StringDecode{}
 	tests := []struct {
-		processor processor.Processor
-		name      string
-		payload   any
-		expected  string
+		name     string
+		payload  any
+		expected string
 	}{
 		{
-			processor: &stringDecoder,
-			name:      "hello",
-			payload:   []byte{0x68, 0x65, 0x6c, 0x6c, 0x6f},
-			expected:  "hello",
+			name:     "hello",
+			payload:  []byte{0x68, 0x65, 0x6c, 0x6c, 0x6f},
+			expected: "hello",
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := test.processor.Process(t.Context(), test.payload)
+			got, err := stringDecoder.Process(t.Context(), test.payload)
 
 			gotString, ok := got.(string)
 			if !ok {
@@ -74,7 +72,6 @@ func TestGoodStringDecode(t *testing.T) {
 func TestBadStringDecode(t *testing.T) {
 	stringDecoder := processor.StringDecode{}
 	tests := []struct {
-		processor   processor.Processor
 		name        string
 		payload     any
 		errorString string
