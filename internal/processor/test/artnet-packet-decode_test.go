@@ -18,7 +18,7 @@ func TestArtnetPacketCreateFromRegistry(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Fatalf("failed to decode artnet.packet.decode processor: %s", err)
+		t.Fatalf("failed to create artnet.packet.decode processor: %s", err)
 	}
 
 	if processorInstance.Type() != "artnet.packet.decode" {
