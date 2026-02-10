@@ -91,12 +91,12 @@ func init() {
 			userAgent, ok := params["userAgent"]
 			if ok {
 
-				specificTransportString, ok := userAgent.(string)
+				specificUserAgentString, ok := userAgent.(string)
 
 				if !ok {
 					return nil, errors.New("sip.call.server userAgent must be a string")
 				}
-				userAgentString = specificTransportString
+				userAgentString = specificUserAgentString
 			}
 
 			return &SIPCallServer{config: config, IP: ipString, Port: int(portNum), Transport: transportString, UserAgent: userAgentString, logger: CreateLogger(config)}, nil
