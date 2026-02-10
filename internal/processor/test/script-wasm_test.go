@@ -125,3 +125,56 @@ func TestGoodScriptWASM(t *testing.T) {
 		})
 	}
 }
+
+func TestBadScriptWASM(t *testing.T) {
+	tests := []struct {
+		name        string
+		params      map[string]any
+		payload     any
+		errorString string
+	}{
+		{
+			name: "non-byte slice input",
+			params: map[string]any{
+				"path":       "good.wasm",
+				"enableWasi": true,
+			},
+			payload:     "hello",
+			errorString: "script.wasm can only operator on byte array",
+		},
+		{
+			name: "function not found in module",
+			params: map[string]any{
+				"path":       "good.wasm",
+				"enableWasi": true,
+				"function":   "asdf",
+			},
+			payload:     []byte("hello"),
+			errorString: "unknown function: asdf",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			registration, ok := processor.ProcessorRegistry["script.wasm"]
+			if !ok {
+				t.Fatalf("script.wasm processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "script.wasm",
+				Params: test.params,
+			})
+
+			got, err := processorInstance.Process(t.Context(), test.payload)
+
+			if err == nil {
+				t.Fatalf("script.wasm expected to fail but succeeded, got: %v", got)
+			}
+
+			if err.Error() != test.errorString {
+				t.Fatalf("script.wasm got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+		})
+	}
+}
