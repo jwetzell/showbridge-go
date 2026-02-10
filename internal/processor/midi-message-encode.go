@@ -18,7 +18,7 @@ func (mme *MIDIMessageEncode) Process(ctx context.Context, payload any) (any, er
 	payloadMessage, ok := payload.(midi.Message)
 
 	if !ok {
-		return nil, errors.New("midi.message.encode processor only accepts an midi.Message")
+		return nil, errors.New("midi.message.encode processor only accepts a midi.Message")
 	}
 
 	return payloadMessage.Bytes(), nil

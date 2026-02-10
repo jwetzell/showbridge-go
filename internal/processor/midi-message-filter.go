@@ -19,7 +19,7 @@ func (mmf *MIDIMessageFilter) Process(ctx context.Context, payload any) (any, er
 	payloadMessage, ok := payload.(midi.Message)
 
 	if !ok {
-		return nil, errors.New("midi.message.filter processor only accepts an midi.Message")
+		return nil, errors.New("midi.message.filter processor only accepts a midi.Message")
 	}
 
 	if payloadMessage.Type().String() != mmf.MIDIType {
