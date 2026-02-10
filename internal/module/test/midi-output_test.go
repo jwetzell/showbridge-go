@@ -33,3 +33,55 @@ func TestMIDIOutputFromRegistry(t *testing.T) {
 		t.Fatalf("midi.output module has wrong type: %s", moduleInstance.Type())
 	}
 }
+
+func TestBadMIDIOutput(t *testing.T) {
+	tests := []struct {
+		name        string
+		params      map[string]any
+		errorString string
+	}{
+		{
+			name:        "no port param",
+			params:      map[string]any{},
+			errorString: "midi.output requires a port parameter",
+		},
+		{
+			name:        "non-string port",
+			params:      map[string]any{"port": 123},
+			errorString: "midi.output port must be a string",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+
+			registration, ok := module.ModuleRegistry["midi.output"]
+			if !ok {
+				t.Fatalf("midi.output module not registered")
+			}
+
+			moduleInstance, err := registration.New(config.ModuleConfig{
+				Id:     "test",
+				Type:   "midi.output",
+				Params: test.params,
+			})
+
+			if err != nil {
+				if test.errorString != err.Error() {
+					t.Fatalf("midi.output got error '%s', expected '%s'", err.Error(), test.errorString)
+				}
+				return
+			}
+
+			err = moduleInstance.Start(t.Context())
+
+			if err == nil {
+				t.Fatalf("midi.output expected to fail")
+			}
+
+			if err.Error() != test.errorString {
+				t.Fatalf("midi.output got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+		})
+	}
+}

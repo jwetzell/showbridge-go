@@ -33,3 +33,44 @@ func TestSIPDTMFServerFromRegistry(t *testing.T) {
 		t.Fatalf("sip.dtmf.server module has wrong type: %s", moduleInstance.Type())
 	}
 }
+
+func TestBadSIPDTMFServer(t *testing.T) {
+	tests := []struct {
+		name        string
+		params      map[string]any
+		errorString string
+	}{}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+
+			registration, ok := module.ModuleRegistry["sip.dtmf.server"]
+			if !ok {
+				t.Fatalf("sip.dtmf.server module not registered")
+			}
+
+			moduleInstance, err := registration.New(config.ModuleConfig{
+				Id:     "test",
+				Type:   "sip.dtmf.server",
+				Params: test.params,
+			})
+
+			if err != nil {
+				if test.errorString != err.Error() {
+					t.Fatalf("sip.dtmf.server got error '%s', expected '%s'", err.Error(), test.errorString)
+				}
+				return
+			}
+
+			err = moduleInstance.Start(t.Context())
+
+			if err == nil {
+				t.Fatalf("sip.dtmf.server expected to fail")
+			}
+
+			if err.Error() != test.errorString {
+				t.Fatalf("sip.dtmf.server got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+		})
+	}
+}

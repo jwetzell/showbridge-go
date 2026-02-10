@@ -30,3 +30,44 @@ func TestSIPCallServerFromRegistry(t *testing.T) {
 		t.Fatalf("sip.call.server module has wrong type: %s", moduleInstance.Type())
 	}
 }
+
+func TestBadSIPCallServer(t *testing.T) {
+	tests := []struct {
+		name        string
+		params      map[string]any
+		errorString string
+	}{}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+
+			registration, ok := module.ModuleRegistry["sip.call.server"]
+			if !ok {
+				t.Fatalf("sip.call.server module not registered")
+			}
+
+			moduleInstance, err := registration.New(config.ModuleConfig{
+				Id:     "test",
+				Type:   "sip.call.server",
+				Params: test.params,
+			})
+
+			if err != nil {
+				if test.errorString != err.Error() {
+					t.Fatalf("sip.call.server got error '%s', expected '%s'", err.Error(), test.errorString)
+				}
+				return
+			}
+
+			err = moduleInstance.Start(t.Context())
+
+			if err == nil {
+				t.Fatalf("sip.call.server expected to fail")
+			}
+
+			if err.Error() != test.errorString {
+				t.Fatalf("sip.call.server got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+		})
+	}
+}

@@ -35,3 +35,75 @@ func TestTCPClientFromRegistry(t *testing.T) {
 		t.Fatalf("net.tcp.client module has wrong type: %s", moduleInstance.Type())
 	}
 }
+
+func TestBadTCPClient(t *testing.T) {
+	tests := []struct {
+		name        string
+		params      map[string]any
+		errorString string
+	}{
+		{
+			name: "no port param",
+			params: map[string]any{
+				"host": "localhost",
+			},
+			errorString: "net.tcp.client requires a port parameter",
+		},
+		{
+			name: "non-number port param",
+			params: map[string]any{
+				"host": "localhost",
+				"port": "8000",
+			},
+			errorString: "net.tcp.client port must be a number",
+		},
+		{
+			name: "no host param",
+			params: map[string]any{
+				"port": 8000.0,
+			},
+			errorString: "net.tcp.client requires a host parameter",
+		},
+		{
+			name: "non-string host param",
+			params: map[string]any{
+				"host": 123,
+				"port": 8000.0,
+			},
+			errorString: "net.tcp.client host must be a string",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+
+			registration, ok := module.ModuleRegistry["net.tcp.client"]
+			if !ok {
+				t.Fatalf("net.tcp.client module not registered")
+			}
+
+			moduleInstance, err := registration.New(config.ModuleConfig{
+				Id:     "test",
+				Type:   "net.tcp.client",
+				Params: test.params,
+			})
+
+			if err != nil {
+				if test.errorString != err.Error() {
+					t.Fatalf("net.tcp.client got error '%s', expected '%s'", err.Error(), test.errorString)
+				}
+				return
+			}
+
+			err = moduleInstance.Start(t.Context())
+
+			if err == nil {
+				t.Fatalf("net.tcp.client expected to fail")
+			}
+
+			if err.Error() != test.errorString {
+				t.Fatalf("net.tcp.client got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+		})
+	}
+}
