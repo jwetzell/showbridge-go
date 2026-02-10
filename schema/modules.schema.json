@@ -308,6 +308,10 @@
                 "enum": ["udp", "tcp", "ws", "udp4", "tcp4"],
                 "default": "udp"
               },
+              "userAgent": {
+                "type": "string",
+                "default": "showbridge"
+              },
               "separator": {
                 "type": "string",
                 "minLength": 1,

@@ -27,6 +27,7 @@ type SIPDTMFServer struct {
 	IP        string
 	Port      int
 	Transport string
+	UserAgent string
 	Separator string
 	logger    *slog.Logger
 	cancel    context.CancelFunc
@@ -85,6 +86,19 @@ func init() {
 				transportString = specificTransportString
 			}
 
+			userAgentString := "showbridge"
+
+			userAgent, ok := params["userAgent"]
+			if ok {
+
+				specificUserAgentString, ok := userAgent.(string)
+
+				if !ok {
+					return nil, errors.New("sip.call.server userAgent must be a string")
+				}
+				userAgentString = specificUserAgentString
+			}
+
 			separator, ok := params["separator"]
 			if !ok {
 				return nil, errors.New("sip.dtmf.server requires a separator parameter")
@@ -101,7 +115,7 @@ func init() {
 			if !strings.ContainsRune("0123456789*#ABCD", rune(separatorString[0])) {
 				return nil, errors.New("sip.dtmf.server separator must be a valid DTMF character")
 			}
-			return &SIPDTMFServer{config: config, IP: ipString, Port: int(portNum), Transport: transportString, Separator: separatorString, logger: CreateLogger(config)}, nil
+			return &SIPDTMFServer{config: config, IP: ipString, Port: int(portNum), Transport: transportString, UserAgent: userAgentString, Separator: separatorString, logger: CreateLogger(config)}, nil
 		},
 	})
 }
@@ -129,6 +143,7 @@ func (sds *SIPDTMFServer) Start(ctx context.Context) error {
 	diagoLogger := slog.New(slog.NewJSONHandler(io.Discard, nil))
 
 	ua, _ := sipgo.NewUA(
+		sipgo.WithUserAgent(sds.UserAgent),
 		sipgo.WithUserAgentTransportLayerOptions(sip.WithTransportLayerLogger(diagoLogger)),
 		sipgo.WithUserAgentTransactionLayerOptions(sip.WithTransactionLayerLogger(diagoLogger)),
 	)
