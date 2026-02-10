@@ -78,7 +78,7 @@ func (us *UDPServer) Id() string {
 }
 
 func (us *UDPServer) Type() string {
-	return us.config.Id
+	return us.config.Type
 }
 
 func (us *UDPServer) Start(ctx context.Context) error {
