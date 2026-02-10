@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"log/slog"
 	"net"
 	"time"
@@ -54,7 +53,7 @@ func init() {
 
 			addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", ipString, uint16(portNum)))
 			if err != nil {
-				log.Fatalf("error resolving UDP address: %v", err)
+				return nil, err
 			}
 
 			bufferSizeNum := 2048
