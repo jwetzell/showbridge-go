@@ -36,7 +36,7 @@ func init() {
 			durationNum, ok := duration.(float64)
 
 			if !ok {
-				return nil, errors.New("time.sleep duration must be number")
+				return nil, errors.New("time.sleep duration must be a number")
 			}
 
 			return &MetaDelay{config: config, Duration: time.Millisecond * time.Duration(durationNum)}, nil

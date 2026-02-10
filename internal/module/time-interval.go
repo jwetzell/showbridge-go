@@ -34,7 +34,7 @@ func init() {
 			durationNum, ok := duration.(float64)
 
 			if !ok {
-				return nil, errors.New("time.interval duration must be number")
+				return nil, errors.New("time.interval duration must be a number")
 			}
 			return &TimeInterval{Duration: uint32(durationNum), config: config, logger: CreateLogger(config)}, nil
 		},

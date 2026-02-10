@@ -36,7 +36,7 @@ func init() {
 			brokerString, ok := broker.(string)
 
 			if !ok {
-				return nil, errors.New("mqtt.client broker must be string")
+				return nil, errors.New("mqtt.client broker must be a string")
 			}
 
 			topic, ok := params["topic"]
@@ -48,7 +48,7 @@ func init() {
 			topicString, ok := topic.(string)
 
 			if !ok {
-				return nil, errors.New("mqtt.client topic must be string")
+				return nil, errors.New("mqtt.client topic must be a string")
 			}
 
 			clientId, ok := params["clientId"]
@@ -60,7 +60,7 @@ func init() {
 			clientIdString, ok := clientId.(string)
 
 			if !ok {
-				return nil, errors.New("mqtt.client clientId must be string")
+				return nil, errors.New("mqtt.client clientId must be a string")
 			}
 
 			return &MQTTClient{config: config, Broker: brokerString, Topic: topicString, ClientID: clientIdString, logger: CreateLogger(config)}, nil

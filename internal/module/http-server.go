@@ -65,7 +65,7 @@ func init() {
 			portNum, ok := port.(float64)
 
 			if !ok {
-				return nil, errors.New("http.server port must be uint16")
+				return nil, errors.New("http.server port must be a number")
 			}
 
 			return &HTTPServer{Port: uint16(portNum), config: config, logger: CreateLogger(config)}, nil

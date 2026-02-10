@@ -38,7 +38,7 @@ func init() {
 			hostString, ok := host.(string)
 
 			if !ok {
-				return nil, errors.New("net.tcp.client host must be string")
+				return nil, errors.New("net.tcp.client host must be a string")
 			}
 
 			port, ok := params["port"]

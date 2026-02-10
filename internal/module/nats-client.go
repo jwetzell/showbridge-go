@@ -36,7 +36,7 @@ func init() {
 			urlString, ok := url.(string)
 
 			if !ok {
-				return nil, errors.New("nats.client url must be string")
+				return nil, errors.New("nats.client url must be a string")
 			}
 
 			subject, ok := params["subject"]
@@ -48,7 +48,7 @@ func init() {
 			subjectString, ok := subject.(string)
 
 			if !ok {
-				return nil, errors.New("nats.client subject must be string")
+				return nil, errors.New("nats.client subject must be a string")
 			}
 
 			return &NATSClient{config: config, URL: urlString, Subject: subjectString, logger: CreateLogger(config)}, nil
