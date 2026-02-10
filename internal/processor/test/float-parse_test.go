@@ -80,37 +80,55 @@ func TestFloatParseGoodConfig(t *testing.T) {
 }
 
 func TestGoodFloatParse(t *testing.T) {
-	floatParser := processor.FloatParse{}
 	tests := []struct {
-		processor processor.Processor
-		name      string
-		payload   any
-		bitSize   int
-		expected  float64
+		name     string
+		params   map[string]any
+		payload  any
+		expected float64
 	}{
 		{
-			name:     "positive number",
+			name: "positive number",
+			params: map[string]any{
+				"bitSize": 64.0,
+			},
 			payload:  "12345.67",
-			bitSize:  64,
 			expected: 12345.67,
 		},
 		{
-			name:     "negative number",
+			name: "negative number",
+			params: map[string]any{
+				"bitSize": 64.0,
+			},
 			payload:  "-12345.67",
-			bitSize:  64,
 			expected: -12345.67,
 		},
 		{
-			name:     "zero",
+			name: "zero",
+			params: map[string]any{
+				"bitSize": 64.0,
+			},
 			payload:  "0",
-			bitSize:  64,
 			expected: 0,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := floatParser.Process(t.Context(), test.payload)
+			registration, ok := processor.ProcessorRegistry["float.parse"]
+			if !ok {
+				t.Fatalf("float.parse processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "float.parse",
+				Params: test.params,
+			})
+
+			if err != nil {
+				t.Fatalf("float.parse failed to create processor: %s", err)
+			}
+
+			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			gotFloat, ok := got.(float64)
 			if !ok {
@@ -128,38 +146,50 @@ func TestGoodFloatParse(t *testing.T) {
 
 func TestBadFloatParse(t *testing.T) {
 	tests := []struct {
-		processor   processor.Processor
 		name        string
+		params      map[string]any
 		payload     any
-		bitSize     int
 		errorString string
 	}{
 		{
-			name:        "non-string input",
+			name: "non-string input",
+			params: map[string]any{
+				"bitSize": 64.0,
+			},
 			payload:     []byte{0x01},
-			bitSize:     64,
 			errorString: "float.parse processor only accepts a string",
 		},
 		{
-			name:        "not float string",
+			name: "not float string",
+			params: map[string]any{
+				"bitSize": 64.0,
+			},
 			payload:     "abcd",
-			bitSize:     64,
 			errorString: "strconv.ParseFloat: parsing \"abcd\": invalid syntax",
 		},
 		{
-			name:        "bit size overflow",
+			name: "bit size overflow",
+			params: map[string]any{
+				"bitSize": 32.0,
+			},
 			payload:     "1.79e+64",
-			bitSize:     32,
 			errorString: "strconv.ParseFloat: parsing \"1.79e+64\": value out of range",
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			floatParser := processor.FloatParse{
-				BitSize: test.bitSize,
+			registration, ok := processor.ProcessorRegistry["float.parse"]
+			if !ok {
+				t.Fatalf("float.parse processor not registered")
 			}
-			got, err := floatParser.Process(t.Context(), test.payload)
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "float.parse",
+				Params: test.params,
+			})
+
+			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			if err == nil {
 				t.Fatalf("float.parse expected to fail but succeeded, got: %v", got)

@@ -49,22 +49,36 @@ func TestStringSplitFromRegistry(t *testing.T) {
 
 func TestGoodStringSplit(t *testing.T) {
 	tests := []struct {
-		processor processor.Processor
-		name      string
-		payload   any
-		expected  []string
+		name     string
+		params   map[string]any
+		payload  any
+		expected []string
 	}{
 		{
-			processor: &processor.StringSplit{Separator: ","},
-			name:      "comma separated",
-			payload:   "part1,part2,part3",
-			expected:  []string{"part1", "part2", "part3"},
+			name:     "comma separated",
+			params:   map[string]any{"separator": ","},
+			payload:  "part1,part2,part3",
+			expected: []string{"part1", "part2", "part3"},
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := test.processor.Process(t.Context(), test.payload)
+			registration, ok := processor.ProcessorRegistry["string.split"]
+			if !ok {
+				t.Fatalf("string.split processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "string.split",
+				Params: test.params,
+			})
+
+			if err != nil {
+				t.Fatalf("string.split failed to create processor: %s", err)
+			}
+
+			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			gotStrings, ok := got.([]string)
 			if !ok {

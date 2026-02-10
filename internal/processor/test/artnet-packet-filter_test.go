@@ -71,12 +71,15 @@ func TestGoodArtnetPacketFilter(t *testing.T) {
 
 	tests := []struct {
 		name     string
+		params   map[string]any
 		payload  any
-		opCode   uint16
 		expected artnet.ArtNetPacket
 	}{
 		{
 			name: "tiemcode packet with matching opCode",
+			params: map[string]any{
+				"opCode": float64(artnet.OpTimeCode),
+			},
 			payload: &artnet.ArtTimeCode{
 				ID:        []byte{'A', 'r', 't', '-', 'N', 'e', 't', 0x00},
 				OpCode:    artnet.OpTimeCode,
@@ -90,7 +93,6 @@ func TestGoodArtnetPacketFilter(t *testing.T) {
 				Hours:     0,
 				Type:      0,
 			},
-			opCode: artnet.OpTimeCode,
 			expected: &artnet.ArtTimeCode{
 				ID:        []byte{'A', 'r', 't', '-', 'N', 'e', 't', 0x00},
 				OpCode:    artnet.OpTimeCode,
@@ -106,7 +108,10 @@ func TestGoodArtnetPacketFilter(t *testing.T) {
 			},
 		},
 		{
-			name: "tiemcode packet with mismatching opCode",
+			name: "timecode packet with mismatching opCode",
+			params: map[string]any{
+				"opCode": float64(artnet.OpDmx),
+			},
 			payload: &artnet.ArtTimeCode{
 				ID:        []byte{'A', 'r', 't', '-', 'N', 'e', 't', 0x00},
 				OpCode:    artnet.OpTimeCode,
@@ -120,17 +125,27 @@ func TestGoodArtnetPacketFilter(t *testing.T) {
 				Hours:     0,
 				Type:      0,
 			},
-			opCode:   artnet.OpDmx,
 			expected: nil,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			artnetPacketFilter := processor.ArtNetPacketFilter{
-				OpCode: test.opCode,
+			registration, ok := processor.ProcessorRegistry["artnet.packet.filter"]
+			if !ok {
+				t.Fatalf("artnet.packet.filter processor not registered")
 			}
-			got, err := artnetPacketFilter.Process(t.Context(), test.payload)
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "artnet.packet.filter",
+				Params: test.params,
+			})
+
+			if err != nil {
+				t.Fatalf("artnet.packet.filter failed to create processor: %s", err)
+			}
+
+			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			if err != nil {
 				t.Fatalf("artnet.packet.filter failed: %s", err)
@@ -158,8 +173,8 @@ func TestGoodArtnetPacketFilter(t *testing.T) {
 func TestBadArtnetPacketFilter(t *testing.T) {
 	tests := []struct {
 		name        string
-		payload     any
 		params      map[string]any
+		payload     any
 		errorString string
 	}{
 		{

@@ -2,7 +2,6 @@ package processor_test
 
 import (
 	"testing"
-	"text/template"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
@@ -53,37 +52,37 @@ func TestGoodStringCreate(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		template string
+		params   map[string]any
 		payload  any
 		expected string
 	}{
 		{
 			name:     "string payload",
-			template: "{{.}}",
+			params:   map[string]any{"template": "{{.}}"},
 			payload:  "hello",
 			expected: "hello",
 		},
 		{
 			name:     "number payload",
-			template: "{{.}}",
+			params:   map[string]any{"template": "{{.}}"},
 			payload:  4,
 			expected: "4",
 		},
 		{
 			name:     "boolean payload",
-			template: "{{.}}",
+			params:   map[string]any{"template": "{{.}}"},
 			payload:  true,
 			expected: "true",
 		},
 		{
 			name:     "struct payload - field",
-			template: "{{.Data}}",
+			params:   map[string]any{"template": "{{.Data}}"},
 			payload:  TestStruct{Data: "test"},
 			expected: "test",
 		},
 		{
 			name:     "struct payload - method",
-			template: "{{.GetData}}",
+			params:   map[string]any{"template": "{{.GetData}}"},
 			payload:  TestStruct{Data: "test"},
 			expected: "test",
 		},
@@ -91,14 +90,21 @@ func TestGoodStringCreate(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			template, err := template.New("template").Parse(test.template)
-			if err != nil {
-				t.Fatalf("string.create template parsing failed: %s", err)
+			registration, ok := processor.ProcessorRegistry["string.create"]
+			if !ok {
+				t.Fatalf("string.create processor not registered")
 			}
 
-			processor := &processor.StringCreate{Template: template}
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "string.create",
+				Params: test.params,
+			})
 
-			got, err := processor.Process(t.Context(), test.payload)
+			if err != nil {
+				t.Fatalf("string.create failed to create processor: %s", err)
+			}
+
+			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			gotStrings, ok := got.(string)
 			if !ok {

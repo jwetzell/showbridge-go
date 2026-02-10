@@ -67,27 +67,37 @@ func TestIntRandomGoodConfig(t *testing.T) {
 
 func TestGoodIntRandom(t *testing.T) {
 	tests := []struct {
-		processor processor.Processor
-		name      string
-		payload   any
-		min       int
-		max       int
+		name    string
+		payload any
+		params  map[string]any
 	}{
 		{
-			name:    "1-10",
+			name: "1-10",
+			params: map[string]any{
+				"min": 1.0,
+				"max": 10.0,
+			},
 			payload: "12345",
-			min:     1,
-			max:     10,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			intRandom := processor.IntRandom{
-				Min: test.min,
-				Max: test.max,
+			registration, ok := processor.ProcessorRegistry["int.random"]
+			if !ok {
+				t.Fatalf("int.random processor not registered")
 			}
-			got, err := intRandom.Process(t.Context(), test.payload)
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "int.random",
+				Params: test.params,
+			})
+
+			if err != nil {
+				t.Fatalf("int.random failed to create processor: %s", err)
+			}
+
+			got, err := processorInstance.Process(t.Context(), test.payload)
 			gotInt, ok := got.(int)
 			if !ok {
 				t.Fatalf("int.random returned a %T payload: %s", got, got)
@@ -95,8 +105,18 @@ func TestGoodIntRandom(t *testing.T) {
 			if err != nil {
 				t.Fatalf("int.random failed: %s", err)
 			}
-			if gotInt < test.min || gotInt > test.max {
-				t.Fatalf("int.random got %d, expected between %d and %d", gotInt, test.min, test.max)
+
+			minNum, ok := test.params["min"].(float64)
+			if !ok {
+				t.Fatalf("int.random test min param is not a number: %s", test.params["min"])
+			}
+			maxNum, ok := test.params["max"].(float64)
+			if !ok {
+				t.Fatalf("int.random test max param is not a number: %s", test.params["max"])
+			}
+
+			if gotInt < int(minNum) || gotInt > int(maxNum) {
+				t.Fatalf("int.random got %d, expected between %d and %d", gotInt, int(minNum), int(maxNum))
 			}
 		})
 	}

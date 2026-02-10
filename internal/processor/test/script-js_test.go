@@ -79,40 +79,48 @@ func TestScriptJSBadConfigWrongProgramType(t *testing.T) {
 
 func TestGoodScriptJS(t *testing.T) {
 	tests := []struct {
-		processor processor.Processor
-		name      string
-		payload   any
-		expected  any
+		name     string
+		params   map[string]any
+		payload  any
+		expected any
 	}{
 		{
 			name: "number",
-			processor: &processor.ScriptJS{Program: `
-			payload = payload + 1
-			`},
+			params: map[string]any{
+				"program": `
+				payload = payload + 1
+				`,
+			},
 			payload:  1,
 			expected: 2,
 		},
 		{
 			name: "string",
-			processor: &processor.ScriptJS{Program: `
-			payload = payload + "1"
-			`},
+			params: map[string]any{
+				"program": `
+				payload = payload + "1"
+				`,
+			},
 			payload:  "1",
 			expected: "11",
 		},
 		{
 			name: "object",
-			processor: &processor.ScriptJS{Program: `
-			payload = { key: payload }
-			`},
+			params: map[string]any{
+				"program": `
+				payload = { key: payload }
+				`,
+			},
 			payload:  "1",
 			expected: map[string]any{"key": "1"},
 		},
 		{
 			name: "nil",
-			processor: &processor.ScriptJS{Program: `
-			payload = undefined
-			`},
+			params: map[string]any{
+				"program": `
+				payload = undefined
+				`,
+			},
 			payload:  "1",
 			expected: nil,
 		},
@@ -120,7 +128,21 @@ func TestGoodScriptJS(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := test.processor.Process(t.Context(), test.payload)
+			registration, ok := processor.ProcessorRegistry["script.js"]
+			if !ok {
+				t.Fatalf("script.js processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "script.js",
+				Params: test.params,
+			})
+
+			if err != nil {
+				t.Fatalf("script.js failed to create processor: %s", err)
+			}
+
+			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			if err != nil {
 				t.Fatalf("script.js process failed: %s", err)
@@ -151,13 +173,17 @@ func TestGoodScriptJS(t *testing.T) {
 func TestBadScriptJS(t *testing.T) {
 	tests := []struct {
 		name        string
-		processor   processor.Processor
+		params      map[string]any
 		payload     any
 		errorString string
 	}{
 		{
-			name:        "accessing not defined variable",
-			processor:   &processor.ScriptJS{Program: `paylod = foo`},
+			name: "accessing not defined variable",
+			params: map[string]any{
+				"program": `
+				paylod = foo
+				`,
+			},
 			payload:     0,
 			errorString: "ReferenceError: 'foo' is not defined",
 		},
@@ -165,7 +191,17 @@ func TestBadScriptJS(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := test.processor.Process(t.Context(), test.payload)
+			registration, ok := processor.ProcessorRegistry["script.js"]
+			if !ok {
+				t.Fatalf("script.js processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "script.js",
+				Params: test.params,
+			})
+
+			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			if err == nil {
 				t.Fatalf("script.js expected to fail but succeeded, got: %v", got)

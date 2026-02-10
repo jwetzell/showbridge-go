@@ -118,8 +118,8 @@ func TestGoodStringFilter(t *testing.T) {
 func TestBadStringFilter(t *testing.T) {
 	tests := []struct {
 		name        string
-		payload     any
 		params      map[string]any
+		payload     any
 		errorString string
 	}{
 		{

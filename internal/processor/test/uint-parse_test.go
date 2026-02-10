@@ -101,50 +101,54 @@ func TestUintParseGoodConfig(t *testing.T) {
 func TestGoodUintParse(t *testing.T) {
 
 	tests := []struct {
-		processor processor.Processor
-		name      string
-		payload   any
-		expected  uint64
-		base      int
-		bitSize   int
+		name     string
+		params   map[string]any
+		payload  any
+		expected uint64
 	}{
 		{
 			name:     "positive number",
+			params:   map[string]any{"base": 10.0, "bitSize": 64.0},
 			payload:  "12345",
 			expected: 12345,
-			base:     10,
-			bitSize:  64,
 		},
 		{
 			name:     "zero",
+			params:   map[string]any{"base": 10.0, "bitSize": 64.0},
 			payload:  "0",
 			expected: 0,
-			base:     10,
-			bitSize:  64,
 		},
 		{
 			name:     "binary",
+			params:   map[string]any{"base": 2.0, "bitSize": 64.0},
 			payload:  "1010101",
 			expected: 85,
-			base:     2,
-			bitSize:  64,
 		},
 		{
 			name:     "hex",
+			params:   map[string]any{"base": 16.0, "bitSize": 64.0},
 			payload:  "15F",
 			expected: 351,
-			base:     16,
-			bitSize:  64,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			uintParser := processor.UintParse{
-				Base:    test.base,
-				BitSize: test.bitSize,
+			registration, ok := processor.ProcessorRegistry["uint.parse"]
+			if !ok {
+				t.Fatalf("uint.parse processor not registered")
 			}
-			got, err := uintParser.Process(t.Context(), test.payload)
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "uint.parse",
+				Params: test.params,
+			})
+
+			if err != nil {
+				t.Fatalf("uint.parse failed to create processor: %s", err)
+			}
+
+			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			gotUint, ok := got.(uint64)
 			if !ok {
@@ -161,41 +165,45 @@ func TestGoodUintParse(t *testing.T) {
 }
 
 func TestBadUintParse(t *testing.T) {
-	uintParser := processor.UintParse{}
 	tests := []struct {
-		processor   processor.Processor
 		name        string
+		params      map[string]any
 		payload     any
-		base        int
-		bitSize     int
 		errorString string
 	}{
 		{
 			name:        "non-string input",
+			params:      map[string]any{"base": 10.0, "bitSize": 64.0},
 			payload:     []byte{0x01},
-			base:        10,
-			bitSize:     64,
 			errorString: "uint.parse processor only accepts a string",
 		},
 		{
 			name:        "not uint string",
+			params:      map[string]any{"base": 10.0, "bitSize": 64.0},
 			payload:     "-1234",
-			base:        10,
-			bitSize:     64,
 			errorString: "strconv.ParseUint: parsing \"-1234\": invalid syntax",
 		},
 		{
 			name:        "bit overflow",
+			params:      map[string]any{"base": 10.0, "bitSize": 32.0},
 			payload:     "123456789012345678901234567",
-			base:        10,
-			bitSize:     32,
 			errorString: "strconv.ParseUint: parsing \"123456789012345678901234567\": value out of range",
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := uintParser.Process(t.Context(), test.payload)
+			registration, ok := processor.ProcessorRegistry["uint.parse"]
+			if !ok {
+				t.Fatalf("uint.parse processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "uint.parse",
+				Params: test.params,
+			})
+
+			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			if err == nil {
 				t.Fatalf("uint.parse expected to fail but succeeded, got: %v", got)
