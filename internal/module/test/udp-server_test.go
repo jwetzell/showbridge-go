@@ -52,6 +52,22 @@ func TestBadUDPServer(t *testing.T) {
 			},
 			errorString: "net.udp.server port must be a number",
 		},
+		{
+			name: "non-string ip param",
+			params: map[string]any{
+				"port": 8000.0,
+				"ip":   123,
+			},
+			errorString: "net.udp.server ip must be a string",
+		},
+		{
+			name: "non-number bufferSize param",
+			params: map[string]any{
+				"port":       8000.0,
+				"bufferSize": "1024",
+			},
+			errorString: "net.udp.server bufferSize must be a number",
+		},
 	}
 
 	for _, test := range tests {

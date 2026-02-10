@@ -79,6 +79,15 @@ func TestBadTCPServer(t *testing.T) {
 			},
 			errorString: "net.tcp.server unknown framing method: asdfasdfasdfasdflkj",
 		},
+		{
+			name: "non-string ip param",
+			params: map[string]any{
+				"port":    8000.0,
+				"framing": "LF",
+				"ip":      123,
+			},
+			errorString: "net.tcp.server ip must be a string",
+		},
 	}
 
 	for _, test := range tests {
