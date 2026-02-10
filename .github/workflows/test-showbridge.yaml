@@ -34,11 +34,14 @@ jobs:
         run: go mod tidy
 
       - name: run tests
-        run: go test ./...
-        
+        run: go test ./... -coverpkg "github.com/jwetzell/showbridge-go/..." -coverprofile coverage.out
+
+      - name: clean up coverage report
+        run: cat coverage.out | grep -v "github.com/jwetzell/showbridge-go/cmd" > coverage.nocmd.out       
       - name: Update coverage report
         uses: ncruces/go-coverage-report@v0.3.2
         with:
+          coverage-file: coverage.nocmd.out
           report: true
           chart: true
           amend: true
