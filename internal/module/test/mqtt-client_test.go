@@ -14,6 +14,7 @@ func TestMQTTClientFromRegistry(t *testing.T) {
 	}
 
 	moduleInstance, err := registration.New(config.ModuleConfig{
+		Id:   "test",
 		Type: "mqtt.client",
 		Params: map[string]any{
 			"broker":   "mqtt://localhost:1883",
@@ -24,6 +25,10 @@ func TestMQTTClientFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create mqtt.client module: %s", err)
+	}
+
+	if moduleInstance.Id() != "test" {
+		t.Fatalf("mqtt.client module has wrong id: %s", moduleInstance.Id())
 	}
 
 	if moduleInstance.Type() != "mqtt.client" {

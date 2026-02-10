@@ -14,6 +14,7 @@ func TestNATSClientFromRegistry(t *testing.T) {
 	}
 
 	moduleInstance, err := registration.New(config.ModuleConfig{
+		Id:   "test",
 		Type: "nats.client",
 		Params: map[string]any{
 			"url":     "nats://127.0.0.1:4222",
@@ -23,6 +24,10 @@ func TestNATSClientFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create nats.client module: %s", err)
+	}
+
+	if moduleInstance.Id() != "test" {
+		t.Fatalf("nats.client module has wrong id: %s", moduleInstance.Id())
 	}
 
 	if moduleInstance.Type() != "nats.client" {

@@ -14,6 +14,7 @@ func TestSIPDTMFServerFromRegistry(t *testing.T) {
 	}
 
 	moduleInstance, err := registration.New(config.ModuleConfig{
+		Id:   "test",
 		Type: "sip.dtmf.server",
 		Params: map[string]any{
 			"separator": "#",
@@ -22,6 +23,10 @@ func TestSIPDTMFServerFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create sip.dtmf.server module: %s", err)
+	}
+
+	if moduleInstance.Id() != "test" {
+		t.Fatalf("sip.dtmf.server module has wrong id: %s", moduleInstance.Id())
 	}
 
 	if moduleInstance.Type() != "sip.dtmf.server" {

@@ -14,6 +14,7 @@ func TestHTTPServerFromRegistry(t *testing.T) {
 	}
 
 	moduleInstance, err := registration.New(config.ModuleConfig{
+		Id:   "test",
 		Type: "http.server",
 		Params: map[string]any{
 			"port": 3000.0,
@@ -22,6 +23,10 @@ func TestHTTPServerFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create http.server module: %s", err)
+	}
+
+	if moduleInstance.Id() != "test" {
+		t.Fatalf("http.server module has wrong id: %s", moduleInstance.Id())
 	}
 
 	if moduleInstance.Type() != "http.server" {

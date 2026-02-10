@@ -14,6 +14,7 @@ func TestSerialClientFromRegistry(t *testing.T) {
 	}
 
 	moduleInstance, err := registration.New(config.ModuleConfig{
+		Id:   "test",
 		Type: "serial.client",
 		Params: map[string]any{
 			"port":     "/dev/ttyUSB0",
@@ -24,6 +25,10 @@ func TestSerialClientFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create serial.client module: %s", err)
+	}
+
+	if moduleInstance.Id() != "test" {
+		t.Fatalf("serial.client module has wrong id: %s", moduleInstance.Id())
 	}
 
 	if moduleInstance.Type() != "serial.client" {

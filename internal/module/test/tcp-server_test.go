@@ -14,6 +14,7 @@ func TestTCPServerFromRegistry(t *testing.T) {
 	}
 
 	moduleInstance, err := registration.New(config.ModuleConfig{
+		Id:   "test",
 		Type: "net.tcp.server",
 		Params: map[string]any{
 			"port":    8000.0,
@@ -23,6 +24,10 @@ func TestTCPServerFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create net.tcp.server module: %s", err)
+	}
+
+	if moduleInstance.Id() != "test" {
+		t.Fatalf("net.tcp.server module has wrong id: %s", moduleInstance.Id())
 	}
 
 	if moduleInstance.Type() != "net.tcp.server" {

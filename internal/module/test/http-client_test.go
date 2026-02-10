@@ -14,11 +14,16 @@ func TestHTTPClientFromRegistry(t *testing.T) {
 	}
 
 	moduleInstance, err := registration.New(config.ModuleConfig{
+		Id:   "test",
 		Type: "http.client",
 	})
 
 	if err != nil {
 		t.Fatalf("failed to create http.client module: %s", err)
+	}
+
+	if moduleInstance.Id() != "test" {
+		t.Fatalf("http.client module has wrong id: %s", moduleInstance.Id())
 	}
 
 	if moduleInstance.Type() != "http.client" {

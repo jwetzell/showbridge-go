@@ -14,6 +14,7 @@ func TestUDPClientFromRegistry(t *testing.T) {
 	}
 
 	moduleInstance, err := registration.New(config.ModuleConfig{
+		Id:   "test",
 		Type: "net.udp.client",
 		Params: map[string]any{
 			"host":    "localhost",
@@ -24,6 +25,10 @@ func TestUDPClientFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create net.udp.client module: %s", err)
+	}
+
+	if moduleInstance.Id() != "test" {
+		t.Fatalf("net.udp.client module has wrong id: %s", moduleInstance.Id())
 	}
 
 	if moduleInstance.Type() != "net.udp.client" {

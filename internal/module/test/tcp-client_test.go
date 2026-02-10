@@ -14,6 +14,7 @@ func TestTCPClientFromRegistry(t *testing.T) {
 	}
 
 	moduleInstance, err := registration.New(config.ModuleConfig{
+		Id:   "test",
 		Type: "net.tcp.client",
 		Params: map[string]any{
 			"host":    "localhost",
@@ -24,6 +25,10 @@ func TestTCPClientFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create net.tcp.client module: %s", err)
+	}
+
+	if moduleInstance.Id() != "test" {
+		t.Fatalf("net.tcp.client module has wrong id: %s", moduleInstance.Id())
 	}
 
 	if moduleInstance.Type() != "net.tcp.client" {

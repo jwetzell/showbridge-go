@@ -14,6 +14,7 @@ func TestUDPMulticastFromRegistry(t *testing.T) {
 	}
 
 	moduleInstance, err := registration.New(config.ModuleConfig{
+		Id:   "test",
 		Type: "net.udp.multicast",
 		Params: map[string]any{
 			"ip":   "236.10.10.10",
@@ -22,10 +23,14 @@ func TestUDPMulticastFromRegistry(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Fatalf("failed to create udp.multicast module: %s", err)
+		t.Fatalf("failed to create net.udp.multicast module: %s", err)
+	}
+
+	if moduleInstance.Id() != "test" {
+		t.Fatalf("net.udp.multicast module has wrong id: %s", moduleInstance.Id())
 	}
 
 	if moduleInstance.Type() != "net.udp.multicast" {
-		t.Fatalf("udp.multicast module has wrong type: %s", moduleInstance.Type())
+		t.Fatalf("net.udp.multicast module has wrong type: %s", moduleInstance.Type())
 	}
 }

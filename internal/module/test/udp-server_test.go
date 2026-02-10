@@ -14,6 +14,7 @@ func TestUDPServerFromRegistry(t *testing.T) {
 	}
 
 	moduleInstance, err := registration.New(config.ModuleConfig{
+		Id:   "test",
 		Type: "net.udp.server",
 		Params: map[string]any{
 			"port": 8000.0,
@@ -22,6 +23,10 @@ func TestUDPServerFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create udp.server module: %s", err)
+	}
+
+	if moduleInstance.Id() != "test" {
+		t.Fatalf("udp.server module has wrong id: %s", moduleInstance.Id())
 	}
 
 	if moduleInstance.Type() != "net.udp.server" {

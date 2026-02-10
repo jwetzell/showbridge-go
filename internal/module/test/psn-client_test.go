@@ -14,11 +14,16 @@ func TestPSNClientFromRegistry(t *testing.T) {
 	}
 
 	moduleInstance, err := registration.New(config.ModuleConfig{
+		Id:   "test",
 		Type: "psn.client",
 	})
 
 	if err != nil {
 		t.Fatalf("failed to create psn.client module: %s", err)
+	}
+
+	if moduleInstance.Id() != "test" {
+		t.Fatalf("psn.client module has wrong id: %s", moduleInstance.Id())
 	}
 
 	if moduleInstance.Type() != "psn.client" {

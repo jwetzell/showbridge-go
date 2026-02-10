@@ -14,6 +14,7 @@ func TestMIDIInputFromRegistry(t *testing.T) {
 	}
 
 	moduleInstance, err := registration.New(config.ModuleConfig{
+		Id:   "test",
 		Type: "midi.input",
 		Params: map[string]any{
 			"port": "test",
@@ -22,6 +23,10 @@ func TestMIDIInputFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create midi.input module: %s", err)
+	}
+
+	if moduleInstance.Id() != "test" {
+		t.Fatalf("midi.input module has wrong id: %s", moduleInstance.Id())
 	}
 
 	if moduleInstance.Type() != "midi.input" {
