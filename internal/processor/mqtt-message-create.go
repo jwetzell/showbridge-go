@@ -22,6 +22,15 @@ type MQTTMessageCreate struct {
 	Payload  []byte
 }
 
+func NewMQTTMessage(topic string, qos byte, retained bool, payload []byte) MQTTMessage {
+	return MQTTMessage{
+		topic:    topic,
+		qos:      qos,
+		retained: retained,
+		payload:  payload,
+	}
+}
+
 func (mm MQTTMessage) Duplicate() bool {
 	// TODO(jwetzell): implement?
 	return false
