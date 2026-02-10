@@ -29,13 +29,18 @@ func TestTimeSleepFromRegistry(t *testing.T) {
 	}
 }
 
-func TestBadTimeSleep(t *testing.T) {
+func TestGoodTimeSleep(t *testing.T) {
 	tests := []struct {
-		name        string
-		params      map[string]any
-		payload     any
-		errorString string
-	}{}
+		name    string
+		params  map[string]any
+		payload any
+	}{
+		{
+			name:    "string payload",
+			payload: "hello",
+			params:  map[string]any{"duration": 100.0},
+		},
+	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -48,6 +53,65 @@ func TestBadTimeSleep(t *testing.T) {
 				Type:   "time.sleep",
 				Params: test.params,
 			})
+
+			if err != nil {
+				t.Fatalf("time.sleep failed to create processor: %s", err)
+			}
+
+			got, err := processorInstance.Process(t.Context(), test.payload)
+
+			if err != nil {
+				t.Fatalf("time.sleep failed: %s", err)
+			}
+
+			if got != test.payload {
+				t.Fatalf("time.sleep got %+v, expected %+v", got, test.payload)
+			}
+		})
+	}
+}
+
+func TestBadTimeSleep(t *testing.T) {
+	tests := []struct {
+		name        string
+		params      map[string]any
+		payload     any
+		errorString string
+	}{
+		{
+			name:        "no-duration param",
+			payload:     "hello",
+			params:      map[string]any{},
+			errorString: "time.sleep requires a duration parameter",
+		},
+		{
+			name:    "non-number duration param",
+			payload: "hello",
+			params: map[string]any{
+				"duration": "1000",
+			},
+			errorString: "time.sleep duration must be a number",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			registration, ok := processor.ProcessorRegistry["time.sleep"]
+			if !ok {
+				t.Fatalf("time.sleep processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "time.sleep",
+				Params: test.params,
+			})
+
+			if err != nil {
+				if test.errorString != err.Error() {
+					t.Fatalf("string.split got error '%s', expected '%s'", err.Error(), test.errorString)
+				}
+				return
+			}
 
 			got, err := processorInstance.Process(t.Context(), test.payload)
 
