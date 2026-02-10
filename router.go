@@ -202,7 +202,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 				}
 
 				if payload == nil {
-					r.logger.Error("no input after processing", "route", routeIndex, "source", sourceId)
+					r.logger.Debug("no payload after processing, route terminated", "route", routeIndex, "source", sourceId)
 					return
 				}
 
