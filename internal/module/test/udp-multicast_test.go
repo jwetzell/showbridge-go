@@ -71,6 +71,14 @@ func TestBadUDPMulticast(t *testing.T) {
 			},
 			errorString: "net.udp.multicast ip must be a string",
 		},
+		{
+			name: "invalid addr",
+			params: map[string]any{
+				"ip":   "127.0.0.",
+				"port": 8000.0,
+			},
+			errorString: "lookup 127.0.0.: no such host",
+		},
 	}
 
 	for _, test := range tests {

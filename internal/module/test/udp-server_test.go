@@ -68,6 +68,14 @@ func TestBadUDPServer(t *testing.T) {
 			},
 			errorString: "net.udp.server bufferSize must be a number",
 		},
+		{
+			name: "invalid addr",
+			params: map[string]any{
+				"ip":   "127.0.0.",
+				"port": 8000.0,
+			},
+			errorString: "lookup 127.0.0.: no such host",
+		},
 	}
 
 	for _, test := range tests {
