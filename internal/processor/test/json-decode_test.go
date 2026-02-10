@@ -89,3 +89,36 @@ func TestGoodJsonDecode(t *testing.T) {
 		})
 	}
 }
+
+func TestBadJsonDecode(t *testing.T) {
+	stringEncoder := processor.JsonDecode{}
+	tests := []struct {
+		name        string
+		payload     any
+		errorString string
+	}{
+		{
+			name:        "non-string input",
+			payload:     []byte("hello"),
+			errorString: "json.decode processor only accepts a string",
+		},
+		{
+			name:        "invalid json",
+			payload:     "{\"address\":\"/hello\",\"args\":}",
+			errorString: "invalid character '}' looking for beginning of value",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := stringEncoder.Process(t.Context(), test.payload)
+
+			if err == nil {
+				t.Fatalf("json.decode expected to fail but got payload: %+v", got)
+			}
+			if err.Error() != test.errorString {
+				t.Fatalf("json.decode got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+		})
+	}
+}

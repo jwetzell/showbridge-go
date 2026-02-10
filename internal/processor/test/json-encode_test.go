@@ -83,3 +83,31 @@ func TestGoodJsonEncode(t *testing.T) {
 		})
 	}
 }
+
+func TestBadJsonEncode(t *testing.T) {
+	stringEncoder := processor.JsonEncode{}
+	tests := []struct {
+		name        string
+		payload     any
+		errorString string
+	}{
+		{
+			name:        "unencodable type",
+			payload:     make(chan int),
+			errorString: "json: unsupported type: chan int",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := stringEncoder.Process(t.Context(), test.payload)
+
+			if err == nil {
+				t.Fatalf("json.encode expected to fail but got payload: %+v", got)
+			}
+			if err.Error() != test.errorString {
+				t.Fatalf("json.encode got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+		})
+	}
+}
