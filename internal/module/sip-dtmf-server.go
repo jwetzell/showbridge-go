@@ -94,7 +94,7 @@ func init() {
 				specificUserAgentString, ok := userAgent.(string)
 
 				if !ok {
-					return nil, errors.New("sip.call.server userAgent must be a string")
+					return nil, errors.New("sip.dtmf.server userAgent must be a string")
 				}
 				userAgentString = specificUserAgentString
 			}
