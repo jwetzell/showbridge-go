@@ -36,7 +36,36 @@ func TestBadSIPCallServer(t *testing.T) {
 		name        string
 		params      map[string]any
 		errorString string
-	}{}
+	}{
+		{
+			name: "non-number port param",
+			params: map[string]any{
+				"port": "8000",
+			},
+			errorString: "sip.call.server port must be a number",
+		},
+		{
+			name: "non-string ip param",
+			params: map[string]any{
+				"ip": 123,
+			},
+			errorString: "sip.call.server ip must be a string",
+		},
+		{
+			name: "non-string transport param",
+			params: map[string]any{
+				"transport": 123,
+			},
+			errorString: "sip.call.server transport must be a string",
+		},
+		{
+			name: "non-string userAgent param",
+			params: map[string]any{
+				"userAgent": 123,
+			},
+			errorString: "sip.call.server userAgent must be a string",
+		},
+	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
