@@ -30,40 +30,6 @@ func TestScriptWASMFromRegistry(t *testing.T) {
 
 }
 
-func TestScriptWASMNoPath(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["script.wasm"]
-	if !ok {
-		t.Fatalf("script.wasm processor not registered")
-	}
-
-	_, err := registration.New(config.ProcessorConfig{
-		Type:   "script.wasm",
-		Params: map[string]any{},
-	})
-
-	if err == nil {
-		t.Fatalf("script.wasm processor should have thrown an error when creating")
-	}
-}
-
-func TestScriptWASMBadConfigWrongPathType(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["script.wasm"]
-	if !ok {
-		t.Fatalf("script.wasm processor not registered")
-	}
-
-	_, err := registration.New(config.ProcessorConfig{
-		Type: "script.wasm",
-		Params: map[string]any{
-			"path": 12345,
-		},
-	})
-
-	if err == nil {
-		t.Fatalf("script.wasm processor should have thrown an error when creating with non-string path")
-	}
-}
-
 func TestGoodScriptWASM(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -134,6 +100,39 @@ func TestBadScriptWASM(t *testing.T) {
 		errorString string
 	}{
 		{
+			name:        "no path parameter",
+			params:      map[string]any{},
+			payload:     []byte("hello"),
+			errorString: "script.wasm requires a path parameter",
+		},
+		{
+			name: "non-string path parameter",
+			params: map[string]any{
+				"path": 12345,
+			},
+			payload:     []byte("hello"),
+			errorString: "script.wasm path must be a string",
+		},
+		{
+			name: "non-string function",
+			params: map[string]any{
+				"path":       "good.wasm",
+				"enableWasi": true,
+				"function":   12345,
+			},
+			payload:     []byte("hello"),
+			errorString: "script.wasm function must be a string",
+		},
+		{
+			name: "non-boolean enableWasi",
+			params: map[string]any{
+				"path":       "good.wasm",
+				"enableWasi": "true",
+			},
+			payload:     []byte("hello"),
+			errorString: "script.wasm enableWasi must be a boolean",
+		},
+		{
 			name: "non-byte slice input",
 			params: map[string]any{
 				"path":       "good.wasm",
@@ -152,6 +151,14 @@ func TestBadScriptWASM(t *testing.T) {
 			payload:     []byte("hello"),
 			errorString: "unknown function: asdf",
 		},
+		{
+			name: "path doesn't exist",
+			params: map[string]any{
+				"path": "asdf.wasm",
+			},
+			payload:     []byte("hello"),
+			errorString: "open asdf.wasm: no such file or directory",
+		},
 	}
 
 	for _, test := range tests {
@@ -165,6 +172,13 @@ func TestBadScriptWASM(t *testing.T) {
 				Type:   "script.wasm",
 				Params: test.params,
 			})
+
+			if err != nil {
+				if test.errorString != err.Error() {
+					t.Fatalf("string.create got error '%s', expected '%s'", err.Error(), test.errorString)
+				}
+				return
+			}
 
 			got, err := processorInstance.Process(t.Context(), test.payload)
 
