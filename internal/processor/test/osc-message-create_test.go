@@ -64,6 +64,73 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 			payload:  map[string]any{"Value": "value"},
 			expected: osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: "arg1", Type: "s"}}},
 		},
+		{
+			name: "address with template and mixed args",
+			params: map[string]any{
+				"address": "/test/{{.Value}}",
+				"args":    []interface{}{"arg1", "42", "3.14"},
+				"types":   "sif",
+			},
+			payload: map[string]any{"Value": "value"},
+			expected: osc.OSCMessage{
+				Address: "/test/value",
+				Args: []osc.OSCArg{
+					{Value: "arg1", Type: "s"},
+					{Value: int32(42), Type: "i"},
+					{Value: float32(3.14), Type: "f"},
+				},
+			},
+		},
+		{
+			name: "address with template and int64 arg",
+			params: map[string]any{
+				"address": "/test/{{.Value}}",
+				"args":    []interface{}{"42"},
+				"types":   "h",
+			},
+			payload:  map[string]any{"Value": "value"},
+			expected: osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: int64(42), Type: "h"}}},
+		},
+		{
+			name: "address with template and double arg",
+			params: map[string]any{
+				"address": "/test/{{.Value}}",
+				"args":    []interface{}{"42"},
+				"types":   "d",
+			},
+			payload:  map[string]any{"Value": "value"},
+			expected: osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: float64(42), Type: "d"}}},
+		},
+		{
+			name: "address with template and true arg",
+			params: map[string]any{
+				"address": "/test/{{.Value}}",
+				"args":    []interface{}{""},
+				"types":   "T",
+			},
+			payload:  map[string]any{"Value": "value"},
+			expected: osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: true, Type: "T"}}},
+		},
+		{
+			name: "address with template and false arg",
+			params: map[string]any{
+				"address": "/test/{{.Value}}",
+				"args":    []interface{}{""},
+				"types":   "F",
+			},
+			payload:  map[string]any{"Value": "value"},
+			expected: osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: false, Type: "F"}}},
+		},
+		{
+			name: "address with template and nil arg",
+			params: map[string]any{
+				"address": "/test/{{.Value}}",
+				"args":    []interface{}{""},
+				"types":   "N",
+			},
+			payload:  map[string]any{"Value": "value"},
+			expected: osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: nil, Type: "N"}}},
+		},
 	}
 
 	for _, test := range tests {
@@ -147,6 +214,15 @@ func TestBadOSCMessageCreate(t *testing.T) {
 			errorString: "osc.message.create address must be an array found string",
 		},
 		{
+			name: "args without types parameter",
+			params: map[string]any{
+				"address": "/test",
+				"args":    []interface{}{"arg1"},
+			},
+			payload:     "test",
+			errorString: "osc.message.create requires a types parameter with args",
+		},
+		{
 			name: "args and types length mismatch",
 			params: map[string]any{
 				"address": "/test",
@@ -205,7 +281,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 			errorString: "osc.message.create address must not be empty",
 		},
 		{
-			name: "template with missing value",
+			name: "address template with missing value",
 			params: map[string]any{
 				"address": "/test/{{.missing}}",
 			},
@@ -219,6 +295,16 @@ func TestBadOSCMessageCreate(t *testing.T) {
 			},
 			payload:     "test",
 			errorString: "osc.message.create address must start with '/'",
+		},
+		{
+			name: "address template with missing field",
+			params: map[string]any{
+				"address": "/test",
+				"args":    []interface{}{"{{.missing}}"},
+				"types":   "s",
+			},
+			payload:     "test",
+			errorString: "template: arg:1:2: executing \"arg\" at <.missing>: can't evaluate field missing in type string",
 		},
 	}
 
