@@ -38,7 +38,7 @@ func TestGoodScriptWASM(t *testing.T) {
 		expected []byte
 	}{
 		{
-			name: "number",
+			name: "string input, default process function with wasi",
 			params: map[string]any{
 				"path":       "good.wasm",
 				"enableWasi": true,
@@ -47,7 +47,7 @@ func TestGoodScriptWASM(t *testing.T) {
 			expected: []byte("Processed: hello"),
 		},
 		{
-			name: "number",
+			name: "string input, specified function with wasi",
 			params: map[string]any{
 				"path":       "good.wasm",
 				"enableWasi": true,
