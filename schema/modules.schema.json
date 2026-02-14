@@ -11,7 +11,8 @@
         "title": "HTTPClientModule",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "const": "http.client"
@@ -25,7 +26,8 @@
         "title": "HTTPServerModule",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "const": "http.server"
@@ -51,7 +53,8 @@
         "title": "TimeIntervalModule",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "const": "time.interval"
@@ -75,7 +78,8 @@
         "title": "TimeTimerModule",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "const": "time.timer"
@@ -99,7 +103,8 @@
         "title": "MIDIInputModule",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "const": "midi.input"
@@ -123,7 +128,8 @@
         "title": "MIDIOutputModule",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "const": "midi.output"
@@ -147,7 +153,8 @@
         "title": "MQTTClientModule",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "const": "mqtt.client"
@@ -177,7 +184,8 @@
         "title": "NATSClientModule",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "const": "nats.client"
@@ -204,7 +212,8 @@
         "title": "PSNClientModule",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "const": "psn.client"
@@ -218,7 +227,8 @@
         "title": "SerialClientModule",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "const": "serial.client"
@@ -245,7 +255,8 @@
         "title": "SIPCallServerModule",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "const": "sip.call.server"
@@ -285,7 +296,8 @@
         "title": "SIPDTMFServerModule",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "const": "sip.dtmf.server"
@@ -330,7 +342,8 @@
         "title": "TCPClientModule",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "const": "net.tcp.client"
@@ -363,7 +376,8 @@
         "title": "TCPServerModule",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "const": "net.tcp.server"
@@ -397,7 +411,8 @@
         "title": "UDPClientModule",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "const": "net.udp.client"
@@ -426,7 +441,8 @@
         "title": "UDPMulticastModule",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "const": "net.udp.multicast"
@@ -455,7 +471,8 @@
         "title": "UDPServerModule",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "const": "net.udp.server"
