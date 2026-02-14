@@ -275,7 +275,9 @@
             "required": ["min", "max"],
             "additionalProperties": false
           }
-        }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
       },
       {
         "type": "object",
@@ -803,7 +805,9 @@
             "required": ["min", "max"],
             "additionalProperties": false
           }
-        }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
       }
     ]
   }
