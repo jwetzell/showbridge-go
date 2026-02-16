@@ -10,6 +10,7 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/module"
 	"github.com/jwetzell/showbridge-go/internal/route"
 
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
@@ -23,7 +24,6 @@ type Router struct {
 	RouteInstances []route.Route
 	moduleWait     sync.WaitGroup
 	logger         *slog.Logger
-	tracer         trace.Tracer
 	runningConfig  config.Config
 }
 
@@ -101,13 +101,12 @@ func (r *Router) getModule(moduleId string) module.Module {
 	return moduleInstance
 }
 
-func NewRouter(config config.Config, tracer trace.Tracer) (*Router, []module.ModuleError, []route.RouteError) {
+func NewRouter(config config.Config) (*Router, []module.ModuleError, []route.RouteError) {
 
 	router := Router{
 		ModuleInstances: make(map[string]module.Module),
 		RouteInstances:  []route.Route{},
 		logger:          slog.Default().With("component", "router"),
-		tracer:          tracer,
 		runningConfig:   config,
 	}
 	router.logger.Debug("creating")
@@ -173,7 +172,7 @@ func (r *Router) Stop() {
 }
 
 func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) (bool, []route.RouteIOError) {
-	spanCtx, span := r.tracer.Start(ctx, "router.input", trace.WithAttributes(attribute.String("source.id", sourceId)), trace.WithNewRoot())
+	spanCtx, span := otel.Tracer("router").Start(ctx, "input", trace.WithAttributes(attribute.String("source.id", sourceId)), trace.WithNewRoot())
 	defer span.End()
 	var routeIOErrors []route.RouteIOError
 	routeFound := false
@@ -187,7 +186,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 				routeFound = true
 				routeContext := context.WithValue(spanCtx, route.SourceContextKey, sourceId)
 
-				routeCtx, routeSpan := r.tracer.Start(routeContext, "route", trace.WithAttributes(attribute.Int("route.index", routeIndex), attribute.String("route.input", routeInstance.Input()), attribute.String("route.output", routeInstance.Output())))
+				routeCtx, routeSpan := otel.Tracer("router").Start(routeContext, "route", trace.WithAttributes(attribute.Int("route.index", routeIndex), attribute.String("route.input", routeInstance.Input()), attribute.String("route.output", routeInstance.Output())))
 				payload, err := routeInstance.ProcessPayload(routeCtx, payload)
 				if err != nil {
 					if routeIOErrors == nil {
@@ -225,7 +224,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 }
 
 func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload any) error {
-	spanCtx, span := r.tracer.Start(ctx, "router.output", trace.WithAttributes(attribute.String("destination.id", destinationId)))
+	spanCtx, span := otel.Tracer("router").Start(ctx, "output", trace.WithAttributes(attribute.String("destination.id", destinationId)))
 	defer span.End()
 
 	destinationModule := r.getModule(destinationId)
@@ -238,13 +237,13 @@ func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload
 		return err
 	}
 
-	moduleOutputCtx, moduleOutputSpan := r.tracer.Start(spanCtx, "module.output", trace.WithAttributes(attribute.String("module.id", destinationModule.Id()), attribute.String("module.type", destinationModule.Type())))
+	moduleOutputCtx, moduleOutputSpan := otel.Tracer("router").Start(spanCtx, "module.output", trace.WithAttributes(attribute.String("module.id", destinationModule.Id()), attribute.String("module.type", destinationModule.Type())))
 	defer moduleOutputSpan.End()
 	err := destinationModule.Output(moduleOutputCtx, payload)
 	if err != nil {
 		moduleOutputSpan.SetStatus(codes.Error, err.Error())
 		moduleOutputSpan.RecordError(err)
-		r.logger.Error("module output encountered error", "module", destinationModule.Id(), "error", err)
+		r.logger.ErrorContext(moduleOutputCtx, "module output encountered error", "module", destinationModule.Id(), "error", err)
 		return err
 	} else {
 		moduleOutputSpan.SetStatus(codes.Ok, "module output successful")

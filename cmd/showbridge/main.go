@@ -19,7 +19,6 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.39.0"
-	"go.opentelemetry.io/otel/trace"
 	"sigs.k8s.io/yaml"
 )
 
@@ -90,7 +89,6 @@ type showbridgeApp struct {
 	logger       *slog.Logger
 	router       *showbridge.Router
 	routerRunner *sync.WaitGroup
-	tracer       trace.Tracer
 	routerMutex  sync.Mutex
 }
 
@@ -155,7 +153,6 @@ func run(ctx context.Context, c *cli.Command) error {
 
 	slog.SetDefault(slog.New(logHandler))
 
-	var tracer trace.Tracer
 	if c.Bool("trace") {
 		exporter, err := otlptracehttp.New(ctx)
 		if err != nil {
@@ -166,9 +163,7 @@ func run(ctx context.Context, c *cli.Command) error {
 		otel.SetTracerProvider(tracerProvider)
 		defer tracerProvider.Shutdown(ctx)
 
-		tracer = tracerProvider.Tracer("showbridge")
-	} else {
-		tracer = otel.Tracer("showbridge")
+		otel.SetTracerProvider(tracerProvider)
 	}
 
 	showbridgeApp := &showbridgeApp{
@@ -176,7 +171,6 @@ func run(ctx context.Context, c *cli.Command) error {
 		configPath:   configPath,
 		logger:       slog.Default().With("component", "cmd"),
 		routerRunner: &sync.WaitGroup{},
-		tracer:       tracer,
 	}
 
 	router, err := showbridgeApp.getNewRouter()
@@ -233,7 +227,7 @@ func (app *showbridgeApp) getNewRouter() (*showbridge.Router, error) {
 		return nil, err
 	}
 
-	router, moduleErrors, routeErrors := showbridge.NewRouter(config, app.tracer)
+	router, moduleErrors, routeErrors := showbridge.NewRouter(config)
 
 	for _, moduleError := range moduleErrors {
 		app.logger.Error("problem initializing module", "index", moduleError.Index, "error", moduleError.Error)

@@ -6,6 +6,7 @@ import (
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
@@ -76,12 +77,11 @@ func (r *ProcessorRoute) Output() string {
 }
 
 func (r *ProcessorRoute) ProcessPayload(ctx context.Context, payload any) (any, error) {
-	parentSpan := trace.SpanFromContext(ctx)
-	tracer := parentSpan.TracerProvider().Tracer("route.ProcessPayload")
-	processCtx, processSpan := tracer.Start(ctx, "route.process")
+	tracer := otel.Tracer("route")
+	processCtx, processSpan := tracer.Start(ctx, "ProcessPayload")
 	defer processSpan.End()
 	for processorIndex, processor := range r.processors {
-		processorCtx, processorSpan := tracer.Start(processCtx, "route.processor", trace.WithAttributes(attribute.Int("processor.index", processorIndex), attribute.String("processor.type", processor.Type())))
+		processorCtx, processorSpan := tracer.Start(processCtx, "processor.process", trace.WithAttributes(attribute.Int("processor.index", processorIndex), attribute.String("processor.type", processor.Type())))
 		processedPayload, err := processor.Process(processorCtx, payload)
 		if err != nil {
 			processorSpan.SetStatus(codes.Error, "route processor error")
