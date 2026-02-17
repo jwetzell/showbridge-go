@@ -237,7 +237,7 @@ func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload
 		return err
 	}
 
-	moduleOutputCtx, moduleOutputSpan := otel.Tracer("router").Start(spanCtx, "module.output", trace.WithAttributes(attribute.String("module.id", destinationModule.Id()), attribute.String("module.type", destinationModule.Type())))
+	moduleOutputCtx, moduleOutputSpan := otel.Tracer("module").Start(spanCtx, "output", trace.WithAttributes(attribute.String("module.id", destinationModule.Id()), attribute.String("module.type", destinationModule.Type())))
 	defer moduleOutputSpan.End()
 	err := destinationModule.Output(moduleOutputCtx, payload)
 	if err != nil {
