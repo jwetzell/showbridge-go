@@ -81,7 +81,7 @@ func (r *ProcessorRoute) ProcessPayload(ctx context.Context, payload any) (any, 
 	processCtx, processSpan := tracer.Start(ctx, "ProcessPayload")
 	defer processSpan.End()
 	for processorIndex, processor := range r.processors {
-		processorCtx, processorSpan := tracer.Start(processCtx, "processor.process", trace.WithAttributes(attribute.Int("processor.index", processorIndex), attribute.String("processor.type", processor.Type())))
+		processorCtx, processorSpan := otel.Tracer("processor").Start(processCtx, "process", trace.WithAttributes(attribute.Int("processor.index", processorIndex), attribute.String("processor.type", processor.Type())))
 		processedPayload, err := processor.Process(processorCtx, payload)
 		if err != nil {
 			processorSpan.SetStatus(codes.Error, "route processor error")
