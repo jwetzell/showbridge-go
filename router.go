@@ -21,7 +21,7 @@ type Router struct {
 	Context         context.Context
 	ModuleInstances map[string]module.Module
 	// TODO(jwetzell): change to something easier to lookup
-	RouteInstances []route.Route
+	RouteInstances []*route.Route
 	moduleWait     sync.WaitGroup
 	logger         *slog.Logger
 	runningConfig  config.Config
@@ -105,7 +105,7 @@ func NewRouter(config config.Config) (*Router, []module.ModuleError, []route.Rou
 
 	router := Router{
 		ModuleInstances: make(map[string]module.Module),
-		RouteInstances:  []route.Route{},
+		RouteInstances:  []*route.Route{},
 		logger:          slog.Default().With("component", "router"),
 		runningConfig:   config,
 	}
@@ -180,6 +180,10 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 	var routeWaitGroup sync.WaitGroup
 
 	for routeIndex, routeInstance := range r.RouteInstances {
+		if routeInstance == nil {
+			r.logger.Error("nil route instance found", "routeIndex", routeIndex)
+			continue
+		}
 		if routeInstance.Input() == sourceId {
 			routeWaitGroup.Go(func() {
 

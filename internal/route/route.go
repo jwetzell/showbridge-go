@@ -35,19 +35,13 @@ type RouteIO interface {
 	HandleOutput(ctx context.Context, destinationId string, payload any) error
 }
 
-type Route interface {
-	Input() string
-	Output() string
-	ProcessPayload(ctx context.Context, payload any) (any, error)
-}
-
-type ProcessorRoute struct {
+type Route struct {
 	input      string
 	processors []processor.Processor
 	output     string
 }
 
-func NewRoute(config config.RouteConfig) (Route, error) {
+func NewRoute(config config.RouteConfig) (*Route, error) {
 	processors := []processor.Processor{}
 
 	if len(config.Processors) > 0 {
@@ -65,18 +59,18 @@ func NewRoute(config config.RouteConfig) (Route, error) {
 		}
 	}
 
-	return &ProcessorRoute{input: config.Input, processors: processors, output: config.Output}, nil
+	return &Route{input: config.Input, processors: processors, output: config.Output}, nil
 }
 
-func (r *ProcessorRoute) Input() string {
+func (r *Route) Input() string {
 	return r.input
 }
 
-func (r *ProcessorRoute) Output() string {
+func (r *Route) Output() string {
 	return r.output
 }
 
-func (r *ProcessorRoute) ProcessPayload(ctx context.Context, payload any) (any, error) {
+func (r *Route) ProcessPayload(ctx context.Context, payload any) (any, error) {
 	tracer := otel.Tracer("route")
 	processCtx, processSpan := tracer.Start(ctx, "ProcessPayload")
 	defer processSpan.End()
