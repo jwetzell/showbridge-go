@@ -12,7 +12,7 @@ require (
 	github.com/jwetzell/free-d-go v0.1.0
 	github.com/jwetzell/osc-go v0.1.0
 	github.com/jwetzell/psn-go v0.3.0
-	github.com/nats-io/nats.go v1.48.0
+	github.com/nats-io/nats.go v1.49.0
 	github.com/urfave/cli/v3 v3.6.2
 	gitlab.com/gomidi/midi/v2 v2.3.22
 	go.bug.st/serial v1.6.4
@@ -43,9 +43,9 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.7 // indirect
 	github.com/ianlancetaylor/demangle v0.0.0-20240805132620-81f5be970eca // indirect
 	github.com/icholy/digest v1.1.0 // indirect
-	github.com/klauspost/compress v1.18.0 // indirect
+	github.com/klauspost/compress v1.18.2 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/nats-io/nkeys v0.4.11 // indirect
+	github.com/nats-io/nkeys v0.4.12 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/ncruces/go-strftime v1.0.0 // indirect
 	github.com/pion/logging v0.2.4 // indirect
