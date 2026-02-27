@@ -6,7 +6,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.5.1
 	github.com/emiago/diago v0.27.0
 	github.com/emiago/sipgo v1.2.0
-	github.com/expr-lang/expr v1.17.7
+	github.com/expr-lang/expr v1.17.8
 	github.com/extism/go-sdk v1.7.1
 	github.com/jwetzell/artnet-go v0.2.1
 	github.com/jwetzell/free-d-go v0.1.0
