@@ -209,6 +209,38 @@
       },
       {
         "type": "object",
+        "title": "NATSServerModule",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "type": {
+            "const": "nats.server"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "ip": {
+                "type": "string",
+                "default": "0.0.0.0"
+              },
+              "port": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535,
+                "default": 4222
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          }
+        },
+        "required": ["id", "type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
         "title": "PSNClientModule",
         "properties": {
           "id": {
