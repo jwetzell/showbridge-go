@@ -131,7 +131,7 @@ func TestBadStringCreate(t *testing.T) {
 			name:        "no template param",
 			payload:     "hello",
 			params:      map[string]any{},
-			errorString: "string.create requires a template parameter",
+			errorString: "string.create template error: not found",
 		},
 		{
 			name:    "non string template",
@@ -139,7 +139,7 @@ func TestBadStringCreate(t *testing.T) {
 			params: map[string]any{
 				"template": 1,
 			},
-			errorString: "string.create template must be a string",
+			errorString: "string.create template error: not a string",
 		},
 		{
 			name:    "invalid template",

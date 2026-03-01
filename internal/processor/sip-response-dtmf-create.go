@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
 	"text/template"
 
@@ -56,40 +57,19 @@ func init() {
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 
-			preWait, ok := params["preWait"]
-
-			if !ok {
-				return nil, errors.New("sip.response.dtmf.create requires a preWait parameter")
+			preWaitNum, err := params.GetInt("preWait")
+			if err != nil {
+				return nil, fmt.Errorf("sip.response.dtmf.create preWait error: %w", err)
 			}
 
-			preWaitNum, ok := preWait.(float64)
-
-			if !ok {
-				return nil, errors.New("sip.response.dtmf.create preWait must be a number")
+			postWaitNum, err := params.GetInt("postWait")
+			if err != nil {
+				return nil, fmt.Errorf("sip.response.dtmf.create postWait error: %w", err)
 			}
 
-			postWait, ok := params["postWait"]
-
-			if !ok {
-				return nil, errors.New("sip.response.dtmf.create requires a postWait parameter")
-			}
-
-			postWaitNum, ok := postWait.(float64)
-
-			if !ok {
-				return nil, errors.New("sip.response.dtmf.create postWait must be a number")
-			}
-
-			digits, ok := params["digits"]
-
-			if !ok {
-				return nil, errors.New("sip.response.dtmf.create requires a digits parameter")
-			}
-
-			digitsString, ok := digits.(string)
-
-			if !ok {
-				return nil, errors.New("sip.response.dtmf.create digits must be a string")
+			digitsString, err := params.GetString("digits")
+			if err != nil {
+				return nil, fmt.Errorf("sip.response.dtmf.create digits error: %w", err)
 			}
 
 			digitsTemplate, err := template.New("digits").Parse(digitsString)

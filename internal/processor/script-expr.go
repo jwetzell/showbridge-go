@@ -2,7 +2,7 @@ package processor
 
 import (
 	"context"
-	"errors"
+	"fmt"
 
 	"github.com/expr-lang/expr"
 	"github.com/expr-lang/expr/vm"
@@ -35,16 +35,9 @@ func init() {
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 
-			expression, ok := params["expression"]
-
-			if !ok {
-				return nil, errors.New("script.expr requires an expression parameter")
-			}
-
-			expressionString, ok := expression.(string)
-
-			if !ok {
-				return nil, errors.New("script.expr expression must be a string")
+			expressionString, err := params.GetString("expression")
+			if err != nil {
+				return nil, fmt.Errorf("script.expr expression error: %w", err)
 			}
 
 			program, err := expr.Compile(expressionString)

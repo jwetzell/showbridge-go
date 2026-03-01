@@ -3,6 +3,7 @@ package module
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -27,40 +28,22 @@ func init() {
 		Type: "mqtt.client",
 		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
-			broker, ok := params["broker"]
+			brokerString, err := params.GetString("broker")
 
-			if !ok {
-				return nil, errors.New("mqtt.client requires a broker parameter")
+			if err != nil {
+				return nil, fmt.Errorf("mqtt.client broker error: %w", err)
 			}
 
-			brokerString, ok := broker.(string)
+			topicString, err := params.GetString("topic")
 
-			if !ok {
-				return nil, errors.New("mqtt.client broker must be a string")
+			if err != nil {
+				return nil, fmt.Errorf("mqtt.client topic error: %w", err)
 			}
 
-			topic, ok := params["topic"]
+			clientIdString, err := params.GetString("clientId")
 
-			if !ok {
-				return nil, errors.New("mqtt.client requires a topic parameter")
-			}
-
-			topicString, ok := topic.(string)
-
-			if !ok {
-				return nil, errors.New("mqtt.client topic must be a string")
-			}
-
-			clientId, ok := params["clientId"]
-
-			if !ok {
-				return nil, errors.New("mqtt.client requires a clientId parameter")
-			}
-
-			clientIdString, ok := clientId.(string)
-
-			if !ok {
-				return nil, errors.New("mqtt.client clientId must be a string")
+			if err != nil {
+				return nil, fmt.Errorf("mqtt.client clientId error: %w", err)
 			}
 
 			return &MQTTClient{config: config, Broker: brokerString, Topic: topicString, ClientID: clientIdString, logger: CreateLogger(config)}, nil

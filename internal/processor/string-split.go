@@ -3,6 +3,7 @@ package processor
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -35,16 +36,9 @@ func init() {
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 
-			separator, ok := params["separator"]
-
-			if !ok {
-				return nil, errors.New("string.split requires a separator")
-			}
-
-			separatorString, ok := separator.(string)
-
-			if !ok {
-				return nil, errors.New("string.split separator must be a string")
+			separatorString, err := params.GetString("separator")
+			if err != nil {
+				return nil, fmt.Errorf("string.split separator error: %w", err)
 			}
 
 			return &StringSplit{config: config, Separator: separatorString}, nil

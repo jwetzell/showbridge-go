@@ -32,48 +32,29 @@ func init() {
 		Type: "serial.client",
 		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
-			port, ok := params["port"]
-
-			if !ok {
-				return nil, errors.New("serial.client requires a port parameter")
+			portString, err := params.GetString("port")
+			if err != nil {
+				return nil, fmt.Errorf("serial.client port error: %w", err)
 			}
 
-			portString, ok := port.(string)
-
-			if !ok {
-				return nil, errors.New("serial.client port must be a string")
-			}
-
-			framingMethod, ok := params["framing"]
-
-			if !ok {
-				return nil, errors.New("serial.client requires a framing parameter")
-			}
-
-			framingMethodString, ok := framingMethod.(string)
-
-			if !ok {
-				return nil, errors.New("serial.client framing method must be a string")
+			framingMethodString, err := params.GetString("framing")
+			if err != nil {
+				return nil, fmt.Errorf("serial.client framing error: %w", err)
 			}
 
 			framer := framer.GetFramer(framingMethodString)
 
 			if framer == nil {
-				return nil, fmt.Errorf("serial.client unknown framing method: %s", framingMethod)
+				return nil, fmt.Errorf("serial.client unknown framing method: %s", framingMethodString)
 			}
 
-			buadRate, ok := params["baudRate"]
-			if !ok {
-				return nil, errors.New("serial.client requires a baudRate parameter")
-			}
-
-			baudRateNum, ok := buadRate.(float64)
-			if !ok {
-				return nil, errors.New("serial.client baudRate must be a number")
+			baudRateInt, err := params.GetInt("baudRate")
+			if err != nil {
+				return nil, fmt.Errorf("serial.client baudRate error: %w", err)
 			}
 
 			mode := serial.Mode{
-				BaudRate: int(baudRateNum),
+				BaudRate: baudRateInt,
 			}
 
 			return &SerialClient{config: config, Port: portString, Framer: framer, Mode: &mode, logger: CreateLogger(config)}, nil

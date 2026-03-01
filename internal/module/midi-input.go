@@ -29,16 +29,9 @@ func init() {
 		Type: "midi.input",
 		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
-			port, ok := params["port"]
-
-			if !ok {
-				return nil, errors.New("midi.input requires a port parameter")
-			}
-
-			portString, ok := port.(string)
-
-			if !ok {
-				return nil, errors.New("midi.input port must be a string")
+			portString, err := params.GetString("port")
+			if err != nil {
+				return nil, fmt.Errorf("midi.input port error: %w", err)
 			}
 
 			return &MIDIInput{config: config, Port: portString, logger: CreateLogger(config)}, nil

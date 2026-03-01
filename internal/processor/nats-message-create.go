@@ -3,7 +3,7 @@ package processor
 import (
 	"bytes"
 	"context"
-	"errors"
+	"fmt"
 	"text/template"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -57,16 +57,9 @@ func init() {
 		Type: "nats.message.create",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
-			subject, ok := params["subject"]
-
-			if !ok {
-				return nil, errors.New("nats.message.create requires a subject parameter")
-			}
-
-			subjectString, ok := subject.(string)
-
-			if !ok {
-				return nil, errors.New("nats.message.create subject must be a string")
+			subjectString, err := params.GetString("subject")
+			if err != nil {
+				return nil, fmt.Errorf("nats.message.create subject error: %w", err)
 			}
 
 			subjectTemplate, err := template.New("subject").Parse(subjectString)
@@ -75,16 +68,9 @@ func init() {
 				return nil, err
 			}
 
-			payload, ok := params["payload"]
-
-			if !ok {
-				return nil, errors.New("nats.message.create requires a payload parameter")
-			}
-
-			payloadString, ok := payload.(string)
-
-			if !ok {
-				return nil, errors.New("nats.message.create payload must be a string")
+			payloadString, err := params.GetString("payload")
+			if err != nil {
+				return nil, fmt.Errorf("nats.message.create payload error: %w", err)
 			}
 
 			payloadTemplate, err := template.New("payload").Parse(payloadString)

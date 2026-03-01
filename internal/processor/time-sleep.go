@@ -2,7 +2,7 @@ package processor
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"time"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -28,15 +28,9 @@ func init() {
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 
-			duration, ok := params["duration"]
-			if !ok {
-				return nil, errors.New("time.sleep requires a duration parameter")
-			}
-
-			durationNum, ok := duration.(float64)
-
-			if !ok {
-				return nil, errors.New("time.sleep duration must be a number")
+			durationNum, err := params.GetInt("duration")
+			if err != nil {
+				return nil, fmt.Errorf("time.sleep duration error: %w", err)
 			}
 
 			return &MetaDelay{config: config, Duration: time.Millisecond * time.Duration(durationNum)}, nil

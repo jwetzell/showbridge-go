@@ -46,7 +46,7 @@ func TestBadTCPServer(t *testing.T) {
 			params: map[string]any{
 				"framing": "LF",
 			},
-			errorString: "net.tcp.server requires a port parameter",
+			errorString: "net.tcp.server port error: not found",
 		},
 		{
 			name: "non-number port param",
@@ -54,14 +54,14 @@ func TestBadTCPServer(t *testing.T) {
 				"port":    "8000",
 				"framing": "LF",
 			},
-			errorString: "net.tcp.server port must be a number",
+			errorString: "net.tcp.server port error: not a number",
 		},
 		{
 			name: "no framing param",
 			params: map[string]any{
 				"port": 8000.0,
 			},
-			errorString: "net.tcp.server requires a framing parameter",
+			errorString: "net.tcp.server framing error: not found",
 		},
 		{
 			name: "non-string framing param",
@@ -69,7 +69,7 @@ func TestBadTCPServer(t *testing.T) {
 				"port":    8000.0,
 				"framing": 1,
 			},
-			errorString: "net.tcp.server framing method must be a string",
+			errorString: "net.tcp.server framing error: not a string",
 		},
 		{
 			name: "unkown framing method",
@@ -86,7 +86,7 @@ func TestBadTCPServer(t *testing.T) {
 				"framing": "LF",
 				"ip":      123,
 			},
-			errorString: "net.tcp.server ip must be a string",
+			errorString: "net.tcp.server ip error: not a string",
 		},
 		{
 			name: "invalid addr",

@@ -3,7 +3,7 @@ package processor
 import (
 	"bytes"
 	"context"
-	"errors"
+	"fmt"
 	"text/template"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -36,16 +36,9 @@ func init() {
 		Type: "string.create",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
-			tmpl, ok := params["template"]
-
-			if !ok {
-				return nil, errors.New("string.create requires a template parameter")
-			}
-
-			templateString, ok := tmpl.(string)
-
-			if !ok {
-				return nil, errors.New("string.create template must be a string")
+			templateString, err := params.GetString("template")
+			if err != nil {
+				return nil, fmt.Errorf("string.create template error: %w", err)
 			}
 
 			templateTemplate, err := template.New("template").Parse(templateString)

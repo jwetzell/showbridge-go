@@ -37,13 +37,9 @@ func init() {
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 
-			opCode, ok := params["opCode"]
-			if !ok {
-				return nil, fmt.Errorf("artnet.packet.filter requires an opCode parameter")
-			}
-			opCodeNum, ok := opCode.(float64)
-			if !ok {
-				return nil, fmt.Errorf("artnet.packet.filter opCode must be a number")
+			opCodeNum, err := params.GetInt("opCode")
+			if err != nil {
+				return nil, fmt.Errorf("artnet.packet.filter opCode error: %w", err)
 			}
 
 			return &ArtNetPacketFilter{config: config, OpCode: uint16(opCodeNum)}, nil

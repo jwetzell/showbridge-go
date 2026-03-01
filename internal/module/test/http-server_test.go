@@ -43,12 +43,12 @@ func TestBadHTTPServer(t *testing.T) {
 		{
 			name:        "no port param",
 			params:      map[string]any{},
-			errorString: "http.server requires a port parameter",
+			errorString: "http.server port error: not found",
 		},
 		{
 			name:        "non-numeric port",
 			params:      map[string]any{"port": "3000"},
-			errorString: "http.server port must be a number",
+			errorString: "http.server port error: not a number",
 		},
 	}
 

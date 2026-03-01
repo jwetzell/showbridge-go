@@ -46,7 +46,7 @@ func TestBadNATSClient(t *testing.T) {
 			params: map[string]any{
 				"subject": "test/subject",
 			},
-			errorString: "nats.client requires a url parameter",
+			errorString: "nats.client url error: not found",
 		},
 		{
 			name: "non-string url",
@@ -54,14 +54,14 @@ func TestBadNATSClient(t *testing.T) {
 				"url":     123,
 				"subject": "test/subject",
 			},
-			errorString: "nats.client url must be a string",
+			errorString: "nats.client url error: not a string",
 		},
 		{
 			name: "no subject param",
 			params: map[string]any{
 				"url": "nats://127.0.0.1:4222",
 			},
-			errorString: "nats.client requires a subject parameter",
+			errorString: "nats.client subject error: not found",
 		},
 		{
 			name: "non-string subject",
@@ -69,7 +69,7 @@ func TestBadNATSClient(t *testing.T) {
 				"url":     "nats://127.0.0.1:4222",
 				"subject": 123,
 			},
-			errorString: "nats.client subject must be a string",
+			errorString: "nats.client subject error: not a string",
 		},
 	}
 

@@ -2,6 +2,7 @@ package processor
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	extism "github.com/extism/go-sdk"
@@ -44,44 +45,30 @@ func (se *ScriptWASM) Type() string {
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type: "script.wasm",
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
+		New: func(processorConfig config.ProcessorConfig) (Processor, error) {
+			params := processorConfig.Params
 
-			path, ok := params["path"]
-
-			if !ok {
-				return nil, fmt.Errorf("script.wasm requires a path parameter")
+			pathString, err := params.GetString("path")
+			if err != nil {
+				return nil, fmt.Errorf("script.wasm path error: %w", err)
 			}
 
-			pathString, ok := path.(string)
-
-			if !ok {
-				return nil, fmt.Errorf("script.wasm path must be a string")
-			}
-
-			functionString := "process"
-
-			function, ok := params["function"]
-
-			if ok {
-				specificFunctionString, ok := function.(string)
-
-				if !ok {
-					return nil, fmt.Errorf("script.wasm function must be a string")
+			functionString, err := params.GetString("function")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					functionString = "process"
+				} else {
+					return nil, fmt.Errorf("script.wasm function error: %w", err)
 				}
-				functionString = specificFunctionString
 			}
 
-			enableWasiBool := false
-
-			enableWasi, ok := params["enableWasi"]
-
-			if ok {
-				specificEnableWasi, ok := enableWasi.(bool)
-				if !ok {
-					return nil, fmt.Errorf("script.wasm enableWasi must be a boolean")
+			enableWasiBool, err := params.GetBool("enableWasi")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					enableWasiBool = false
+				} else {
+					return nil, fmt.Errorf("script.wasm enableWasi error: %w", err)
 				}
-				enableWasiBool = specificEnableWasi
 			}
 
 			manifest := extism.Manifest{
@@ -100,7 +87,7 @@ func init() {
 				return nil, err
 			}
 
-			return &ScriptWASM{config: config, Program: program, Function: functionString}, nil
+			return &ScriptWASM{config: processorConfig, Program: program, Function: functionString}, nil
 		},
 	})
 }

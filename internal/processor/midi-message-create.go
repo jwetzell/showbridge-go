@@ -5,7 +5,6 @@ package processor
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"strconv"
 	"text/template"
@@ -32,16 +31,9 @@ func newMidiNoteOnCreate(config config.ProcessorConfig) (Processor, error) {
 
 	params := config.Params
 
-	channel, ok := params["channel"]
-
-	if !ok {
-		return nil, errors.New("midi.message.create NoteOn requires a channel parameter")
-	}
-
-	channelString, ok := channel.(string)
-
-	if !ok {
-		return nil, errors.New("midi.message.create NoteOn channel must be a string")
+	channelString, err := params.GetString("channel")
+	if err != nil {
+		return nil, fmt.Errorf("midi.message.create channel error: %w", err)
 	}
 
 	channelTemplate, err := template.New("channel").Parse(channelString)
@@ -50,16 +42,9 @@ func newMidiNoteOnCreate(config config.ProcessorConfig) (Processor, error) {
 		return nil, err
 	}
 
-	note, ok := params["note"]
-
-	if !ok {
-		return nil, errors.New("midi.message.create NoteOn requires a note parameter")
-	}
-
-	noteString, ok := note.(string)
-
-	if !ok {
-		return nil, errors.New("midi.message.create NoteOn note must be a string")
+	noteString, err := params.GetString("note")
+	if err != nil {
+		return nil, fmt.Errorf("midi.message.create note error: %w", err)
 	}
 
 	noteTemplate, err := template.New("note").Parse(noteString)
@@ -68,16 +53,9 @@ func newMidiNoteOnCreate(config config.ProcessorConfig) (Processor, error) {
 		return nil, err
 	}
 
-	velocity, ok := params["velocity"]
-
-	if !ok {
-		return nil, errors.New("midi.message.create NoteOn requires a velocity parameter")
-	}
-
-	velocityString, ok := velocity.(string)
-
-	if !ok {
-		return nil, errors.New("midi.message.create NoteOn velocity must be a string")
+	velocityString, err := params.GetString("velocity")
+	if err != nil {
+		return nil, fmt.Errorf("midi.message.create velocity error: %w", err)
 	}
 
 	velocityTemplate, err := template.New("velocity").Parse(velocityString)
@@ -123,16 +101,9 @@ func newMidiNoteOffCreate(config config.ProcessorConfig) (Processor, error) {
 
 	params := config.Params
 
-	channel, ok := params["channel"]
-
-	if !ok {
-		return nil, errors.New("midi.message.create NoteOn requires a channel parameter")
-	}
-
-	channelString, ok := channel.(string)
-
-	if !ok {
-		return nil, errors.New("midi.message.create NoteOn channel must be a string")
+	channelString, err := params.GetString("channel")
+	if err != nil {
+		return nil, fmt.Errorf("midi.message.create channel error: %w", err)
 	}
 
 	channelTemplate, err := template.New("channel").Parse(channelString)
@@ -141,19 +112,23 @@ func newMidiNoteOffCreate(config config.ProcessorConfig) (Processor, error) {
 		return nil, err
 	}
 
-	note, ok := params["note"]
-
-	if !ok {
-		return nil, errors.New("midi.message.create NoteOn requires a note parameter")
-	}
-
-	noteString, ok := note.(string)
-
-	if !ok {
-		return nil, errors.New("midi.message.create NoteOn note must be a string")
+	noteString, err := params.GetString("note")
+	if err != nil {
+		return nil, fmt.Errorf("midi.message.create note error: %w", err)
 	}
 
 	noteTemplate, err := template.New("note").Parse(noteString)
+
+	if err != nil {
+		return nil, err
+	}
+
+	velocityString, err := params.GetString("velocity")
+	if err != nil {
+		return nil, fmt.Errorf("midi.message.create velocity error: %w", err)
+	}
+
+	velocityTemplate, err := template.New("velocity").Parse(velocityString)
 
 	if err != nil {
 		return nil, err
@@ -179,7 +154,16 @@ func newMidiNoteOffCreate(config config.ProcessorConfig) (Processor, error) {
 
 		noteValue, err := strconv.ParseUint(noteBuffer.String(), 10, 8)
 
-		payloadMessage := midi.NoteOff(uint8(channelValue), uint8(noteValue))
+		var velocityBuffer bytes.Buffer
+		err = velocityTemplate.Execute(&velocityBuffer, payload)
+
+		if err != nil {
+			return nil, err
+		}
+
+		velocityValue, err := strconv.ParseUint(velocityBuffer.String(), 10, 8)
+
+		payloadMessage := midi.NoteOffVelocity(uint8(channelValue), uint8(noteValue), uint8(velocityValue))
 		return payloadMessage, nil
 	}}, nil
 }
@@ -188,16 +172,9 @@ func newMidiControlChangeCreate(config config.ProcessorConfig) (Processor, error
 
 	params := config.Params
 
-	channel, ok := params["channel"]
-
-	if !ok {
-		return nil, errors.New("midi.message.create ControlChange requires a channel parameter")
-	}
-
-	channelString, ok := channel.(string)
-
-	if !ok {
-		return nil, errors.New("midi.message.create ControlChange channel must be a string")
+	channelString, err := params.GetString("channel")
+	if err != nil {
+		return nil, fmt.Errorf("midi.message.create channel error: %w", err)
 	}
 
 	channelTemplate, err := template.New("channel").Parse(channelString)
@@ -206,16 +183,9 @@ func newMidiControlChangeCreate(config config.ProcessorConfig) (Processor, error
 		return nil, err
 	}
 
-	control, ok := params["control"]
-
-	if !ok {
-		return nil, errors.New("midi.message.create ControlChange requires a control parameter")
-	}
-
-	controlString, ok := control.(string)
-
-	if !ok {
-		return nil, errors.New("midi.message.create ControlChange control must be a string")
+	controlString, err := params.GetString("control")
+	if err != nil {
+		return nil, fmt.Errorf("midi.message.create control error: %w", err)
 	}
 
 	controlTemplate, err := template.New("control").Parse(controlString)
@@ -224,16 +194,9 @@ func newMidiControlChangeCreate(config config.ProcessorConfig) (Processor, error
 		return nil, err
 	}
 
-	value, ok := params["value"]
-
-	if !ok {
-		return nil, errors.New("midi.message.create ControlChange requires a value parameter")
-	}
-
-	valueString, ok := value.(string)
-
-	if !ok {
-		return nil, errors.New("midi.message.create ControlChange value must be a string")
+	valueString, err := params.GetString("value")
+	if err != nil {
+		return nil, fmt.Errorf("midi.message.create value error: %w", err)
 	}
 
 	valueTemplate, err := template.New("value").Parse(valueString)
@@ -280,16 +243,9 @@ func newMidiProgramChangeCreate(config config.ProcessorConfig) (Processor, error
 
 	params := config.Params
 
-	channel, ok := params["channel"]
-
-	if !ok {
-		return nil, errors.New("midi.message.create ProgramChange requires a channel parameter")
-	}
-
-	channelString, ok := channel.(string)
-
-	if !ok {
-		return nil, errors.New("midi.message.create ProgramChange channel must be a string")
+	channelString, err := params.GetString("channel")
+	if err != nil {
+		return nil, fmt.Errorf("midi.message.create channel error: %w", err)
 	}
 
 	channelTemplate, err := template.New("channel").Parse(channelString)
@@ -298,16 +254,9 @@ func newMidiProgramChangeCreate(config config.ProcessorConfig) (Processor, error
 		return nil, err
 	}
 
-	program, ok := params["program"]
-
-	if !ok {
-		return nil, errors.New("midi.message.create ProgramChange requires a program parameter")
-	}
-
-	programString, ok := program.(string)
-
-	if !ok {
-		return nil, errors.New("midi.message.create ProgramChange program must be a string")
+	programString, err := params.GetString("program")
+	if err != nil {
+		return nil, fmt.Errorf("midi.message.create program error: %w", err)
 	}
 
 	programTemplate, err := template.New("program").Parse(programString)
@@ -347,16 +296,9 @@ func init() {
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 
-			msgType, ok := params["type"]
-
-			if !ok {
-				return nil, errors.New("midi.message.create requires a type parameter")
-			}
-
-			msgTypeString, ok := msgType.(string)
-
-			if !ok {
-				return nil, errors.New("midi.message.create type parameter must be a string")
+			msgTypeString, err := params.GetString("type")
+			if err != nil {
+				return nil, fmt.Errorf("midi.message.create type error: %w", err)
 			}
 
 			switch msgTypeString {

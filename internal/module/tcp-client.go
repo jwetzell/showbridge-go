@@ -29,27 +29,14 @@ func init() {
 		Type: "net.tcp.client",
 		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
-			host, ok := params["host"]
-
-			if !ok {
-				return nil, errors.New("net.tcp.client requires a host parameter")
+			hostString, err := params.GetString("host")
+			if err != nil {
+				return nil, fmt.Errorf("net.tcp.client host error: %w", err)
 			}
 
-			hostString, ok := host.(string)
-
-			if !ok {
-				return nil, errors.New("net.tcp.client host must be a string")
-			}
-
-			port, ok := params["port"]
-			if !ok {
-				return nil, errors.New("net.tcp.client requires a port parameter")
-			}
-
-			portNum, ok := port.(float64)
-
-			if !ok {
-				return nil, errors.New("net.tcp.client port must be a number")
+			portNum, err := params.GetInt("port")
+			if err != nil {
+				return nil, fmt.Errorf("net.tcp.client port error: %w", err)
 			}
 
 			addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", hostString, uint16(portNum)))
@@ -57,22 +44,15 @@ func init() {
 				return nil, err
 			}
 
-			framingMethod, ok := params["framing"]
-
-			if !ok {
-				return nil, errors.New("net.tcp.client requires a framing parameter")
-			}
-
-			framingMethodString, ok := framingMethod.(string)
-
-			if !ok {
-				return nil, errors.New("net.tcp.client framing method must be a string")
+			framingMethodString, err := params.GetString("framing")
+			if err != nil {
+				return nil, fmt.Errorf("net.tcp.client framing error: %w", err)
 			}
 
 			framer := framer.GetFramer(framingMethodString)
 
 			if framer == nil {
-				return nil, fmt.Errorf("net.tcp.client unknown framing method: %s", framingMethod)
+				return nil, fmt.Errorf("net.tcp.client unknown framing method: %s", framingMethodString)
 			}
 			return &TCPClient{framer: framer, Addr: addr, config: config, logger: CreateLogger(config)}, nil
 		},

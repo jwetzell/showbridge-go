@@ -25,30 +25,20 @@ type UDPServer struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.udp.server",
-		New: func(config config.ModuleConfig) (Module, error) {
-			params := config.Params
-			port, ok := params["port"]
-			if !ok {
-				return nil, errors.New("net.udp.server requires a port parameter")
+		New: func(moduleConfig config.ModuleConfig) (Module, error) {
+			params := moduleConfig.Params
+			portNum, err := params.GetInt("port")
+			if err != nil {
+				return nil, fmt.Errorf("net.udp.server port error: %w", err)
 			}
 
-			portNum, ok := port.(float64)
-
-			if !ok {
-				return nil, errors.New("net.udp.server port must be a number")
-			}
-
-			ipString := "0.0.0.0"
-
-			ip, ok := params["ip"]
-			if ok {
-
-				specificIpString, ok := ip.(string)
-
-				if !ok {
-					return nil, errors.New("net.udp.server ip must be a string")
+			ipString, err := params.GetString("ip")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					ipString = "0.0.0.0"
+				} else {
+					return nil, fmt.Errorf("net.udp.server ip error: %w", err)
 				}
-				ipString = specificIpString
 			}
 
 			addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", ipString, uint16(portNum)))
@@ -56,18 +46,15 @@ func init() {
 				return nil, err
 			}
 
-			bufferSizeNum := 2048
-			bufferSize, ok := params["bufferSize"]
-
-			if ok {
-				bufferSizeFloat, ok := bufferSize.(float64)
-
-				if !ok {
-					return nil, errors.New("net.udp.server bufferSize must be a number")
+			bufferSizeNum, err := params.GetInt("bufferSize")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					bufferSizeNum = 2048
+				} else {
+					return nil, fmt.Errorf("net.udp.server bufferSize error: %w", err)
 				}
-				bufferSizeNum = int(bufferSizeFloat)
 			}
-			return &UDPServer{Addr: addr, BufferSize: bufferSizeNum, config: config, logger: CreateLogger(config)}, nil
+			return &UDPServer{Addr: addr, BufferSize: bufferSizeNum, config: moduleConfig, logger: CreateLogger(moduleConfig)}, nil
 		},
 	})
 }

@@ -27,27 +27,14 @@ func init() {
 		Type: "net.udp.client",
 		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
-			host, ok := params["host"]
-
-			if !ok {
-				return nil, errors.New("net.udp.client requires a host parameter")
+			hostString, err := params.GetString("host")
+			if err != nil {
+				return nil, fmt.Errorf("net.udp.client host error: %w", err)
 			}
 
-			hostString, ok := host.(string)
-
-			if !ok {
-				return nil, errors.New("net.udp.client host must be a string")
-			}
-
-			port, ok := params["port"]
-			if !ok {
-				return nil, errors.New("net.udp.client requires a port parameter")
-			}
-
-			portNum, ok := port.(float64)
-
-			if !ok {
-				return nil, errors.New("net.udp.client port must be a number")
+			portNum, err := params.GetInt("port")
+			if err != nil {
+				return nil, fmt.Errorf("net.udp.client port error: %w", err)
 			}
 
 			addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", hostString, uint16(portNum)))

@@ -33,55 +33,38 @@ type TCPServer struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.tcp.server",
-		New: func(config config.ModuleConfig) (Module, error) {
-			params := config.Params
-			port, ok := params["port"]
-			if !ok {
-				return nil, errors.New("net.tcp.server requires a port parameter")
+		New: func(moduleConfig config.ModuleConfig) (Module, error) {
+			params := moduleConfig.Params
+			portNum, err := params.GetInt("port")
+			if err != nil {
+				return nil, fmt.Errorf("net.tcp.server port error: %w", err)
 			}
 
-			portNum, ok := port.(float64)
-
-			if !ok {
-				return nil, errors.New("net.tcp.server port must be a number")
-			}
-
-			framingMethod, ok := params["framing"]
-
-			if !ok {
-				return nil, errors.New("net.tcp.server requires a framing parameter")
-			}
-
-			framingMethodString, ok := framingMethod.(string)
-
-			if !ok {
-				return nil, errors.New("net.tcp.server framing method must be a string")
+			framingMethodString, err := params.GetString("framing")
+			if err != nil {
+				return nil, fmt.Errorf("net.tcp.server framing error: %w", err)
 			}
 
 			framer := framer.GetFramer(framingMethodString)
 
 			if framer == nil {
-				return nil, fmt.Errorf("net.tcp.server unknown framing method: %s", framingMethod)
+				return nil, fmt.Errorf("net.tcp.server unknown framing method: %s", framingMethodString)
 			}
 
-			ipString := "0.0.0.0"
-
-			ip, ok := params["ip"]
-			if ok {
-
-				specificIpString, ok := ip.(string)
-
-				if !ok {
-					return nil, errors.New("net.tcp.server ip must be a string")
+			ipString, err := params.GetString("ip")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					ipString = "0.0.0.0"
+				} else {
+					return nil, fmt.Errorf("net.tcp.server ip error: %w", err)
 				}
-				ipString = specificIpString
 			}
 
 			addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", ipString, uint16(portNum)))
 			if err != nil {
 				return nil, err
 			}
-			return &TCPServer{Framer: framer, Addr: addr, config: config, quit: make(chan interface{}), logger: CreateLogger(config)}, nil
+			return &TCPServer{Framer: framer, Addr: addr, config: moduleConfig, quit: make(chan interface{}), logger: CreateLogger(moduleConfig)}, nil
 		},
 	})
 }

@@ -27,28 +27,15 @@ func init() {
 		Type: "nats.client",
 		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
-			url, ok := params["url"]
-
-			if !ok {
-				return nil, errors.New("nats.client requires a url parameter")
+			urlString, err := params.GetString("url")
+			if err != nil {
+				return nil, errors.New("nats.client url error: " + err.Error())
 			}
 
-			urlString, ok := url.(string)
+			subjectString, err := params.GetString("subject")
 
-			if !ok {
-				return nil, errors.New("nats.client url must be a string")
-			}
-
-			subject, ok := params["subject"]
-
-			if !ok {
-				return nil, errors.New("nats.client requires a subject parameter")
-			}
-
-			subjectString, ok := subject.(string)
-
-			if !ok {
-				return nil, errors.New("nats.client subject must be a string")
+			if err != nil {
+				return nil, errors.New("nats.client subject error: " + err.Error())
 			}
 
 			return &NATSClient{config: config, URL: urlString, Subject: subjectString, logger: CreateLogger(config)}, nil

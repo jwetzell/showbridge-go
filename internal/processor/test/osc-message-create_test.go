@@ -185,7 +185,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 			name:        "no address parameter",
 			params:      map[string]any{},
 			payload:     "test",
-			errorString: "osc.message.create requires an address parameter",
+			errorString: "osc.message.create address error: not found",
 		},
 		{
 			name: "non-string address parameter",
@@ -193,7 +193,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 				"address": 123,
 			},
 			payload:     "test",
-			errorString: "osc.message.create address must be a string",
+			errorString: "osc.message.create address error: not a string",
 		},
 		{
 			name: "bad address template",
@@ -220,7 +220,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 				"args":    []interface{}{"arg1"},
 			},
 			payload:     "test",
-			errorString: "osc.message.create requires a types parameter with args",
+			errorString: "osc.message.create types error: not found",
 		},
 		{
 			name: "args and types length mismatch",
@@ -240,7 +240,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 				"types":   "ss",
 			},
 			payload:     "test",
-			errorString: "osc.message.create arg must be a string",
+			errorString: "osc.message.create arg error: not a string",
 		},
 		{
 			name: "bad arg template",
@@ -260,7 +260,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 				"types":   123,
 			},
 			payload:     "test",
-			errorString: "osc.message.create types must be a string",
+			errorString: "osc.message.create types error: not a string",
 		},
 		{
 			name: "invalid type in types parameter",

@@ -82,7 +82,7 @@ func TestBadTimeSleep(t *testing.T) {
 			name:        "no-duration param",
 			payload:     "hello",
 			params:      map[string]any{},
-			errorString: "time.sleep requires a duration parameter",
+			errorString: "time.sleep duration error: not found",
 		},
 		{
 			name:    "non-number duration param",
@@ -90,7 +90,7 @@ func TestBadTimeSleep(t *testing.T) {
 			params: map[string]any{
 				"duration": "1000",
 			},
-			errorString: "time.sleep duration must be a number",
+			errorString: "time.sleep duration error: not a number",
 		},
 	}
 

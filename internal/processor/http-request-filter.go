@@ -44,18 +44,11 @@ func (hrf *HTTPRequestFilter) Type() string {
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type: "http.request.filter",
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
-			path, ok := params["path"]
-
-			if !ok {
-				return nil, errors.New("http.request.filter requires a path parameter")
-			}
-
-			pathString, ok := path.(string)
-
-			if !ok {
-				return nil, errors.New("http.request.filter path must be a string")
+		New: func(moduleConfig config.ProcessorConfig) (Processor, error) {
+			params := moduleConfig.Params
+			pathString, err := params.GetString("path")
+			if err != nil {
+				return nil, fmt.Errorf("http.request.filter path error: %w", err)
 			}
 
 			pathRegexp, err := regexp.Compile(fmt.Sprintf("^%s$", pathString))
@@ -64,18 +57,17 @@ func init() {
 				return nil, err
 			}
 
-			method, ok := params["method"]
-
-			if ok {
-				methodString, ok := method.(string)
-
-				if !ok {
-					return nil, errors.New("http.request.filter method must be a string")
+			methodString, err := params.GetString("method")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					return &HTTPRequestFilter{config: moduleConfig, Path: pathRegexp}, nil
+				} else {
+					return nil, fmt.Errorf("http.request.filter method error: %w", err)
 				}
-				return &HTTPRequestFilter{config: config, Path: pathRegexp, Method: methodString}, nil
 			}
 
-			return &HTTPRequestFilter{config: config, Path: pathRegexp}, nil
+			return &HTTPRequestFilter{config: moduleConfig, Path: pathRegexp, Method: methodString}, nil
+
 		},
 	})
 }

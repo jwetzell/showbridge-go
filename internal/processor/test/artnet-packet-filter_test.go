@@ -199,7 +199,7 @@ func TestBadArtnetPacketFilter(t *testing.T) {
 				Type:      0,
 			},
 			params:      map[string]any{},
-			errorString: "artnet.packet.filter requires an opCode parameter",
+			errorString: "artnet.packet.filter opCode error: not found",
 		},
 		{
 			name: "opCode not a number",
@@ -217,7 +217,7 @@ func TestBadArtnetPacketFilter(t *testing.T) {
 				Type:      0,
 			},
 			params:      map[string]any{"opCode": "100"},
-			errorString: "artnet.packet.filter opCode must be a number",
+			errorString: "artnet.packet.filter opCode error: not a number",
 		},
 	}
 

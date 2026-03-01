@@ -5,6 +5,7 @@ package processor
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"gitlab.com/gomidi/midi/v2"
@@ -38,18 +39,12 @@ func init() {
 		Type: "midi.message.filter",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
-			midiType, ok := params["type"]
-
-			if !ok {
-				return nil, errors.New("midi.message.filter requires a type parameter")
-			}
-			midiTypeString, ok := midiType.(string)
-
-			if !ok {
-				return nil, errors.New("midi.message.filter type must be a string")
+			msgTypeString, err := params.GetString("type")
+			if err != nil {
+				return nil, fmt.Errorf("midi.message.filter type error: %w", err)
 			}
 
-			return &MIDIMessageFilter{config: config, MIDIType: midiTypeString}, nil
+			return &MIDIMessageFilter{config: config, MIDIType: msgTypeString}, nil
 		},
 	})
 }

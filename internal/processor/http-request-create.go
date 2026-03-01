@@ -3,7 +3,7 @@ package processor
 import (
 	"bytes"
 	"context"
-	"errors"
+	"fmt"
 	"net/http"
 	"text/template"
 
@@ -47,28 +47,14 @@ func init() {
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 
-			method, ok := params["method"]
-
-			if !ok {
-				return nil, errors.New("http.request.create requires a method parameter")
+			methodString, err := params.GetString("method")
+			if err != nil {
+				return nil, fmt.Errorf("http.request.create method error: %w", err)
 			}
 
-			methodString, ok := method.(string)
-
-			if !ok {
-				return nil, errors.New("http.request.create url must be a string")
-			}
-
-			url, ok := params["url"]
-
-			if !ok {
-				return nil, errors.New("http.request.create requires a url parameter")
-			}
-
-			urlString, ok := url.(string)
-
-			if !ok {
-				return nil, errors.New("http.request.create url must be a string")
+			urlString, err := params.GetString("url")
+			if err != nil {
+				return nil, fmt.Errorf("http.request.create url error: %w", err)
 			}
 
 			urlTemplate, err := template.New("url").Parse(urlString)

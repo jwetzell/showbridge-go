@@ -46,66 +46,49 @@ type SIPDTMFCall struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "sip.dtmf.server",
-		New: func(config config.ModuleConfig) (Module, error) {
-			params := config.Params
-			portNum := 5060
+		New: func(moduleConfig config.ModuleConfig) (Module, error) {
+			params := moduleConfig.Params
 
-			port, ok := params["port"]
-			if ok {
-				specificPortNum, ok := port.(float64)
+			portNum, err := params.GetInt("port")
+			if err != nil {
 
-				if !ok {
-					return nil, errors.New("sip.dtmf.server port must be a number")
+				if errors.Is(err, config.ErrParamNotFound) {
+					portNum = 5060
+				} else {
+					return nil, fmt.Errorf("sip.dtmf.server port error: %w", err)
 				}
-				portNum = int(specificPortNum)
 			}
 
-			ipString := "0.0.0.0"
-
-			ip, ok := params["ip"]
-			if ok {
-
-				specificIpString, ok := ip.(string)
-
-				if !ok {
-					return nil, errors.New("sip.dtmf.server ip must be a string")
+			ipString, err := params.GetString("ip")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					ipString = "0.0.0.0"
+				} else {
+					return nil, fmt.Errorf("sip.dtmf.server ip error: %w", err)
 				}
-				ipString = specificIpString
 			}
 
-			transportString := "udp"
-
-			transport, ok := params["transport"]
-			if ok {
-
-				specificTransportString, ok := transport.(string)
-
-				if !ok {
-					return nil, errors.New("sip.dtmf.server transport must be a string")
+			transportString, err := params.GetString("transport")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					transportString = "udp"
+				} else {
+					return nil, fmt.Errorf("sip.dtmf.server transport error: %w", err)
 				}
-				transportString = specificTransportString
 			}
 
-			userAgentString := "showbridge"
-
-			userAgent, ok := params["userAgent"]
-			if ok {
-
-				specificUserAgentString, ok := userAgent.(string)
-
-				if !ok {
-					return nil, errors.New("sip.dtmf.server userAgent must be a string")
+			userAgentString, err := params.GetString("userAgent")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					userAgentString = "showbridge"
+				} else {
+					return nil, fmt.Errorf("sip.dtmf.server userAgent error: %w", err)
 				}
-				userAgentString = specificUserAgentString
 			}
 
-			separator, ok := params["separator"]
-			if !ok {
-				return nil, errors.New("sip.dtmf.server requires a separator parameter")
-			}
-			separatorString, ok := separator.(string)
-			if !ok {
-				return nil, errors.New("sip.dtmf.server separator must be a string")
+			separatorString, err := params.GetString("separator")
+			if err != nil {
+				return nil, fmt.Errorf("sip.dtmf.server separator error: %w", err)
 			}
 
 			if len(separatorString) != 1 {
@@ -115,7 +98,7 @@ func init() {
 			if !strings.ContainsRune("0123456789*#ABCD", rune(separatorString[0])) {
 				return nil, errors.New("sip.dtmf.server separator must be a valid DTMF character")
 			}
-			return &SIPDTMFServer{config: config, IP: ipString, Port: int(portNum), Transport: transportString, UserAgent: userAgentString, Separator: separatorString, logger: CreateLogger(config)}, nil
+			return &SIPDTMFServer{config: moduleConfig, IP: ipString, Port: int(portNum), Transport: transportString, UserAgent: userAgentString, Separator: separatorString, logger: CreateLogger(moduleConfig)}, nil
 		},
 	})
 }

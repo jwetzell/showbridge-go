@@ -40,16 +40,9 @@ func init() {
 		Type: "osc.message.filter",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
-			address, ok := params["address"]
-
-			if !ok {
-				return nil, errors.New("osc.message.filter requires an address parameter")
-			}
-
-			addressString, ok := address.(string)
-
-			if !ok {
-				return nil, errors.New("osc.message.filter address must be a string")
+			addressString, err := params.GetString("address")
+			if err != nil {
+				return nil, fmt.Errorf("osc.message.filter address error: %w", err)
 			}
 
 			addressPattern := strings.ReplaceAll(addressString, "?", ".")

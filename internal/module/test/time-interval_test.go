@@ -43,14 +43,14 @@ func TestBadTimeInterval(t *testing.T) {
 		{
 			name:        "no duration param",
 			params:      map[string]any{},
-			errorString: "time.interval requires a duration parameter",
+			errorString: "time.interval duration error: not found",
 		},
 		{
 			name: "non-number duration param",
 			params: map[string]any{
 				"duration": "8000",
 			},
-			errorString: "time.interval duration must be a number",
+			errorString: "time.interval duration error: not a number",
 		},
 	}
 

@@ -48,7 +48,7 @@ func TestBadMQTTClient(t *testing.T) {
 				"topic":    "test/topic",
 				"clientId": "test",
 			},
-			errorString: "mqtt.client requires a broker parameter",
+			errorString: "mqtt.client broker error: not found",
 		},
 		{
 			name: "non-string broker",
@@ -57,7 +57,7 @@ func TestBadMQTTClient(t *testing.T) {
 				"topic":    "test/topic",
 				"clientId": "test",
 			},
-			errorString: "mqtt.client broker must be a string",
+			errorString: "mqtt.client broker error: not a string",
 		},
 		{
 			name: "no topic param",
@@ -65,7 +65,7 @@ func TestBadMQTTClient(t *testing.T) {
 				"broker":   "mqtt://localhost:1883",
 				"clientId": "test",
 			},
-			errorString: "mqtt.client requires a topic parameter",
+			errorString: "mqtt.client topic error: not found",
 		},
 		{
 			name: "non-string topic",
@@ -74,7 +74,7 @@ func TestBadMQTTClient(t *testing.T) {
 				"topic":    123,
 				"clientId": "test",
 			},
-			errorString: "mqtt.client topic must be a string",
+			errorString: "mqtt.client topic error: not a string",
 		},
 		{
 			name: "no clientId param",
@@ -82,7 +82,7 @@ func TestBadMQTTClient(t *testing.T) {
 				"broker": "mqtt://localhost:1883",
 				"topic":  "test/topic",
 			},
-			errorString: "mqtt.client requires a clientId parameter",
+			errorString: "mqtt.client clientId error: not found",
 		},
 		{
 			name: "non-string clientId",
@@ -91,7 +91,7 @@ func TestBadMQTTClient(t *testing.T) {
 				"topic":    "test/topic",
 				"clientId": 123,
 			},
-			errorString: "mqtt.client clientId must be a string",
+			errorString: "mqtt.client clientId error: not a string",
 		},
 	}
 

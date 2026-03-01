@@ -46,7 +46,7 @@ func TestBadNATSServer(t *testing.T) {
 			params: map[string]any{
 				"ip": 123,
 			},
-			errorString: "nats.server ip must be a string",
+			errorString: "nats.server ip error: not a string",
 		},
 	}
 

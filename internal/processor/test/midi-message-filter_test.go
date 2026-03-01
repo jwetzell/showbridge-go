@@ -104,7 +104,7 @@ func TestBadMIDIMessageFilter(t *testing.T) {
 			name:        "no type param",
 			params:      map[string]any{},
 			payload:     midi.NoteOn(1, 60, 127),
-			errorString: "midi.message.filter requires a type parameter",
+			errorString: "midi.message.filter type error: not found",
 		},
 		{
 			name: "non-string type param",
@@ -112,7 +112,7 @@ func TestBadMIDIMessageFilter(t *testing.T) {
 				"type": 123,
 			},
 			payload:     "hello",
-			errorString: "midi.message.filter type must be a string",
+			errorString: "midi.message.filter type error: not a string",
 		},
 		{
 			name: "non-midi message input",

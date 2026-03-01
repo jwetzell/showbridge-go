@@ -43,14 +43,14 @@ func TestBadSIPDTMFServer(t *testing.T) {
 		{
 			name:        "no separator param",
 			params:      map[string]any{},
-			errorString: "sip.dtmf.server requires a separator parameter",
+			errorString: "sip.dtmf.server separator error: not found",
 		},
 		{
 			name: "non-string separator param",
 			params: map[string]any{
 				"separator": 123,
 			},
-			errorString: "sip.dtmf.server separator must be a string",
+			errorString: "sip.dtmf.server separator error: not a string",
 		},
 		{
 			name: "non-number port param",
@@ -58,7 +58,7 @@ func TestBadSIPDTMFServer(t *testing.T) {
 				"separator": "#",
 				"port":      "8000",
 			},
-			errorString: "sip.dtmf.server port must be a number",
+			errorString: "sip.dtmf.server port error: not a number",
 		},
 		{
 			name: "non-string ip param",
@@ -66,7 +66,7 @@ func TestBadSIPDTMFServer(t *testing.T) {
 				"separator": "#",
 				"ip":        123,
 			},
-			errorString: "sip.dtmf.server ip must be a string",
+			errorString: "sip.dtmf.server ip error: not a string",
 		},
 		{
 			name: "non-string transport param",
@@ -74,7 +74,7 @@ func TestBadSIPDTMFServer(t *testing.T) {
 				"separator": "#",
 				"transport": 123,
 			},
-			errorString: "sip.dtmf.server transport must be a string",
+			errorString: "sip.dtmf.server transport error: not a string",
 		},
 		{
 			name: "non-string userAgent param",
@@ -82,7 +82,7 @@ func TestBadSIPDTMFServer(t *testing.T) {
 				"separator": "#",
 				"userAgent": 123,
 			},
-			errorString: "sip.dtmf.server userAgent must be a string",
+			errorString: "sip.dtmf.server userAgent error: not a string",
 		},
 	}
 

@@ -47,7 +47,7 @@ func TestBadTCPClient(t *testing.T) {
 			params: map[string]any{
 				"host": "localhost",
 			},
-			errorString: "net.tcp.client requires a port parameter",
+			errorString: "net.tcp.client port error: not found",
 		},
 		{
 			name: "non-number port param",
@@ -55,14 +55,14 @@ func TestBadTCPClient(t *testing.T) {
 				"host": "localhost",
 				"port": "8000",
 			},
-			errorString: "net.tcp.client port must be a number",
+			errorString: "net.tcp.client port error: not a number",
 		},
 		{
 			name: "no host param",
 			params: map[string]any{
 				"port": 8000.0,
 			},
-			errorString: "net.tcp.client requires a host parameter",
+			errorString: "net.tcp.client host error: not found",
 		},
 		{
 			name: "non-string host param",
@@ -70,7 +70,7 @@ func TestBadTCPClient(t *testing.T) {
 				"host": 123,
 				"port": 8000.0,
 			},
-			errorString: "net.tcp.client host must be a string",
+			errorString: "net.tcp.client host error: not a string",
 		},
 	}
 

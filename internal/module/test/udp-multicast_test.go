@@ -46,7 +46,7 @@ func TestBadUDPMulticast(t *testing.T) {
 			params: map[string]any{
 				"ip": "localhost",
 			},
-			errorString: "net.udp.multicast requires a port parameter",
+			errorString: "net.udp.multicast port error: not found",
 		},
 		{
 			name: "non-number port param",
@@ -54,14 +54,14 @@ func TestBadUDPMulticast(t *testing.T) {
 				"ip":   "localhost",
 				"port": "8000",
 			},
-			errorString: "net.udp.multicast port must be a number",
+			errorString: "net.udp.multicast port error: not a number",
 		},
 		{
 			name: "no ip param",
 			params: map[string]any{
 				"port": 8000.0,
 			},
-			errorString: "net.udp.multicast requires an ip parameter",
+			errorString: "net.udp.multicast ip error: not found",
 		},
 		{
 			name: "non-string ip param",
@@ -69,7 +69,7 @@ func TestBadUDPMulticast(t *testing.T) {
 				"ip":   123,
 				"port": 8000.0,
 			},
-			errorString: "net.udp.multicast ip must be a string",
+			errorString: "net.udp.multicast ip error: not a string",
 		},
 		{
 			name: "invalid addr",

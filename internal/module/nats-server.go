@@ -27,42 +27,31 @@ type NATSServer struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "nats.server",
-		New: func(config config.ModuleConfig) (Module, error) {
-			params := config.Params
-			portNum := 4222
-
-			port, ok := params["port"]
-			if ok {
-				specificportNum, ok := port.(int)
-				if !ok {
-					specificportNum, ok := port.(float64)
-					if !ok {
-						return nil, errors.New("nats.server port must be a number")
-					}
-					portNum = int(specificportNum)
+		New: func(moduleConfig config.ModuleConfig) (Module, error) {
+			params := moduleConfig.Params
+			portNum, err := params.GetInt("port")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					portNum = 4222
 				} else {
-					portNum = int(specificportNum)
+					return nil, fmt.Errorf("nats.server port error: %w", err)
 				}
 			}
 
-			ipString := "0.0.0.0"
-
-			ip, ok := params["ip"]
-			if ok {
-
-				specificIpString, ok := ip.(string)
-
-				if !ok {
-					return nil, errors.New("nats.server ip must be a string")
+			ipString, err := params.GetString("ip")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					ipString = "0.0.0.0"
+				} else {
+					return nil, fmt.Errorf("nats.server ip error: %w", err)
 				}
-				ipString = specificIpString
 			}
 
-			_, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", ipString, uint16(portNum)))
+			_, err = net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", ipString, uint16(portNum)))
 			if err != nil {
 				return nil, err
 			}
-			return &NATSServer{config: config, logger: CreateLogger(config), Ip: ipString, Port: portNum}, nil
+			return &NATSServer{config: moduleConfig, logger: CreateLogger(moduleConfig), Ip: ipString, Port: portNum}, nil
 		},
 	})
 }

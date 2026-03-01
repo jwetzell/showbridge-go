@@ -111,13 +111,13 @@ func TestBadStringSplit(t *testing.T) {
 			name:        "missing separator param",
 			payload:     "part1,part2,part3",
 			params:      map[string]any{},
-			errorString: "string.split requires a separator",
+			errorString: "string.split separator error: not found",
 		},
 		{
 			name:        "non-string separator param",
 			payload:     "part1,part2,part3",
 			params:      map[string]any{"separator": 123},
-			errorString: "string.split separator must be a string",
+			errorString: "string.split separator error: not a string",
 		},
 	}
 

@@ -46,60 +46,46 @@ type sipCallContextKey string
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "sip.call.server",
-		New: func(config config.ModuleConfig) (Module, error) {
-			params := config.Params
-			portNum := 5060
+		New: func(moduleConfig config.ModuleConfig) (Module, error) {
+			params := moduleConfig.Params
+			portNum, err := params.GetInt("port")
+			if err != nil {
 
-			port, ok := params["port"]
-			if ok {
-				specificPortNum, ok := port.(float64)
-
-				if !ok {
-					return nil, errors.New("sip.call.server port must be a number")
+				if errors.Is(err, config.ErrParamNotFound) {
+					portNum = 5060
+				} else {
+					return nil, fmt.Errorf("sip.call.server port error: %w", err)
 				}
-				portNum = int(specificPortNum)
 			}
 
-			ipString := "0.0.0.0"
-
-			ip, ok := params["ip"]
-			if ok {
-
-				specificIpString, ok := ip.(string)
-
-				if !ok {
-					return nil, errors.New("sip.call.server ip must be a string")
+			ipString, err := params.GetString("ip")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					ipString = "0.0.0.0"
+				} else {
+					return nil, fmt.Errorf("sip.call.server ip error: %w", err)
 				}
-				ipString = specificIpString
 			}
 
-			transportString := "udp"
-
-			transport, ok := params["transport"]
-			if ok {
-
-				specificTransportString, ok := transport.(string)
-
-				if !ok {
-					return nil, errors.New("sip.call.server transport must be a string")
+			transportString, err := params.GetString("transport")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					transportString = "udp"
+				} else {
+					return nil, fmt.Errorf("sip.call.server transport error: %w", err)
 				}
-				transportString = specificTransportString
 			}
 
-			userAgentString := "showbridge"
-
-			userAgent, ok := params["userAgent"]
-			if ok {
-
-				specificUserAgentString, ok := userAgent.(string)
-
-				if !ok {
-					return nil, errors.New("sip.call.server userAgent must be a string")
+			userAgentString, err := params.GetString("userAgent")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					userAgentString = "showbridge"
+				} else {
+					return nil, fmt.Errorf("sip.call.server userAgent error: %w", err)
 				}
-				userAgentString = specificUserAgentString
 			}
 
-			return &SIPCallServer{config: config, IP: ipString, Port: int(portNum), Transport: transportString, UserAgent: userAgentString, logger: CreateLogger(config)}, nil
+			return &SIPCallServer{config: moduleConfig, IP: ipString, Port: int(portNum), Transport: transportString, UserAgent: userAgentString, logger: CreateLogger(moduleConfig)}, nil
 		},
 	})
 }

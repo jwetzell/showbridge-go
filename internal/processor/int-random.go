@@ -3,6 +3,7 @@ package processor
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math/rand/v2"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -29,33 +30,21 @@ func init() {
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 
-			min, ok := params["min"]
-			if !ok {
-				return nil, errors.New("int.random requires a min parameter")
+			minInt, err := params.GetInt("min")
+			if err != nil {
+				return nil, fmt.Errorf("int.random min error: %w", err)
 			}
 
-			minFloat, ok := min.(float64)
-
-			if !ok {
-				return nil, errors.New("int.random min must be a number")
+			maxInt, err := params.GetInt("max")
+			if err != nil {
+				return nil, fmt.Errorf("int.random max error: %w", err)
 			}
 
-			max, ok := params["max"]
-			if !ok {
-				return nil, errors.New("int.random requires a max parameter")
-			}
-
-			maxFloat, ok := max.(float64)
-
-			if !ok {
-				return nil, errors.New("int.random max must be a number")
-			}
-
-			if maxFloat < minFloat {
+			if maxInt < minInt {
 				return nil, errors.New("int.random max must be greater than min")
 			}
 
-			return &IntRandom{config: config, Min: int(minFloat), Max: int(maxFloat)}, nil
+			return &IntRandom{config: config, Min: int(minInt), Max: int(maxInt)}, nil
 		},
 	})
 }

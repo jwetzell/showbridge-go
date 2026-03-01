@@ -43,12 +43,12 @@ func TestBadMIDIInput(t *testing.T) {
 		{
 			name:        "no port param",
 			params:      map[string]any{},
-			errorString: "midi.input requires a port parameter",
+			errorString: "midi.input port error: not found",
 		},
 		{
 			name:        "non-string port",
 			params:      map[string]any{"port": 123},
-			errorString: "midi.input port must be a string",
+			errorString: "midi.input port error: not a string",
 		},
 	}
 

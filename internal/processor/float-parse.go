@@ -3,6 +3,7 @@ package processor
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -34,20 +35,18 @@ func (fp *FloatParse) Type() string {
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type: "float.parse",
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
-			bitSizeNum := 64
-			bitSize, ok := params["bitSize"]
-			if ok {
-				bitSizeFloat, ok := bitSize.(float64)
+		New: func(moduleConfig config.ProcessorConfig) (Processor, error) {
+			params := moduleConfig.Params
 
-				if !ok {
-					return nil, errors.New("float.parse bitSize must be a number")
+			bitSizeNum, err := params.GetInt("bitSize")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					bitSizeNum = 64
+				} else {
+					return nil, fmt.Errorf("float.parse bitSize error: %w", err)
 				}
-
-				bitSizeNum = int(bitSizeFloat)
 			}
-			return &FloatParse{config: config, BitSize: bitSizeNum}, nil
+			return &FloatParse{config: moduleConfig, BitSize: bitSizeNum}, nil
 		},
 	})
 }

@@ -108,7 +108,7 @@ func TestBadOSCMessageFilter(t *testing.T) {
 			name:        "no address parameter",
 			params:      map[string]any{},
 			payload:     osc.OSCMessage{Address: "/test"},
-			errorString: "osc.message.filter requires an address parameter",
+			errorString: "osc.message.filter address error: not found",
 		},
 		{
 			name: "non-string address parameter",
@@ -116,7 +116,7 @@ func TestBadOSCMessageFilter(t *testing.T) {
 				"address": 123,
 			},
 			payload:     osc.OSCMessage{Address: "/test"},
-			errorString: "osc.message.filter address must be a string",
+			errorString: "osc.message.filter address error: not a string",
 		},
 		{
 			name: "bad address pattern",

@@ -3,6 +3,7 @@ package module
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"time"
 
@@ -26,15 +27,9 @@ func init() {
 		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 
-			duration, ok := params["duration"]
-			if !ok {
-				return nil, errors.New("time.timer requires a duration parameter")
-			}
-
-			durationNum, ok := duration.(float64)
-
-			if !ok {
-				return nil, errors.New("time.timer duration must be a number")
+			durationNum, err := params.GetInt("duration")
+			if err != nil {
+				return nil, fmt.Errorf("time.timer duration error: %w", err)
 			}
 
 			return &TimeTimer{Duration: uint32(durationNum), config: config, logger: CreateLogger(config)}, nil

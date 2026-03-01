@@ -3,7 +3,7 @@ package processor
 import (
 	"bytes"
 	"context"
-	"errors"
+	"fmt"
 	"text/template"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -44,28 +44,14 @@ func init() {
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 
-			status, ok := params["status"]
-
-			if !ok {
-				return nil, errors.New("http.response.create requires a status parameter")
+			statusNum, err := params.GetInt("status")
+			if err != nil {
+				return nil, fmt.Errorf("http.response.create status error: %w", err)
 			}
 
-			statusNum, ok := status.(float64)
-
-			if !ok {
-				return nil, errors.New("http.response.create status must be a number")
-			}
-
-			bodyTmpl, ok := params["bodyTemplate"]
-
-			if !ok {
-				return nil, errors.New("http.response.create requires a bodyTemplate parameter")
-			}
-
-			bodyTemplateString, ok := bodyTmpl.(string)
-
-			if !ok {
-				return nil, errors.New("http.response.create bodyTemplate must be a string")
+			bodyTemplateString, err := params.GetString("bodyTemplate")
+			if err != nil {
+				return nil, fmt.Errorf("http.response.create bodyTemplate error: %w", err)
 			}
 
 			bodyTemplate, err := template.New("body").Parse(bodyTemplateString)

@@ -42,28 +42,28 @@ func TestBadSIPCallServer(t *testing.T) {
 			params: map[string]any{
 				"port": "8000",
 			},
-			errorString: "sip.call.server port must be a number",
+			errorString: "sip.call.server port error: not a number",
 		},
 		{
 			name: "non-string ip param",
 			params: map[string]any{
 				"ip": 123,
 			},
-			errorString: "sip.call.server ip must be a string",
+			errorString: "sip.call.server ip error: not a string",
 		},
 		{
 			name: "non-string transport param",
 			params: map[string]any{
 				"transport": 123,
 			},
-			errorString: "sip.call.server transport must be a string",
+			errorString: "sip.call.server transport error: not a string",
 		},
 		{
 			name: "non-string userAgent param",
 			params: map[string]any{
 				"userAgent": 123,
 			},
-			errorString: "sip.call.server userAgent must be a string",
+			errorString: "sip.call.server userAgent error: not a string",
 		},
 	}
 

@@ -47,7 +47,7 @@ func TestBadUDPClient(t *testing.T) {
 			params: map[string]any{
 				"host": "localhost",
 			},
-			errorString: "net.udp.client requires a port parameter",
+			errorString: "net.udp.client port error: not found",
 		},
 		{
 			name: "non-number port param",
@@ -55,14 +55,14 @@ func TestBadUDPClient(t *testing.T) {
 				"host": "localhost",
 				"port": "8000",
 			},
-			errorString: "net.udp.client port must be a number",
+			errorString: "net.udp.client port error: not a number",
 		},
 		{
 			name: "no host param",
 			params: map[string]any{
 				"port": 8000.0,
 			},
-			errorString: "net.udp.client requires a host parameter",
+			errorString: "net.udp.client host error: not found",
 		},
 		{
 			name: "non-string host param",
@@ -70,7 +70,7 @@ func TestBadUDPClient(t *testing.T) {
 				"host": 123,
 				"port": 8000.0,
 			},
-			errorString: "net.udp.client host must be a string",
+			errorString: "net.udp.client host error: not a string",
 		},
 	}
 

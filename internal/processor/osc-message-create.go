@@ -80,16 +80,9 @@ func init() {
 		Type: "osc.message.create",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
-			address, ok := params["address"]
-
-			if !ok {
-				return nil, errors.New("osc.message.create requires an address parameter")
-			}
-
-			addressString, ok := address.(string)
-
-			if !ok {
-				return nil, errors.New("osc.message.create address must be a string")
+			addressString, err := params.GetString("address")
+			if err != nil {
+				return nil, fmt.Errorf("osc.message.create address error: %w", err)
 			}
 
 			addressTemplate, err := template.New("address").Parse(addressString)
@@ -107,16 +100,9 @@ func init() {
 					return nil, fmt.Errorf("osc.message.create address must be an array found %T", args)
 				}
 
-				types, ok := params["types"]
-
-				if !ok {
-					return nil, errors.New("osc.message.create requires a types parameter with args")
-				}
-
-				typesString, ok := types.(string)
-
-				if !ok {
-					return nil, errors.New("osc.message.create types must be a string")
+				typesString, err := params.GetString("types")
+				if err != nil {
+					return nil, fmt.Errorf("osc.message.create types error: %w", err)
 				}
 
 				if len(rawArgs) != len(typesString) {
@@ -129,7 +115,7 @@ func init() {
 					argString, ok := rawArg.(string)
 
 					if !ok {
-						return nil, errors.New("osc.message.create arg must be a string")
+						return nil, errors.New("osc.message.create arg error: not a string")
 					}
 
 					argTemplate, err := template.New("arg").Parse(argString)

@@ -3,6 +3,7 @@ package processor
 import (
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -37,16 +38,9 @@ func init() {
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 
-			pattern, ok := params["pattern"]
-
-			if !ok {
-				return nil, errors.New("string.filter requires a pattern parameter")
-			}
-
-			patternString, ok := pattern.(string)
-
-			if !ok {
-				return nil, errors.New("string.filter pattern must be a string")
+			patternString, err := params.GetString("pattern")
+			if err != nil {
+				return nil, fmt.Errorf("string.filter pattern error: %w", err)
 			}
 
 			patternRegexp, err := regexp.Compile(patternString)

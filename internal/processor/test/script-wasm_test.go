@@ -103,7 +103,7 @@ func TestBadScriptWASM(t *testing.T) {
 			name:        "no path parameter",
 			params:      map[string]any{},
 			payload:     []byte("hello"),
-			errorString: "script.wasm requires a path parameter",
+			errorString: "script.wasm path error: not found",
 		},
 		{
 			name: "non-string path parameter",
@@ -111,7 +111,7 @@ func TestBadScriptWASM(t *testing.T) {
 				"path": 12345,
 			},
 			payload:     []byte("hello"),
-			errorString: "script.wasm path must be a string",
+			errorString: "script.wasm path error: not a string",
 		},
 		{
 			name: "non-string function",
@@ -121,7 +121,7 @@ func TestBadScriptWASM(t *testing.T) {
 				"function":   12345,
 			},
 			payload:     []byte("hello"),
-			errorString: "script.wasm function must be a string",
+			errorString: "script.wasm function error: not a string",
 		},
 		{
 			name: "non-boolean enableWasi",

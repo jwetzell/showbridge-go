@@ -3,6 +3,7 @@ package processor
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -81,47 +82,26 @@ func init() {
 		Type: "mqtt.message.create",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
-			topic, ok := params["topic"]
-
-			if !ok {
-				return nil, errors.New("mqtt.message.create requires a topic parameter")
+			topicString, err := params.GetString("topic")
+			if err != nil {
+				return nil, fmt.Errorf("mqtt.message.create topic error: %w", err)
 			}
 
-			topicString, ok := topic.(string)
-
-			if !ok {
-				return nil, errors.New("mqtt.message.create topic must be a string")
+			qosByte, err := params.GetInt("qos")
+			if err != nil {
+				return nil, fmt.Errorf("mqtt.message.create qos error: %w", err)
 			}
 
-			qos, ok := params["qos"]
-
-			if !ok {
-				return nil, errors.New("mqtt.message.create requires a qos parameter")
-			}
-
-			qosByte, ok := qos.(float64)
-
-			if !ok {
-				return nil, errors.New("mqtt.message.create qos must be a number")
-			}
-
-			retained, ok := params["retained"]
-
-			if !ok {
-				return nil, errors.New("mqtt.message.create requires a retained parameter")
-			}
-
-			retainedBool, ok := retained.(bool)
-
-			if !ok {
-				return nil, errors.New("mqtt.message.create retained must be a boolean")
+			retainedBool, err := params.GetBool("retained")
+			if err != nil {
+				return nil, fmt.Errorf("mqtt.message.create retained error: %w", err)
 			}
 
 			//TODO(jwetzell): convert payload into []byte or string for sending
 			payload, ok := params["payload"]
 
 			if !ok {
-				return nil, errors.New("mqtt.message.create requires a payload parameter")
+				return nil, errors.New("mqtt.message.create payload error: not found")
 			}
 
 			if payloadBytes, ok := payload.([]byte); ok {
@@ -131,7 +111,7 @@ func init() {
 			payloadString, ok := payload.(string)
 
 			if !ok {
-				return nil, errors.New("mqtt.message.create payload must be a string or byte array")
+				return nil, errors.New("mqtt.message.create payload error: not a string or byte array")
 			}
 
 			payloadBytes := []byte(payloadString)

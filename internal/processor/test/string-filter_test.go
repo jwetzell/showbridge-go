@@ -126,7 +126,7 @@ func TestBadStringFilter(t *testing.T) {
 			name:        "no pattern param",
 			payload:     "hello",
 			params:      map[string]any{},
-			errorString: "string.filter requires a pattern parameter",
+			errorString: "string.filter pattern error: not found",
 		},
 		{
 			name:    "non-string input",
@@ -142,7 +142,7 @@ func TestBadStringFilter(t *testing.T) {
 			params: map[string]any{
 				"pattern": 123,
 			},
-			errorString: "string.filter pattern must be a string",
+			errorString: "string.filter pattern error: not a string",
 		},
 		{
 			name:    "invalid regex pattern",

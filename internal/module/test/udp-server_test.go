@@ -43,14 +43,14 @@ func TestBadUDPServer(t *testing.T) {
 		{
 			name:        "no port param",
 			params:      map[string]any{},
-			errorString: "net.udp.server requires a port parameter",
+			errorString: "net.udp.server port error: not found",
 		},
 		{
 			name: "non-number port param",
 			params: map[string]any{
 				"port": "8000",
 			},
-			errorString: "net.udp.server port must be a number",
+			errorString: "net.udp.server port error: not a number",
 		},
 		{
 			name: "non-string ip param",
@@ -58,7 +58,7 @@ func TestBadUDPServer(t *testing.T) {
 				"port": 8000.0,
 				"ip":   123,
 			},
-			errorString: "net.udp.server ip must be a string",
+			errorString: "net.udp.server ip error: not a string",
 		},
 		{
 			name: "non-number bufferSize param",
@@ -66,7 +66,7 @@ func TestBadUDPServer(t *testing.T) {
 				"port":       8000.0,
 				"bufferSize": "1024",
 			},
-			errorString: "net.udp.server bufferSize must be a number",
+			errorString: "net.udp.server bufferSize error: not a number",
 		},
 		{
 			name: "invalid addr",

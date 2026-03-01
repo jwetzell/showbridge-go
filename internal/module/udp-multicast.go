@@ -25,36 +25,23 @@ type UDPMulticast struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.udp.multicast",
-		New: func(config config.ModuleConfig) (Module, error) {
-			params := config.Params
-			ip, ok := params["ip"]
-
-			if !ok {
-				return nil, errors.New("net.udp.multicast requires an ip parameter")
+		New: func(moduleConfig config.ModuleConfig) (Module, error) {
+			params := moduleConfig.Params
+			ipString, err := params.GetString("ip")
+			if err != nil {
+				return nil, fmt.Errorf("net.udp.multicast ip error: %w", err)
 			}
 
-			ipString, ok := ip.(string)
-
-			if !ok {
-				return nil, errors.New("net.udp.multicast ip must be a string")
-			}
-
-			port, ok := params["port"]
-			if !ok {
-				return nil, errors.New("net.udp.multicast requires a port parameter")
-			}
-
-			portNum, ok := port.(float64)
-
-			if !ok {
-				return nil, errors.New("net.udp.multicast port must be a number")
+			portNum, err := params.GetInt("port")
+			if err != nil {
+				return nil, fmt.Errorf("net.udp.multicast port error: %w", err)
 			}
 
 			addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", ipString, uint16(portNum)))
 			if err != nil {
 				return nil, err
 			}
-			return &UDPMulticast{config: config, Addr: addr, logger: CreateLogger(config)}, nil
+			return &UDPMulticast{config: moduleConfig, Addr: addr, logger: CreateLogger(moduleConfig)}, nil
 		},
 	})
 }

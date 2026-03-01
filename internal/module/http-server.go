@@ -57,17 +57,10 @@ func init() {
 		Type: "http.server",
 		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
-			port, ok := params["port"]
-			if !ok {
-				return nil, errors.New("http.server requires a port parameter")
+			portNum, err := params.GetInt("port")
+			if err != nil {
+				return nil, fmt.Errorf("http.server port error: %w", err)
 			}
-
-			portNum, ok := port.(float64)
-
-			if !ok {
-				return nil, errors.New("http.server port must be a number")
-			}
-
 			return &HTTPServer{Port: uint16(portNum), config: config, logger: CreateLogger(config)}, nil
 		},
 	})

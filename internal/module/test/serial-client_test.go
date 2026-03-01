@@ -47,7 +47,7 @@ func TestBadSerialClient(t *testing.T) {
 			params: map[string]any{
 				"framing": "LF",
 			},
-			errorString: "serial.client requires a port parameter",
+			errorString: "serial.client port error: not found",
 		},
 		{
 			name: "non-string port param",
@@ -55,14 +55,14 @@ func TestBadSerialClient(t *testing.T) {
 				"port":    8000,
 				"framing": "LF",
 			},
-			errorString: "serial.client port must be a string",
+			errorString: "serial.client port error: not a string",
 		},
 		{
 			name: "no framing param",
 			params: map[string]any{
 				"port": "/dev/ttyUSB0",
 			},
-			errorString: "serial.client requires a framing parameter",
+			errorString: "serial.client framing error: not found",
 		},
 		{
 			name: "non-string framing param",
@@ -70,7 +70,7 @@ func TestBadSerialClient(t *testing.T) {
 				"port":    "/dev/ttyUSB0",
 				"framing": 1,
 			},
-			errorString: "serial.client framing method must be a string",
+			errorString: "serial.client framing error: not a string",
 		},
 		{
 			name: "unkown framing method",

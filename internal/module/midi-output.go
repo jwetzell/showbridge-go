@@ -30,16 +30,9 @@ func init() {
 		New: func(config config.ModuleConfig) (Module, error) {
 			params := config.Params
 
-			port, ok := params["port"]
-
-			if !ok {
-				return nil, errors.New("midi.output requires a port parameter")
-			}
-
-			portString, ok := port.(string)
-
-			if !ok {
-				return nil, errors.New("midi.output port must be a string")
+			portString, err := params.GetString("port")
+			if err != nil {
+				return nil, fmt.Errorf("midi.output port error: %w", err)
 			}
 
 			return &MIDIOutput{config: config, Port: portString, logger: CreateLogger(config)}, nil

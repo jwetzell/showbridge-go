@@ -3,6 +3,7 @@ package processor
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -35,33 +36,27 @@ func (ip *IntParse) Type() string {
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type: "int.parse",
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
+		New: func(moduleConfig config.ProcessorConfig) (Processor, error) {
+			params := moduleConfig.Params
 
-			baseNum := 10
-			base, ok := params["base"]
-			if ok {
-				baseFloat, ok := base.(float64)
-
-				if !ok {
-					return nil, errors.New("int.parse base must be a number")
+			baseNum, err := params.GetInt("base")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					baseNum = 10
+				} else {
+					return nil, fmt.Errorf("int.parse base error: %w", err)
 				}
-
-				baseNum = int(baseFloat)
 			}
 
-			bitSizeNum := 64
-			bitSize, ok := params["bitSize"]
-			if ok {
-				bitSizeFloat, ok := bitSize.(float64)
-
-				if !ok {
-					return nil, errors.New("int.parse bitSize must be a number")
+			bitSizeNum, err := params.GetInt("bitSize")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					bitSizeNum = 64
+				} else {
+					return nil, fmt.Errorf("int.parse bitSize error: %w", err)
 				}
-
-				bitSizeNum = int(bitSizeFloat)
 			}
-			return &IntParse{config: config, Base: baseNum, BitSize: bitSizeNum}, nil
+			return &IntParse{config: moduleConfig, Base: baseNum, BitSize: bitSizeNum}, nil
 		},
 	})
 }
