@@ -519,17 +519,6 @@
         "properties": {
           "type": {
             "type": "string",
-            "const": "nats.message.encode"
-          }
-        },
-        "required": ["type"],
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
             "const": "osc.message.create"
           },
           "params": {
