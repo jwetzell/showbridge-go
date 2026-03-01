@@ -33,13 +33,16 @@ func init() {
 
 			port, ok := params["port"]
 			if ok {
-
-				specificportNum, ok := port.(float64)
-
+				specificportNum, ok := port.(int)
 				if !ok {
-					return nil, errors.New("net.udp.server port must be a number")
+					specificportNum, ok := port.(float64)
+					if !ok {
+						return nil, errors.New("nats.server port must be a number")
+					}
+					portNum = int(specificportNum)
+				} else {
+					portNum = int(specificportNum)
 				}
-				portNum = int(specificportNum)
 			}
 
 			ipString := "0.0.0.0"
@@ -50,7 +53,7 @@ func init() {
 				specificIpString, ok := ip.(string)
 
 				if !ok {
-					return nil, errors.New("net.udp.server ip must be a string")
+					return nil, errors.New("nats.server ip must be a string")
 				}
 				ipString = specificIpString
 			}
