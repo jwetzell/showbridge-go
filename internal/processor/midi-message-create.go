@@ -206,19 +206,19 @@ func newMidiControlChangeCreate(config config.ProcessorConfig) (Processor, error
 		return nil, err
 	}
 
-	controller, ok := params["controller"]
+	control, ok := params["control"]
 
 	if !ok {
-		return nil, errors.New("midi.message.create ControlChange requires a controller parameter")
+		return nil, errors.New("midi.message.create ControlChange requires a control parameter")
 	}
 
-	controllerString, ok := controller.(string)
+	controlString, ok := control.(string)
 
 	if !ok {
-		return nil, errors.New("midi.message.create ControlChange controller must be a string")
+		return nil, errors.New("midi.message.create ControlChange control must be a string")
 	}
 
-	controllerTemplate, err := template.New("controller").Parse(controllerString)
+	controlTemplate, err := template.New("control").Parse(controlString)
 
 	if err != nil {
 		return nil, err
@@ -253,14 +253,14 @@ func newMidiControlChangeCreate(config config.ProcessorConfig) (Processor, error
 
 		channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
 
-		var controllerBuffer bytes.Buffer
-		err = controllerTemplate.Execute(&controllerBuffer, payload)
+		var controlBuffer bytes.Buffer
+		err = controlTemplate.Execute(&controlBuffer, payload)
 
 		if err != nil {
 			return nil, err
 		}
 
-		controllerValue, err := strconv.ParseUint(controllerBuffer.String(), 10, 8)
+		controlValue, err := strconv.ParseUint(controlBuffer.String(), 10, 8)
 
 		var valueBuffer bytes.Buffer
 		err = valueTemplate.Execute(&valueBuffer, payload)
@@ -271,7 +271,7 @@ func newMidiControlChangeCreate(config config.ProcessorConfig) (Processor, error
 
 		valueValue, err := strconv.ParseUint(valueBuffer.String(), 10, 8)
 
-		payloadMessage := midi.ControlChange(uint8(channelValue), uint8(controllerValue), uint8(valueValue))
+		payloadMessage := midi.ControlChange(uint8(channelValue), uint8(controlValue), uint8(valueValue))
 		return payloadMessage, nil
 	}}, nil
 }

@@ -361,14 +361,14 @@
                   "channel": {
                     "type": "string"
                   },
-                  "controller": {
+                  "control": {
                     "type": "string"
                   },
                   "value": {
                     "type": "string"
                   }
                 },
-                "required": ["type", "channel", "controller", "value"],
+                "required": ["type", "channel", "control", "value"],
                 "additionalProperties": false
               },
               {
