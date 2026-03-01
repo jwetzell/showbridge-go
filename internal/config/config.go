@@ -55,7 +55,7 @@ func (p Params) GetBool(key string) (bool, error) {
 
 	boolValue, ok := value.(bool)
 	if !ok {
-		return false, errors.New("not a bool")
+		return false, errors.New("not a boolean")
 	}
 	return boolValue, nil
 }

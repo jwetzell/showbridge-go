@@ -130,7 +130,7 @@ func TestBadScriptWASM(t *testing.T) {
 				"enableWasi": "true",
 			},
 			payload:     []byte("hello"),
-			errorString: "script.wasm enableWasi must be a boolean",
+			errorString: "script.wasm enableWasi error: not a boolean",
 		},
 		{
 			name: "non-byte slice input",
