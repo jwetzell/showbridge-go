@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 )
 
 type Config struct {
@@ -58,6 +59,28 @@ func (p Params) GetBool(key string) (bool, error) {
 		return false, errors.New("not a boolean")
 	}
 	return boolValue, nil
+}
+
+func (p Params) GetStringSlice(key string) ([]string, error) {
+	value, ok := p[key]
+	if !ok {
+		return nil, ErrParamNotFound
+	}
+
+	interfaceSlice, ok := value.([]any)
+	if !ok {
+		return nil, errors.New("not a slice")
+	}
+
+	stringSlice := make([]string, len(interfaceSlice))
+	for i, v := range interfaceSlice {
+		str, ok := v.(string)
+		if !ok {
+			return nil, fmt.Errorf("element at index %d is not a string", i)
+		}
+		stringSlice[i] = str
+	}
+	return stringSlice, nil
 }
 
 type ModuleConfig struct {
