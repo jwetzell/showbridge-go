@@ -16,6 +16,22 @@ type TestStruct struct {
 	Data   any
 }
 
+func (t TestStruct) GetString() string {
+	return t.String
+}
+
+func (t TestStruct) GetInt() int {
+	return t.Int
+}
+
+func (t TestStruct) GetFloat() float64 {
+	return t.Float
+}
+
+func (t TestStruct) GetBool() bool {
+	return t.Bool
+}
+
 func (t TestStruct) GetData() any {
 	return t.Data
 }
