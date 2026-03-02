@@ -211,7 +211,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 				"types":   "s",
 			},
 			payload:     "test",
-			errorString: "osc.message.create address must be an array found string",
+			errorString: "osc.message.create args error: not a slice",
 		},
 		{
 			name: "args without types parameter",
@@ -240,7 +240,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 				"types":   "ss",
 			},
 			payload:     "test",
-			errorString: "osc.message.create arg error: not a string",
+			errorString: "osc.message.create args error: element at index 1 is not a string",
 		},
 		{
 			name: "bad arg template",

@@ -78,8 +78,8 @@ func (omc *OSCMessageCreate) Type() string {
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type: "osc.message.create",
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
+		New: func(processorConfig config.ProcessorConfig) (Processor, error) {
+			params := processorConfig.Params
 			addressString, err := params.GetString("address")
 			if err != nil {
 				return nil, fmt.Errorf("osc.message.create address error: %w", err)
@@ -91,43 +91,36 @@ func init() {
 				return nil, err
 			}
 
-			args, ok := params["args"]
-
-			if ok {
-				rawArgs, ok := args.([]interface{})
-
-				if !ok {
-					return nil, fmt.Errorf("osc.message.create address must be an array found %T", args)
+			argStrings, err := params.GetStringSlice("args")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					return &OSCMessageCreate{config: processorConfig, Address: addressTemplate}, nil
+				} else {
+					return nil, fmt.Errorf("osc.message.create args error: %w", err)
 				}
-
-				typesString, err := params.GetString("types")
-				if err != nil {
-					return nil, fmt.Errorf("osc.message.create types error: %w", err)
-				}
-
-				if len(rawArgs) != len(typesString) {
-					return nil, errors.New("osc.message.create args and types must be the same length")
-				}
-
-				argTemplates := []*template.Template{}
-
-				for _, rawArg := range rawArgs {
-					argString, ok := rawArg.(string)
-
-					if !ok {
-						return nil, errors.New("osc.message.create arg error: not a string")
-					}
-
-					argTemplate, err := template.New("arg").Parse(argString)
-
-					if err != nil {
-						return nil, err
-					}
-					argTemplates = append(argTemplates, argTemplate)
-				}
-				return &OSCMessageCreate{config: config, Address: addressTemplate, Args: argTemplates, Types: typesString}, nil
 			}
-			return &OSCMessageCreate{config: config, Address: addressTemplate}, nil
+
+			typesString, err := params.GetString("types")
+			if err != nil {
+				return nil, fmt.Errorf("osc.message.create types error: %w", err)
+			}
+
+			if len(argStrings) != len(typesString) {
+				return nil, errors.New("osc.message.create args and types must be the same length")
+			}
+
+			argTemplates := []*template.Template{}
+
+			for _, argString := range argStrings {
+
+				argTemplate, err := template.New("arg").Parse(argString)
+
+				if err != nil {
+					return nil, err
+				}
+				argTemplates = append(argTemplates, argTemplate)
+			}
+			return &OSCMessageCreate{config: processorConfig, Address: addressTemplate, Args: argTemplates, Types: typesString}, nil
 		},
 	})
 }
