@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"math"
 )
 
 type Config struct {
@@ -83,6 +84,90 @@ func (p Params) GetStringSlice(key string) ([]string, error) {
 		stringSlice[i] = str
 	}
 	return stringSlice, nil
+}
+
+func (p Params) GetIntSlice(key string) ([]int, error) {
+	value, ok := p[key]
+	if !ok {
+		return nil, ErrParamNotFound
+	}
+
+	interfaceSlice, ok := value.([]any)
+	if !ok {
+		return nil, ErrParamNotSlice
+	}
+
+	intSlice := make([]int, len(interfaceSlice))
+	for i, v := range interfaceSlice {
+
+		intValue, ok := v.(int)
+		if ok {
+			intSlice[i] = intValue
+			continue
+		}
+
+		uintValue, ok := v.(uint)
+		if ok {
+			intSlice[i] = int(uintValue)
+			continue
+		}
+
+		floatValue, ok := v.(float64)
+		if ok {
+			if floatValue != math.Floor(floatValue) {
+				return nil, fmt.Errorf("element at index %d is not an integer", i)
+			}
+			intSlice[i] = int(floatValue)
+			continue
+		}
+		return nil, fmt.Errorf("element at index %d is not a number", i)
+	}
+	return intSlice, nil
+}
+
+func (p Params) GetByteSlice(key string) ([]byte, error) {
+	value, ok := p[key]
+	if !ok {
+		return nil, ErrParamNotFound
+	}
+
+	byteSlice, ok := value.([]any)
+	if !ok {
+		return nil, ErrParamNotSlice
+	}
+
+	result := make([]byte, len(byteSlice))
+	for i, v := range byteSlice {
+		uintValue, ok := v.(uint)
+		if ok {
+			if uintValue > 255 {
+				return nil, fmt.Errorf("element at index %d is out of byte range", i)
+			}
+			result[i] = byte(uintValue)
+			continue
+		}
+		intValue, ok := v.(int)
+		if ok {
+			if intValue < 0 || intValue > 255 {
+				return nil, fmt.Errorf("element at index %d is out of byte range", i)
+			}
+			result[i] = byte(intValue)
+			continue
+		}
+		floatValue, ok := v.(float64)
+		if ok {
+			if floatValue != math.Floor(floatValue) {
+				return nil, fmt.Errorf("element at index %d is not an integer", i)
+			}
+			if floatValue < 0 || floatValue > 255 {
+				return nil, fmt.Errorf("element at index %d is out of byte range", i)
+			}
+			result[i] = byte(floatValue)
+			continue
+		}
+		return nil, fmt.Errorf("element at index %d is not a number", i)
+	}
+	return result, nil
 }
 
 type ModuleConfig struct {
