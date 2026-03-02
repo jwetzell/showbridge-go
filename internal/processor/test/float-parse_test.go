@@ -26,59 +26,6 @@ func TestFloatParseFromRegistry(t *testing.T) {
 	}
 }
 
-func TestFloatParseBadConfigBitSizeString(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["float.parse"]
-	if !ok {
-		t.Fatalf("float.parse processor not registered")
-	}
-
-	_, err := registration.New(config.ProcessorConfig{
-		Type: "float.parse",
-		Params: map[string]any{
-			"bitSize": "64",
-		},
-	})
-
-	if err == nil {
-		t.Fatalf("float.parse should have returned an error for bad bitSize config")
-	}
-}
-
-func TestFloatParseGoodConfig(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["float.parse"]
-	if !ok {
-		t.Fatalf("float.parse processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Type: "float.parse",
-		Params: map[string]any{
-			"bitSize": 64.0,
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("float.parse should have created processor but got error: %s", err)
-	}
-
-	payload := "12345.0"
-	expected := float64(12345.0)
-
-	got, err := processorInstance.Process(t.Context(), payload)
-	if err != nil {
-		t.Fatalf("float.parse processing failed: %s", err)
-	}
-
-	gotFloat, ok := got.(float64)
-	if !ok {
-		t.Fatalf("float.parse returned a %T payload: %s", got, got)
-	}
-
-	if gotFloat != expected {
-		t.Fatalf("float.parse got %f, expected %f", gotFloat, expected)
-	}
-}
-
 func TestGoodFloatParse(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -152,6 +99,14 @@ func TestBadFloatParse(t *testing.T) {
 		errorString string
 	}{
 		{
+			name: "non-string bitSize",
+			params: map[string]any{
+				"bitSize": "32",
+			},
+			payload:     "1.23",
+			errorString: "float.parse bitSize error: not a number",
+		},
+		{
 			name: "non-string input",
 			params: map[string]any{
 				"bitSize": 64,
@@ -188,6 +143,13 @@ func TestBadFloatParse(t *testing.T) {
 				Type:   "float.parse",
 				Params: test.params,
 			})
+
+			if err != nil {
+				if err.Error() != test.errorString {
+					t.Fatalf("float.parse got error '%s', expected '%s'", err.Error(), test.errorString)
+				}
+				return
+			}
 
 			got, err := processorInstance.Process(t.Context(), test.payload)
 

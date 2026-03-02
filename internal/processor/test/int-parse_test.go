@@ -26,78 +26,6 @@ func TestIntParseFromRegistry(t *testing.T) {
 	}
 }
 
-func TestIntParseBadConfigBaseString(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["int.parse"]
-	if !ok {
-		t.Fatalf("int.parse processor not registered")
-	}
-
-	_, err := registration.New(config.ProcessorConfig{
-		Type: "int.parse",
-		Params: map[string]any{
-			"base": "10",
-		},
-	})
-
-	if err == nil {
-		t.Fatalf("int.parse should have returned an error for bad base config")
-	}
-}
-
-func TestIntParseBadConfigBitSizeString(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["int.parse"]
-	if !ok {
-		t.Fatalf("int.parse processor not registered")
-	}
-
-	_, err := registration.New(config.ProcessorConfig{
-		Type: "int.parse",
-		Params: map[string]any{
-			"bitSize": "64",
-		},
-	})
-
-	if err == nil {
-		t.Fatalf("int.parse should have returned an error for bad bitSize config")
-	}
-}
-
-func TestIntParseGoodConfig(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["int.parse"]
-	if !ok {
-		t.Fatalf("int.parse processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Type: "int.parse",
-		Params: map[string]any{
-			"base":    10.0,
-			"bitSize": 64.0,
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("int.parse should have created processor but got error: %s", err)
-	}
-
-	payload := "12345"
-	expected := int64(12345)
-
-	got, err := processorInstance.Process(t.Context(), payload)
-	if err != nil {
-		t.Fatalf("int.parse processing failed: %s", err)
-	}
-
-	gotInt, ok := got.(int64)
-	if !ok {
-		t.Fatalf("int.parse returned a %T payload: %s", got, got)
-	}
-
-	if gotInt != expected {
-		t.Fatalf("int.parse got %d, expected %d", gotInt, expected)
-	}
-}
-
 func TestGoodIntParse(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -192,6 +120,24 @@ func TestBadIntParse(t *testing.T) {
 		errorString string
 	}{
 		{
+			name: "non-string base",
+			params: map[string]any{
+				"base":    "10",
+				"bitSize": 64,
+			},
+			payload:     "12345",
+			errorString: "int.parse base error: not a number",
+		},
+		{
+			name: "non-string bitSize",
+			params: map[string]any{
+				"base":    10,
+				"bitSize": "64",
+			},
+			payload:     "12345",
+			errorString: "int.parse bitSize error: not a number",
+		},
+		{
 			name: "non-string input",
 			params: map[string]any{
 				"base":    10,
@@ -231,6 +177,13 @@ func TestBadIntParse(t *testing.T) {
 				Type:   "int.parse",
 				Params: test.params,
 			})
+
+			if err != nil {
+				if err.Error() != test.errorString {
+					t.Fatalf("int.parse got error '%s', expected '%s'", err.Error(), test.errorString)
+				}
+				return
+			}
 
 			got, err := processorInstance.Process(t.Context(), test.payload)
 
