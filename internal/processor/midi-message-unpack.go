@@ -45,7 +45,7 @@ type MIDIPitchBend struct {
 }
 
 func (mmu *MIDIMessageUnpack) Process(ctx context.Context, payload any) (any, error) {
-	payloadMidi, ok := payload.(midi.Message)
+	payloadMidi, ok := GetAnyAs[midi.Message](payload)
 
 	if !ok {
 		return nil, errors.New("midi.message.unpack processor only accepts a midi.Message")

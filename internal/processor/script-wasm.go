@@ -17,7 +17,7 @@ type ScriptWASM struct {
 
 func (se *ScriptWASM) Process(ctx context.Context, payload any) (any, error) {
 
-	payloadBytes, ok := payload.([]byte)
+	payloadBytes, ok := GetAnyAs[[]byte](payload)
 
 	if !ok {
 		return nil, fmt.Errorf("script.wasm can only operator on byte array")

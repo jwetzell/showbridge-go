@@ -15,7 +15,7 @@ type FloatParse struct {
 }
 
 func (fp *FloatParse) Process(ctx context.Context, payload any) (any, error) {
-	payloadString, ok := payload.(string)
+	payloadString, ok := GetAnyAs[string](payload)
 
 	if !ok {
 		return nil, errors.New("float.parse processor only accepts a string")

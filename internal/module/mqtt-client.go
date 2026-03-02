@@ -8,6 +8,7 @@ import (
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
@@ -101,7 +102,7 @@ func (mc *MQTTClient) Start(ctx context.Context) error {
 }
 
 func (mc *MQTTClient) Output(ctx context.Context, payload any) error {
-	payloadMessage, ok := payload.(mqtt.Message)
+	payloadMessage, ok := processor.GetAnyAs[mqtt.Message](payload)
 
 	if !ok {
 		return errors.New("mqtt.client is only able to output a MQTTMessage")

@@ -13,7 +13,7 @@ type JsonDecode struct {
 }
 
 func (jd *JsonDecode) Process(ctx context.Context, payload any) (any, error) {
-	payloadString, ok := payload.(string)
+	payloadString, ok := GetAnyAs[string](payload)
 
 	if !ok {
 		return nil, errors.New("json.decode processor only accepts a string")

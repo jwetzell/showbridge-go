@@ -17,7 +17,7 @@ type MIDIMessageFilter struct {
 }
 
 func (mmf *MIDIMessageFilter) Process(ctx context.Context, payload any) (any, error) {
-	payloadMessage, ok := payload.(midi.Message)
+	payloadMessage, ok := GetAnyAs[midi.Message](payload)
 
 	if !ok {
 		return nil, errors.New("midi.message.filter processor only accepts a midi.Message")

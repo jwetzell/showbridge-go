@@ -13,7 +13,7 @@ type FreeDDecode struct {
 }
 
 func (fdd *FreeDDecode) Process(ctx context.Context, payload any) (any, error) {
-	payloadBytes, ok := payload.([]byte)
+	payloadBytes, ok := GetAnyAs[[]byte](payload)
 
 	if !ok {
 		return nil, errors.New("freed.decode processor only accepts a []byte")

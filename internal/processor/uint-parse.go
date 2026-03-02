@@ -16,7 +16,7 @@ type UintParse struct {
 }
 
 func (up *UintParse) Process(ctx context.Context, payload any) (any, error) {
-	payloadString, ok := payload.(string)
+	payloadString, ok := GetAnyAs[string](payload)
 
 	if !ok {
 		return nil, errors.New("uint.parse processor only accepts a string")

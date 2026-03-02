@@ -10,6 +10,7 @@ import (
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/framer"
+	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
@@ -152,7 +153,7 @@ func (tc *TCPClient) Output(ctx context.Context, payload any) error {
 			return err
 		}
 	}
-	payloadBytes, ok := payload.([]byte)
+	payloadBytes, ok := processor.GetAnyAs[[]byte](payload)
 	if !ok {
 		return errors.New("net.tcp.client is only able to output bytes")
 	}

@@ -13,7 +13,7 @@ type ArtNetPacketEncode struct {
 }
 
 func (ape *ArtNetPacketEncode) Process(ctx context.Context, payload any) (any, error) {
-	payloadPacket, ok := payload.(artnet.ArtNetPacket)
+	payloadPacket, ok := GetAnyAs[artnet.ArtNetPacket](payload)
 
 	if !ok {
 		return nil, fmt.Errorf("artnet.packet.encode processor only accepts an ArtNetPacket")

@@ -18,7 +18,7 @@ type OSCMessageFilter struct {
 
 func (omf *OSCMessageFilter) Process(ctx context.Context, payload any) (any, error) {
 
-	payloadMessage, ok := payload.(osc.OSCMessage)
+	payloadMessage, ok := GetAnyAs[osc.OSCMessage](payload)
 
 	if !ok {
 		return nil, errors.New("osc.message.filter can only operate on OSCMessage payloads")

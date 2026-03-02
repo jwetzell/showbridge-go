@@ -199,7 +199,7 @@ func (sds *SIPDTMFServer) Output(ctx context.Context, payload any) error {
 		return errors.New("sip.dtmf.server inDialog already ended")
 	}
 
-	payloadDTMFResponse, ok := payload.(processor.SipDTMFResponse)
+	payloadDTMFResponse, ok := processor.GetAnyAs[processor.SipDTMFResponse](payload)
 
 	if ok {
 		dtmfWriter := call.inDialog.AudioWriterDTMF()
@@ -216,7 +216,7 @@ func (sds *SIPDTMFServer) Output(ctx context.Context, payload any) error {
 		return nil
 	}
 
-	payloadAudioFileResponse, ok := payload.(processor.SipAudioFileResponse)
+	payloadAudioFileResponse, ok := processor.GetAnyAs[processor.SipAudioFileResponse](payload)
 
 	if ok {
 		audioFile, err := os.Open(payloadAudioFileResponse.AudioFile)

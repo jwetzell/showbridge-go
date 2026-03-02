@@ -13,7 +13,7 @@ type FreeDEncode struct {
 }
 
 func (fde *FreeDEncode) Process(ctx context.Context, payload any) (any, error) {
-	payloadPosition, ok := payload.(freeD.FreeDPosition)
+	payloadPosition, ok := GetAnyAs[freeD.FreeDPosition](payload)
 
 	if !ok {
 		return nil, errors.New("freed.decode processor only accepts a FreeDEncode")

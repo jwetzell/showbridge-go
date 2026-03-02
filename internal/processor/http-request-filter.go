@@ -18,7 +18,7 @@ type HTTPRequestFilter struct {
 
 func (hrf *HTTPRequestFilter) Process(ctx context.Context, payload any) (any, error) {
 
-	payloadRequest, ok := payload.(*http.Request)
+	payloadRequest, ok := GetAnyAs[*http.Request](payload)
 
 	if !ok {
 		return nil, errors.New("http.request.filter can only operate on http.Request payloads")

@@ -15,7 +15,7 @@ type StringFilter struct {
 }
 
 func (sf *StringFilter) Process(ctx context.Context, payload any) (any, error) {
-	payloadString, ok := payload.(string)
+	payloadString, ok := GetAnyAs[string](payload)
 
 	if !ok {
 		return nil, errors.New("string.filter processor only accepts a string")

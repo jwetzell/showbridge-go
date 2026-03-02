@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
@@ -61,7 +62,7 @@ func (hc *HTTPClient) Start(ctx context.Context) error {
 
 func (hc *HTTPClient) Output(ctx context.Context, payload any) error {
 
-	payloadRequest, ok := payload.(*http.Request)
+	payloadRequest, ok := processor.GetAnyAs[*http.Request](payload)
 
 	if !ok {
 		return errors.New("http.client is only able to output an http.Request")

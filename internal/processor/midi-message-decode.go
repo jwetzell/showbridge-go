@@ -15,7 +15,7 @@ type MIDIMessageDecode struct {
 }
 
 func (mmd *MIDIMessageDecode) Process(ctx context.Context, payload any) (any, error) {
-	payloadBytes, ok := payload.([]byte)
+	payloadBytes, ok := GetAnyAs[[]byte](payload)
 
 	if !ok {
 		return nil, errors.New("midi.message.decode processor only accepts a []byte")

@@ -15,7 +15,7 @@ type MIDIMessageEncode struct {
 }
 
 func (mme *MIDIMessageEncode) Process(ctx context.Context, payload any) (any, error) {
-	payloadMessage, ok := payload.(midi.Message)
+	payloadMessage, ok := GetAnyAs[midi.Message](payload)
 
 	if !ok {
 		return nil, errors.New("midi.message.encode processor only accepts a midi.Message")

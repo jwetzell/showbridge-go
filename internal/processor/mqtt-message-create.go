@@ -104,11 +104,11 @@ func init() {
 				return nil, errors.New("mqtt.message.create payload error: not found")
 			}
 
-			if payloadBytes, ok := payload.([]byte); ok {
+			if payloadBytes, ok := GetAnyAs[[]byte](payload); ok {
 				return &MQTTMessageCreate{config: config, Topic: topicString, QoS: byte(qosByte), Retained: retainedBool, Payload: payloadBytes}, nil
 			}
 
-			payloadString, ok := payload.(string)
+			payloadString, ok := GetAnyAs[string](payload)
 
 			if !ok {
 				return nil, errors.New("mqtt.message.create payload error: not a string or byte array")

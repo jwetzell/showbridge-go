@@ -13,7 +13,7 @@ type OSCMessageEncode struct {
 }
 
 func (ome *OSCMessageEncode) Process(ctx context.Context, payload any) (any, error) {
-	payloadMessage, ok := payload.(osc.OSCMessage)
+	payloadMessage, ok := GetAnyAs[osc.OSCMessage](payload)
 
 	if !ok {
 		return nil, errors.New("osc.message.encode processor only accepts an OSCMessage")

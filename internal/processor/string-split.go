@@ -15,7 +15,7 @@ type StringSplit struct {
 }
 
 func (ss *StringSplit) Process(ctx context.Context, payload any) (any, error) {
-	payloadString, ok := payload.(string)
+	payloadString, ok := GetAnyAs[string](payload)
 
 	if !ok {
 		return nil, errors.New("string.split only accepts a string")

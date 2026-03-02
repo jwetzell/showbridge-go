@@ -13,7 +13,7 @@ type MQTTMessageEncode struct {
 }
 
 func (mme *MQTTMessageEncode) Process(ctx context.Context, payload any) (any, error) {
-	payloadMessage, ok := payload.(mqtt.Message)
+	payloadMessage, ok := GetAnyAs[mqtt.Message](payload)
 
 	if !ok {
 		return nil, errors.New("mqtt.message.encode processor only accepts an mqtt.Message")

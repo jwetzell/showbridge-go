@@ -16,7 +16,7 @@ type IntParse struct {
 }
 
 func (ip *IntParse) Process(ctx context.Context, payload any) (any, error) {
-	payloadString, ok := payload.(string)
+	payloadString, ok := GetAnyAs[string](payload)
 
 	if !ok {
 		return nil, errors.New("int.parse processor only accepts a string")

@@ -12,7 +12,7 @@ type StringDecode struct {
 }
 
 func (sd *StringDecode) Process(ctx context.Context, payload any) (any, error) {
-	payloadBytes, ok := payload.([]byte)
+	payloadBytes, ok := GetAnyAs[[]byte](payload)
 
 	if !ok {
 		return nil, errors.New("string.decode processor only accepts a []byte")

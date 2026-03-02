@@ -13,7 +13,7 @@ type ArtNetPacketDecode struct {
 }
 
 func (apd *ArtNetPacketDecode) Process(ctx context.Context, payload any) (any, error) {
-	payloadBytes, ok := payload.([]byte)
+	payloadBytes, ok := GetAnyAs[[]byte](payload)
 
 	if !ok {
 		return nil, fmt.Errorf("artnet.packet.decode processor only accepts a []byte")

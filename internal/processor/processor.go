@@ -40,3 +40,8 @@ var (
 	processorRegistryMu sync.RWMutex
 	ProcessorRegistry   = make(map[string]ProcessorRegistration)
 )
+
+func GetAnyAs[T any](p any) (T, bool) {
+	typed, ok := p.(T)
+	return typed, ok
+}

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
@@ -108,7 +109,7 @@ func (um *UDPMulticast) Start(ctx context.Context) error {
 
 func (um *UDPMulticast) Output(ctx context.Context, payload any) error {
 
-	payloadBytes, ok := payload.([]byte)
+	payloadBytes, ok := processor.GetAnyAs[[]byte](payload)
 	if !ok {
 		return errors.New("net.udp.multicast can only output bytes")
 	}

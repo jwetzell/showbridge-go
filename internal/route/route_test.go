@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
@@ -58,7 +59,7 @@ func TestGoodRouteHandleInput(t *testing.T) {
 		t.Fatalf("route ProcessPayload returned error: %v", err)
 	}
 
-	payloadBytes, ok := payload.([]byte)
+	payloadBytes, ok := processor.GetAnyAs[[]byte](payload)
 	if !ok {
 		t.Fatalf("payload should be []byte got %T", payload)
 	}
