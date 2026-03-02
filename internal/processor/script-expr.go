@@ -17,22 +17,7 @@ type ScriptExpr struct {
 
 func (se *ScriptExpr) Process(ctx context.Context, payload any) (any, error) {
 
-	payloadType := fmt.Sprintf("%T", payload)
-
-	exprEnv := payload
-
-	switch payloadType {
-	case "uint", "uint8", "uint16", "uint32", "uint64":
-		exprEnv = PayloadStruct{Payload: payload}
-	case "int", "int8", "int16", "int32", "int64":
-		exprEnv = PayloadStruct{Payload: payload}
-	case "float32", "float64":
-		exprEnv = PayloadStruct{Payload: payload}
-	case "string":
-		exprEnv = PayloadStruct{Payload: payload}
-	case "bool":
-		exprEnv = PayloadStruct{Payload: payload}
-	}
+	exprEnv := SafeExprEnv(payload)
 
 	output, err := expr.Run(se.Program, exprEnv)
 	if err != nil {

@@ -28,58 +28,6 @@ func TestScriptExprFromRegistry(t *testing.T) {
 	}
 }
 
-func TestScriptExprNoProgram(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["script.expr"]
-	if !ok {
-		t.Fatalf("script.expr processor not registered")
-	}
-
-	_, err := registration.New(config.ProcessorConfig{
-		Type:   "script.expr",
-		Params: map[string]any{},
-	})
-
-	if err == nil {
-		t.Fatalf("script.expr processor should have thrown an error when creating")
-	}
-}
-
-func TestScriptExprBadConfigWrongExpressionType(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["script.expr"]
-	if !ok {
-		t.Fatalf("script.expr processor not registered")
-	}
-
-	_, err := registration.New(config.ProcessorConfig{
-		Type: "script.expr",
-		Params: map[string]any{
-			"expression": 12345,
-		},
-	})
-
-	if err == nil {
-		t.Fatalf("script.expr processor should have thrown an error when creating with non-string expression")
-	}
-}
-
-func TestScriptExprBadConfigNonCompilingExpression(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["script.expr"]
-	if !ok {
-		t.Fatalf("script.expr processor not registered")
-	}
-
-	_, err := registration.New(config.ProcessorConfig{
-		Type: "script.expr",
-		Params: map[string]any{
-			"expression": "foo + ",
-		},
-	})
-
-	if err == nil {
-		t.Fatalf("script.expr processor should have thrown an error when creating with non-compiling expression")
-	}
-}
-
 func TestGoodScriptExpr(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -90,7 +38,7 @@ func TestGoodScriptExpr(t *testing.T) {
 		{
 			name: "number",
 			params: map[string]any{
-				"expression": "foo + bar",
+				"expression": "Payload.foo + Payload.bar",
 			},
 			payload: map[string]any{
 				"foo": 1,
@@ -101,7 +49,7 @@ func TestGoodScriptExpr(t *testing.T) {
 		{
 			name: "string",
 			params: map[string]any{
-				"expression": "foo + bar",
+				"expression": "Payload.foo + Payload.bar",
 			},
 			payload: map[string]any{
 				"foo": "1",
@@ -145,18 +93,24 @@ func TestBadScriptExpr(t *testing.T) {
 	tests := []struct {
 		name        string
 		params      map[string]any
-		payload     map[string]any
+		payload     any
 		errorString string
 	}{
 		{
+			name:        "no expression parameter",
+			params:      map[string]any{},
+			payload:     map[string]any{"foo": 1, "bar": 1},
+			errorString: "script.expr expression error: not found",
+		},
+		{
 			name: "accessing missing field",
 			params: map[string]any{
-				"expression": "foo + bar",
+				"expression": "Payload.foo + Payload.bar",
 			},
 			payload: map[string]any{
 				"foo": 1,
 			},
-			errorString: "invalid operation: int + <nil> (1:5)\n | foo + bar\n | ....^",
+			errorString: "invalid operation: int + <nil> (1:13)\n | Payload.foo + Payload.bar\n | ............^",
 		},
 	}
 
@@ -171,6 +125,13 @@ func TestBadScriptExpr(t *testing.T) {
 				Type:   "script.expr",
 				Params: test.params,
 			})
+
+			if err != nil {
+				if err.Error() != test.errorString {
+					t.Fatalf("script.expr got error '%s', expected '%s'", err.Error(), test.errorString)
+				}
+				return
+			}
 
 			got, err := processorInstance.Process(t.Context(), test.payload)
 

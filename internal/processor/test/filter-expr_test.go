@@ -39,7 +39,7 @@ func TestGoodFilterExpr(t *testing.T) {
 		{
 			name: "number",
 			params: map[string]any{
-				"expression": "Int > 0",
+				"expression": "Payload.Int > 0",
 			},
 			payload: TestStruct{
 				Int: 1,
@@ -51,7 +51,7 @@ func TestGoodFilterExpr(t *testing.T) {
 		{
 			name: "string",
 			params: map[string]any{
-				"expression": "String == 'hello'",
+				"expression": "Payload.String == 'hello'",
 			},
 			payload: TestStruct{
 				String: "hello",
@@ -63,7 +63,7 @@ func TestGoodFilterExpr(t *testing.T) {
 		{
 			name: "not matching",
 			params: map[string]any{
-				"expression": "Int > 0",
+				"expression": "Payload.Int > 0",
 			},
 			payload: TestStruct{
 				Int: 0,
@@ -136,12 +136,12 @@ func TestBadFilterExpr(t *testing.T) {
 		{
 			name: "accessing missing field",
 			params: map[string]any{
-				"expression": "foo + bar",
+				"expression": "Payload.foo + Payload.bar",
 			},
 			payload: map[string]any{
 				"foo": 1,
 			},
-			errorString: "invalid operation: int + <nil> (1:5)\n | foo + bar\n | ....^",
+			errorString: "invalid operation: int + <nil> (1:13)\n | Payload.foo + Payload.bar\n | ............^",
 		},
 	}
 
