@@ -746,6 +746,26 @@
         "properties": {
           "type": {
             "type": "string",
+            "const": "struct.field.get"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["name"]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
             "const": "time.sleep"
           },
           "params": {
