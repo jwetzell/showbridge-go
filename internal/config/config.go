@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"reflect"
 )
 
 type Config struct {
@@ -131,14 +132,20 @@ func (p Params) GetByteSlice(key string) ([]byte, error) {
 		return nil, ErrParamNotFound
 	}
 
-	byteSlice, ok := value.([]any)
-	if !ok {
+	v := reflect.ValueOf(value)
+	if v.Kind() != reflect.Slice {
 		return nil, ErrParamNotSlice
 	}
 
-	result := make([]byte, len(byteSlice))
-	for i, v := range byteSlice {
-		uintValue, ok := v.(uint)
+	result := make([]byte, v.Len())
+	for i := 0; i < v.Len(); i++ {
+		elem := v.Index(i).Interface()
+		byteValue, ok := elem.(byte)
+		if ok {
+			result[i] = byteValue
+			continue
+		}
+		uintValue, ok := elem.(uint)
 		if ok {
 			if uintValue > 255 {
 				return nil, fmt.Errorf("element at index %d is out of byte range", i)
@@ -146,7 +153,7 @@ func (p Params) GetByteSlice(key string) ([]byte, error) {
 			result[i] = byte(uintValue)
 			continue
 		}
-		intValue, ok := v.(int)
+		intValue, ok := elem.(int)
 		if ok {
 			if intValue < 0 || intValue > 255 {
 				return nil, fmt.Errorf("element at index %d is out of byte range", i)
@@ -154,7 +161,7 @@ func (p Params) GetByteSlice(key string) ([]byte, error) {
 			result[i] = byte(intValue)
 			continue
 		}
-		floatValue, ok := v.(float64)
+		floatValue, ok := elem.(float64)
 		if ok {
 			if floatValue != math.Floor(floatValue) {
 				return nil, fmt.Errorf("element at index %d is not an integer", i)
