@@ -184,18 +184,6 @@
       },
       {
         "type": "object",
-        "title": "Encode HTTP Request",
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "http.request.encode"
-          }
-        },
-        "required": ["type"],
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
         "title": "Filter HTTP Request",
         "properties": {
           "type": {
@@ -243,18 +231,6 @@
           }
         },
         "required": ["type", "params"],
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
-        "title": "Encode HTTP Response",
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "http.response.encode"
-          }
-        },
-        "required": ["type"],
         "additionalProperties": false
       },
       {
