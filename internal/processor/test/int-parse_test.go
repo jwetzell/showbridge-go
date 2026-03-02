@@ -108,8 +108,8 @@ func TestGoodIntParse(t *testing.T) {
 		{
 			name: "positive number",
 			params: map[string]any{
-				"base":    10.0,
-				"bitSize": 64.0,
+				"base":    10,
+				"bitSize": 64,
 			},
 			payload:  "12345",
 			expected: 12345,
@@ -117,8 +117,8 @@ func TestGoodIntParse(t *testing.T) {
 		{
 			name: "negative number",
 			params: map[string]any{
-				"base":    10.0,
-				"bitSize": 64.0,
+				"base":    10,
+				"bitSize": 64,
 			},
 			payload:  "-12345",
 			expected: -12345,
@@ -126,8 +126,8 @@ func TestGoodIntParse(t *testing.T) {
 		{
 			name: "zero",
 			params: map[string]any{
-				"base":    10.0,
-				"bitSize": 64.0,
+				"base":    10,
+				"bitSize": 64,
 			},
 			payload:  "0",
 			expected: 0,
@@ -135,8 +135,8 @@ func TestGoodIntParse(t *testing.T) {
 		{
 			name: "binary",
 			params: map[string]any{
-				"base":    2.0,
-				"bitSize": 64.0,
+				"base":    2,
+				"bitSize": 64,
 			},
 			payload:  "1010101",
 			expected: 85,
@@ -144,8 +144,8 @@ func TestGoodIntParse(t *testing.T) {
 		{
 			name: "hex",
 			params: map[string]any{
-				"base":    16.0,
-				"bitSize": 64.0,
+				"base":    16,
+				"bitSize": 64,
 			},
 			payload:  "15F",
 			expected: 351,
@@ -194,8 +194,8 @@ func TestBadIntParse(t *testing.T) {
 		{
 			name: "non-string input",
 			params: map[string]any{
-				"base":    10.0,
-				"bitSize": 64.0,
+				"base":    10,
+				"bitSize": 64,
 			},
 			payload:     []byte{0x01},
 			errorString: "int.parse processor only accepts a string",
@@ -203,8 +203,8 @@ func TestBadIntParse(t *testing.T) {
 		{
 			name: "not int string",
 			params: map[string]any{
-				"base":    10.0,
-				"bitSize": 64.0,
+				"base":    10,
+				"bitSize": 64,
 			},
 			payload:     "123.46",
 			errorString: "strconv.ParseInt: parsing \"123.46\": invalid syntax",
@@ -212,8 +212,8 @@ func TestBadIntParse(t *testing.T) {
 		{
 			name: "bit overflow",
 			params: map[string]any{
-				"base":    10.0,
-				"bitSize": 32.0,
+				"base":    10,
+				"bitSize": 32,
 			},
 			payload:     "12345678901234567890",
 			errorString: "strconv.ParseInt: parsing \"12345678901234567890\": value out of range",

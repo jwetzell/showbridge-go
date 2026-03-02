@@ -19,7 +19,7 @@ func TestSerialClientFromRegistry(t *testing.T) {
 		Params: map[string]any{
 			"port":     "/dev/ttyUSB0",
 			"framing":  "LF",
-			"baudRate": 9600.0,
+			"baudRate": 9600,
 		},
 	})
 

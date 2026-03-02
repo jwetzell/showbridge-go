@@ -17,7 +17,7 @@ func TestTCPServerFromRegistry(t *testing.T) {
 		Id:   "test",
 		Type: "net.tcp.server",
 		Params: map[string]any{
-			"port":    8000.0,
+			"port":    8000,
 			"framing": "LF",
 		},
 	})
@@ -59,14 +59,14 @@ func TestBadTCPServer(t *testing.T) {
 		{
 			name: "no framing param",
 			params: map[string]any{
-				"port": 8000.0,
+				"port": 8000,
 			},
 			errorString: "net.tcp.server framing error: not found",
 		},
 		{
 			name: "non-string framing param",
 			params: map[string]any{
-				"port":    8000.0,
+				"port":    8000,
 				"framing": 1,
 			},
 			errorString: "net.tcp.server framing error: not a string",
@@ -74,7 +74,7 @@ func TestBadTCPServer(t *testing.T) {
 		{
 			name: "unkown framing method",
 			params: map[string]any{
-				"port":    8000.0,
+				"port":    8000,
 				"framing": "asdfasdfasdfasdflkj",
 			},
 			errorString: "net.tcp.server unknown framing method: asdfasdfasdfasdflkj",
@@ -82,7 +82,7 @@ func TestBadTCPServer(t *testing.T) {
 		{
 			name: "non-string ip param",
 			params: map[string]any{
-				"port":    8000.0,
+				"port":    8000,
 				"framing": "LF",
 				"ip":      123,
 			},
@@ -92,7 +92,7 @@ func TestBadTCPServer(t *testing.T) {
 			name: "invalid addr",
 			params: map[string]any{
 				"ip":      "127.0.0.",
-				"port":    8000.0,
+				"port":    8000,
 				"framing": "LF",
 			},
 			errorString: "lookup 127.0.0.: no such host",

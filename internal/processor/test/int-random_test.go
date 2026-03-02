@@ -16,8 +16,8 @@ func TestIntRandomFromRegistry(t *testing.T) {
 	processorInstance, err := registration.New(config.ProcessorConfig{
 		Type: "int.random",
 		Params: map[string]any{
-			"min": 1.0,
-			"max": 10.0,
+			"min": 1,
+			"max": 10,
 		},
 	})
 
@@ -39,8 +39,8 @@ func TestIntRandomGoodConfig(t *testing.T) {
 	processorInstance, err := registration.New(config.ProcessorConfig{
 		Type: "int.random",
 		Params: map[string]any{
-			"min": 1.0,
-			"max": 10.0,
+			"min": 1,
+			"max": 10,
 		},
 	})
 
@@ -74,8 +74,8 @@ func TestGoodIntRandom(t *testing.T) {
 		{
 			name: "1-10",
 			params: map[string]any{
-				"min": 1.0,
-				"max": 10.0,
+				"min": 1,
+				"max": 10,
 			},
 			payload: "12345",
 		},
@@ -106,11 +106,11 @@ func TestGoodIntRandom(t *testing.T) {
 				t.Fatalf("int.random failed: %s", err)
 			}
 
-			minNum, ok := test.params["min"].(float64)
+			minNum, ok := test.params["min"].(int)
 			if !ok {
 				t.Fatalf("int.random test min param is not a number: %s", test.params["min"])
 			}
-			maxNum, ok := test.params["max"].(float64)
+			maxNum, ok := test.params["max"].(int)
 			if !ok {
 				t.Fatalf("int.random test max param is not a number: %s", test.params["max"])
 			}
@@ -132,31 +132,31 @@ func TestBadIntRandom(t *testing.T) {
 		{
 			name:        "no min param",
 			payload:     "hello",
-			params:      map[string]any{"max": 10.0},
+			params:      map[string]any{"max": 10},
 			errorString: "int.random min error: not found",
 		},
 		{
 			name:        "no max param",
 			payload:     "hello",
-			params:      map[string]any{"min": 1.0},
+			params:      map[string]any{"min": 1},
 			errorString: "int.random max error: not found",
 		},
 		{
 			name:        "min param not a number",
 			payload:     "hello",
-			params:      map[string]any{"min": "1", "max": 10.0},
+			params:      map[string]any{"min": "1", "max": 10},
 			errorString: "int.random min error: not a number",
 		},
 		{
 			name:        "max param not a number",
 			payload:     "hello",
-			params:      map[string]any{"min": 1.0, "max": "10"},
+			params:      map[string]any{"min": 1, "max": "10"},
 			errorString: "int.random max error: not a number",
 		},
 		{
 			name:        "max less than min",
 			payload:     "hello",
-			params:      map[string]any{"min": 1.0, "max": 0.0},
+			params:      map[string]any{"min": 1, "max": 0},
 			errorString: "int.random max must be greater than min",
 		},
 	}

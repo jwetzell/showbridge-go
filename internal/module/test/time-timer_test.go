@@ -17,7 +17,7 @@ func TestTimeTimerFromRegistry(t *testing.T) {
 		Id:   "test",
 		Type: "time.timer",
 		Params: map[string]any{
-			"duration": 1000.0,
+			"duration": 1000,
 		},
 	})
 

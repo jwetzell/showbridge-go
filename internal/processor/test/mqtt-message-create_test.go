@@ -18,7 +18,7 @@ func TestMQTTMessageCreateFromRegistry(t *testing.T) {
 		Params: map[string]any{
 			"topic":    "test/topic",
 			"payload":  "Hello, World!",
-			"qos":      1.0,
+			"qos":      1,
 			"retained": true,
 		},
 	})

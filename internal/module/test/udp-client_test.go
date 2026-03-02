@@ -18,7 +18,7 @@ func TestUDPClientFromRegistry(t *testing.T) {
 		Type: "net.udp.client",
 		Params: map[string]any{
 			"host":    "localhost",
-			"port":    8000.0,
+			"port":    8000,
 			"framing": "LF",
 		},
 	})
@@ -60,7 +60,7 @@ func TestBadUDPClient(t *testing.T) {
 		{
 			name: "no host param",
 			params: map[string]any{
-				"port": 8000.0,
+				"port": 8000,
 			},
 			errorString: "net.udp.client host error: not found",
 		},
@@ -68,7 +68,7 @@ func TestBadUDPClient(t *testing.T) {
 			name: "non-string host param",
 			params: map[string]any{
 				"host": 123,
-				"port": 8000.0,
+				"port": 8000,
 			},
 			errorString: "net.udp.client host error: not a string",
 		},

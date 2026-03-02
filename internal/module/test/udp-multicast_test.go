@@ -18,7 +18,7 @@ func TestUDPMulticastFromRegistry(t *testing.T) {
 		Type: "net.udp.multicast",
 		Params: map[string]any{
 			"ip":   "236.10.10.10",
-			"port": 56565.0,
+			"port": 56565,
 		},
 	})
 
@@ -59,7 +59,7 @@ func TestBadUDPMulticast(t *testing.T) {
 		{
 			name: "no ip param",
 			params: map[string]any{
-				"port": 8000.0,
+				"port": 8000,
 			},
 			errorString: "net.udp.multicast ip error: not found",
 		},
@@ -67,7 +67,7 @@ func TestBadUDPMulticast(t *testing.T) {
 			name: "non-string ip param",
 			params: map[string]any{
 				"ip":   123,
-				"port": 8000.0,
+				"port": 8000,
 			},
 			errorString: "net.udp.multicast ip error: not a string",
 		},
@@ -75,7 +75,7 @@ func TestBadUDPMulticast(t *testing.T) {
 			name: "invalid addr",
 			params: map[string]any{
 				"ip":   "127.0.0.",
-				"port": 8000.0,
+				"port": 8000,
 			},
 			errorString: "lookup 127.0.0.: no such host",
 		},

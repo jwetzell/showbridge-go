@@ -17,7 +17,7 @@ func TestHTTPServerFromRegistry(t *testing.T) {
 		Id:   "test",
 		Type: "http.server",
 		Params: map[string]any{
-			"port": 3000.0,
+			"port": 3000,
 		},
 	})
 

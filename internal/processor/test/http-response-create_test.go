@@ -16,7 +16,7 @@ func TestHTTPResponseCreateFromRegistry(t *testing.T) {
 	processorInstance, err := registration.New(config.ProcessorConfig{
 		Type: "http.response.create",
 		Params: map[string]any{
-			"status":       200.0,
+			"status":       200,
 			"bodyTemplate": "Hello, World!",
 		},
 	})

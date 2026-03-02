@@ -16,7 +16,7 @@ func TestTimeSleepFromRegistry(t *testing.T) {
 	processorInstance, err := registration.New(config.ProcessorConfig{
 		Type: "time.sleep",
 		Params: map[string]any{
-			"duration": 1000.0,
+			"duration": 1000,
 		},
 	})
 
@@ -38,7 +38,7 @@ func TestGoodTimeSleep(t *testing.T) {
 		{
 			name:    "string payload",
 			payload: "hello",
-			params:  map[string]any{"duration": 100.0},
+			params:  map[string]any{"duration": 100},
 		},
 	}
 

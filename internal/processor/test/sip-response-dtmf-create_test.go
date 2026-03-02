@@ -16,9 +16,9 @@ func TestSipResponseDTMFCreateFromRegistry(t *testing.T) {
 	processorInstance, err := registration.New(config.ProcessorConfig{
 		Type: "sip.response.dtmf.create",
 		Params: map[string]any{
-			"preWait":  0.0,
+			"preWait":  0,
 			"digits":   "good.wav",
-			"postWait": 0.0,
+			"postWait": 0,
 		},
 	})
 

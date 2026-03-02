@@ -17,7 +17,7 @@ func TestUDPServerFromRegistry(t *testing.T) {
 		Id:   "test",
 		Type: "net.udp.server",
 		Params: map[string]any{
-			"port": 8000.0,
+			"port": 8000,
 		},
 	})
 
@@ -55,7 +55,7 @@ func TestBadUDPServer(t *testing.T) {
 		{
 			name: "non-string ip param",
 			params: map[string]any{
-				"port": 8000.0,
+				"port": 8000,
 				"ip":   123,
 			},
 			errorString: "net.udp.server ip error: not a string",
@@ -63,7 +63,7 @@ func TestBadUDPServer(t *testing.T) {
 		{
 			name: "non-number bufferSize param",
 			params: map[string]any{
-				"port":       8000.0,
+				"port":       8000,
 				"bufferSize": "1024",
 			},
 			errorString: "net.udp.server bufferSize error: not a number",
@@ -72,7 +72,7 @@ func TestBadUDPServer(t *testing.T) {
 			name: "invalid addr",
 			params: map[string]any{
 				"ip":   "127.0.0.",
-				"port": 8000.0,
+				"port": 8000,
 			},
 			errorString: "lookup 127.0.0.: no such host",
 		},

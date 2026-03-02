@@ -89,7 +89,7 @@ func TestGoodFloatParse(t *testing.T) {
 		{
 			name: "positive number",
 			params: map[string]any{
-				"bitSize": 64.0,
+				"bitSize": 64,
 			},
 			payload:  "12345.67",
 			expected: 12345.67,
@@ -97,7 +97,7 @@ func TestGoodFloatParse(t *testing.T) {
 		{
 			name: "negative number",
 			params: map[string]any{
-				"bitSize": 64.0,
+				"bitSize": 64,
 			},
 			payload:  "-12345.67",
 			expected: -12345.67,
@@ -105,7 +105,7 @@ func TestGoodFloatParse(t *testing.T) {
 		{
 			name: "zero",
 			params: map[string]any{
-				"bitSize": 64.0,
+				"bitSize": 64,
 			},
 			payload:  "0",
 			expected: 0,
@@ -154,7 +154,7 @@ func TestBadFloatParse(t *testing.T) {
 		{
 			name: "non-string input",
 			params: map[string]any{
-				"bitSize": 64.0,
+				"bitSize": 64,
 			},
 			payload:     []byte{0x01},
 			errorString: "float.parse processor only accepts a string",
@@ -162,7 +162,7 @@ func TestBadFloatParse(t *testing.T) {
 		{
 			name: "not float string",
 			params: map[string]any{
-				"bitSize": 64.0,
+				"bitSize": 64,
 			},
 			payload:     "abcd",
 			errorString: "strconv.ParseFloat: parsing \"abcd\": invalid syntax",
@@ -170,7 +170,7 @@ func TestBadFloatParse(t *testing.T) {
 		{
 			name: "bit size overflow",
 			params: map[string]any{
-				"bitSize": 32.0,
+				"bitSize": 32,
 			},
 			payload:     "1.79e+64",
 			errorString: "strconv.ParseFloat: parsing \"1.79e+64\": value out of range",

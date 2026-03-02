@@ -108,25 +108,25 @@ func TestGoodUintParse(t *testing.T) {
 	}{
 		{
 			name:     "positive number",
-			params:   map[string]any{"base": 10.0, "bitSize": 64.0},
+			params:   map[string]any{"base": 10, "bitSize": 64},
 			payload:  "12345",
 			expected: 12345,
 		},
 		{
 			name:     "zero",
-			params:   map[string]any{"base": 10.0, "bitSize": 64.0},
+			params:   map[string]any{"base": 10, "bitSize": 64},
 			payload:  "0",
 			expected: 0,
 		},
 		{
 			name:     "binary",
-			params:   map[string]any{"base": 2.0, "bitSize": 64.0},
+			params:   map[string]any{"base": 2, "bitSize": 64},
 			payload:  "1010101",
 			expected: 85,
 		},
 		{
 			name:     "hex",
-			params:   map[string]any{"base": 16.0, "bitSize": 64.0},
+			params:   map[string]any{"base": 16, "bitSize": 64},
 			payload:  "15F",
 			expected: 351,
 		},
@@ -173,19 +173,19 @@ func TestBadUintParse(t *testing.T) {
 	}{
 		{
 			name:        "non-string input",
-			params:      map[string]any{"base": 10.0, "bitSize": 64.0},
+			params:      map[string]any{"base": 10, "bitSize": 64},
 			payload:     []byte{0x01},
 			errorString: "uint.parse processor only accepts a string",
 		},
 		{
 			name:        "not uint string",
-			params:      map[string]any{"base": 10.0, "bitSize": 64.0},
+			params:      map[string]any{"base": 10, "bitSize": 64},
 			payload:     "-1234",
 			errorString: "strconv.ParseUint: parsing \"-1234\": invalid syntax",
 		},
 		{
 			name:        "bit overflow",
-			params:      map[string]any{"base": 10.0, "bitSize": 32.0},
+			params:      map[string]any{"base": 10, "bitSize": 32},
 			payload:     "123456789012345678901234567",
 			errorString: "strconv.ParseUint: parsing \"123456789012345678901234567\": value out of range",
 		},

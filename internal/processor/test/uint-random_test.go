@@ -16,8 +16,8 @@ func TestUintRandomFromRegistry(t *testing.T) {
 	processorInstance, err := registration.New(config.ProcessorConfig{
 		Type: "uint.random",
 		Params: map[string]any{
-			"min": 1.0,
-			"max": 10.0,
+			"min": 1,
+			"max": 10,
 		},
 	})
 
@@ -39,8 +39,8 @@ func TestUintRandomGoodConfig(t *testing.T) {
 	processorInstance, err := registration.New(config.ProcessorConfig{
 		Type: "uint.random",
 		Params: map[string]any{
-			"min": 1.0,
-			"max": 10.0,
+			"min": 1,
+			"max": 10,
 		},
 	})
 
@@ -74,7 +74,7 @@ func TestGoodUintRandom(t *testing.T) {
 	}{
 		{
 			name:    "1-10",
-			params:  map[string]any{"min": 1.0, "max": 10.0},
+			params:  map[string]any{"min": 1, "max": 10},
 			payload: "12345",
 		},
 	}
@@ -104,11 +104,11 @@ func TestGoodUintRandom(t *testing.T) {
 			if err != nil {
 				t.Fatalf("uint.random failed: %s", err)
 			}
-			minNum, ok := test.params["min"].(float64)
+			minNum, ok := test.params["min"].(int)
 			if !ok {
 				t.Fatalf("uint.random test min param is not a number")
 			}
-			maxNum, ok := test.params["max"].(float64)
+			maxNum, ok := test.params["max"].(int)
 			if !ok {
 				t.Fatalf("uint.random test max param is not a number")
 			}
@@ -129,31 +129,31 @@ func TestBadUintRandom(t *testing.T) {
 		{
 			name:        "no min param",
 			payload:     "hello",
-			params:      map[string]any{"max": 10.0},
+			params:      map[string]any{"max": 10},
 			errorString: "uint.random min error: not found",
 		},
 		{
 			name:        "no max param",
 			payload:     "hello",
-			params:      map[string]any{"min": 1.0},
+			params:      map[string]any{"min": 1},
 			errorString: "uint.random max error: not found",
 		},
 		{
 			name:        "min param not a number",
 			payload:     "hello",
-			params:      map[string]any{"min": "1", "max": 10.0},
+			params:      map[string]any{"min": "1", "max": 10},
 			errorString: "uint.random min error: not a number",
 		},
 		{
 			name:        "max param not a number",
 			payload:     "hello",
-			params:      map[string]any{"min": 1.0, "max": "10"},
+			params:      map[string]any{"min": 1, "max": "10"},
 			errorString: "uint.random max error: not a number",
 		},
 		{
 			name:        "max less than min",
 			payload:     "hello",
-			params:      map[string]any{"min": 1.0, "max": 0.0},
+			params:      map[string]any{"min": 1, "max": 0},
 			errorString: "uint.random max must be greater than min",
 		},
 	}
