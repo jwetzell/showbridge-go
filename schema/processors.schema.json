@@ -66,6 +66,28 @@
       },
       {
         "type": "object",
+        "title": "Filter by Expr expression",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "filter.expr"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "expression": {
+                "type": "string"
+              }
+            },
+            "required": ["expression"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
         "title": "Parse Float",
         "properties": {
           "type": {
