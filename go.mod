@@ -14,7 +14,7 @@ require (
 	github.com/jwetzell/psn-go v0.3.0
 	github.com/nats-io/nats-server/v2 v2.12.4
 	github.com/nats-io/nats.go v1.49.0
-	github.com/urfave/cli/v3 v3.6.2
+	github.com/urfave/cli/v3 v3.7.0
 	gitlab.com/gomidi/midi/v2 v2.3.23
 	go.bug.st/serial v1.6.4
 	go.opentelemetry.io/otel v1.41.0
