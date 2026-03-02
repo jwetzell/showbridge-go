@@ -16,6 +16,8 @@ var (
 	ErrParamNotFound  = errors.New("not found")
 	ErrParamNotString = errors.New("not a string")
 	ErrParamNotNumber = errors.New("not a number")
+	ErrParamNotBool   = errors.New("not a boolean")
+	ErrParamNotSlice  = errors.New("not a slice")
 )
 
 func (p Params) GetString(key string) (string, error) {
@@ -56,7 +58,7 @@ func (p Params) GetBool(key string) (bool, error) {
 
 	boolValue, ok := value.(bool)
 	if !ok {
-		return false, errors.New("not a boolean")
+		return false, ErrParamNotBool
 	}
 	return boolValue, nil
 }
@@ -69,7 +71,7 @@ func (p Params) GetStringSlice(key string) ([]string, error) {
 
 	interfaceSlice, ok := value.([]any)
 	if !ok {
-		return nil, errors.New("not a slice")
+		return nil, ErrParamNotSlice
 	}
 
 	stringSlice := make([]string, len(interfaceSlice))
