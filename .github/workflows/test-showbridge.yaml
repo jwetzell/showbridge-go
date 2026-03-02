@@ -34,7 +34,7 @@ jobs:
         run: go mod tidy
 
       - name: run tests
-        run: go test ./... -coverpkg "github.com/jwetzell/showbridge-go/..." -coverprofile coverage.out
+        run: go test ./... -count=1 -coverpkg "github.com/jwetzell/showbridge-go/..." -coverprofile coverage.out
 
       - name: clean up coverage report
         run: cat coverage.out | grep -v "github.com/jwetzell/showbridge-go/cmd" > coverage.nocmd.out       
