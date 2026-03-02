@@ -322,7 +322,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 
 			if err != nil {
 				if test.errorString != err.Error() {
-					t.Fatalf("string.create got error '%s', expected '%s'", err.Error(), test.errorString)
+					t.Fatalf("osc.message.create got error '%s', expected '%s'", err.Error(), test.errorString)
 				}
 				return
 			}
