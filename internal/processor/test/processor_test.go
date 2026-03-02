@@ -8,6 +8,18 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
+type TestStruct struct {
+	String string
+	Int    int
+	Float  float64
+	Bool   bool
+	Data   any
+}
+
+func (t TestStruct) GetData() any {
+	return t.Data
+}
+
 type TestProcessor struct {
 }
 

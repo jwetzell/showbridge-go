@@ -7,14 +7,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-type TestStruct struct {
-	Data string
-}
-
-func (t TestStruct) GetData() string {
-	return t.Data
-}
-
 func TestStringCreateFromRegistry(t *testing.T) {
 	registration, ok := processor.ProcessorRegistry["string.create"]
 	if !ok {
