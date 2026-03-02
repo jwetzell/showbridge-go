@@ -80,8 +80,8 @@ func (mmc *MQTTMessageCreate) Type() string {
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type: "mqtt.message.create",
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
+		New: func(processorConfig config.ProcessorConfig) (Processor, error) {
+			params := processorConfig.Params
 			topicString, err := params.GetString("topic")
 			if err != nil {
 				return nil, fmt.Errorf("mqtt.message.create topic error: %w", err)
@@ -98,25 +98,22 @@ func init() {
 			}
 
 			//TODO(jwetzell): convert payload into []byte or string for sending
-			payload, ok := params["payload"]
-
-			if !ok {
-				return nil, errors.New("mqtt.message.create payload error: not found")
-			}
-
-			if payloadBytes, ok := GetAnyAs[[]byte](payload); ok {
-				return &MQTTMessageCreate{config: config, Topic: topicString, QoS: byte(qosByte), Retained: retainedBool, Payload: payloadBytes}, nil
-			}
-
-			payloadString, ok := GetAnyAs[string](payload)
-
-			if !ok {
-				return nil, errors.New("mqtt.message.create payload error: not a string or byte array")
+			payloadString, err := params.GetString("payload")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotString) {
+					payloadBytes, err := params.GetByteSlice("payload")
+					if err != nil {
+						return nil, fmt.Errorf("mqtt.message.create payload error: %w", err)
+					}
+					return &MQTTMessageCreate{config: processorConfig, Topic: topicString, QoS: byte(qosByte), Retained: retainedBool, Payload: payloadBytes}, nil
+				} else {
+					return nil, fmt.Errorf("mqtt.message.create payload error: %w", err)
+				}
 			}
 
 			payloadBytes := []byte(payloadString)
 
-			return &MQTTMessageCreate{config: config, Topic: topicString, QoS: byte(qosByte), Retained: retainedBool, Payload: payloadBytes}, nil
+			return &MQTTMessageCreate{config: processorConfig, Topic: topicString, QoS: byte(qosByte), Retained: retainedBool, Payload: payloadBytes}, nil
 		},
 	})
 }
