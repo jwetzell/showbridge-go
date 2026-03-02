@@ -8,6 +8,7 @@
     "oneOf": [
       {
         "type": "object",
+        "title": "Decode ArtNet Packet",
         "properties": {
           "type": {
             "type": "string",
@@ -19,6 +20,7 @@
       },
       {
         "type": "object",
+        "title": "Encode ArtNet Packet",
         "properties": {
           "type": {
             "type": "string",
@@ -30,6 +32,7 @@
       },
       {
         "type": "object",
+        "title": "Filter ArtNet Packet",
         "properties": {
           "type": {
             "type": "string",
@@ -51,6 +54,7 @@
       },
       {
         "type": "object",
+        "title": "Debug Log",
         "properties": {
           "type": {
             "type": "string",
@@ -62,6 +66,7 @@
       },
       {
         "type": "object",
+        "title": "Parse Float",
         "properties": {
           "type": {
             "type": "string",
@@ -73,6 +78,7 @@
       },
       {
         "type": "object",
+        "title": "Create FreeD",
         "properties": {
           "type": {
             "type": "string",
@@ -128,6 +134,7 @@
       },
       {
         "type": "object",
+        "title": "Decode FreeD",
         "properties": {
           "type": {
             "type": "string",
@@ -139,6 +146,7 @@
       },
       {
         "type": "object",
+        "title": "Encode FreeD",
         "properties": {
           "type": {
             "type": "string",
@@ -150,6 +158,7 @@
       },
       {
         "type": "object",
+        "title": "Create HTTP Request",
         "properties": {
           "type": {
             "type": "string",
@@ -175,6 +184,7 @@
       },
       {
         "type": "object",
+        "title": "Encode HTTP Request",
         "properties": {
           "type": {
             "type": "string",
@@ -186,6 +196,7 @@
       },
       {
         "type": "object",
+        "title": "Filter HTTP Request",
         "properties": {
           "type": {
             "type": "string",
@@ -211,6 +222,7 @@
       },
       {
         "type": "object",
+        "title": "Create HTTP Response",
         "properties": {
           "type": {
             "type": "string",
@@ -235,6 +247,7 @@
       },
       {
         "type": "object",
+        "title": "Encode HTTP Response",
         "properties": {
           "type": {
             "type": "string",
@@ -246,6 +259,7 @@
       },
       {
         "type": "object",
+        "title": "Parse Int",
         "properties": {
           "type": {
             "type": "string",
@@ -257,6 +271,7 @@
       },
       {
         "type": "object",
+        "title": "Random Int",
         "properties": {
           "type": {
             "type": "string",
@@ -281,6 +296,7 @@
       },
       {
         "type": "object",
+        "title": "Decode JSON",
         "properties": {
           "type": {
             "type": "string",
@@ -292,6 +308,7 @@
       },
       {
         "type": "object",
+        "title": "Encode JSON",
         "properties": {
           "type": {
             "type": "string",
@@ -303,6 +320,7 @@
       },
       {
         "type": "object",
+        "title": "Create MIDI Message",
         "properties": {
           "type": {
             "type": "string",
@@ -396,6 +414,7 @@
       },
       {
         "type": "object",
+        "title": "Decode MIDI Message",
         "properties": {
           "type": {
             "type": "string",
@@ -407,6 +426,7 @@
       },
       {
         "type": "object",
+        "title": "Encode MIDI Message",
         "properties": {
           "type": {
             "type": "string",
@@ -418,6 +438,7 @@
       },
       {
         "type": "object",
+        "title": "Filter MIDI Message",
         "properties": {
           "type": {
             "type": "string",
@@ -440,6 +461,7 @@
       },
       {
         "type": "object",
+        "title": "Unpack MIDI Message",
         "properties": {
           "type": {
             "type": "string",
@@ -451,6 +473,7 @@
       },
       {
         "type": "object",
+        "title": "Create MQTT Message",
         "properties": {
           "type": {
             "type": "string",
@@ -481,6 +504,7 @@
       },
       {
         "type": "object",
+        "title": "Encode MQTT Message",
         "properties": {
           "type": {
             "type": "string",
@@ -492,6 +516,7 @@
       },
       {
         "type": "object",
+        "title": "Create NATS Message",
         "properties": {
           "type": {
             "type": "string",
@@ -516,6 +541,7 @@
       },
       {
         "type": "object",
+        "title": "Create OSC Message",
         "properties": {
           "type": {
             "type": "string",
@@ -546,6 +572,7 @@
       },
       {
         "type": "object",
+        "title": "Decode OSC Message",
         "properties": {
           "type": {
             "type": "string",
@@ -557,6 +584,7 @@
       },
       {
         "type": "object",
+        "title": "Encode OSC Message",
         "properties": {
           "type": {
             "type": "string",
@@ -568,6 +596,7 @@
       },
       {
         "type": "object",
+        "title": "Filter OSC Message",
         "properties": {
           "type": {
             "type": "string",
@@ -589,6 +618,7 @@
       },
       {
         "type": "object",
+        "title": "Evaluate Expr expression",
         "properties": {
           "type": {
             "type": "string",
@@ -610,6 +640,7 @@
       },
       {
         "type": "object",
+        "title": "Run JavaScript",
         "properties": {
           "type": {
             "type": "string",
@@ -631,6 +662,7 @@
       },
       {
         "type": "object",
+        "title": "Run WASM Plugin",
         "properties": {
           "type": {
             "type": "string",
@@ -660,6 +692,7 @@
       },
       {
         "type": "object",
+        "title": "Create String",
         "properties": {
           "type": {
             "type": "string",
@@ -680,6 +713,7 @@
       },
       {
         "type": "object",
+        "title": "Decode String",
         "properties": {
           "type": {
             "type": "string",
@@ -691,6 +725,7 @@
       },
       {
         "type": "object",
+        "title": "Encode String",
         "properties": {
           "type": {
             "type": "string",
@@ -702,6 +737,7 @@
       },
       {
         "type": "object",
+        "title": "Filter String",
         "properties": {
           "type": {
             "type": "string",
@@ -723,6 +759,7 @@
       },
       {
         "type": "object",
+        "title": "Split String",
         "properties": {
           "type": {
             "type": "string",
@@ -743,6 +780,7 @@
       },
       {
         "type": "object",
+        "title": "Get Struct Field",
         "properties": {
           "type": {
             "type": "string",
@@ -763,6 +801,7 @@
       },
       {
         "type": "object",
+        "title": "Get Struct Method",
         "properties": {
           "type": {
             "type": "string",
@@ -783,6 +822,7 @@
       },
       {
         "type": "object",
+        "title": "Sleep",
         "properties": {
           "type": {
             "type": "string",
@@ -803,6 +843,7 @@
       },
       {
         "type": "object",
+        "title": "Parse Unsigned Int",
         "properties": {
           "type": {
             "type": "string",
@@ -814,6 +855,7 @@
       },
       {
         "type": "object",
+        "title": "Random Unsigned Int",
         "properties": {
           "type": {
             "type": "string",
