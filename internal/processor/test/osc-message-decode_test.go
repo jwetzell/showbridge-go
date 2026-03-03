@@ -86,9 +86,19 @@ func TestBadOSCMessageDecode(t *testing.T) {
 		errorString string
 	}{
 		{
-			name:        "non byte slice message input",
+			name:        "non []byte payload",
 			payload:     "test",
 			errorString: "osc.message.decode processor only accepts a []byte payload",
+		},
+		{
+			name:        "empty []byte payload",
+			payload:     []byte{},
+			errorString: "osc.message.decode processor can't work on empty []byte",
+		},
+		{
+			name:        "wrong start byte in payload",
+			payload:     []byte{48, 116, 101, 115, 116, 0, 0, 0, 44, 105, 0, 0, 0, 0, 0, 42},
+			errorString: "osc.message.decode processor needs an OSC looking []byte",
 		},
 	}
 
