@@ -39,7 +39,7 @@ func (omc *OSCMessageCreate) Process(ctx context.Context, payload any) (any, err
 		return nil, errors.New("osc.message.create address must start with '/'")
 	}
 
-	payloadMessage := osc.OSCMessage{
+	payloadMessage := &osc.OSCMessage{
 		Address: addressString,
 	}
 
