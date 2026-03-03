@@ -1,8 +1,10 @@
 package processor_test
 
 import (
+	"slices"
 	"testing"
 
+	"github.com/jwetzell/osc-go"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -23,5 +25,68 @@ func TestOSCMessageEncodeFromRegistry(t *testing.T) {
 
 	if processorInstance.Type() != "osc.message.encode" {
 		t.Fatalf("osc.message.encode processor has wrong type: %s", processorInstance.Type())
+	}
+}
+
+func TestGoodOSCMessageEncode(t *testing.T) {
+	processorInstance := processor.OSCMessageEncode{}
+	tests := []struct {
+		name     string
+		payload  any
+		expected []byte
+	}{
+		{
+			name: "basic OSC message",
+			payload: osc.OSCMessage{
+				Address: "/test",
+			},
+			expected: []byte{47, 116, 101, 115, 116, 0, 0, 0, 44, 0, 0, 0},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := processorInstance.Process(t.Context(), test.payload)
+			if err != nil {
+				t.Fatalf("osc.message.encode processing failed: %s", err)
+			}
+
+			gotBytes, ok := got.([]byte)
+			if !ok {
+				t.Fatalf("osc.message.encode returned a %T payload: %s", got, got)
+			}
+
+			if !slices.Equal(gotBytes, test.expected) {
+				t.Fatalf("osc.message.encode got %+v, expected %+v", got, test.expected)
+			}
+		})
+	}
+}
+
+func TestBadOSCMessageEncode(t *testing.T) {
+	processorInstance := processor.OSCMessageEncode{}
+	tests := []struct {
+		name        string
+		payload     any
+		errorString string
+	}{
+		{
+			name:        "non-osc message input",
+			payload:     "test",
+			errorString: "osc.message.encode processor only accepts an OSCMessage",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := processorInstance.Process(t.Context(), test.payload)
+
+			if err == nil {
+				t.Fatalf("osc.message.encode expected to fail but got payload: %s", got)
+			}
+			if err.Error() != test.errorString {
+				t.Fatalf("osc.message.encode got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+		})
 	}
 }
