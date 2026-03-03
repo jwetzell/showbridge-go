@@ -74,6 +74,84 @@ func TestGoodIntParamsJSON(t *testing.T) {
 	}
 }
 
+func TestGoodFloat32ParamsJSON(t *testing.T) {
+	testCases := []struct {
+		name       string
+		paramsJSON string
+		key        string
+		expected   float32
+	}{
+		{
+			name:       "no decimal param",
+			paramsJSON: `{"key": 1}`,
+			key:        "key",
+			expected:   1,
+		},
+		{
+			name:       "float param",
+			paramsJSON: `{"key": 1.23}`,
+			key:        "key",
+			expected:   1.23,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			params := config.Params{}
+			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
+			if err != nil {
+				t.Fatalf("Failed to unmarshal params JSON: %v", err)
+			}
+			value, err := params.GetFloat32(testCase.key)
+			if err != nil {
+				t.Fatalf("GetFloat32 returned error: %v", err)
+			}
+			if value != testCase.expected {
+				t.Fatalf("GetFloat32 got %f, expected %f", value, testCase.expected)
+			}
+		})
+	}
+}
+
+func TestGoodFloat64ParamsJSON(t *testing.T) {
+	testCases := []struct {
+		name       string
+		paramsJSON string
+		key        string
+		expected   float64
+	}{
+		{
+			name:       "no decimal param",
+			paramsJSON: `{"key": 1}`,
+			key:        "key",
+			expected:   1,
+		},
+		{
+			name:       "float param",
+			paramsJSON: `{"key": 1.23}`,
+			key:        "key",
+			expected:   1.23,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			params := config.Params{}
+			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
+			if err != nil {
+				t.Fatalf("Failed to unmarshal params JSON: %v", err)
+			}
+			value, err := params.GetFloat64(testCase.key)
+			if err != nil {
+				t.Fatalf("GetFloat64 returned error: %v", err)
+			}
+			if value != testCase.expected {
+				t.Fatalf("GetFloat64 got %f, expected %f", value, testCase.expected)
+			}
+		})
+	}
+}
+
 func TestGoodBoolParamsJSON(t *testing.T) {
 	testCases := []struct {
 		name       string
@@ -150,6 +228,12 @@ func TestGoodIntSliceParamsJSON(t *testing.T) {
 		{
 			name:       "int array",
 			paramsJSON: `{"key": [1, 2, 3]}`,
+			key:        "key",
+			expected:   []int{1, 2, 3},
+		},
+		{
+			name:       "int array with floats",
+			paramsJSON: `{"key": [1.0, 2.0, 3.0]}`,
 			key:        "key",
 			expected:   []int{1, 2, 3},
 		},
