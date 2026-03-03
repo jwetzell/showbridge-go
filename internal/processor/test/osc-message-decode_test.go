@@ -40,6 +40,7 @@ func TestGoodOSCMessageDecode(t *testing.T) {
 			payload: []byte{47, 116, 101, 115, 116, 0, 0, 0, 44, 0, 0, 0},
 			expected: osc.OSCMessage{
 				Address: "/test",
+				Args:    []osc.OSCArg{},
 			},
 		},
 	}
