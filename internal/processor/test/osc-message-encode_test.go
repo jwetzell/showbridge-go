@@ -37,14 +37,14 @@ func TestGoodOSCMessageEncode(t *testing.T) {
 	}{
 		{
 			name: "basic OSC message",
-			payload: osc.OSCMessage{
+			payload: &osc.OSCMessage{
 				Address: "/test",
 			},
 			expected: []byte{47, 116, 101, 115, 116, 0, 0, 0, 44, 0, 0, 0},
 		},
 		{
 			name: "basic OSC message with argument",
-			payload: osc.OSCMessage{
+			payload: &osc.OSCMessage{
 				Address: "/test",
 				Args: []osc.OSCArg{
 					{
@@ -86,7 +86,7 @@ func TestBadOSCMessageEncode(t *testing.T) {
 		{
 			name:        "non-osc message input",
 			payload:     "test",
-			errorString: "osc.message.encode processor only accepts an OSCMessage",
+			errorString: "osc.message.encode processor only accepts an *OSCMessage",
 		},
 	}
 

@@ -61,8 +61,8 @@ github.com/jwetzell/artnet-go v0.2.1 h1:iYTKWcwYrF5kBkYfkw2UbWvoueeA23iKEn7fR27m
 github.com/jwetzell/artnet-go v0.2.1/go.mod h1:gli97Z32a0kMkZ6taoTiK7/lqHcF/dhiGjGJdx/PxqA=
 github.com/jwetzell/free-d-go v0.1.0 h1:xHt6dvyit98X+OC3jVzV0aLidxbyzi3vI9QiYkteEtA=
 github.com/jwetzell/free-d-go v0.1.0/go.mod h1:KmrkooRARRaxJTBSPvwt/6IMAIaHH1R8bSA8cwbbELw=
-github.com/jwetzell/osc-go v0.1.0 h1:EXxup5VWBErHot2Ri4MFToPf6KCzLDTbCt2x6GLfw8I=
-github.com/jwetzell/osc-go v0.1.0/go.mod h1:xLz0jTwebSxtx1TkKN1YVdeRqvpFNweDhTut5TE393A=
+github.com/jwetzell/osc-go v0.2.0 h1:4as+BYCeZhEddFczGveP5yZZxvY728Uavz+ZSLZfOII=
+github.com/jwetzell/osc-go v0.2.0/go.mod h1:D3ZIXYB12bt4S35lKFUqgCFbF1Y+9Ld0sOhHA9mGZZM=
 github.com/jwetzell/psn-go v0.3.0 h1:WVpCEmExYE8a+I5hQak5jNJJp2x35VdGX/VuMUKPmhY=
 github.com/jwetzell/psn-go v0.3.0/go.mod h1:bcEAeti4sQM375buujb3mIfmUstD4Aby18gq3ENb6+o=
 github.com/klauspost/compress v1.18.3 h1:9PJRvfbmTabkOX8moIpXPbMMbYN60bWImDDU7L+/6zw=

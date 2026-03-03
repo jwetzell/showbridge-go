@@ -33,12 +33,12 @@ func TestGoodOSCMessageDecode(t *testing.T) {
 	tests := []struct {
 		name     string
 		payload  []byte
-		expected osc.OSCMessage
+		expected *osc.OSCMessage
 	}{
 		{
 			name:    "basic OSC message",
 			payload: []byte{47, 116, 101, 115, 116, 0, 0, 0, 44, 0, 0, 0},
-			expected: osc.OSCMessage{
+			expected: &osc.OSCMessage{
 				Address: "/test",
 				Args:    []osc.OSCArg{},
 			},
@@ -46,7 +46,7 @@ func TestGoodOSCMessageDecode(t *testing.T) {
 		{
 			name:    "basic OSC message with argument",
 			payload: []byte{47, 116, 101, 115, 116, 0, 0, 0, 44, 105, 0, 0, 0, 0, 0, 42},
-			expected: osc.OSCMessage{
+			expected: &osc.OSCMessage{
 				Address: "/test",
 				Args: []osc.OSCArg{
 					{
@@ -66,7 +66,7 @@ func TestGoodOSCMessageDecode(t *testing.T) {
 				t.Fatalf("osc.message.decode processing failed: %s", err)
 			}
 
-			gotMessage, ok := got.(osc.OSCMessage)
+			gotMessage, ok := got.(*osc.OSCMessage)
 			if !ok {
 				t.Fatalf("osc.message.decode returned a %T payload: %s", got, got)
 			}
@@ -99,6 +99,11 @@ func TestBadOSCMessageDecode(t *testing.T) {
 			name:        "wrong start byte in payload",
 			payload:     []byte{48, 116, 101, 115, 116, 0, 0, 0, 44, 105, 0, 0, 0, 0, 0, 42},
 			errorString: "osc.message.decode processor needs an OSC looking []byte",
+		},
+		{
+			name:        "invalid OSC payload",
+			payload:     []byte{47, 116, 101, 115, 116, 0},
+			errorString: "osc.message.decode processor failed to decode OSC message: string data is not properly padded",
 		},
 	}
 

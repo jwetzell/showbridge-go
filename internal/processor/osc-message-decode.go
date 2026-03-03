@@ -3,6 +3,7 @@ package processor
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	osc "github.com/jwetzell/osc-go"
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -29,7 +30,7 @@ func (omd *OSCMessageDecode) Process(ctx context.Context, payload any) (any, err
 
 	message, err := osc.MessageFromBytes(payloadBytes)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("osc.message.decode processor failed to decode OSC message: %w", err)
 	}
 	return message, nil
 }
