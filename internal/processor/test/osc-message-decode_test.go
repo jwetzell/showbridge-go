@@ -43,6 +43,19 @@ func TestGoodOSCMessageDecode(t *testing.T) {
 				Args:    []osc.OSCArg{},
 			},
 		},
+		{
+			name:    "basic OSC message with argument",
+			payload: []byte{47, 116, 101, 115, 116, 0, 0, 0, 44, 105, 0, 0, 0, 0, 0, 42},
+			expected: osc.OSCMessage{
+				Address: "/test",
+				Args: []osc.OSCArg{
+					{
+						Type:  "i",
+						Value: int32(42),
+					},
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {

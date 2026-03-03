@@ -42,6 +42,19 @@ func TestGoodOSCMessageEncode(t *testing.T) {
 			},
 			expected: []byte{47, 116, 101, 115, 116, 0, 0, 0, 44, 0, 0, 0},
 		},
+		{
+			name: "basic OSC message with argument",
+			payload: osc.OSCMessage{
+				Address: "/test",
+				Args: []osc.OSCArg{
+					{
+						Type:  "i",
+						Value: int32(42),
+					},
+				},
+			},
+			expected: []byte{47, 116, 101, 115, 116, 0, 0, 0, 44, 105, 0, 0, 0, 0, 0, 42},
+		},
 	}
 
 	for _, test := range tests {
