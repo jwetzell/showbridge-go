@@ -75,7 +75,7 @@ func TestGoodOSCMessageFilter(t *testing.T) {
 			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			if err != nil {
-				t.Fatalf("osc.message.filter process failed: %s", err)
+				t.Fatalf("osc.message.filter processing failed: %s", err)
 			}
 
 			if test.expected == nil {

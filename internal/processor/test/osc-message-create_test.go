@@ -152,7 +152,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			if err != nil {
-				t.Fatalf("osc.message.create process failed: %s", err)
+				t.Fatalf("osc.message.create processing failed: %s", err)
 			}
 
 			if test.expected == nil {

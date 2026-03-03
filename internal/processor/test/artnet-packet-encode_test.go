@@ -60,7 +60,7 @@ func TestGoodArtnetPacketEncode(t *testing.T) {
 			got, err := packetEncoder.Process(t.Context(), test.payload)
 
 			if err != nil {
-				t.Fatalf("artnet.packet.encode failed: %s", err)
+				t.Fatalf("artnet.packet.encode processing failed: %s", err)
 			}
 
 			//TODO(jwetzell): work out better way to compare the any/any

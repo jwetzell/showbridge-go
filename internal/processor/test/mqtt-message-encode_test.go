@@ -45,14 +45,15 @@ func TestGoodMQTTMessageEncode(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			got, err := stringEncoder.Process(t.Context(), test.payload)
+			if err != nil {
+				t.Fatalf("mqtt.message.encode processing failed: %s", err)
+			}
 
 			gotBytes, ok := got.([]byte)
 			if !ok {
 				t.Fatalf("mqtt.message.encode returned a %T payload: %s", got, got)
 			}
-			if err != nil {
-				t.Fatalf("mqtt.message.encode failed: %s", err)
-			}
+
 			if !slices.Equal(gotBytes, test.expected) {
 				t.Fatalf("mqtt.message.encode got %s, expected %s", got, test.expected)
 			}

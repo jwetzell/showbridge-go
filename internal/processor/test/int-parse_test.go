@@ -97,13 +97,13 @@ func TestGoodIntParse(t *testing.T) {
 			}
 
 			got, err := processorInstance.Process(t.Context(), test.payload)
+			if err != nil {
+				t.Fatalf("int.parse processing failed: %s", err)
+			}
 
 			gotInt, ok := got.(int64)
 			if !ok {
 				t.Fatalf("int.parse returned a %T payload: %s", got, got)
-			}
-			if err != nil {
-				t.Fatalf("int.parse failed: %s", err)
 			}
 			if gotInt != test.expected {
 				t.Fatalf("int.parse got %d, expected %d", gotInt, test.expected)

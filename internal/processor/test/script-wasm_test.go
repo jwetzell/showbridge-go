@@ -77,7 +77,7 @@ func TestGoodScriptWASM(t *testing.T) {
 			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			if err != nil {
-				t.Fatalf("script.wasm process failed: %s", err)
+				t.Fatalf("script.wasm processing failed: %s", err)
 			}
 
 			gotBytes, ok := got.([]byte)

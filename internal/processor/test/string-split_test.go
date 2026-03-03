@@ -79,16 +79,17 @@ func TestGoodStringSplit(t *testing.T) {
 			}
 
 			got, err := processorInstance.Process(t.Context(), test.payload)
+			if err != nil {
+				t.Fatalf("string.split processing failed: %s", err)
+			}
 
 			gotStrings, ok := got.([]string)
 			if !ok {
 				t.Fatalf("string.split returned a %T payload: %s", got, got)
 			}
-			if err != nil {
-				t.Fatalf("string.split failed: %s", err)
-			}
+
 			if !slices.Equal(gotStrings, test.expected) {
-				t.Fatalf("string.split got %s, expected %s", got, test.expected)
+				t.Fatalf("string.split got %+v, expected %+v", gotStrings, test.expected)
 			}
 		})
 	}

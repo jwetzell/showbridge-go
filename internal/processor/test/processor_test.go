@@ -36,6 +36,8 @@ func (t TestStruct) GetData() any {
 	return t.Data
 }
 
+func (t TestStruct) Void() {}
+
 type TestProcessor struct {
 }
 

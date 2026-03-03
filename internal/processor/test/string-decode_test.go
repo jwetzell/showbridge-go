@@ -54,14 +54,15 @@ func TestGoodStringDecode(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			got, err := stringDecoder.Process(t.Context(), test.payload)
+			if err != nil {
+				t.Fatalf("string.decode processing failed: %s", err)
+			}
 
 			gotString, ok := got.(string)
 			if !ok {
 				t.Fatalf("string.decode returned a %T payload: %s", got, got)
 			}
-			if err != nil {
-				t.Fatalf("string.decode failed: %s", err)
-			}
+
 			if gotString != test.expected {
 				t.Fatalf("string.decode got %s, expected %s", got, test.expected)
 			}

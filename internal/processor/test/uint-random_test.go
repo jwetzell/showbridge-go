@@ -96,14 +96,15 @@ func TestGoodUintRandom(t *testing.T) {
 			}
 
 			got, err := processorInstance.Process(t.Context(), test.payload)
+			if err != nil {
+				t.Fatalf("uint.random processing failed: %s", err)
+			}
 
 			gotUint, ok := got.(uint)
 			if !ok {
 				t.Fatalf("uint.random returned a %T payload: %s", got, got)
 			}
-			if err != nil {
-				t.Fatalf("uint.random failed: %s", err)
-			}
+
 			minNum, ok := test.params["min"].(int)
 			if !ok {
 				t.Fatalf("uint.random test min param is not a number")

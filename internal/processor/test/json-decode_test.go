@@ -75,14 +75,15 @@ func TestGoodJsonDecode(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			got, err := jsonDecoder.Process(t.Context(), test.payload)
+			if err != nil {
+				t.Fatalf("json.decode processing failed: %s", err)
+			}
 
 			gotMap, ok := got.(map[string]any)
 			if !ok {
 				t.Fatalf("json.decode returned a %T payload: %s", got, got)
 			}
-			if err != nil {
-				t.Fatalf("json.decode failed: %s", err)
-			}
+
 			if !reflect.DeepEqual(gotMap, test.expected) {
 				t.Fatalf("json.decode got %x, expected %s", got, test.expected)
 			}

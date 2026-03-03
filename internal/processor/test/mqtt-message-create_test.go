@@ -106,7 +106,7 @@ func TestGoodMQTTMessageCreate(t *testing.T) {
 			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			if err != nil {
-				t.Fatalf("mqtt.message.create process failed: %s", err)
+				t.Fatalf("mqtt.message.create processing failed: %s", err)
 			}
 
 			if test.expected == nil {

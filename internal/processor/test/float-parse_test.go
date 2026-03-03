@@ -76,13 +76,13 @@ func TestGoodFloatParse(t *testing.T) {
 			}
 
 			got, err := processorInstance.Process(t.Context(), test.payload)
+			if err != nil {
+				t.Fatalf("float.parse processing failed: %s", err)
+			}
 
 			gotFloat, ok := got.(float64)
 			if !ok {
 				t.Fatalf("float.parse returned a %T payload: %s", got, got)
-			}
-			if err != nil {
-				t.Fatalf("float.parse failed: %s", err)
 			}
 			if gotFloat != test.expected {
 				t.Fatalf("float.parse got %f, expected %f", gotFloat, test.expected)

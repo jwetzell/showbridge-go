@@ -93,7 +93,7 @@ func TestGoodStructFieldGet(t *testing.T) {
 			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			if err != nil {
-				t.Fatalf("struct.field.get failed: %s", err)
+				t.Fatalf("struct.field.get processing failed: %s", err)
 			}
 
 			if got != test.expected {

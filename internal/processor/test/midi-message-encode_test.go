@@ -45,14 +45,15 @@ func TestGoodMIDIMessageEncode(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			got, err := midiMessageEncoder.Process(t.Context(), test.payload)
+			if err != nil {
+				t.Fatalf("midi.message.encode processing failed: %s", err)
+			}
 
 			gotBytes, ok := got.([]byte)
 			if !ok {
 				t.Fatalf("midi.message.encode returned a %T payload: %s", got, got)
 			}
-			if err != nil {
-				t.Fatalf("midi.message.encode failed: %s", err)
-			}
+
 			if !slices.Equal(gotBytes, test.expected) {
 				t.Fatalf("midi.message.encode got %+v, expected %+v", got, test.expected)
 			}

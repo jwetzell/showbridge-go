@@ -145,7 +145,7 @@ func TestGoodScriptJS(t *testing.T) {
 			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			if err != nil {
-				t.Fatalf("script.js process failed: %s", err)
+				t.Fatalf("script.js processing failed: %s", err)
 			}
 
 			//TODO(jwetzell): work out better way to compare the any/any

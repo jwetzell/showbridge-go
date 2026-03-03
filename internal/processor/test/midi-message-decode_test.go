@@ -46,7 +46,7 @@ func TestGoodMIDIMessageDecode(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			got, err := processorInstance.Process(t.Context(), test.payload)
 			if err != nil {
-				t.Fatalf("midi.message.decode failed: %s", err)
+				t.Fatalf("midi.message.decode processing failed: %s", err)
 			}
 
 			gotMessage, ok := got.(midi.Message)

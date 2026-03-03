@@ -61,16 +61,16 @@ func TestGoodStringEncode(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			got, err := stringEncoder.Process(t.Context(), test.payload)
+			if err != nil {
+				t.Fatalf("string.encode processing failed: %s", err)
+			}
 
 			gotBytes, ok := got.([]byte)
 			if !ok {
 				t.Fatalf("string.encode returned a %T payload: %s", got, got)
 			}
-			if err != nil {
-				t.Fatalf("string.encode failed: %s", err)
-			}
 			if !slices.Equal(gotBytes, test.expected) {
-				t.Fatalf("string.encode got %s, expected %s", got, test.expected)
+				t.Fatalf("string.encode got %+v, expected %+v", gotBytes, test.expected)
 			}
 		})
 	}

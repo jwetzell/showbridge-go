@@ -98,12 +98,13 @@ func TestGoodStringCreate(t *testing.T) {
 
 			got, err := processorInstance.Process(t.Context(), test.payload)
 
+			if err != nil {
+				t.Fatalf("string.create processing failed: %s", err)
+			}
+
 			gotStrings, ok := got.(string)
 			if !ok {
 				t.Fatalf("string.create returned a %T payload: %s", got, got)
-			}
-			if err != nil {
-				t.Fatalf("string.create failed: %s", err)
 			}
 			if gotStrings != test.expected {
 				t.Fatalf("string.create got %s, expected %s", got, test.expected)

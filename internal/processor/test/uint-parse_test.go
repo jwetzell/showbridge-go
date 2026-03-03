@@ -77,14 +77,15 @@ func TestGoodUintParse(t *testing.T) {
 			}
 
 			got, err := processorInstance.Process(t.Context(), test.payload)
+			if err != nil {
+				t.Fatalf("uint.parse processing failed: %s", err)
+			}
 
 			gotUint, ok := got.(uint64)
 			if !ok {
 				t.Fatalf("uint.parse returned a %T payload: %s", got, got)
 			}
-			if err != nil {
-				t.Fatalf("uint.parse failed: %s", err)
-			}
+
 			if gotUint != test.expected {
 				t.Fatalf("uint.parse got %d, expected %d", gotUint, test.expected)
 			}

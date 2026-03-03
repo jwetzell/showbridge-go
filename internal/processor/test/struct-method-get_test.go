@@ -1,6 +1,7 @@
 package processor_test
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -93,11 +94,11 @@ func TestGoodStructMethodGet(t *testing.T) {
 			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			if err != nil {
-				t.Fatalf("struct.method.get failed: %s", err)
+				t.Fatalf("struct.method.get processing failed: %s", err)
 			}
 
-			if got != test.expected {
-				t.Fatalf("struct.method.get got %s, expected %s", got, test.expected)
+			if !reflect.DeepEqual(got, test.expected) {
+				t.Fatalf("struct.method.get got %+v, expected %+v", got, test.expected)
 			}
 		})
 	}

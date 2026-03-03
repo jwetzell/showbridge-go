@@ -91,7 +91,7 @@ func TestGoodFilterExpr(t *testing.T) {
 			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			if err != nil {
-				t.Fatalf("filter.expr failed: %s", err)
+				t.Fatalf("filter.expr processing failed: %s", err)
 			}
 
 			//TODO(jwetzell): work out better way to compare the any/any

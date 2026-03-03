@@ -104,14 +104,15 @@ func TestGoodMIDIMessageCreate(t *testing.T) {
 			}
 
 			got, err := processorInstance.Process(t.Context(), test.payload)
+			if err != nil {
+				t.Fatalf("midi.message.create processing failed: %s", err)
+			}
 
 			gotMessage, ok := got.(midi.Message)
 			if !ok {
 				t.Fatalf("midi.message.create returned a %T payload: %s", got, got)
 			}
-			if err != nil {
-				t.Fatalf("midi.message.create failed: %s", err)
-			}
+
 			if !reflect.DeepEqual(gotMessage, test.expected) {
 				t.Fatalf("midi.message.create got %v, expected %v", gotMessage, test.expected)
 			}
