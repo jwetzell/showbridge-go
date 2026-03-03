@@ -44,7 +44,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 				"address": "/test",
 			},
 			payload:  osc.OSCMessage{},
-			expected: osc.OSCMessage{Address: "/test"},
+			expected: &osc.OSCMessage{Address: "/test"},
 		},
 		{
 			name: "address with template and no args",
@@ -52,7 +52,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 				"address": "/test/{{.Value}}",
 			},
 			payload:  map[string]any{"Value": "value"},
-			expected: osc.OSCMessage{Address: "/test/value"},
+			expected: &osc.OSCMessage{Address: "/test/value"},
 		},
 		{
 			name: "address with template and string arg",
@@ -62,7 +62,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 				"types":   "s",
 			},
 			payload:  map[string]any{"Value": "value"},
-			expected: osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: "arg1", Type: "s"}}},
+			expected: &osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: "arg1", Type: "s"}}},
 		},
 		{
 			name: "address with template and mixed args",
@@ -72,7 +72,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 				"types":   "sif",
 			},
 			payload: map[string]any{"Value": "value"},
-			expected: osc.OSCMessage{
+			expected: &osc.OSCMessage{
 				Address: "/test/value",
 				Args: []osc.OSCArg{
 					{Value: "arg1", Type: "s"},
@@ -89,7 +89,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 				"types":   "h",
 			},
 			payload:  map[string]any{"Value": "value"},
-			expected: osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: int64(42), Type: "h"}}},
+			expected: &osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: int64(42), Type: "h"}}},
 		},
 		{
 			name: "address with template and double arg",
@@ -99,7 +99,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 				"types":   "d",
 			},
 			payload:  map[string]any{"Value": "value"},
-			expected: osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: float64(42), Type: "d"}}},
+			expected: &osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: float64(42), Type: "d"}}},
 		},
 		{
 			name: "address with template and true arg",
@@ -109,7 +109,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 				"types":   "T",
 			},
 			payload:  map[string]any{"Value": "value"},
-			expected: osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: true, Type: "T"}}},
+			expected: &osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: true, Type: "T"}}},
 		},
 		{
 			name: "address with template and false arg",
@@ -119,7 +119,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 				"types":   "F",
 			},
 			payload:  map[string]any{"Value": "value"},
-			expected: osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: false, Type: "F"}}},
+			expected: &osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: false, Type: "F"}}},
 		},
 		{
 			name: "address with template and nil arg",
@@ -129,7 +129,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 				"types":   "N",
 			},
 			payload:  map[string]any{"Value": "value"},
-			expected: osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: nil, Type: "N"}}},
+			expected: &osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: nil, Type: "N"}}},
 		},
 	}
 
@@ -162,7 +162,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 				return
 			}
 
-			gotMessage, ok := got.(osc.OSCMessage)
+			gotMessage, ok := got.(*osc.OSCMessage)
 			if !ok {
 				t.Fatalf("osc.message.create returned a %T payload: %s", got, got)
 			}
