@@ -73,6 +73,22 @@ func TestGoodStructMethodGet(t *testing.T) {
 			payload:  TestStruct{Bool: true},
 			expected: true,
 		},
+		{
+			name: "array data",
+			params: map[string]any{
+				"name": "GetData",
+			},
+			payload:  TestStruct{Data: []string{"hello"}},
+			expected: []string{"hello"},
+		},
+		{
+			name: "void",
+			params: map[string]any{
+				"name": "Void",
+			},
+			payload:  TestStruct{},
+			expected: nil,
+		},
 	}
 
 	for _, test := range tests {
