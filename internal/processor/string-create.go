@@ -15,8 +15,10 @@ type StringCreate struct {
 }
 
 func (sc *StringCreate) Process(ctx context.Context, payload any) (any, error) {
+	templateData := GetTemplateData(ctx, payload)
+
 	var templateBuffer bytes.Buffer
-	err := sc.Template.Execute(&templateBuffer, payload)
+	err := sc.Template.Execute(&templateBuffer, templateData)
 
 	if err != nil {
 		return nil, err

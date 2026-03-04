@@ -49,7 +49,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 		{
 			name: "address with template and no args",
 			params: map[string]any{
-				"address": "/test/{{.Value}}",
+				"address": "/test/{{.Payload.Value}}",
 			},
 			payload:  map[string]any{"Value": "value"},
 			expected: &osc.OSCMessage{Address: "/test/value"},
@@ -57,7 +57,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 		{
 			name: "address with template and string arg",
 			params: map[string]any{
-				"address": "/test/{{.Value}}",
+				"address": "/test/{{.Payload.Value}}",
 				"args":    []interface{}{"arg1"},
 				"types":   "s",
 			},
@@ -67,7 +67,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 		{
 			name: "address with template and mixed args",
 			params: map[string]any{
-				"address": "/test/{{.Value}}",
+				"address": "/test/{{.Payload.Value}}",
 				"args":    []interface{}{"arg1", "42", "3.14"},
 				"types":   "sif",
 			},
@@ -84,7 +84,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 		{
 			name: "address with template and int64 arg",
 			params: map[string]any{
-				"address": "/test/{{.Value}}",
+				"address": "/test/{{.Payload.Value}}",
 				"args":    []interface{}{"42"},
 				"types":   "h",
 			},
@@ -94,7 +94,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 		{
 			name: "address with template and double arg",
 			params: map[string]any{
-				"address": "/test/{{.Value}}",
+				"address": "/test/{{.Payload.Value}}",
 				"args":    []interface{}{"42"},
 				"types":   "d",
 			},
@@ -104,7 +104,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 		{
 			name: "address with template and true arg",
 			params: map[string]any{
-				"address": "/test/{{.Value}}",
+				"address": "/test/{{.Payload.Value}}",
 				"args":    []interface{}{""},
 				"types":   "T",
 			},
@@ -114,7 +114,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 		{
 			name: "address with template and false arg",
 			params: map[string]any{
-				"address": "/test/{{.Value}}",
+				"address": "/test/{{.Payload.Value}}",
 				"args":    []interface{}{""},
 				"types":   "F",
 			},
@@ -124,7 +124,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 		{
 			name: "address with template and nil arg",
 			params: map[string]any{
-				"address": "/test/{{.Value}}",
+				"address": "/test/{{.Payload.Value}}",
 				"args":    []interface{}{""},
 				"types":   "N",
 			},
@@ -286,7 +286,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 				"address": "/test/{{.missing}}",
 			},
 			payload:     "test",
-			errorString: "template: address:1:8: executing \"address\" at <.missing>: can't evaluate field missing in type string",
+			errorString: "template: address:1:8: executing \"address\" at <.missing>: can't evaluate field missing in type processor.TemplateData",
 		},
 		{
 			name: "address doesn't start with slash",
@@ -304,7 +304,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 				"types":   "s",
 			},
 			payload:     "test",
-			errorString: "template: arg:1:2: executing \"arg\" at <.missing>: can't evaluate field missing in type string",
+			errorString: "template: arg:1:2: executing \"arg\" at <.missing>: can't evaluate field missing in type processor.TemplateData",
 		},
 	}
 

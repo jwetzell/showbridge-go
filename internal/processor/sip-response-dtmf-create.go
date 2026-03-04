@@ -27,8 +27,10 @@ type SipDTMFResponse struct {
 
 func (scc *SipResponseDTMFCreate) Process(ctx context.Context, payload any) (any, error) {
 
+	templateData := GetTemplateData(ctx, payload)
+
 	var digitsBuffer bytes.Buffer
-	err := scc.Digits.Execute(&digitsBuffer, payload)
+	err := scc.Digits.Execute(&digitsBuffer, templateData)
 
 	if err != nil {
 		return nil, err

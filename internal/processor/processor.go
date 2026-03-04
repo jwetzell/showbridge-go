@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -44,4 +45,18 @@ var (
 func GetAnyAs[T any](p any) (T, bool) {
 	typed, ok := p.(T)
 	return typed, ok
+}
+
+type TemplateData struct {
+	Payload any
+	Modules any
+}
+
+func GetTemplateData(ctx context.Context, payload any) TemplateData {
+	templateData := TemplateData{Payload: payload}
+	modules := ctx.Value(common.ModulesContextKey)
+	if modules != nil {
+		templateData.Modules = modules
+	}
+	return templateData
 }

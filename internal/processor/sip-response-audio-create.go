@@ -24,8 +24,10 @@ type SipAudioFileResponse struct {
 
 func (scc *SipResponseAudioCreate) Process(ctx context.Context, payload any) (any, error) {
 
+	templateData := GetTemplateData(ctx, payload)
+
 	var audioFileBuffer bytes.Buffer
-	err := scc.AudioFile.Execute(&audioFileBuffer, payload)
+	err := scc.AudioFile.Execute(&audioFileBuffer, templateData)
 
 	if err != nil {
 		return nil, err
