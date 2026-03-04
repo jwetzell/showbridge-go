@@ -147,7 +147,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	}
 
 	var focusBuffer bytes.Buffer
-	err = fc.Zoom.Execute(&focusBuffer, payload)
+	err = fc.Focus.Execute(&focusBuffer, payload)
 
 	if err != nil {
 		return nil, err
