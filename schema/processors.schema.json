@@ -838,45 +838,6 @@
         },
         "required": ["type", "params"],
         "additionalProperties": false
-      },
-      {
-        "type": "object",
-        "title": "Parse Unsigned Int",
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "uint.parse"
-          }
-        },
-        "required": ["type"],
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
-        "title": "Random Unsigned Int",
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "uint.random"
-          },
-          "params": {
-            "type": "object",
-            "properties": {
-              "min": {
-                "type": "integer",
-                "minimum": 0
-              },
-              "max": {
-                "type": "integer",
-                "minimum": 0
-              }
-            },
-            "required": ["min", "max"],
-            "additionalProperties": false
-          }
-        },
-        "required": ["type", "params"],
-        "additionalProperties": false
       }
     ]
   }
