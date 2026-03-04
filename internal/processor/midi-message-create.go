@@ -65,9 +65,10 @@ func newMidiNoteOnCreate(config config.ProcessorConfig) (Processor, error) {
 	}
 
 	return &MIDIMessageCreate{config: config, ProcessFunc: func(ctx context.Context, payload any) (any, error) {
+		templateData := GetTemplateData(ctx, payload)
 
 		var channelBuffer bytes.Buffer
-		err := channelTemplate.Execute(&channelBuffer, payload)
+		err := channelTemplate.Execute(&channelBuffer, templateData)
 
 		if err != nil {
 			return nil, err
@@ -76,7 +77,7 @@ func newMidiNoteOnCreate(config config.ProcessorConfig) (Processor, error) {
 		channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
 
 		var noteBuffer bytes.Buffer
-		err = noteTemplate.Execute(&noteBuffer, payload)
+		err = noteTemplate.Execute(&noteBuffer, templateData)
 
 		if err != nil {
 			return nil, err
@@ -85,7 +86,7 @@ func newMidiNoteOnCreate(config config.ProcessorConfig) (Processor, error) {
 		noteValue, err := strconv.ParseUint(noteBuffer.String(), 10, 8)
 
 		var velocityBuffer bytes.Buffer
-		err = velocityTemplate.Execute(&velocityBuffer, payload)
+		err = velocityTemplate.Execute(&velocityBuffer, templateData)
 
 		if err != nil {
 			return nil, err
@@ -136,8 +137,10 @@ func newMidiNoteOffCreate(config config.ProcessorConfig) (Processor, error) {
 
 	return &MIDIMessageCreate{config: config, ProcessFunc: func(ctx context.Context, payload any) (any, error) {
 
+		templateData := GetTemplateData(ctx, payload)
+
 		var channelBuffer bytes.Buffer
-		err := channelTemplate.Execute(&channelBuffer, payload)
+		err := channelTemplate.Execute(&channelBuffer, templateData)
 
 		if err != nil {
 			return nil, err
@@ -146,7 +149,7 @@ func newMidiNoteOffCreate(config config.ProcessorConfig) (Processor, error) {
 		channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
 
 		var noteBuffer bytes.Buffer
-		err = noteTemplate.Execute(&noteBuffer, payload)
+		err = noteTemplate.Execute(&noteBuffer, templateData)
 
 		if err != nil {
 			return nil, err
@@ -155,7 +158,7 @@ func newMidiNoteOffCreate(config config.ProcessorConfig) (Processor, error) {
 		noteValue, err := strconv.ParseUint(noteBuffer.String(), 10, 8)
 
 		var velocityBuffer bytes.Buffer
-		err = velocityTemplate.Execute(&velocityBuffer, payload)
+		err = velocityTemplate.Execute(&velocityBuffer, templateData)
 
 		if err != nil {
 			return nil, err
@@ -207,8 +210,10 @@ func newMidiControlChangeCreate(config config.ProcessorConfig) (Processor, error
 
 	return &MIDIMessageCreate{config: config, ProcessFunc: func(ctx context.Context, payload any) (any, error) {
 
+		templateData := GetTemplateData(ctx, payload)
+
 		var channelBuffer bytes.Buffer
-		err := channelTemplate.Execute(&channelBuffer, payload)
+		err := channelTemplate.Execute(&channelBuffer, templateData)
 
 		if err != nil {
 			return nil, err
@@ -217,7 +222,7 @@ func newMidiControlChangeCreate(config config.ProcessorConfig) (Processor, error
 		channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
 
 		var controlBuffer bytes.Buffer
-		err = controlTemplate.Execute(&controlBuffer, payload)
+		err = controlTemplate.Execute(&controlBuffer, templateData)
 
 		if err != nil {
 			return nil, err
@@ -226,7 +231,7 @@ func newMidiControlChangeCreate(config config.ProcessorConfig) (Processor, error
 		controlValue, err := strconv.ParseUint(controlBuffer.String(), 10, 8)
 
 		var valueBuffer bytes.Buffer
-		err = valueTemplate.Execute(&valueBuffer, payload)
+		err = valueTemplate.Execute(&valueBuffer, templateData)
 
 		if err != nil {
 			return nil, err
@@ -266,9 +271,10 @@ func newMidiProgramChangeCreate(config config.ProcessorConfig) (Processor, error
 	}
 
 	return &MIDIMessageCreate{config: config, ProcessFunc: func(ctx context.Context, payload any) (any, error) {
+		templateData := GetTemplateData(ctx, payload)
 
 		var channelBuffer bytes.Buffer
-		err := channelTemplate.Execute(&channelBuffer, payload)
+		err := channelTemplate.Execute(&channelBuffer, templateData)
 
 		if err != nil {
 			return nil, err
@@ -277,7 +283,7 @@ func newMidiProgramChangeCreate(config config.ProcessorConfig) (Processor, error
 		channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
 
 		var programBuffer bytes.Buffer
-		err = programTemplate.Execute(&programBuffer, payload)
+		err = programTemplate.Execute(&programBuffer, templateData)
 
 		if err != nil {
 			return nil, err

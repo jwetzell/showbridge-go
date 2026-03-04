@@ -18,8 +18,10 @@ type HTTPRequestCreate struct {
 
 func (hrc *HTTPRequestCreate) Process(ctx context.Context, payload any) (any, error) {
 
+	templateData := GetTemplateData(ctx, payload)
+
 	var urlBuffer bytes.Buffer
-	err := hrc.URL.Execute(&urlBuffer, payload)
+	err := hrc.URL.Execute(&urlBuffer, templateData)
 
 	if err != nil {
 		return nil, err

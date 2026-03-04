@@ -22,8 +22,10 @@ type OSCMessageCreate struct {
 
 func (omc *OSCMessageCreate) Process(ctx context.Context, payload any) (any, error) {
 
+	templateData := GetTemplateData(ctx, payload)
+
 	var addressBuffer bytes.Buffer
-	err := omc.Address.Execute(&addressBuffer, payload)
+	err := omc.Address.Execute(&addressBuffer, templateData)
 
 	if err != nil {
 		return nil, err
@@ -47,7 +49,7 @@ func (omc *OSCMessageCreate) Process(ctx context.Context, payload any) (any, err
 
 	for argIndex, argTemplate := range omc.Args {
 		var argBuffer bytes.Buffer
-		err := argTemplate.Execute(&argBuffer, payload)
+		err := argTemplate.Execute(&argBuffer, templateData)
 
 		if err != nil {
 			return nil, err

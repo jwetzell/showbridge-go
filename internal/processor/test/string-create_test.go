@@ -16,7 +16,7 @@ func TestStringCreateFromRegistry(t *testing.T) {
 	processorInstance, err := registration.New(config.ProcessorConfig{
 		Type: "string.create",
 		Params: map[string]any{
-			"template": "{{.}}",
+			"template": "{{.Payload}}",
 		},
 	})
 	if err != nil {
@@ -50,31 +50,31 @@ func TestGoodStringCreate(t *testing.T) {
 	}{
 		{
 			name:     "string payload",
-			params:   map[string]any{"template": "{{.}}"},
+			params:   map[string]any{"template": "{{.Payload}}"},
 			payload:  "hello",
 			expected: "hello",
 		},
 		{
 			name:     "number payload",
-			params:   map[string]any{"template": "{{.}}"},
+			params:   map[string]any{"template": "{{.Payload}}"},
 			payload:  4,
 			expected: "4",
 		},
 		{
 			name:     "boolean payload",
-			params:   map[string]any{"template": "{{.}}"},
+			params:   map[string]any{"template": "{{.Payload}}"},
 			payload:  true,
 			expected: "true",
 		},
 		{
 			name:     "struct payload - field",
-			params:   map[string]any{"template": "{{.Data}}"},
+			params:   map[string]any{"template": "{{.Payload.Data}}"},
 			payload:  TestStruct{Data: "test"},
 			expected: "test",
 		},
 		{
 			name:     "struct payload - method",
-			params:   map[string]any{"template": "{{.GetData}}"},
+			params:   map[string]any{"template": "{{.Payload.GetData}}"},
 			payload:  TestStruct{Data: "test"},
 			expected: "test",
 		},
@@ -148,7 +148,7 @@ func TestBadStringCreate(t *testing.T) {
 			params: map[string]any{
 				"template": "{{.Invalid}}",
 			},
-			errorString: "template: template:1:2: executing \"template\" at <.Invalid>: can't evaluate field Invalid in type string",
+			errorString: "template: template:1:2: executing \"template\" at <.Invalid>: can't evaluate field Invalid in type processor.TemplateData",
 		},
 	}
 

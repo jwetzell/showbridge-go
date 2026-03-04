@@ -21,9 +21,10 @@ type NATSMessageCreate struct {
 }
 
 func (nmc *NATSMessageCreate) Process(ctx context.Context, payload any) (any, error) {
+	templateData := GetTemplateData(ctx, payload)
 
 	var payloadBuffer bytes.Buffer
-	err := nmc.Payload.Execute(&payloadBuffer, payload)
+	err := nmc.Payload.Execute(&payloadBuffer, templateData)
 
 	if err != nil {
 		return nil, err
@@ -32,7 +33,7 @@ func (nmc *NATSMessageCreate) Process(ctx context.Context, payload any) (any, er
 	payloadString := payloadBuffer.String()
 
 	var subjectBuffer bytes.Buffer
-	err = nmc.Subject.Execute(&subjectBuffer, payload)
+	err = nmc.Subject.Execute(&subjectBuffer, templateData)
 
 	if err != nil {
 		return nil, err

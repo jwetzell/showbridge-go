@@ -26,8 +26,10 @@ type FreeDCreate struct {
 
 func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 
+	templateData := GetTemplateData(ctx, payload)
+
 	var idBuffer bytes.Buffer
-	err := fc.Id.Execute(&idBuffer, payload)
+	err := fc.Id.Execute(&idBuffer, templateData)
 
 	if err != nil {
 		return nil, err
@@ -42,7 +44,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	}
 
 	var panBuffer bytes.Buffer
-	err = fc.Pan.Execute(&panBuffer, payload)
+	err = fc.Pan.Execute(&panBuffer, templateData)
 
 	if err != nil {
 		return nil, err
@@ -57,7 +59,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	}
 
 	var tiltBuffer bytes.Buffer
-	err = fc.Tilt.Execute(&tiltBuffer, payload)
+	err = fc.Tilt.Execute(&tiltBuffer, templateData)
 
 	if err != nil {
 		return nil, err
@@ -72,7 +74,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	}
 
 	var rollBuffer bytes.Buffer
-	err = fc.Tilt.Execute(&rollBuffer, payload)
+	err = fc.Tilt.Execute(&rollBuffer, templateData)
 
 	if err != nil {
 		return nil, err
@@ -87,7 +89,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	}
 
 	var posXBuffer bytes.Buffer
-	err = fc.PosX.Execute(&posXBuffer, payload)
+	err = fc.PosX.Execute(&posXBuffer, templateData)
 
 	if err != nil {
 		return nil, err
@@ -102,7 +104,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	}
 
 	var posYBuffer bytes.Buffer
-	err = fc.PosY.Execute(&posYBuffer, payload)
+	err = fc.PosY.Execute(&posYBuffer, templateData)
 
 	if err != nil {
 		return nil, err
@@ -117,7 +119,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	}
 
 	var posZBuffer bytes.Buffer
-	err = fc.PosZ.Execute(&posZBuffer, payload)
+	err = fc.PosZ.Execute(&posZBuffer, templateData)
 
 	if err != nil {
 		return nil, err
@@ -132,7 +134,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	}
 
 	var zoomBuffer bytes.Buffer
-	err = fc.Zoom.Execute(&zoomBuffer, payload)
+	err = fc.Zoom.Execute(&zoomBuffer, templateData)
 
 	if err != nil {
 		return nil, err
@@ -147,7 +149,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	}
 
 	var focusBuffer bytes.Buffer
-	err = fc.Focus.Execute(&focusBuffer, payload)
+	err = fc.Focus.Execute(&focusBuffer, templateData)
 
 	if err != nil {
 		return nil, err

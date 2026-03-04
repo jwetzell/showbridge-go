@@ -21,8 +21,10 @@ type HTTPResponse struct {
 }
 
 func (hre *HTTPResponseCreate) Process(ctx context.Context, payload any) (any, error) {
+	templateData := GetTemplateData(ctx, payload)
+
 	var bodyBuffer bytes.Buffer
-	err := hre.BodyTmpl.Execute(&bodyBuffer, payload)
+	err := hre.BodyTmpl.Execute(&bodyBuffer, templateData)
 
 	if err != nil {
 		return nil, err
