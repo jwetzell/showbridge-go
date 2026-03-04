@@ -15,13 +15,13 @@ type IntRandom struct {
 	config config.ProcessorConfig
 }
 
-func (up *IntRandom) Process(ctx context.Context, payload any) (any, error) {
-	payloadInt := rand.IntN(up.Max-up.Min+1) + up.Min
+func (ir *IntRandom) Process(ctx context.Context, payload any) (any, error) {
+	payloadInt := rand.IntN(ir.Max-ir.Min+1) + ir.Min
 	return payloadInt, nil
 }
 
-func (up *IntRandom) Type() string {
-	return up.config.Type
+func (ir *IntRandom) Type() string {
+	return ir.config.Type
 }
 
 func init() {
