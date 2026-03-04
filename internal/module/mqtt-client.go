@@ -7,6 +7,7 @@ import (
 	"log/slog"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/route"
@@ -62,7 +63,7 @@ func (mc *MQTTClient) Type() string {
 
 func (mc *MQTTClient) Start(ctx context.Context) error {
 	mc.logger.Debug("running")
-	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
 
 	if !ok {
 		return errors.New("mqtt.client unable to get router from context")

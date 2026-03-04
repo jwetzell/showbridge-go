@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/jwetzell/showbridge-go"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
 	"github.com/jwetzell/showbridge-go/internal/route"
@@ -33,7 +34,7 @@ func (mcm *MockCounterModule) Output(context.Context, any) error {
 }
 
 func (mcm *MockCounterModule) Start(ctx context.Context) error {
-	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
 
 	if !ok {
 		return fmt.Errorf("mock.counter could not get router from context")

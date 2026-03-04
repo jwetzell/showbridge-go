@@ -8,6 +8,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/route"
@@ -57,7 +58,7 @@ func (um *UDPMulticast) Type() string {
 
 func (um *UDPMulticast) Start(ctx context.Context) error {
 	um.logger.Debug("running")
-	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
 
 	if !ok {
 		return errors.New("net.udp.multicast unable to get router from context")

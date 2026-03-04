@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"sync"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
 	"github.com/jwetzell/showbridge-go/internal/route"
@@ -154,7 +155,7 @@ func (r *Router) Start(ctx context.Context) {
 	routerContext, cancel := context.WithCancel(ctx)
 	r.Context = routerContext
 	r.contextCancel = cancel
-	contextWithRouter := context.WithValue(routerContext, route.RouterContextKey, r)
+	contextWithRouter := context.WithValue(routerContext, common.RouterContextKey, r)
 
 	for moduleId := range r.ModuleInstances {
 		// TODO(jwetzell): handle module run errors
@@ -188,7 +189,8 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 			routeWaitGroup.Go(func() {
 
 				routeFound = true
-				routeContext := context.WithValue(spanCtx, route.SourceContextKey, sourceId)
+				routeContext := context.WithValue(spanCtx, common.SourceContextKey, sourceId)
+				routeContext = context.WithValue(routeContext, common.ModulesContextKey, r.ModuleInstances)
 
 				routeCtx, routeSpan := otel.Tracer("router").Start(routeContext, "route", trace.WithAttributes(attribute.Int("route.index", routeIndex), attribute.String("route.input", routeInstance.Input()), attribute.String("route.output", routeInstance.Output())))
 				payload, err := routeInstance.ProcessPayload(routeCtx, payload)

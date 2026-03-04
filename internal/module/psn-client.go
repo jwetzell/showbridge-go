@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/jwetzell/psn-go"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/route"
 )
@@ -43,7 +44,7 @@ func (pc *PSNClient) Type() string {
 
 func (pc *PSNClient) Start(ctx context.Context) error {
 	pc.logger.Debug("running")
-	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
 
 	if !ok {
 		return errors.New("psn.client unable to get router from context")

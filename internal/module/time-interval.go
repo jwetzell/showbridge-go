@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/route"
 )
@@ -46,7 +47,7 @@ func (i *TimeInterval) Type() string {
 
 func (i *TimeInterval) Start(ctx context.Context) error {
 	i.logger.Debug("running")
-	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
 
 	if !ok {
 		return errors.New("time.interval unable to get router from context")

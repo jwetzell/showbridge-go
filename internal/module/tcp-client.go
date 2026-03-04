@@ -8,6 +8,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/framer"
 	"github.com/jwetzell/showbridge-go/internal/processor"
@@ -70,7 +71,7 @@ func (tc *TCPClient) Type() string {
 
 func (tc *TCPClient) Start(ctx context.Context) error {
 	tc.logger.Debug("running")
-	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
 
 	if !ok {
 		return errors.New("net.tcp.client unable to get router from context")

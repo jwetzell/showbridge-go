@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/route"
 	"gitlab.com/gomidi/midi/v2"
@@ -50,7 +51,7 @@ func (mi *MIDIInput) Type() string {
 func (mi *MIDIInput) Start(ctx context.Context) error {
 	mi.logger.Debug("running")
 	defer midi.CloseDriver()
-	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
 
 	if !ok {
 		return errors.New("midi.input unable to get router from context")

@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/route"
@@ -63,7 +64,7 @@ func (uc *UDPClient) SetupConn() error {
 
 func (uc *UDPClient) Start(ctx context.Context) error {
 	uc.logger.Debug("running")
-	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
 
 	if !ok {
 		return errors.New("net.udp.client unable to get router from context")

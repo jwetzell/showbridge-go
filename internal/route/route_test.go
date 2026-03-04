@@ -5,6 +5,7 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/route"
@@ -54,7 +55,7 @@ func TestGoodRouteHandleInput(t *testing.T) {
 	}
 
 	inputData := "test input data"
-	payload, err := testRoute.ProcessPayload(context.WithValue(t.Context(), route.RouterContextKey, &MockRouter{}), inputData)
+	payload, err := testRoute.ProcessPayload(context.WithValue(t.Context(), common.RouterContextKey, &MockRouter{}), inputData)
 	if err != nil {
 		t.Fatalf("route ProcessPayload returned error: %v", err)
 	}
@@ -84,7 +85,7 @@ func TestRouteHandleInputWithProcessorError(t *testing.T) {
 	}
 
 	inputData := "test input data"
-	_, err = testRoute.ProcessPayload(context.WithValue(t.Context(), route.RouterContextKey, &MockRouter{}), inputData)
+	_, err = testRoute.ProcessPayload(context.WithValue(t.Context(), common.RouterContextKey, &MockRouter{}), inputData)
 	if err == nil {
 		t.Fatalf("route HandleOutput did not return error for bad processor")
 	}
@@ -103,7 +104,7 @@ func TestRouteHandleNilPayload(t *testing.T) {
 		return
 	}
 
-	payload, err := testRoute.ProcessPayload(context.WithValue(t.Context(), route.RouterContextKey, &MockRouter{}), nil)
+	payload, err := testRoute.ProcessPayload(context.WithValue(t.Context(), common.RouterContextKey, &MockRouter{}), nil)
 	if err != nil {
 		t.Fatalf("route ProcessPayload returned error: %v", err)
 	}
@@ -126,7 +127,7 @@ func TestRouteHandleNilPayloadFromProcessor(t *testing.T) {
 		t.Fatalf("route failed to create: %v", err)
 	}
 
-	payload, err := testRoute.ProcessPayload(context.WithValue(t.Context(), route.RouterContextKey, &MockRouter{}), "test")
+	payload, err := testRoute.ProcessPayload(context.WithValue(t.Context(), common.RouterContextKey, &MockRouter{}), "test")
 	if err != nil {
 		t.Fatalf("route HandleOutput returned error for nil payload: %v", err)
 	}

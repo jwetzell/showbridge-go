@@ -8,6 +8,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/route"
 	"github.com/nats-io/nats-server/v2/server"
@@ -66,7 +67,7 @@ func (ns *NATSServer) Type() string {
 
 func (ns *NATSServer) Start(ctx context.Context) error {
 	ns.logger.Debug("running")
-	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
 
 	if !ok {
 		return errors.New("nats.server unable to get router from context")

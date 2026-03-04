@@ -12,11 +12,6 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type routeContextKey string
-
-var RouterContextKey routeContextKey = routeContextKey("router")
-var SourceContextKey routeContextKey = routeContextKey("source")
-
 type RouteError struct {
 	Index  int
 	Config config.RouteConfig

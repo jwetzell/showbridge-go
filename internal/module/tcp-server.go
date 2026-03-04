@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/framer"
 	"github.com/jwetzell/showbridge-go/internal/processor"
@@ -154,7 +155,7 @@ ClientRead:
 
 func (ts *TCPServer) Start(ctx context.Context) error {
 	ts.logger.Debug("running")
-	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
 
 	if !ok {
 		return errors.New("net.tcp.server unable to get router from context")

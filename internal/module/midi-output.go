@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/route"
@@ -52,7 +53,7 @@ func (mo *MIDIOutput) Type() string {
 func (mo *MIDIOutput) Start(ctx context.Context) error {
 	mo.logger.Debug("running")
 	defer midi.CloseDriver()
-	router, ok := ctx.Value(route.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
 
 	if !ok {
 		return errors.New("midi.output unable to get router from context")
