@@ -108,3 +108,20 @@ func (uc *UDPClient) Output(ctx context.Context, payload any) error {
 func (uc *UDPClient) Stop() {
 	uc.cancel()
 }
+
+func (uc *UDPClient) Get(key string) (any, error) {
+	switch key {
+	case "host":
+		host, err := uc.config.Params.GetString("host")
+		if err != nil {
+			return nil, fmt.Errorf("net.udp.client host error: %w", err)
+		}
+		return host, nil
+	case "ip":
+		return uc.Addr.IP.String(), nil
+	case "port":
+		return uc.Addr.Port, nil
+	default:
+		return nil, errors.New("net.udp.client key not found")
+	}
+}

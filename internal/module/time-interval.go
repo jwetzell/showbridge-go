@@ -83,3 +83,12 @@ func (i *TimeInterval) Output(ctx context.Context, payload any) error {
 func (i *TimeInterval) Stop() {
 	i.cancel()
 }
+
+func (i *TimeInterval) Get(key string) (any, error) {
+	switch key {
+	case "duration":
+		return i.Duration, nil
+	default:
+		return nil, errors.New("time.interval key not found")
+	}
+}

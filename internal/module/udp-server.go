@@ -123,3 +123,14 @@ func (us *UDPServer) Output(ctx context.Context, payload any) error {
 func (us *UDPServer) Stop() {
 	us.cancel()
 }
+
+func (us *UDPServer) Get(key string) (any, error) {
+	switch key {
+	case "ip":
+		return us.Addr.IP.String(), nil
+	case "port":
+		return us.Addr.Port, nil
+	default:
+		return nil, errors.New("net.udp.server key not found")
+	}
+}

@@ -113,3 +113,7 @@ func (ns *NATSServer) Stop() {
 		ns.server.Shutdown()
 	}
 }
+
+func (ns *NATSServer) Get(key string) (any, error) {
+	return nil, errors.New("nats.server does not support Get")
+}

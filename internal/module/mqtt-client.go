@@ -127,3 +127,7 @@ func (mc *MQTTClient) Output(ctx context.Context, payload any) error {
 func (mc *MQTTClient) Stop() {
 	mc.cancel()
 }
+
+func (mc *MQTTClient) Get(key string) (any, error) {
+	return nil, errors.New("mqtt.client does not support Get")
+}

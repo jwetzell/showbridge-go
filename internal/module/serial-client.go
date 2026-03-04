@@ -171,3 +171,12 @@ func (sc *SerialClient) Output(ctx context.Context, payload any) error {
 func (sc *SerialClient) Stop() {
 	sc.cancel()
 }
+
+func (sc *SerialClient) Get(key string) (any, error) {
+	switch key {
+	case "port":
+		return sc.Port, nil
+	default:
+		return nil, errors.New("serial.client key not found")
+	}
+}

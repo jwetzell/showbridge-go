@@ -21,6 +21,7 @@ type Module interface {
 	Start(context.Context) error
 	Stop()
 	Output(context.Context, any) error
+	Get(key string) (any, error)
 }
 
 type ModuleRegistration struct {

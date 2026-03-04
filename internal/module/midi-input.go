@@ -90,3 +90,12 @@ func (mi *MIDIInput) Output(ctx context.Context, payload any) error {
 func (mi *MIDIInput) Stop() {
 	mi.cancel()
 }
+
+func (mi *MIDIInput) Get(key string) (any, error) {
+	switch key {
+	case "port":
+		return mi.Port, nil
+	default:
+		return nil, errors.New("midi.input key not found")
+	}
+}

@@ -30,6 +30,10 @@ func (m *TestModule) Id() string {
 	return "test"
 }
 
+func (m *TestModule) Get(key string) (any, error) {
+	return nil, nil
+}
+
 func TestModuleBadRegistrationNoType(t *testing.T) {
 	defer func() {
 		if r := recover(); r == nil {

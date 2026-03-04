@@ -47,6 +47,13 @@ func (mcm *MockCounterModule) Start(ctx context.Context) error {
 	return nil
 }
 
+func (mcm *MockCounterModule) Get(key string) (any, error) {
+	if key == "count" {
+		return mcm.outputCount, nil
+	}
+	return nil, fmt.Errorf("mock.counter key not found")
+}
+
 func (mcm *MockCounterModule) Type() string {
 	return mcm.config.Type
 }

@@ -89,3 +89,7 @@ func (hc *HTTPClient) Output(ctx context.Context, payload any) error {
 func (hc *HTTPClient) Stop() {
 	hc.cancel()
 }
+
+func (hc *HTTPClient) Get(key string) (any, error) {
+	return nil, errors.New("http.client does not support Get")
+}
