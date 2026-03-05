@@ -17,23 +17,9 @@ type RouteError struct {
 	Config config.RouteConfig
 	Error  error
 }
-
-type RouteIOError struct {
-	Index        int
-	OutputError  error
-	ProcessError error
-	InputError   error
-}
-
-type RouteIO interface {
-	HandleInput(ctx context.Context, sourceId string, payload any) (bool, []RouteIOError)
-	HandleOutput(ctx context.Context, destinationId string, payload any) error
-}
-
 type Route struct {
 	input      string
 	processors []processor.Processor
-	output     string
 }
 
 func NewRoute(config config.RouteConfig) (*Route, error) {
@@ -54,15 +40,11 @@ func NewRoute(config config.RouteConfig) (*Route, error) {
 		}
 	}
 
-	return &Route{input: config.Input, processors: processors, output: config.Output}, nil
+	return &Route{input: config.Input, processors: processors}, nil
 }
 
 func (r *Route) Input() string {
 	return r.input
-}
-
-func (r *Route) Output() string {
-	return r.output
 }
 
 func (r *Route) ProcessPayload(ctx context.Context, payload any) (any, error) {

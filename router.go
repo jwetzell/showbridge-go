@@ -172,10 +172,10 @@ func (r *Router) Stop() {
 	r.contextCancel()
 }
 
-func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) (bool, []route.RouteIOError) {
+func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) (bool, []common.RouteIOError) {
 	spanCtx, span := otel.Tracer("router").Start(ctx, "input", trace.WithAttributes(attribute.String("source.id", sourceId)), trace.WithNewRoot())
 	defer span.End()
-	var routeIOErrors []route.RouteIOError
+	var routeIOErrors []common.RouteIOError
 	routeFound := false
 
 	var routeWaitGroup sync.WaitGroup
@@ -190,36 +190,21 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 
 				routeFound = true
 				routeContext := context.WithValue(spanCtx, common.SourceContextKey, sourceId)
+				routeContext = context.WithValue(routeContext, common.RouterContextKey, r)
 				routeContext = context.WithValue(routeContext, common.ModulesContextKey, r.ModuleInstances)
 
-				routeCtx, routeSpan := otel.Tracer("router").Start(routeContext, "route", trace.WithAttributes(attribute.Int("route.index", routeIndex), attribute.String("route.input", routeInstance.Input()), attribute.String("route.output", routeInstance.Output())))
-				payload, err := routeInstance.ProcessPayload(routeCtx, payload)
+				routeCtx, routeSpan := otel.Tracer("router").Start(routeContext, "route", trace.WithAttributes(attribute.Int("route.index", routeIndex), attribute.String("route.input", routeInstance.Input())))
+				_, err := routeInstance.ProcessPayload(routeCtx, payload)
 				if err != nil {
 					if routeIOErrors == nil {
-						routeIOErrors = []route.RouteIOError{}
+						routeIOErrors = []common.RouteIOError{}
 					}
 					r.logger.Error("unable to process input", "route", routeIndex, "source", sourceId, "error", err)
-					routeIOErrors = append(routeIOErrors, route.RouteIOError{
+					routeIOErrors = append(routeIOErrors, common.RouteIOError{
 						Index:        routeIndex,
 						ProcessError: err,
 					})
 					return
-				}
-
-				if payload == nil {
-					r.logger.Debug("no payload after processing, route terminated", "route", routeIndex, "source", sourceId)
-					return
-				}
-
-				outputError := r.HandleOutput(routeCtx, routeInstance.Output(), payload)
-				if outputError != nil {
-					if routeIOErrors == nil {
-						routeIOErrors = []route.RouteIOError{}
-					}
-					routeIOErrors = append(routeIOErrors, route.RouteIOError{
-						Index:       routeIndex,
-						OutputError: outputError,
-					})
 				}
 				routeSpan.End()
 			})

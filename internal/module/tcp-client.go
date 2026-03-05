@@ -12,7 +12,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/framer"
 	"github.com/jwetzell/showbridge-go/internal/processor"
-	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type TCPClient struct {
@@ -20,7 +19,7 @@ type TCPClient struct {
 	framer framer.Framer
 	conn   *net.TCPConn
 	ctx    context.Context
-	router route.RouteIO
+	router common.RouteIO
 	Addr   *net.TCPAddr
 	logger *slog.Logger
 	cancel context.CancelFunc
@@ -71,7 +70,7 @@ func (tc *TCPClient) Type() string {
 
 func (tc *TCPClient) Start(ctx context.Context) error {
 	tc.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
 
 	if !ok {
 		return errors.New("net.tcp.client unable to get router from context")

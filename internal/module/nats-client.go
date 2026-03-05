@@ -8,14 +8,13 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
-	"github.com/jwetzell/showbridge-go/internal/route"
 	"github.com/nats-io/nats.go"
 )
 
 type NATSClient struct {
 	config  config.ModuleConfig
 	ctx     context.Context
-	router  route.RouteIO
+	router  common.RouteIO
 	URL     string
 	Subject string
 	client  *nats.Conn
@@ -54,7 +53,7 @@ func (nc *NATSClient) Type() string {
 
 func (nc *NATSClient) Start(ctx context.Context) error {
 	nc.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
 
 	if !ok {
 		return errors.New("nats.client unable to get router from context")

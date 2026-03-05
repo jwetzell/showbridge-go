@@ -11,14 +11,13 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
-	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type UDPMulticast struct {
 	config config.ModuleConfig
 	conn   *net.UDPConn
 	ctx    context.Context
-	router route.RouteIO
+	router common.RouteIO
 	Addr   *net.UDPAddr
 	logger *slog.Logger
 	cancel context.CancelFunc
@@ -58,7 +57,7 @@ func (um *UDPMulticast) Type() string {
 
 func (um *UDPMulticast) Start(ctx context.Context) error {
 	um.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
 
 	if !ok {
 		return errors.New("net.udp.multicast unable to get router from context")

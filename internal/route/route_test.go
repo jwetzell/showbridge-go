@@ -13,8 +13,7 @@ import (
 
 func TestRouteCreate(t *testing.T) {
 	routeConfig := config.RouteConfig{
-		Input:  "input",
-		Output: "output",
+		Input: "input",
 	}
 
 	testRoute, err := route.NewRoute(routeConfig)
@@ -25,15 +24,12 @@ func TestRouteCreate(t *testing.T) {
 	if testRoute.Input() != routeConfig.Input {
 		t.Fatalf("route input does not match expected input")
 	}
-	if testRoute.Output() != routeConfig.Output {
-		t.Fatalf("route output does not match expected output")
-	}
 }
 
 type MockRouter struct{}
 
-func (mr *MockRouter) HandleInput(ctx context.Context, sourceId string, payload any) (bool, []route.RouteIOError) {
-	return false, []route.RouteIOError{}
+func (mr *MockRouter) HandleInput(ctx context.Context, sourceId string, payload any) (bool, []common.RouteIOError) {
+	return false, []common.RouteIOError{}
 }
 
 func (mr *MockRouter) HandleOutput(ctx context.Context, destinationId string, payload any) error {
@@ -45,8 +41,13 @@ func TestGoodRouteHandleInput(t *testing.T) {
 		Input: "input",
 		Processors: []config.ProcessorConfig{
 			{Type: "string.encode"},
+			{
+				Type: "router.output",
+				Params: config.Params{
+					"module": "output",
+				},
+			},
 		},
-		Output: "output",
 	}
 
 	testRoute, err := route.NewRoute(routeConfig)
@@ -75,8 +76,13 @@ func TestRouteHandleInputWithProcessorError(t *testing.T) {
 		Input: "input",
 		Processors: []config.ProcessorConfig{
 			{Type: "string.create", Params: map[string]any{"template": "{{.invalid}}}"}},
+			{
+				Type: "router.output",
+				Params: config.Params{
+					"module": "output",
+				},
+			},
 		},
-		Output: "output",
 	}
 
 	testRoute, err := route.NewRoute(routeConfig)
@@ -93,9 +99,15 @@ func TestRouteHandleInputWithProcessorError(t *testing.T) {
 
 func TestRouteHandleNilPayload(t *testing.T) {
 	routeConfig := config.RouteConfig{
-		Input:      "input",
-		Processors: []config.ProcessorConfig{},
-		Output:     "output",
+		Input: "input",
+		Processors: []config.ProcessorConfig{
+			{
+				Type: "router.output",
+				Params: config.Params{
+					"module": "output",
+				},
+			},
+		},
 	}
 
 	testRoute, err := route.NewRoute(routeConfig)
@@ -118,8 +130,13 @@ func TestRouteHandleNilPayloadFromProcessor(t *testing.T) {
 		Input: "input",
 		Processors: []config.ProcessorConfig{
 			{Type: "script.js", Params: map[string]any{"program": "payload = undefined"}},
+			{
+				Type: "router.output",
+				Params: config.Params{
+					"module": "output",
+				},
+			},
 		},
-		Output: "output",
 	}
 
 	testRoute, err := route.NewRoute(routeConfig)
@@ -143,7 +160,6 @@ func TestRouteUnknownProcessor(t *testing.T) {
 		Processors: []config.ProcessorConfig{
 			{Type: "asdfasdflkjalkj"},
 		},
-		Output: "output",
 	}
 
 	_, err := route.NewRoute(routeConfig)
@@ -158,7 +174,6 @@ func TestRouteBadProcessorConfig(t *testing.T) {
 		Processors: []config.ProcessorConfig{
 			{Type: "string.create", Params: map[string]any{}},
 		},
-		Output: "output",
 	}
 
 	_, err := route.NewRoute(routeConfig)

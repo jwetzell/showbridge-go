@@ -273,7 +273,6 @@ type ModuleConfig struct {
 type RouteConfig struct {
 	Input      string            `json:"input"`
 	Processors []ProcessorConfig `json:"processors"`
-	Output     string            `json:"output"`
 }
 
 type ProcessorConfig struct {

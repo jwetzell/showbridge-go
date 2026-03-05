@@ -616,6 +616,28 @@
       },
       {
         "type": "object",
+        "title": "Router Output",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "router.output"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "module": {
+                "type": "string",
+                "description": "ID of module to send output to"
+              }
+            },
+            "required": ["module"]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
         "title": "Evaluate Expr expression",
         "properties": {
           "type": {
