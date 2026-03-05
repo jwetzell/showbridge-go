@@ -104,7 +104,7 @@ func (ns *NATSServer) Start(ctx context.Context) error {
 }
 
 func (ns *NATSServer) Output(ctx context.Context, payload any) error {
-	return errors.ErrUnsupported
+	return errors.New("nats.server does not support output")
 }
 
 func (ns *NATSServer) Stop() {
