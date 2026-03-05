@@ -10,7 +10,6 @@ import (
 
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
-	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type UDPServer struct {
@@ -18,7 +17,7 @@ type UDPServer struct {
 	BufferSize int
 	config     config.ModuleConfig
 	ctx        context.Context
-	router     route.RouteIO
+	router     common.RouteIO
 	logger     *slog.Logger
 	cancel     context.CancelFunc
 }
@@ -70,7 +69,7 @@ func (us *UDPServer) Type() string {
 
 func (us *UDPServer) Start(ctx context.Context) error {
 	us.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
 
 	if !ok {
 		return errors.New("net.udp.server unable to get router from context")

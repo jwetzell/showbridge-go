@@ -13,6 +13,8 @@ routes:
     processors:
       - type: osc.message.create
         params:
-          address: "{{.URL.Path}}"
+          address: "{{.Payload.URL.Path}}"
       - type: osc.message.encode
-    output: udp
+      - type: router.output
+        params:
+          module: udp

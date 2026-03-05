@@ -11,7 +11,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
-	"github.com/jwetzell/showbridge-go/internal/route"
 	"gitlab.com/gomidi/midi/v2"
 	_ "gitlab.com/gomidi/midi/v2/drivers/rtmididrv"
 )
@@ -19,7 +18,7 @@ import (
 type MIDIOutput struct {
 	config   config.ModuleConfig
 	ctx      context.Context
-	router   route.RouteIO
+	router   common.RouteIO
 	Port     string
 	SendFunc func(midi.Message) error
 	logger   *slog.Logger
@@ -53,7 +52,7 @@ func (mo *MIDIOutput) Type() string {
 func (mo *MIDIOutput) Start(ctx context.Context) error {
 	mo.logger.Debug("running")
 	defer midi.CloseDriver()
-	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
 
 	if !ok {
 		return errors.New("midi.output unable to get router from context")

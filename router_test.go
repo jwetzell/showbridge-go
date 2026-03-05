@@ -12,14 +12,13 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
-	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type MockCounterModule struct {
 	config      config.ModuleConfig
 	ctx         context.Context
 	outputCount int
-	router      route.RouteIO
+	router      common.RouteIO
 	logger      *slog.Logger
 	cancel      context.CancelFunc
 }
@@ -34,7 +33,7 @@ func (mcm *MockCounterModule) Output(context.Context, any) error {
 }
 
 func (mcm *MockCounterModule) Start(ctx context.Context) error {
-	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
 
 	if !ok {
 		return fmt.Errorf("mock.counter could not get router from context")
@@ -171,7 +170,6 @@ func TestNewRouterRouteWithUnknwonProcessor(t *testing.T) {
 						Type: "asdfasdf",
 					},
 				},
-				Output: "mock",
 			},
 		},
 	}
@@ -201,8 +199,15 @@ func TestRouterInputUnknownDestinationModule(t *testing.T) {
 		},
 		Routes: []config.RouteConfig{
 			{
-				Input:  "mock",
-				Output: "test",
+				Input: "mock",
+				Processors: []config.ProcessorConfig{
+					{
+						Type: "router.output",
+						Params: config.Params{
+							"module": "test",
+						},
+					},
+				},
 			},
 		},
 	}
@@ -238,8 +243,8 @@ func TestRouterInputUnknownDestinationModule(t *testing.T) {
 		t.Fatalf("router should have returned exactly 1 routing error, got: %d", len(routingErrors))
 	}
 
-	if routingErrors[0].OutputError.Error() != "no module found for destination id" {
-		t.Fatalf("routing output error did not match expected, got: %s", routingErrors[0].OutputError.Error())
+	if routingErrors[0].ProcessError.Error() != "router.output failed to send output: no module found for destination id" {
+		t.Fatalf("routing output error did not match expected, got: %s", routingErrors[0].ProcessError.Error())
 	}
 }
 
@@ -253,8 +258,15 @@ func TestRouterInputNoMatchingRoute(t *testing.T) {
 		},
 		Routes: []config.RouteConfig{
 			{
-				Input:  "test",
-				Output: "mock",
+				Input: "test",
+				Processors: []config.ProcessorConfig{
+					{
+						Type: "router.output",
+						Params: config.Params{
+							"module": "mock",
+						},
+					},
+				},
 			},
 		},
 	}
@@ -297,8 +309,15 @@ func TestRouterInputSingleRoute(t *testing.T) {
 		},
 		Routes: []config.RouteConfig{
 			{
-				Input:  "mock",
-				Output: "mock",
+				Input: "mock",
+				Processors: []config.ProcessorConfig{
+					{
+						Type: "router.output",
+						Params: config.Params{
+							"module": "mock",
+						},
+					},
+				},
 			},
 		},
 	}
@@ -361,16 +380,37 @@ func TestRouterInputMultipleRoutes(t *testing.T) {
 		},
 		Routes: []config.RouteConfig{
 			{
-				Input:  "mock",
-				Output: "mock",
+				Input: "mock",
+				Processors: []config.ProcessorConfig{
+					{
+						Type: "router.output",
+						Params: config.Params{
+							"module": "mock",
+						},
+					},
+				},
 			},
 			{
-				Input:  "mock",
-				Output: "mock",
+				Input: "mock",
+				Processors: []config.ProcessorConfig{
+					{
+						Type: "router.output",
+						Params: config.Params{
+							"module": "mock",
+						},
+					},
+				},
 			},
 			{
-				Input:  "mock",
-				Output: "mock",
+				Input: "mock",
+				Processors: []config.ProcessorConfig{
+					{
+						Type: "router.output",
+						Params: config.Params{
+							"module": "mock",
+						},
+					},
+				},
 			},
 		},
 	}
@@ -436,12 +476,26 @@ func TestRouterInputMultipleModules(t *testing.T) {
 		},
 		Routes: []config.RouteConfig{
 			{
-				Input:  "mock1",
-				Output: "mock1",
+				Input: "mock1",
+				Processors: []config.ProcessorConfig{
+					{
+						Type: "router.output",
+						Params: config.Params{
+							"module": "mock1",
+						},
+					},
+				},
 			},
 			{
-				Input:  "mock2",
-				Output: "mock2",
+				Input: "mock2",
+				Processors: []config.ProcessorConfig{
+					{
+						Type: "router.output",
+						Params: config.Params{
+							"module": "mock2",
+						},
+					},
+				},
 			},
 		},
 	}

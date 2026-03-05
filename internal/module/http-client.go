@@ -10,14 +10,13 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
-	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type HTTPClient struct {
 	config config.ModuleConfig
 	ctx    context.Context
 	client *http.Client
-	router route.RouteIO
+	router common.RouteIO
 	logger *slog.Logger
 	cancel context.CancelFunc
 }
@@ -42,7 +41,7 @@ func (hc *HTTPClient) Type() string {
 
 func (hc *HTTPClient) Start(ctx context.Context) error {
 	hc.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
 
 	if !ok {
 		return errors.New("http.client unable to get router from context")

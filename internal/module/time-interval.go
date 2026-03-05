@@ -9,14 +9,13 @@ import (
 
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
-	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type TimeInterval struct {
 	config   config.ModuleConfig
 	Duration uint32
 	ctx      context.Context
-	router   route.RouteIO
+	router   common.RouteIO
 	ticker   *time.Ticker
 	logger   *slog.Logger
 	cancel   context.CancelFunc
@@ -47,7 +46,7 @@ func (i *TimeInterval) Type() string {
 
 func (i *TimeInterval) Start(ctx context.Context) error {
 	i.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
 
 	if !ok {
 		return errors.New("time.interval unable to get router from context")

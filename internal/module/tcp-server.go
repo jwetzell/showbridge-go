@@ -15,7 +15,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/framer"
 	"github.com/jwetzell/showbridge-go/internal/processor"
-	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type TCPServer struct {
@@ -23,7 +22,7 @@ type TCPServer struct {
 	Addr          *net.TCPAddr
 	Framer        framer.Framer
 	ctx           context.Context
-	router        route.RouteIO
+	router        common.RouteIO
 	quit          chan interface{}
 	wg            sync.WaitGroup
 	connections   []*net.TCPConn
@@ -161,7 +160,7 @@ ClientRead:
 
 func (ts *TCPServer) Start(ctx context.Context) error {
 	ts.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
 
 	if !ok {
 		return errors.New("net.tcp.server unable to get router from context")

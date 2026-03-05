@@ -10,7 +10,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
-	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type UDPClient struct {
@@ -19,7 +18,7 @@ type UDPClient struct {
 	Port   uint16
 	conn   *net.UDPConn
 	ctx    context.Context
-	router route.RouteIO
+	router common.RouteIO
 	logger *slog.Logger
 	cancel context.CancelFunc
 }
@@ -64,7 +63,7 @@ func (uc *UDPClient) SetupConn() error {
 
 func (uc *UDPClient) Start(ctx context.Context) error {
 	uc.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
 
 	if !ok {
 		return errors.New("net.udp.client unable to get router from context")

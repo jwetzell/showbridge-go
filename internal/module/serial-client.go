@@ -13,14 +13,13 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/framer"
 	"github.com/jwetzell/showbridge-go/internal/processor"
-	"github.com/jwetzell/showbridge-go/internal/route"
 	"go.bug.st/serial"
 )
 
 type SerialClient struct {
 	config config.ModuleConfig
 	ctx    context.Context
-	router route.RouteIO
+	router common.RouteIO
 	Port   string
 	Framer framer.Framer
 	Mode   *serial.Mode
@@ -86,7 +85,7 @@ func (sc *SerialClient) SetupPort() error {
 
 func (sc *SerialClient) Start(ctx context.Context) error {
 	sc.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
 
 	if !ok {
 		return errors.New("serial.client unable to get router from context")

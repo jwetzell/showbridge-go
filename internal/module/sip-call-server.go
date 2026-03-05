@@ -17,13 +17,12 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
-	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 type SIPCallServer struct {
 	config    config.ModuleConfig
 	ctx       context.Context
-	router    route.RouteIO
+	router    common.RouteIO
 	IP        string
 	Port      int
 	Transport string
@@ -101,7 +100,7 @@ func (scs *SIPCallServer) Type() string {
 
 func (scs *SIPCallServer) Start(ctx context.Context) error {
 	scs.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(route.RouteIO)
+	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
 
 	if !ok {
 		return errors.New("sip.call.server unable to get router from context")
