@@ -97,7 +97,7 @@ func (us *UDPServer) Start(ctx context.Context) error {
 		default:
 			listener.SetDeadline(time.Now().Add(time.Millisecond * 200))
 
-			numBytes, _, err := listener.ReadFromUDP(buffer)
+			numBytes, senderAddr, err := listener.ReadFromUDP(buffer)
 			if err != nil {
 				//NOTE(jwetzell) we hit deadline
 				if opErr, ok := err.(*net.OpError); ok && opErr.Timeout() {
@@ -107,7 +107,8 @@ func (us *UDPServer) Start(ctx context.Context) error {
 			}
 			message := buffer[:numBytes]
 			if us.router != nil {
-				us.router.HandleInput(us.ctx, us.Id(), message)
+				senderCtx := context.WithValue(us.ctx, common.SenderContextKey, senderAddr)
+				us.router.HandleInput(senderCtx, us.Id(), message)
 			} else {
 				us.logger.Error("input received but no router is configured")
 			}
