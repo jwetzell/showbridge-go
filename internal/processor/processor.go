@@ -50,6 +50,7 @@ func GetAnyAs[T any](p any) (T, bool) {
 type TemplateData struct {
 	Payload any
 	Modules any
+	Sender  any
 }
 
 func GetTemplateData(ctx context.Context, payload any) TemplateData {
@@ -57,6 +58,11 @@ func GetTemplateData(ctx context.Context, payload any) TemplateData {
 	modules := ctx.Value(common.ModulesContextKey)
 	if modules != nil {
 		templateData.Modules = modules
+	}
+
+	sender := ctx.Value(common.SenderContextKey)
+	if sender != nil {
+		templateData.Sender = sender
 	}
 	return templateData
 }

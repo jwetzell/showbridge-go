@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net"
 	"net/http"
 
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -84,6 +85,10 @@ func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if hs.router != nil {
 		inputContext := context.WithValue(hs.ctx, httpServerContextKey("responseWriter"), &responseWriter)
+		senderAddr, err := net.ResolveTCPAddr("tcp", r.RemoteAddr)
+		if err == nil {
+			inputContext = context.WithValue(inputContext, common.SenderContextKey, senderAddr)
+		}
 		aRouteFound, routingErrors := hs.router.HandleInput(inputContext, hs.Id(), r)
 		if !responseWriter.done {
 			if aRouteFound {
