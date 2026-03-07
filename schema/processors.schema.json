@@ -93,6 +93,17 @@
           "type": {
             "type": "string",
             "const": "float.parse"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "bitSize": {
+                "type": "integer",
+                "enum": [32, 64],
+                "default": 64
+              }
+            },
+            "additionalProperties": false
           }
         },
         "required": ["type"],
@@ -262,6 +273,22 @@
           "type": {
             "type": "string",
             "const": "int.parse"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "base": {
+                "type": "integer",
+                "enum": [0,2, 8, 10, 16],
+                "default": 10
+              },
+              "bitSize": {
+                "type": "integer",
+                "enum": [0, 8, 16, 32, 64],
+                "default": 64
+               }
+            },
+            "additionalProperties": false
           }
         },
         "required": ["type"],
