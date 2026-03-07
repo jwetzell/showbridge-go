@@ -42,6 +42,7 @@
             "type": "object",
             "properties": {
               "opCode": {
+                "title": "Op Code",
                 "type": "integer"
               }
             },
@@ -76,6 +77,7 @@
             "type": "object",
             "properties": {
               "expression": {
+                "title": "Expression",
                 "type": "string"
               }
             },
@@ -98,6 +100,7 @@
             "type": "object",
             "properties": {
               "bitSize": {
+                "title": "Bit Size",
                 "type": "integer",
                 "enum": [32, 64],
                 "default": 64
@@ -121,30 +124,39 @@
             "type": "object",
             "properties": {
               "id": {
+                "title": "Camera ID",
                 "type": "string"
               },
               "pan": {
+                "title": "Pan",
                 "type": "string"
               },
               "tilt": {
+                "title": "Tilt",
                 "type": "string"
               },
               "roll": {
+                "title": "Roll",
                 "type": "string"
               },
               "posX": {
+                  "title": "Position X",
                 "type": "string"
               },
               "posY": {
+                "title": "Position Y",
                 "type": "string"
               },
               "posZ": {
+                "title": "Position Z",
                 "type": "string"
               },
               "zoom": {
+                "title": "Zoom",
                 "type": "string"
               },
               "focus": {
+                "title": "Focus",
                 "type": "string"
               }
             },
@@ -201,10 +213,12 @@
             "type": "object",
             "properties": {
               "method": {
+                  "title": "HTTP Method",
                 "type": "string",
                 "enum": ["GET", "POST"]
               },
               "url": {
+                "title": "URL",
                 "type": "string"
               }
             },
@@ -227,9 +241,11 @@
             "type": "object",
             "properties": {
               "path": {
+                "title": "Path",
                 "type": "string"
               },
               "method": {
+                "title": "HTTP Method",
                 "type": "string",
                 "enum": ["GET", "POST"]
               }
@@ -253,9 +269,11 @@
             "type": "object",
             "properties": {
               "status": {
+                "title": "Status Code",
                 "type": "integer"
               },
               "body": {
+                "title": "Body",
                 "type": "string"
               }
             },
@@ -278,11 +296,13 @@
             "type": "object",
             "properties": {
               "base": {
+                  "title": "Base",
                 "type": "integer",
                 "enum": [0,2, 8, 10, 16],
                 "default": 10
               },
               "bitSize": {
+                "title": "Bit Size",
                 "type": "integer",
                 "enum": [0, 8, 16, 32, 64],
                 "default": 64
@@ -306,9 +326,11 @@
             "type": "object",
             "properties": {
               "min": {
+                  "title": "Minimum",
                 "type": "integer"
               },
               "max": {
+                  "title": "Maximum",
                 "type": "integer"
               }
             },
@@ -358,16 +380,20 @@
                 "type": "object",
                 "properties": {
                   "type": {
+                    "title": "MIDI Message Type",
                     "type": "string",
                     "enum": ["NoteOn", "noteon", "note_on"]
                   },
                   "channel": {
+                      "title": "Channel",
                     "type": "string"
                   },
                   "note": {
+                    "title": "Note",
                     "type": "string"
                   },
                   "velocity": {
+                    "title": "Velocity",
                     "type": "string"
                   }
                 },
@@ -378,16 +404,20 @@
                 "type": "object",
                 "properties": {
                   "type": {
+                    "title": "MIDI Message Type",
                     "type": "string",
                     "enum": ["NoteOff", "noteoff", "note_off"]
                   },
                   "channel": {
+                    "title": "Channel",
                     "type": "string"
                   },
                   "note": {
+                    "title": "Note",
                     "type": "string"
                   },
                   "velocity": {
+                    "title": "Velocity",
                     "type": "string"
                   }
                 },
@@ -398,16 +428,20 @@
                 "type": "object",
                 "properties": {
                   "type": {
+                    "title": "MIDI Message Type",
                     "type": "string",
                     "enum": ["ControlChange", "controlchange", "control_change"]
                   },
                   "channel": {
+                    "title": "Channel",
                     "type": "string"
                   },
                   "control": {
+                    "title": "Control",
                     "type": "string"
                   },
                   "value": {
+                    "title": "Value",
                     "type": "string"
                   }
                 },
@@ -418,13 +452,16 @@
                 "type": "object",
                 "properties": {
                   "type": {
+                    "title": "MIDI Message Type",
                     "type": "string",
                     "enum": ["ProgramChange", "programchange", "program_change"]
                   },
                   "channel": {
+                    "title": "Channel",
                     "type": "string"
                   },
                   "program": {
+                    "title": "Program",
                     "type": "string"
                   }
                 },
@@ -473,6 +510,7 @@
             "type": "object",
             "properties": {
               "type": {
+                "title": "MIDI Message Type",
                 "type": "string",
                 "enum": ["NoteOn", "NoteOff", "ControlChange", "ProgramChange"]
               }
@@ -508,15 +546,19 @@
             "type": "object",
             "properties": {
               "topic": {
+                  "title": "Topic",
                 "type": "string"
               },
               "qos": {
+                "title": "QoS",
                 "type": "number"
               },
               "retained": {
+                "title": "Retained",
                 "type": "boolean"
               },
               "payload": {
+                "title": "Payload",
                 "type": "string"
               }
             },
@@ -551,9 +593,11 @@
             "type": "object",
             "properties": {
               "subject": {
+                  "title": "Subject",
                 "type": "string"
               },
               "payload": {
+                "title": "Payload",
                 "type": "string"
               }
             },
@@ -576,15 +620,18 @@
             "type": "object",
             "properties": {
               "address": {
+                "title": "Address",
                 "type": "string"
               },
               "args": {
+                  "title": "Arguments",
                 "type": "array",
                 "items": {
                   "type": "string"
                 }
               },
               "types": {
+                "title": "Argument Types",
                 "type": "string"
               }
             },
@@ -631,6 +678,7 @@
             "type": "object",
             "properties": {
               "address": {
+                "title": "Address",
                 "type": "string"
               }
             },
@@ -653,6 +701,7 @@
             "type": "object",
             "properties": {
               "module": {
+                "title": "Module ID",
                 "type": "string",
                 "description": "ID of module to send output to"
               }
@@ -675,6 +724,7 @@
             "type": "object",
             "properties": {
               "expression": {
+                "title": "Expression",
                 "type": "string"
               }
             },
@@ -697,6 +747,7 @@
             "type": "object",
             "properties": {
               "program": {
+                "title": "Program",
                 "type": "string"
               }
             },
@@ -719,13 +770,16 @@
             "type": "object",
             "properties": {
               "path": {
+                "title": "Path",
                 "type": "string"
               },
               "function": {
+                "title": "Function",
                 "type": "string",
                 "default": "process"
               },
               "enableWasi": {
+                "title": "Enable WASI",
                 "type": "boolean",
                 "default": false
               }
@@ -749,6 +803,7 @@
             "type": "object",
             "properties": {
               "template": {
+                "title": "Template",
                 "type": "string"
               }
             },
@@ -794,6 +849,7 @@
             "type": "object",
             "properties": {
               "pattern": {
+                "title": "Pattern",
                 "type": "string"
               }
             },
@@ -816,6 +872,7 @@
             "type": "object",
             "properties": {
               "separator": {
+                "title": "Separator",
                 "type": "string"
               }
             },
@@ -837,6 +894,7 @@
             "type": "object",
             "properties": {
               "name": {
+                "title": "Field Name",
                 "type": "string"
               }
             },
@@ -858,6 +916,7 @@
             "type": "object",
             "properties": {
               "name": {
+                "title": "Method Name",
                 "type": "string"
               }
             },
@@ -879,7 +938,9 @@
             "type": "object",
             "properties": {
               "duration": {
-                "type": "integer"
+                "title": "Duration",
+                "type": "integer",
+                "description": "Duration to sleep in milliseconds"
               }
             },
             "required": ["duration"]

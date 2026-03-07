@@ -36,6 +36,7 @@
             "type": "object",
             "properties": {
               "port": {
+                "title": "Port",
                 "type": "integer",
                 "minimum": 1,
                 "maximum": 65535
@@ -63,6 +64,7 @@
             "type": "object",
             "properties": {
               "duration": {
+                "title": "Duration",
                 "type": "integer"
               }
             },
@@ -88,6 +90,7 @@
             "type": "object",
             "properties": {
               "duration": {
+                "title": "Duration",
                 "type": "integer"
               }
             },
@@ -113,6 +116,7 @@
             "type": "object",
             "properties": {
               "port": {
+                "title": "Port",
                 "type": "string"
               }
             },
@@ -138,6 +142,7 @@
             "type": "object",
             "properties": {
               "port": {
+                "title": "Port",
                 "type": "string"
               }
             },
@@ -163,12 +168,15 @@
             "type": "object",
             "properties": {
               "broker": {
+                "title": "Broker URL",
                 "type": "string"
               },
               "topic": {
+                "title": "Topic",
                 "type": "string"
               },
               "clientId": {
+                "title": "Client ID",
                 "type": "string"
               }
             },
@@ -194,9 +202,11 @@
             "type": "object",
             "properties": {
               "url": {
+                "title": "NATS Server URL",
                 "type": "string"
               },
               "subject": {
+                "title": "Subject",
                 "type": "string"
               }
             },
@@ -222,10 +232,12 @@
             "type": "object",
             "properties": {
               "ip": {
+                "title": "IP",
                 "type": "string",
                 "default": "0.0.0.0"
               },
               "port": {
+                "title": "Port",
                 "type": "integer",
                 "minimum": 1,
                 "maximum": 65535,
@@ -269,9 +281,11 @@
             "type": "object",
             "properties": {
               "port": {
+                "title": "Port",
                 "type": "string"
               },
               "baudRate": {
+                "title": "Baud Rate",
                 "type": "integer"
               }
             },
@@ -297,21 +311,25 @@
             "type": "object",
             "properties": {
               "ip": {
+                "title": "IP",
                 "type": "string",
                 "default": "0.0.0.0"
               },
               "port": {
+                "title": "Port",
                 "type": "integer",
                 "minimum": 1,
                 "maximum": 65535,
                 "default": 5060
               },
               "transport": {
+                "title": "Transport",
                 "type": "string",
                 "enum": ["udp", "tcp", "ws", "udp4", "tcp4"],
                 "default": "udp"
               },
               "userAgent": {
+                "title": "User Agent",
                 "type": "string",
                 "default": "showbridge"
               }
@@ -338,25 +356,30 @@
             "type": "object",
             "properties": {
               "ip": {
+                "title": "IP",
                 "type": "string",
                 "default": "0.0.0.0"
               },
               "port": {
+                "title": "Port",
                 "type": "integer",
                 "minimum": 1,
                 "maximum": 65535,
                 "default": 5060
               },
               "transport": {
+                "title": "Transport",
                 "type": "string",
                 "enum": ["udp", "tcp", "ws", "udp4", "tcp4"],
                 "default": "udp"
               },
               "userAgent": {
+                "title": "User Agent",
                 "type": "string",
                 "default": "showbridge"
               },
               "separator": {
+                "title": "DTMF Separator",
                 "type": "string",
                 "minLength": 1,
                 "maxLength": 1
@@ -384,14 +407,17 @@
             "type": "object",
             "properties": {
               "host": {
+                "title": "Host",
                 "type": "string"
               },
               "port": {
+                "title": "Port",
                 "type": "integer",
                 "minimum": 1,
                 "maximum": 65535
               },
               "framing": {
+                "title": "Framing Method",
                 "type": "string",
                 "enum": ["LF", "CR", "CRLF", "SLIP", "RAW"]
               }
@@ -422,11 +448,13 @@
                 "default": "0.0.0.0"
               },
               "port": {
+                "title" : "Port",
                 "type": "integer",
                 "minimum": 1,
                 "maximum": 65535
               },
               "framing": {
+                "title": "Framing Method",
                 "type": "string",
                 "enum": ["LF", "CR", "CRLF", "SLIP", "RAW"]
               }
@@ -453,9 +481,11 @@
             "type": "object",
             "properties": {
               "host": {
+                "title": "Host",
                 "type": "string"
               },
               "port": {
+                "title": "Port",
                 "type": "integer",
                 "minimum": 1,
                 "maximum": 65535
@@ -483,9 +513,11 @@
             "type": "object",
             "properties": {
               "ip": {
+                "title": "IP",
                 "type": "string"
               },
               "port": {
+                "title": "Port",
                 "type": "integer",
                 "minimum": 1,
                 "maximum": 65535
@@ -513,10 +545,12 @@
             "type": "object",
             "properties": {
               "ip": {
+                "title": "IP",
                 "type": "string",
                 "default": "0.0.0.0"
               },
               "port": {
+                "title": "Port",
                 "type": "integer",
                 "minimum": 1,
                 "maximum": 65535
