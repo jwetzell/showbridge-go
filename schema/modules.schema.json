@@ -8,7 +8,7 @@
     "oneOf": [
       {
         "type": "object",
-        "title": "HTTPClientModule",
+        "title": "HTTP Client",
         "properties": {
           "id": {
             "type": "string",
@@ -23,7 +23,7 @@
       },
       {
         "type": "object",
-        "title": "HTTPServerModule",
+        "title": "HTTP Server",
         "properties": {
           "id": {
             "type": "string",
@@ -50,7 +50,7 @@
       },
       {
         "type": "object",
-        "title": "TimeIntervalModule",
+        "title": "Interval",
         "properties": {
           "id": {
             "type": "string",
@@ -75,7 +75,7 @@
       },
       {
         "type": "object",
-        "title": "TimeTimerModule",
+        "title": "Timer",
         "properties": {
           "id": {
             "type": "string",
@@ -100,7 +100,7 @@
       },
       {
         "type": "object",
-        "title": "MIDIInputModule",
+        "title": "MIDI Input",
         "properties": {
           "id": {
             "type": "string",
@@ -125,7 +125,7 @@
       },
       {
         "type": "object",
-        "title": "MIDIOutputModule",
+        "title": "MIDI Output",
         "properties": {
           "id": {
             "type": "string",
@@ -150,7 +150,7 @@
       },
       {
         "type": "object",
-        "title": "MQTTClientModule",
+        "title": "MQTT Client",
         "properties": {
           "id": {
             "type": "string",
@@ -181,7 +181,7 @@
       },
       {
         "type": "object",
-        "title": "NATSClientModule",
+        "title": "NATS Client",
         "properties": {
           "id": {
             "type": "string",
@@ -209,7 +209,7 @@
       },
       {
         "type": "object",
-        "title": "NATSServerModule",
+        "title": "NATS Server",
         "properties": {
           "id": {
             "type": "string",
@@ -241,7 +241,7 @@
       },
       {
         "type": "object",
-        "title": "PSNClientModule",
+        "title": "PSN Client",
         "properties": {
           "id": {
             "type": "string",
@@ -256,7 +256,7 @@
       },
       {
         "type": "object",
-        "title": "SerialClientModule",
+        "title": "Serial Client",
         "properties": {
           "id": {
             "type": "string",
@@ -284,7 +284,7 @@
       },
       {
         "type": "object",
-        "title": "SIPCallServerModule",
+        "title": "SIP Call Server",
         "properties": {
           "id": {
             "type": "string",
@@ -325,7 +325,7 @@
       },
       {
         "type": "object",
-        "title": "SIPDTMFServerModule",
+        "title": "SIP DTMF Server",
         "properties": {
           "id": {
             "type": "string",
@@ -371,7 +371,7 @@
       },
       {
         "type": "object",
-        "title": "TCPClientModule",
+        "title": "TCP Client",
         "properties": {
           "id": {
             "type": "string",
@@ -405,7 +405,7 @@
       },
       {
         "type": "object",
-        "title": "TCPServerModule",
+        "title": "TCP Server",
         "properties": {
           "id": {
             "type": "string",
@@ -440,7 +440,7 @@
       },
       {
         "type": "object",
-        "title": "UDPClientModule",
+        "title": "UDP Client",
         "properties": {
           "id": {
             "type": "string",
@@ -470,7 +470,7 @@
       },
       {
         "type": "object",
-        "title": "UDPMulticastModule",
+        "title": "UDP Multicast",
         "properties": {
           "id": {
             "type": "string",
@@ -500,7 +500,7 @@
       },
       {
         "type": "object",
-        "title": "UDPServerModule",
+        "title": "UDP Server",
         "properties": {
           "id": {
             "type": "string",
