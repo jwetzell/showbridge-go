@@ -139,7 +139,7 @@ func TestBadScriptWASM(t *testing.T) {
 				"enableWasi": true,
 			},
 			payload:     "hello",
-			errorString: "script.wasm can only operator on byte array",
+			errorString: "script.wasm can only process a byte array",
 		},
 		{
 			name: "function not found in module",

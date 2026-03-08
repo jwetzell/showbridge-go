@@ -20,7 +20,7 @@ func (sw *ScriptWASM) Process(ctx context.Context, payload any) (any, error) {
 	payloadBytes, ok := GetAnyAs[[]byte](payload)
 
 	if !ok {
-		return nil, fmt.Errorf("script.wasm can only operator on byte array")
+		return nil, fmt.Errorf("script.wasm can only process a byte array")
 	}
 
 	program, err := sw.Program.Instance(ctx, extism.PluginInstanceConfig{})
