@@ -3,7 +3,6 @@
 # showbridge (go edition)
 
 [![Coverage](https://github.com/jwetzell/showbridge-go/wiki/coverage.svg)](https://raw.githack.com/wiki/jwetzell/showbridge-go/coverage.html)
-	
 Simple protocol router _/s_
 
 </div>
@@ -14,6 +13,7 @@ Simple protocol router _/s_
 </p>
 
 ### Supported Protocols
+
 - HTTP
 - UDP
 - TCP
@@ -25,7 +25,7 @@ Simple protocol router _/s_
 - [OSC](https://opensoundcontrol.stanford.edu/spec-1_0.html)
 - [FreeD](https://ptzoptics.com/freed/)
 - [SIP](https://en.wikipedia.org/wiki/Session_Initiation_Protocol)
-  
+
 ### CLI Usage
 
 ```
