@@ -8,13 +8,13 @@ import (
 )
 
 func TestHTTPRequestCreateFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["http.request.create"]
+	registration, ok := processor.ProcessorRegistry["http.request.do"]
 	if !ok {
-		t.Fatalf("http.request.create processor not registered")
+		t.Fatalf("http.request.do processor not registered")
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
-		Type: "http.request.create",
+		Type: "http.request.do",
 		Params: map[string]any{
 			"method": "GET",
 			"url":    "http://example.com",
@@ -22,10 +22,10 @@ func TestHTTPRequestCreateFromRegistry(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Fatalf("failed to create http.request.create processor: %s", err)
+		t.Fatalf("failed to create http.request.do processor: %s", err)
 	}
 
-	if processorInstance.Type() != "http.request.create" {
-		t.Fatalf("http.request.create processor has wrong type: %s", processorInstance.Type())
+	if processorInstance.Type() != "http.request.do" {
+		t.Fatalf("http.request.do processor has wrong type: %s", processorInstance.Type())
 	}
 }

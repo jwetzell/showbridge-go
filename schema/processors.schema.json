@@ -203,11 +203,11 @@
       },
       {
         "type": "object",
-        "title": "Create HTTP Request",
+        "title": "Do HTTP Request",
         "properties": {
           "type": {
             "type": "string",
-            "const": "http.request.create"
+            "const": "http.request.do"
           },
           "params": {
             "type": "object",
