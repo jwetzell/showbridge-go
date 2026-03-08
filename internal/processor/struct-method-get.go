@@ -18,7 +18,11 @@ func (sm *StructMethodGet) Process(ctx context.Context, payload any) (any, error
 	s := reflect.ValueOf(payload)
 
 	if s.Kind() != reflect.Struct {
-		return nil, errors.New("struct.method.get processor only accepts a struct payload")
+		if s.Kind() == reflect.Pointer && s.Elem().Kind() == reflect.Struct {
+			s = s.Elem()
+		} else {
+			return nil, errors.New("struct.method.get processor only accepts a struct payload")
+		}
 	}
 
 	method := s.MethodByName(sm.Name)

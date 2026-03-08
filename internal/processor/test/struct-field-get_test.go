@@ -72,6 +72,12 @@ func TestGoodStructFieldGet(t *testing.T) {
 			payload:  TestStruct{Bool: true},
 			expected: true,
 		},
+		{
+			name:     "pointer to struct payload",
+			params:   map[string]any{"name": "Data"},
+			payload:  &TestStruct{Data: "hello"},
+			expected: "hello",
+		},
 	}
 
 	for _, test := range tests {

@@ -18,7 +18,11 @@ func (sf *StructFieldGet) Process(ctx context.Context, payload any) (any, error)
 	s := reflect.ValueOf(payload)
 
 	if s.Kind() != reflect.Struct {
-		return nil, errors.New("struct.field.get processor only accepts a struct payload")
+		if s.Kind() == reflect.Pointer && s.Elem().Kind() == reflect.Struct {
+			s = s.Elem()
+		} else {
+			return nil, errors.New("struct.field.get processor only accepts a struct payload")
+		}
 	}
 
 	field := s.FieldByName(sf.Name)
