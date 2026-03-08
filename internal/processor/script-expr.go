@@ -17,7 +17,7 @@ type ScriptExpr struct {
 
 func (se *ScriptExpr) Process(ctx context.Context, payload any) (any, error) {
 
-	exprEnv := SafeExprEnv(payload)
+	exprEnv := GetEnvData(ctx, payload)
 
 	output, err := expr.Run(se.Program, exprEnv)
 	if err != nil {
