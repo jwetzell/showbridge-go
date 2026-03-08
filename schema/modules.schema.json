@@ -65,7 +65,8 @@
             "properties": {
               "duration": {
                 "title": "Duration",
-                "type": "integer"
+                "type": "integer",
+                "description": "Interval duration in milliseconds"
               }
             },
             "required": ["duration"],
@@ -91,7 +92,8 @@
             "properties": {
               "duration": {
                 "title": "Duration",
-                "type": "integer"
+                "type": "integer",
+                "description": "Timer duration in milliseconds"
               }
             },
             "required": ["duration"],
