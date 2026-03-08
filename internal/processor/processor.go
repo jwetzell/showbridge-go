@@ -101,6 +101,11 @@ type TemplateData struct {
 	Sender  any
 }
 
+type EnvData struct {
+	Payload any
+	Sender  any
+}
+
 func GetTemplateData(ctx context.Context, payload any) TemplateData {
 	templateData := TemplateData{Payload: payload}
 	modules := ctx.Value(common.ModulesContextKey)
@@ -113,4 +118,14 @@ func GetTemplateData(ctx context.Context, payload any) TemplateData {
 		templateData.Sender = sender
 	}
 	return templateData
+}
+
+func GetEnvData(ctx context.Context, payload any) EnvData {
+	envData := EnvData{Payload: payload}
+
+	sender := ctx.Value(common.SenderContextKey)
+	if sender != nil {
+		envData.Sender = sender
+	}
+	return envData
 }

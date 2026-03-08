@@ -15,21 +15,9 @@ type FilterExpr struct {
 	Program *vm.Program
 }
 
-func SafeExprEnv(payload any) any {
-	exprEnv := ExprEnv{
-		Payload: payload,
-	}
-
-	return exprEnv
-}
-
-type ExprEnv struct {
-	Payload any
-}
-
 func (fe *FilterExpr) Process(ctx context.Context, payload any) (any, error) {
 
-	exprEnv := SafeExprEnv(payload)
+	exprEnv := GetEnvData(ctx, payload)
 
 	output, err := expr.Run(fe.Program, exprEnv)
 	if err != nil {

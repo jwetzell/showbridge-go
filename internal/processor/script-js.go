@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"modernc.org/quickjs"
 )
@@ -29,6 +30,16 @@ func (sj *ScriptJS) Process(ctx context.Context, payload any) (any, error) {
 	}
 
 	vm.SetProperty(vm.GlobalObject(), payloadAtom, payload)
+
+	sender := ctx.Value(common.SenderContextKey)
+	if sender != nil {
+		senderAtom, err := vm.NewAtom("sender")
+
+		if err != nil {
+			return nil, err
+		}
+		vm.SetProperty(vm.GlobalObject(), senderAtom, sender)
+	}
 
 	_, err = vm.Eval(sj.Program, quickjs.EvalGlobal)
 
