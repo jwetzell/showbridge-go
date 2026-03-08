@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://showbridge.io/config.schema.json",
   "title": "Config",
-  "description": "showbridge config file",
+  "description": "showbridge configuration",
   "type": "object",
   "properties": {
     "modules": {

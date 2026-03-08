@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://showbridge.io/routes.schema.json",
   "title": "Routes",
-  "description": "showbridge routes array",
+  "description": "route configurations",
   "type": "array",
   "items": {
     "type": "object",

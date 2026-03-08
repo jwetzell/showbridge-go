@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://showbridge.io/processors.schema.json",
   "title": "Processors",
-  "description": "showbridge processors array",
+  "description": "processor configurations",
   "type": "array",
   "items": {
     "oneOf": [
