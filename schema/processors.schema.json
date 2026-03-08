@@ -32,29 +32,6 @@
       },
       {
         "type": "object",
-        "title": "Filter ArtNet Packet",
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "artnet.packet.filter"
-          },
-          "params": {
-            "type": "object",
-            "properties": {
-              "opCode": {
-                "title": "Op Code",
-                "type": "integer"
-              }
-            },
-            "required": ["opCode"],
-            "additionalProperties": false
-          }
-        },
-        "required": ["type", "params"],
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
         "title": "Debug Log",
         "properties": {
           "type": {
@@ -223,34 +200,6 @@
               }
             },
             "required": ["method", "url"],
-            "additionalProperties": false
-          }
-        },
-        "required": ["type", "params"],
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
-        "title": "Filter HTTP Request",
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "http.request.filter"
-          },
-          "params": {
-            "type": "object",
-            "properties": {
-              "path": {
-                "title": "Path",
-                "type": "string"
-              },
-              "method": {
-                "title": "HTTP Method",
-                "type": "string",
-                "enum": ["GET", "POST"]
-              }
-            },
-            "required": ["path"],
             "additionalProperties": false
           }
         },
@@ -500,30 +449,6 @@
       },
       {
         "type": "object",
-        "title": "Filter MIDI Message",
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "midi.message.filter"
-          },
-          "params": {
-            "type": "object",
-            "properties": {
-              "type": {
-                "title": "MIDI Message Type",
-                "type": "string",
-                "enum": ["NoteOn", "NoteOff", "ControlChange", "ProgramChange"]
-              }
-            },
-            "required": ["type"],
-            "additionalProperties": false
-          }
-        },
-        "required": ["type", "params"],
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
         "title": "Unpack MIDI Message",
         "properties": {
           "type": {
@@ -664,29 +589,6 @@
           }
         },
         "required": ["type"],
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
-        "title": "Filter OSC Message",
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "osc.message.filter"
-          },
-          "params": {
-            "type": "object",
-            "properties": {
-              "address": {
-                "title": "Address",
-                "type": "string"
-              }
-            },
-            "required": ["address"],
-            "additionalProperties": false
-          }
-        },
-        "required": ["type", "params"],
         "additionalProperties": false
       },
       {
