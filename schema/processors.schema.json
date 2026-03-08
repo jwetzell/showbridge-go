@@ -117,7 +117,7 @@
                 "type": "string"
               },
               "posX": {
-                  "title": "Position X",
+                "title": "Position X",
                 "type": "string"
               },
               "posY": {
@@ -190,7 +190,7 @@
             "type": "object",
             "properties": {
               "method": {
-                  "title": "HTTP Method",
+                "title": "HTTP Method",
                 "type": "string",
                 "enum": ["GET", "POST"]
               },
@@ -245,7 +245,7 @@
             "type": "object",
             "properties": {
               "base": {
-                  "title": "Base",
+                "title": "Base",
                 "type": "integer",
                 "enum": [0,2, 8, 10, 16],
                 "default": 10
@@ -255,7 +255,7 @@
                 "type": "integer",
                 "enum": [0, 8, 16, 32, 64],
                 "default": 64
-               }
+              }
             },
             "additionalProperties": false
           }
@@ -275,15 +275,50 @@
             "type": "object",
             "properties": {
               "min": {
-                  "title": "Minimum",
+                "title": "Minimum",
                 "type": "integer"
               },
               "max": {
-                  "title": "Maximum",
+                "title": "Maximum",
                 "type": "integer"
               }
             },
             "required": ["min", "max"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "title": "Scale Int",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "int.scale"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "inMin": {
+                "title": "Input Minimum",
+                "type": "integer"
+              },
+              "inMax": {
+                "title": "Input Maximum",
+                "type": "integer"
+              },
+              "outMin": {
+                "title": "Output Minimum",
+                "type": "integer"
+              },
+              "outMax": {
+                "title": "Output Maximum",
+                "type": "integer"
+              }
+            },
+            "required": ["inMin", "inMax", "outMin", "outMax"],
             "additionalProperties": false
           }
         },
@@ -334,7 +369,7 @@
                     "enum": ["NoteOn", "noteon", "note_on"]
                   },
                   "channel": {
-                      "title": "Channel",
+                    "title": "Channel",
                     "type": "string"
                   },
                   "note": {
@@ -471,7 +506,7 @@
             "type": "object",
             "properties": {
               "topic": {
-                  "title": "Topic",
+                "title": "Topic",
                 "type": "string"
               },
               "qos": {
@@ -518,7 +553,7 @@
             "type": "object",
             "properties": {
               "subject": {
-                  "title": "Subject",
+                "title": "Subject",
                 "type": "string"
               },
               "payload": {
@@ -549,7 +584,7 @@
                 "type": "string"
               },
               "args": {
-                  "title": "Arguments",
+                "title": "Arguments",
                 "type": "array",
                 "items": {
                   "type": "string"
