@@ -19,7 +19,7 @@ require (
 	go.bug.st/serial v1.6.4
 	go.opentelemetry.io/otel v1.42.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.41.0
-	go.opentelemetry.io/otel/sdk v1.41.0
+	go.opentelemetry.io/otel/sdk v1.42.0
 	go.opentelemetry.io/otel/trace v1.42.0
 	modernc.org/quickjs v0.17.1
 	sigs.k8s.io/yaml v1.6.0
