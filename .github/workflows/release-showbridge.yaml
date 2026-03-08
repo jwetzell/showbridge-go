@@ -19,7 +19,7 @@ jobs:
       - name: setup go
         uses: actions/setup-go@v6
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
       - name: release
         uses: goreleaser/goreleaser-action@v7
         with:

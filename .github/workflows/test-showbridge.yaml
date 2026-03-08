@@ -5,16 +5,16 @@ on:
     branches:
       - main
     paths:
-      - '**/*.go'
-      - 'go.mod'
-      - 'go.sum'
+      - "**/*.go"
+      - "go.mod"
+      - "go.sum"
   push:
     branches:
       - main
     paths:
-      - '**/*.go'
-      - 'go.mod'
-      - 'go.sum'
+      - "**/*.go"
+      - "go.mod"
+      - "go.sum"
 
 permissions:
   contents: write
@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-go@v6
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
       - name: mod tidy
         run: go mod tidy
 
@@ -37,7 +37,7 @@ jobs:
         run: go test ./... -count=1 -coverpkg "github.com/jwetzell/showbridge-go/..." -coverprofile coverage.out
 
       - name: clean up coverage report
-        run: cat coverage.out | grep -v "github.com/jwetzell/showbridge-go/cmd" > coverage.nocmd.out       
+        run: cat coverage.out | grep -v "github.com/jwetzell/showbridge-go/cmd" > coverage.nocmd.out
       - name: Update coverage report
         uses: ncruces/go-coverage-report@v0.3.2
         with:
@@ -45,5 +45,5 @@ jobs:
           report: true
           chart: true
           amend: true
-        if: github.event_name == 'push'  
+        if: github.event_name == 'push'
         continue-on-error: true

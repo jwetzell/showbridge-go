@@ -1,27 +1,27 @@
 config:
   - changed-files:
-      - any-glob-to-any-file: 'internal/config/**'
+      - any-glob-to-any-file: "internal/config/**"
 
 framer:
   - changed-files:
-      - any-glob-to-any-file: 'internal/framer/**'
+      - any-glob-to-any-file: "internal/framer/**"
 
 module:
   - changed-files:
-      - any-glob-to-any-file: 'internal/module/**'
+      - any-glob-to-any-file: "internal/module/**"
 
 processor:
   - changed-files:
-      - any-glob-to-any-file: 'internal/processor/**'
+      - any-glob-to-any-file: "internal/processor/**"
 
 router:
   - changed-files:
-      - any-glob-to-any-file: 'router*'
-      
+      - any-glob-to-any-file: "router*"
+
 route:
   - changed-files:
-      - any-glob-to-any-file: 'internal/route/**'
-      
+      - any-glob-to-any-file: "internal/route/**"
+
 cli:
   - changed-files:
-      - any-glob-to-any-file: 'cmd/showbridge/**'
+      - any-glob-to-any-file: "cmd/showbridge/**"
