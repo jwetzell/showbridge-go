@@ -8,21 +8,6 @@
     "oneOf": [
       {
         "type": "object",
-        "title": "HTTP Client",
-        "properties": {
-          "id": {
-            "type": "string",
-            "minLength": 1
-          },
-          "type": {
-            "const": "http.client"
-          }
-        },
-        "required": ["id", "type"],
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
         "title": "HTTP Server",
         "properties": {
           "id": {
