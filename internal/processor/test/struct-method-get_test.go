@@ -89,6 +89,14 @@ func TestGoodStructMethodGet(t *testing.T) {
 			payload:  TestStruct{},
 			expected: nil,
 		},
+		{
+			name: "pointer to struct payload",
+			params: map[string]any{
+				"name": "GetData",
+			},
+			payload:  &TestStruct{Data: "hello"},
+			expected: "hello",
+		},
 	}
 
 	for _, test := range tests {
