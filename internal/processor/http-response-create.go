@@ -20,24 +20,24 @@ type HTTPResponse struct {
 	Body   []byte
 }
 
-func (hre *HTTPResponseCreate) Process(ctx context.Context, payload any) (any, error) {
+func (hrc *HTTPResponseCreate) Process(ctx context.Context, payload any) (any, error) {
 	templateData := GetTemplateData(ctx, payload)
 
 	var bodyBuffer bytes.Buffer
-	err := hre.BodyTmpl.Execute(&bodyBuffer, templateData)
+	err := hrc.BodyTmpl.Execute(&bodyBuffer, templateData)
 
 	if err != nil {
 		return nil, err
 	}
 
 	return HTTPResponse{
-		Status: hre.Status,
+		Status: hrc.Status,
 		Body:   bodyBuffer.Bytes(),
 	}, nil
 }
 
-func (hre *HTTPResponseCreate) Type() string {
-	return hre.config.Type
+func (hrc *HTTPResponseCreate) Type() string {
+	return hrc.config.Type
 }
 
 func init() {

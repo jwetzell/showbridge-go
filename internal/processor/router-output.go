@@ -16,14 +16,14 @@ type RouterOutput struct {
 	logger   *slog.Logger
 }
 
-func (dl *RouterOutput) Process(ctx context.Context, payload any) (any, error) {
+func (ro *RouterOutput) Process(ctx context.Context, payload any) (any, error) {
 
 	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
 	if !ok {
 		return nil, errors.New("router.output no router found")
 	}
 
-	err := router.HandleOutput(ctx, dl.ModuleId, payload)
+	err := router.HandleOutput(ctx, ro.ModuleId, payload)
 
 	if err != nil {
 		return nil, fmt.Errorf("router.output failed to send output: %w", err)
@@ -32,8 +32,8 @@ func (dl *RouterOutput) Process(ctx context.Context, payload any) (any, error) {
 	return payload, nil
 }
 
-func (dl *RouterOutput) Type() string {
-	return dl.config.Type
+func (ro *RouterOutput) Type() string {
+	return ro.config.Type
 }
 
 func init() {

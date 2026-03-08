@@ -27,11 +27,11 @@ type ExprEnv struct {
 	Payload any
 }
 
-func (se *FilterExpr) Process(ctx context.Context, payload any) (any, error) {
+func (fe *FilterExpr) Process(ctx context.Context, payload any) (any, error) {
 
 	exprEnv := SafeExprEnv(payload)
 
-	output, err := expr.Run(se.Program, exprEnv)
+	output, err := expr.Run(fe.Program, exprEnv)
 	if err != nil {
 		return nil, err
 	}
@@ -47,8 +47,8 @@ func (se *FilterExpr) Process(ctx context.Context, payload any) (any, error) {
 	return payload, nil
 }
 
-func (se *FilterExpr) Type() string {
-	return se.config.Type
+func (fe *FilterExpr) Type() string {
+	return fe.config.Type
 }
 
 func init() {

@@ -22,12 +22,12 @@ type SipAudioFileResponse struct {
 	AudioFile string
 }
 
-func (scc *SipResponseAudioCreate) Process(ctx context.Context, payload any) (any, error) {
+func (srac *SipResponseAudioCreate) Process(ctx context.Context, payload any) (any, error) {
 
 	templateData := GetTemplateData(ctx, payload)
 
 	var audioFileBuffer bytes.Buffer
-	err := scc.AudioFile.Execute(&audioFileBuffer, templateData)
+	err := srac.AudioFile.Execute(&audioFileBuffer, templateData)
 
 	if err != nil {
 		return nil, err
@@ -36,14 +36,14 @@ func (scc *SipResponseAudioCreate) Process(ctx context.Context, payload any) (an
 	audioFileString := audioFileBuffer.String()
 
 	return SipAudioFileResponse{
-		PreWait:   scc.PreWait,
-		PostWait:  scc.PostWait,
+		PreWait:   srac.PreWait,
+		PostWait:  srac.PostWait,
 		AudioFile: audioFileString,
 	}, nil
 }
 
-func (scc *SipResponseAudioCreate) Type() string {
-	return scc.config.Type
+func (srac *SipResponseAudioCreate) Type() string {
+	return srac.config.Type
 }
 
 func init() {

@@ -25,12 +25,12 @@ type SipDTMFResponse struct {
 	Digits   string
 }
 
-func (scc *SipResponseDTMFCreate) Process(ctx context.Context, payload any) (any, error) {
+func (srdc *SipResponseDTMFCreate) Process(ctx context.Context, payload any) (any, error) {
 
 	templateData := GetTemplateData(ctx, payload)
 
 	var digitsBuffer bytes.Buffer
-	err := scc.Digits.Execute(&digitsBuffer, templateData)
+	err := srdc.Digits.Execute(&digitsBuffer, templateData)
 
 	if err != nil {
 		return nil, err
@@ -38,19 +38,19 @@ func (scc *SipResponseDTMFCreate) Process(ctx context.Context, payload any) (any
 
 	digitsString := digitsBuffer.String()
 
-	if !scc.validDTMF.MatchString(digitsString) {
+	if !srdc.validDTMF.MatchString(digitsString) {
 		return nil, errors.New("sip.response.dtmf.create result of digits template contains invalid characters")
 	}
 
 	return SipDTMFResponse{
-		PreWait:  scc.PreWait,
-		PostWait: scc.PostWait,
+		PreWait:  srdc.PreWait,
+		PostWait: srdc.PostWait,
 		Digits:   digitsString,
 	}, nil
 }
 
-func (scc *SipResponseDTMFCreate) Type() string {
-	return scc.config.Type
+func (srdc *SipResponseDTMFCreate) Type() string {
+	return srdc.config.Type
 }
 
 func init() {

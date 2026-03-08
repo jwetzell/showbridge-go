@@ -8,18 +8,18 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type MetaDelay struct {
+type TimeSleep struct {
 	config   config.ProcessorConfig
 	Duration time.Duration
 }
 
-func (md *MetaDelay) Process(ctx context.Context, payload any) (any, error) {
-	time.Sleep(md.Duration)
+func (ts *TimeSleep) Process(ctx context.Context, payload any) (any, error) {
+	time.Sleep(ts.Duration)
 	return payload, nil
 }
 
-func (md *MetaDelay) Type() string {
-	return md.config.Type
+func (ts *TimeSleep) Type() string {
+	return ts.config.Type
 }
 
 func init() {
@@ -33,7 +33,7 @@ func init() {
 				return nil, fmt.Errorf("time.sleep duration error: %w", err)
 			}
 
-			return &MetaDelay{config: config, Duration: time.Millisecond * time.Duration(durationNum)}, nil
+			return &TimeSleep{config: config, Duration: time.Millisecond * time.Duration(durationNum)}, nil
 		},
 	})
 }

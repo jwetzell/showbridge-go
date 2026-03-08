@@ -15,7 +15,7 @@ type ScriptWASM struct {
 	Function string
 }
 
-func (se *ScriptWASM) Process(ctx context.Context, payload any) (any, error) {
+func (sw *ScriptWASM) Process(ctx context.Context, payload any) (any, error) {
 
 	payloadBytes, ok := GetAnyAs[[]byte](payload)
 
@@ -23,13 +23,13 @@ func (se *ScriptWASM) Process(ctx context.Context, payload any) (any, error) {
 		return nil, fmt.Errorf("script.wasm can only operator on byte array")
 	}
 
-	program, err := se.Program.Instance(ctx, extism.PluginInstanceConfig{})
+	program, err := sw.Program.Instance(ctx, extism.PluginInstanceConfig{})
 
 	if err != nil {
 		return nil, err
 	}
 
-	_, output, err := program.Call(se.Function, payloadBytes)
+	_, output, err := program.Call(sw.Function, payloadBytes)
 
 	if err != nil {
 		return nil, err
@@ -38,8 +38,8 @@ func (se *ScriptWASM) Process(ctx context.Context, payload any) (any, error) {
 	return output, nil
 }
 
-func (se *ScriptWASM) Type() string {
-	return se.config.Type
+func (sw *ScriptWASM) Type() string {
+	return sw.config.Type
 }
 
 func init() {

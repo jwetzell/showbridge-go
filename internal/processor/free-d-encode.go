@@ -12,7 +12,7 @@ type FreeDEncode struct {
 	config config.ProcessorConfig
 }
 
-func (fde *FreeDEncode) Process(ctx context.Context, payload any) (any, error) {
+func (fe *FreeDEncode) Process(ctx context.Context, payload any) (any, error) {
 	payloadPosition, ok := GetAnyAs[freeD.FreeDPosition](payload)
 
 	if !ok {
@@ -23,8 +23,8 @@ func (fde *FreeDEncode) Process(ctx context.Context, payload any) (any, error) {
 	return payloadBytes, nil
 }
 
-func (fde *FreeDEncode) Type() string {
-	return fde.config.Type
+func (fe *FreeDEncode) Type() string {
+	return fe.config.Type
 }
 
 func init() {
