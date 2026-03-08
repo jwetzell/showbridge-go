@@ -9,23 +9,23 @@ import (
 )
 
 func TestStringFilterFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["string.filter"]
+	registration, ok := processor.ProcessorRegistry["filter.regex"]
 	if !ok {
-		t.Fatalf("string.filter processor not registered")
+		t.Fatalf("filter.regex processor not registered")
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
-		Type: "string.filter",
+		Type: "filter.regex",
 		Params: map[string]any{
 			"pattern": "hello",
 		},
 	})
 	if err != nil {
-		t.Fatalf("failed to create string.filter processor: %s", err)
+		t.Fatalf("failed to create filter.regex processor: %s", err)
 	}
 
-	if processorInstance.Type() != "string.filter" {
-		t.Fatalf("string.filter processor has wrong type: %s", processorInstance.Type())
+	if processorInstance.Type() != "filter.regex" {
+		t.Fatalf("filter.regex processor has wrong type: %s", processorInstance.Type())
 	}
 
 	payload := "hello"
@@ -33,17 +33,17 @@ func TestStringFilterFromRegistry(t *testing.T) {
 
 	got, err := processorInstance.Process(t.Context(), payload)
 	if err != nil {
-		t.Fatalf("string.filter processing failed: %s", err)
+		t.Fatalf("filter.regex processing failed: %s", err)
 	}
 
 	gotString, ok := got.(string)
 
 	if !ok {
-		t.Fatalf("string.filter should return byte slice")
+		t.Fatalf("filter.regex should return byte slice")
 	}
 
 	if gotString != expected {
-		t.Fatalf("string.filter got %+v, expected %+v", got, expected)
+		t.Fatalf("filter.regex got %+v, expected %+v", got, expected)
 	}
 }
 
@@ -76,40 +76,40 @@ func TestGoodStringFilter(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["string.filter"]
+			registration, ok := processor.ProcessorRegistry["filter.regex"]
 			if !ok {
-				t.Fatalf("string.filter processor not registered")
+				t.Fatalf("filter.regex processor not registered")
 			}
 
 			processorInstance, err := registration.New(config.ProcessorConfig{
-				Type:   "string.filter",
+				Type:   "filter.regex",
 				Params: test.params,
 			})
 
 			if err != nil {
-				t.Fatalf("string.filter failed to create processor: %s", err)
+				t.Fatalf("filter.regex failed to create processor: %s", err)
 			}
 
 			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			if err != nil {
-				t.Fatalf("string.filter processing failed: %s", err)
+				t.Fatalf("filter.regex processing failed: %s", err)
 			}
 
 			if test.expected == nil {
 				if got != nil {
-					t.Fatalf("string.filter got %+v, expected nil", got)
+					t.Fatalf("filter.regex got %+v, expected nil", got)
 				}
 				return
 			}
 
 			gotString, ok := got.(string)
 			if !ok {
-				t.Fatalf("string.filter returned a %T payload: %s", got, got)
+				t.Fatalf("filter.regex returned a %T payload: %s", got, got)
 			}
 
 			if !reflect.DeepEqual(gotString, test.expected) {
-				t.Fatalf("string.filter got %+v, expected %+v", gotString, test.expected)
+				t.Fatalf("filter.regex got %+v, expected %+v", gotString, test.expected)
 			}
 		})
 	}
@@ -126,7 +126,7 @@ func TestBadStringFilter(t *testing.T) {
 			name:        "no pattern param",
 			payload:     "hello",
 			params:      map[string]any{},
-			errorString: "string.filter pattern error: not found",
+			errorString: "filter.regex pattern error: not found",
 		},
 		{
 			name:    "non-string input",
@@ -134,7 +134,7 @@ func TestBadStringFilter(t *testing.T) {
 			params: map[string]any{
 				"pattern": "hello",
 			},
-			errorString: "string.filter processor only accepts a string",
+			errorString: "filter.regex processor only accepts a string",
 		},
 		{
 			name:    "non-string pattern param",
@@ -142,7 +142,7 @@ func TestBadStringFilter(t *testing.T) {
 			params: map[string]any{
 				"pattern": 123,
 			},
-			errorString: "string.filter pattern error: not a string",
+			errorString: "filter.regex pattern error: not a string",
 		},
 		{
 			name:    "invalid regex pattern",
@@ -156,19 +156,19 @@ func TestBadStringFilter(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["string.filter"]
+			registration, ok := processor.ProcessorRegistry["filter.regex"]
 			if !ok {
-				t.Fatalf("string.filter processor not registered")
+				t.Fatalf("filter.regex processor not registered")
 			}
 
 			processorInstance, err := registration.New(config.ProcessorConfig{
-				Type:   "string.filter",
+				Type:   "filter.regex",
 				Params: test.params,
 			})
 
 			if err != nil {
 				if test.errorString != err.Error() {
-					t.Fatalf("string.filter got error '%s', expected '%s'", err.Error(), test.errorString)
+					t.Fatalf("filter.regex got error '%s', expected '%s'", err.Error(), test.errorString)
 				}
 				return
 			}
@@ -176,11 +176,11 @@ func TestBadStringFilter(t *testing.T) {
 			got, err := processorInstance.Process(t.Context(), test.payload)
 
 			if err == nil {
-				t.Fatalf("string.filter expected to fail but got payload: %s", got)
+				t.Fatalf("filter.regex expected to fail but got payload: %s", got)
 			}
 
 			if err.Error() != test.errorString {
-				t.Fatalf("string.filter got error '%s', expected '%s'", err.Error(), test.errorString)
+				t.Fatalf("filter.regex got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
 	}
