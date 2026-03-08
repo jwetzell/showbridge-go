@@ -9,38 +9,38 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type StringFilter struct {
+type FilterRegex struct {
 	config  config.ProcessorConfig
 	Pattern *regexp.Regexp
 }
 
-func (sf *StringFilter) Process(ctx context.Context, payload any) (any, error) {
+func (fr *FilterRegex) Process(ctx context.Context, payload any) (any, error) {
 	payloadString, ok := GetAnyAs[string](payload)
 
 	if !ok {
-		return nil, errors.New("string.filter processor only accepts a string")
+		return nil, errors.New("filter.regex processor only accepts a string")
 	}
 
-	if !sf.Pattern.MatchString(payloadString) {
+	if !fr.Pattern.MatchString(payloadString) {
 		return nil, nil
 	}
 
 	return payloadString, nil
 }
 
-func (sf *StringFilter) Type() string {
-	return sf.config.Type
+func (fr *FilterRegex) Type() string {
+	return fr.config.Type
 }
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "string.filter",
+		Type: "filter.regex",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 
 			patternString, err := params.GetString("pattern")
 			if err != nil {
-				return nil, fmt.Errorf("string.filter pattern error: %w", err)
+				return nil, fmt.Errorf("filter.regex pattern error: %w", err)
 			}
 
 			patternRegexp, err := regexp.Compile(patternString)
@@ -49,7 +49,7 @@ func init() {
 				return nil, err
 			}
 
-			return &StringFilter{config: config, Pattern: patternRegexp}, nil
+			return &FilterRegex{config: config, Pattern: patternRegexp}, nil
 		},
 	})
 }

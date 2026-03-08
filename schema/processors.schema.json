@@ -67,6 +67,29 @@
       },
       {
         "type": "object",
+        "title": "Filter by Regex",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "filter.regex"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "pattern": {
+                "title": "Pattern",
+                "type": "string"
+              }
+            },
+            "required": ["pattern"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
         "title": "Parse Float",
         "properties": {
           "type": {
@@ -772,29 +795,6 @@
           }
         },
         "required": ["type"],
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
-        "title": "Filter String",
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "string.filter"
-          },
-          "params": {
-            "type": "object",
-            "properties": {
-              "pattern": {
-                "title": "Pattern",
-                "type": "string"
-              }
-            },
-            "required": ["pattern"],
-            "additionalProperties": false
-          }
-        },
-        "required": ["type", "params"],
         "additionalProperties": false
       },
       {
