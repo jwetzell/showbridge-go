@@ -99,9 +99,9 @@ func TestBadJsonDecode(t *testing.T) {
 		errorString string
 	}{
 		{
-			name:        "non-string input",
-			payload:     []byte("hello"),
-			errorString: "json.decode processor only accepts a string",
+			name:        "non-string or byte input",
+			payload:     123,
+			errorString: "json.decode can only process a string or []byte",
 		},
 		{
 			name:        "invalid json",

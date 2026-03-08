@@ -3,6 +3,8 @@ package processor
 import (
 	"context"
 	"fmt"
+	"math"
+	"reflect"
 	"sync"
 
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -45,6 +47,52 @@ var (
 func GetAnyAs[T any](p any) (T, bool) {
 	typed, ok := p.(T)
 	return typed, ok
+}
+
+func GetAnyAsByteSlice(p any) ([]byte, bool) {
+	v := reflect.ValueOf(p)
+	if v.Kind() != reflect.Slice {
+		return nil, false
+	}
+
+	result := make([]byte, v.Len())
+	for i := 0; i < v.Len(); i++ {
+		elem := v.Index(i).Interface()
+		byteValue, ok := elem.(byte)
+		if ok {
+			result[i] = byteValue
+			continue
+		}
+		uintValue, ok := elem.(uint)
+		if ok {
+			if uintValue > 255 {
+				return nil, false
+			}
+			result[i] = byte(uintValue)
+			continue
+		}
+		intValue, ok := elem.(int)
+		if ok {
+			if intValue < 0 || intValue > 255 {
+				return nil, false
+			}
+			result[i] = byte(intValue)
+			continue
+		}
+		floatValue, ok := elem.(float64)
+		if ok {
+			if floatValue != math.Floor(floatValue) {
+				return nil, false
+			}
+			if floatValue < 0 || floatValue > 255 {
+				return nil, false
+			}
+			result[i] = byte(floatValue)
+			continue
+		}
+		return nil, false
+	}
+	return result, true
 }
 
 type TemplateData struct {
