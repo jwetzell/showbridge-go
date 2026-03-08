@@ -13,15 +13,20 @@ type JsonDecode struct {
 }
 
 func (jd *JsonDecode) Process(ctx context.Context, payload any) (any, error) {
-	payloadString, ok := GetAnyAs[string](payload)
+
+	payloadBytes, ok := GetAnyAsByteSlice(payload)
 
 	if !ok {
-		return nil, errors.New("json.decode processor only accepts a string")
+		payloadString, ok := GetAnyAs[string](payload)
+		if !ok {
+			return nil, errors.New("json.decode can only process a string or []byte")
+		}
+		payloadBytes = []byte(payloadString)
 	}
 
 	payloadJson := make(map[string]any)
 
-	err := json.Unmarshal([]byte(payloadString), &payloadJson)
+	err := json.Unmarshal(payloadBytes, &payloadJson)
 	if err != nil {
 		return nil, err
 	}
