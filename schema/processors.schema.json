@@ -247,7 +247,7 @@
               "base": {
                 "title": "Base",
                 "type": "integer",
-                "enum": [0,2, 8, 10, 16],
+                "enum": [0, 2, 8, 10, 16],
                 "default": 10
               },
               "bitSize": {

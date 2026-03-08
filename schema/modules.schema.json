@@ -436,7 +436,7 @@
                 "default": "0.0.0.0"
               },
               "port": {
-                "title" : "Port",
+                "title": "Port",
                 "type": "integer",
                 "minimum": 1,
                 "maximum": 65535
