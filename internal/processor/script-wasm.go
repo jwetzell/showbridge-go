@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	extism "github.com/extism/go-sdk"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -17,7 +18,7 @@ type ScriptWASM struct {
 
 func (sw *ScriptWASM) Process(ctx context.Context, payload any) (any, error) {
 
-	payloadBytes, ok := GetAnyAs[[]byte](payload)
+	payloadBytes, ok := common.GetAnyAs[[]byte](payload)
 
 	if !ok {
 		return nil, fmt.Errorf("script.wasm can only process a byte array")

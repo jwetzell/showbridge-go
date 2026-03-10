@@ -9,7 +9,6 @@ import (
 
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
-	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
 type UDPClient struct {
@@ -88,7 +87,7 @@ func (uc *UDPClient) Start(ctx context.Context) error {
 
 func (uc *UDPClient) Output(ctx context.Context, payload any) error {
 
-	payloadBytes, ok := processor.GetAnyAs[[]byte](payload)
+	payloadBytes, ok := common.GetAnyAs[[]byte](payload)
 	if !ok {
 		return errors.New("net.udp.client is only able to output bytes")
 	}

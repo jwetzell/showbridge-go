@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"gitlab.com/gomidi/midi/v2"
 )
@@ -45,7 +46,7 @@ type MIDIPitchBend struct {
 }
 
 func (mmu *MIDIMessageUnpack) Process(ctx context.Context, payload any) (any, error) {
-	payloadMidi, ok := GetAnyAs[midi.Message](payload)
+	payloadMidi, ok := common.GetAnyAs[midi.Message](payload)
 
 	if !ok {
 		return nil, errors.New("midi.message.unpack processor only accepts a midi.Message")

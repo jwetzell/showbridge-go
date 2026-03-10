@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	freeD "github.com/jwetzell/free-d-go"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -13,7 +14,7 @@ type FreeDEncode struct {
 }
 
 func (fe *FreeDEncode) Process(ctx context.Context, payload any) (any, error) {
-	payloadPosition, ok := GetAnyAs[freeD.FreeDPosition](payload)
+	payloadPosition, ok := common.GetAnyAs[freeD.FreeDPosition](payload)
 
 	if !ok {
 		return nil, errors.New("freed.decode processor only accepts a FreeDEncode")

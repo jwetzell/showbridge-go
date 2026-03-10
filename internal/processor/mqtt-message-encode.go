@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -13,7 +14,7 @@ type MQTTMessageEncode struct {
 }
 
 func (mme *MQTTMessageEncode) Process(ctx context.Context, payload any) (any, error) {
-	payloadMessage, ok := GetAnyAs[mqtt.Message](payload)
+	payloadMessage, ok := common.GetAnyAs[mqtt.Message](payload)
 
 	if !ok {
 		return nil, errors.New("mqtt.message.encode processor only accepts an mqtt.Message")

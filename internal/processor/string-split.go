@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -15,7 +16,7 @@ type StringSplit struct {
 }
 
 func (ss *StringSplit) Process(ctx context.Context, payload any) (any, error) {
-	payloadString, ok := GetAnyAs[string](payload)
+	payloadString, ok := common.GetAnyAs[string](payload)
 
 	if !ok {
 		return nil, errors.New("string.split only accepts a string")

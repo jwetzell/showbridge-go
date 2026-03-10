@@ -12,7 +12,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/framer"
-	"github.com/jwetzell/showbridge-go/internal/processor"
 	"go.bug.st/serial"
 )
 
@@ -157,7 +156,7 @@ func (sc *SerialClient) Start(ctx context.Context) error {
 
 func (sc *SerialClient) Output(ctx context.Context, payload any) error {
 
-	payloadBytes, ok := processor.GetAnyAs[[]byte](payload)
+	payloadBytes, ok := common.GetAnyAs[[]byte](payload)
 
 	if !ok {
 		return errors.New("serial.client can only ouptut bytes")

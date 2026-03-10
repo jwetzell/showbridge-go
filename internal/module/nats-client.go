@@ -94,7 +94,7 @@ func (nc *NATSClient) Start(ctx context.Context) error {
 
 func (nc *NATSClient) Output(ctx context.Context, payload any) error {
 
-	payloadMessage, ok := processor.GetAnyAs[processor.NATSMessage](payload)
+	payloadMessage, ok := common.GetAnyAs[processor.NATSMessage](payload)
 
 	if !ok {
 		return errors.New("nats.client is only able to output NATSMessage")

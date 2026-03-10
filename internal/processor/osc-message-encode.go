@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	osc "github.com/jwetzell/osc-go"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -13,7 +14,7 @@ type OSCMessageEncode struct {
 }
 
 func (ome *OSCMessageEncode) Process(ctx context.Context, payload any) (any, error) {
-	payloadMessage, ok := GetAnyAs[*osc.OSCMessage](payload)
+	payloadMessage, ok := common.GetAnyAs[*osc.OSCMessage](payload)
 
 	if !ok {
 		return nil, errors.New("osc.message.encode processor only accepts an *OSCMessage")

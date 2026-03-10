@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"gitlab.com/gomidi/midi/v2"
 )
@@ -15,7 +16,7 @@ type MIDIMessageEncode struct {
 }
 
 func (mme *MIDIMessageEncode) Process(ctx context.Context, payload any) (any, error) {
-	payloadMessage, ok := GetAnyAs[midi.Message](payload)
+	payloadMessage, ok := common.GetAnyAs[midi.Message](payload)
 
 	if !ok {
 		return nil, errors.New("midi.message.encode processor only accepts a midi.Message")

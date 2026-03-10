@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -16,7 +17,7 @@ type IntParse struct {
 }
 
 func (ip *IntParse) Process(ctx context.Context, payload any) (any, error) {
-	payloadString, ok := GetAnyAs[string](payload)
+	payloadString, ok := common.GetAnyAs[string](payload)
 
 	if !ok {
 		return nil, errors.New("int.parse processor only accepts a string")

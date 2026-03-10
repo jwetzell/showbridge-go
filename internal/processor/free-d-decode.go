@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	freeD "github.com/jwetzell/free-d-go"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -13,7 +14,7 @@ type FreeDDecode struct {
 }
 
 func (fd *FreeDDecode) Process(ctx context.Context, payload any) (any, error) {
-	payloadBytes, ok := GetAnyAs[[]byte](payload)
+	payloadBytes, ok := common.GetAnyAs[[]byte](payload)
 
 	if !ok {
 		return nil, errors.New("freed.decode processor only accepts a []byte")

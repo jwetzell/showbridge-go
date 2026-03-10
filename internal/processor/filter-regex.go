@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -15,7 +16,7 @@ type FilterRegex struct {
 }
 
 func (fr *FilterRegex) Process(ctx context.Context, payload any) (any, error) {
-	payloadString, ok := GetAnyAs[string](payload)
+	payloadString, ok := common.GetAnyAs[string](payload)
 
 	if !ok {
 		return nil, errors.New("filter.regex processor only accepts a string")

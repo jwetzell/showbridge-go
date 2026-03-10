@@ -14,7 +14,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/framer"
-	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
 type TCPServer struct {
@@ -207,7 +206,7 @@ AcceptLoop:
 }
 
 func (ts *TCPServer) Output(ctx context.Context, payload any) error {
-	payloadBytes, ok := processor.GetAnyAs[[]byte](payload)
+	payloadBytes, ok := common.GetAnyAs[[]byte](payload)
 
 	if !ok {
 		return errors.New("net.tcp.server is only able to output bytes")

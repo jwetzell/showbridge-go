@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -12,7 +13,7 @@ type StringEncode struct {
 }
 
 func (se *StringEncode) Process(ctx context.Context, payload any) (any, error) {
-	payloadString, ok := GetAnyAs[string](payload)
+	payloadString, ok := common.GetAnyAs[string](payload)
 
 	if !ok {
 		return nil, errors.New("string.encode processor only accepts a string")

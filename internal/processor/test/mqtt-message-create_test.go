@@ -204,7 +204,7 @@ func TestBadMQTTMessageCreate(t *testing.T) {
 				"payload":  123,
 			},
 			payload:     1,
-			errorString: "mqtt.message.create payload error: not a slice",
+			errorString: "mqtt.message.create payload error: not a byte slice",
 		},
 	}
 

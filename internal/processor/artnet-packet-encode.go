@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/jwetzell/artnet-go"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -13,7 +14,7 @@ type ArtNetPacketEncode struct {
 }
 
 func (ape *ArtNetPacketEncode) Process(ctx context.Context, payload any) (any, error) {
-	payloadPacket, ok := GetAnyAs[artnet.ArtNetPacket](payload)
+	payloadPacket, ok := common.GetAnyAs[artnet.ArtNetPacket](payload)
 
 	if !ok {
 		return nil, fmt.Errorf("artnet.packet.encode processor only accepts an ArtNetPacket")

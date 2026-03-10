@@ -10,7 +10,6 @@ import (
 
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
-	"github.com/jwetzell/showbridge-go/internal/processor"
 	"gitlab.com/gomidi/midi/v2"
 	_ "gitlab.com/gomidi/midi/v2/drivers/rtmididrv"
 )
@@ -85,7 +84,7 @@ func (mo *MIDIOutput) Output(ctx context.Context, payload any) error {
 		return errors.New("midi.output output is not setup")
 	}
 
-	payloadMessage, ok := processor.GetAnyAs[midi.Message](payload)
+	payloadMessage, ok := common.GetAnyAs[midi.Message](payload)
 
 	if !ok {
 		return errors.New("midi.output can only ouptut midi.Message")

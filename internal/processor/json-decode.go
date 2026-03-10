@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -14,10 +15,10 @@ type JsonDecode struct {
 
 func (jd *JsonDecode) Process(ctx context.Context, payload any) (any, error) {
 
-	payloadBytes, ok := GetAnyAsByteSlice(payload)
+	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 
 	if !ok {
-		payloadString, ok := GetAnyAs[string](payload)
+		payloadString, ok := common.GetAnyAs[string](payload)
 		if !ok {
 			return nil, errors.New("json.decode can only process a string or []byte")
 		}

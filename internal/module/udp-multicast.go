@@ -10,7 +10,6 @@ import (
 
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
-	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
 type UDPMulticast struct {
@@ -109,7 +108,7 @@ func (um *UDPMulticast) Start(ctx context.Context) error {
 
 func (um *UDPMulticast) Output(ctx context.Context, payload any) error {
 
-	payloadBytes, ok := processor.GetAnyAs[[]byte](payload)
+	payloadBytes, ok := common.GetAnyAs[[]byte](payload)
 	if !ok {
 		return errors.New("net.udp.multicast can only output bytes")
 	}

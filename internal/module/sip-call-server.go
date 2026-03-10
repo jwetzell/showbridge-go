@@ -173,7 +173,7 @@ func (scs *SIPCallServer) Output(ctx context.Context, payload any) error {
 		return errors.New("sip.call.server inDialog already ended")
 	}
 
-	payloadDTMFResponse, ok := processor.GetAnyAs[processor.SipDTMFResponse](payload)
+	payloadDTMFResponse, ok := common.GetAnyAs[processor.SipDTMFResponse](payload)
 
 	if ok {
 		dtmfWriter := call.inDialog.AudioWriterDTMF()
@@ -189,7 +189,7 @@ func (scs *SIPCallServer) Output(ctx context.Context, payload any) error {
 		return nil
 	}
 
-	payloadAudioFileResponse, ok := processor.GetAnyAs[processor.SipAudioFileResponse](payload)
+	payloadAudioFileResponse, ok := common.GetAnyAs[processor.SipAudioFileResponse](payload)
 
 	if ok {
 		audioFile, err := os.Open(payloadAudioFileResponse.AudioFile)

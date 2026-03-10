@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -15,7 +16,7 @@ type FloatParse struct {
 }
 
 func (fp *FloatParse) Process(ctx context.Context, payload any) (any, error) {
-	payloadString, ok := GetAnyAs[string](payload)
+	payloadString, ok := common.GetAnyAs[string](payload)
 
 	if !ok {
 		return nil, errors.New("float.parse processor only accepts a string")

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -17,7 +18,7 @@ type IntScale struct {
 }
 
 func (ir *IntScale) Process(ctx context.Context, payload any) (any, error) {
-	payloadInt, ok := GetAnyAs[int](payload)
+	payloadInt, ok := common.GetAnyAs[int](payload)
 	if !ok {
 		return nil, errors.New("int.scale can only process an int")
 	}

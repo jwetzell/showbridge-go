@@ -187,7 +187,7 @@ func (hs *HTTPServer) Output(ctx context.Context, payload any) error {
 		return errors.New("http.server output must originate from an http.server input")
 	}
 
-	payloadResponse, ok := processor.GetAnyAs[processor.HTTPResponse](payload)
+	payloadResponse, ok := common.GetAnyAs[processor.HTTPResponse](payload)
 
 	if !ok {
 		return errors.New("http.server is only able to output HTTPResponse")
