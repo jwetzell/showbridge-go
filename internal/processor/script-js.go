@@ -11,43 +11,27 @@ import (
 )
 
 type ScriptJS struct {
-	config  config.ProcessorConfig
-	Program string
+	config      config.ProcessorConfig
+	vm          *quickjs.VM
+	payloadAtom quickjs.Atom
+	senderAtom  quickjs.Atom
+	Program     string
 }
 
 func (sj *ScriptJS) Process(ctx context.Context, payload any) (any, error) {
 
-	vm, err := quickjs.NewVM()
-
-	if err != nil {
-		return nil, err
-	}
-	defer vm.Close()
-	payloadAtom, err := vm.NewAtom("payload")
-
-	if err != nil {
-		return nil, err
-	}
-
-	vm.SetProperty(vm.GlobalObject(), payloadAtom, payload)
+	sj.vm.SetProperty(sj.vm.GlobalObject(), sj.payloadAtom, payload)
 
 	sender := ctx.Value(common.SenderContextKey)
-	if sender != nil {
-		senderAtom, err := vm.NewAtom("sender")
+	sj.vm.SetProperty(sj.vm.GlobalObject(), sj.senderAtom, sender)
 
-		if err != nil {
-			return nil, err
-		}
-		vm.SetProperty(vm.GlobalObject(), senderAtom, sender)
-	}
-
-	_, err = vm.Eval(sj.Program, quickjs.EvalGlobal)
+	_, err := sj.vm.Eval(sj.Program, quickjs.EvalGlobal)
 
 	if err != nil {
 		return nil, err
 	}
 
-	output, err := vm.GetProperty(vm.GlobalObject(), payloadAtom)
+	output, err := sj.vm.GetProperty(sj.vm.GlobalObject(), sj.payloadAtom)
 
 	if err != nil {
 		return nil, err
@@ -87,7 +71,23 @@ func init() {
 				return nil, fmt.Errorf("script.js program error: %w", err)
 			}
 
-			return &ScriptJS{config: config, Program: programString}, nil
+			vm, err := quickjs.NewVM()
+
+			if err != nil {
+				return nil, err
+			}
+
+			payloadAtom, err := vm.NewAtom("payload")
+			if err != nil {
+				return nil, err
+			}
+
+			senderAtom, err := vm.NewAtom("sender")
+			if err != nil {
+				return nil, err
+			}
+
+			return &ScriptJS{config: config, Program: programString, vm: vm, payloadAtom: payloadAtom, senderAtom: senderAtom}, nil
 		},
 	})
 }
