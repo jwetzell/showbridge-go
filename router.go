@@ -159,7 +159,10 @@ func (r *Router) Start(ctx context.Context) {
 
 	for moduleId := range r.ModuleInstances {
 		// TODO(jwetzell): handle module run errors
-		r.startModule(contextWithRouter, moduleId)
+		err := r.startModule(contextWithRouter, moduleId)
+		if err != nil {
+			r.logger.Error("error starting module", "moduleId", moduleId, "error", err)
+		}
 	}
 	<-r.Context.Done()
 	r.logger.Debug("waiting for modules to exit")
