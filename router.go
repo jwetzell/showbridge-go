@@ -27,6 +27,7 @@ type Router struct {
 	ModuleInstances map[string]module.Module
 	// TODO(jwetzell): change to something easier to lookup
 	RouteInstances    []*route.Route
+	ConfigChange      chan config.Config
 	moduleWait        sync.WaitGroup
 	logger            *slog.Logger
 	runningConfig     config.Config
@@ -112,19 +113,20 @@ func (r *Router) getModule(moduleId string) module.Module {
 	return moduleInstance
 }
 
-func NewRouter(config config.Config) (*Router, []module.ModuleError, []route.RouteError) {
+func NewRouter(routerConfig config.Config) (*Router, []module.ModuleError, []route.RouteError) {
 
 	router := Router{
 		ModuleInstances: make(map[string]module.Module),
 		RouteInstances:  []*route.Route{},
+		ConfigChange:    make(chan config.Config, 1),
 		logger:          slog.Default().With("component", "router"),
-		runningConfig:   config,
+		runningConfig:   routerConfig,
 	}
 	router.logger.Debug("creating")
 
 	var moduleErrors []module.ModuleError
 
-	for moduleIndex, moduleDecl := range config.Modules {
+	for moduleIndex, moduleDecl := range routerConfig.Modules {
 
 		err := router.addModule(moduleDecl)
 		if err != nil {
@@ -142,7 +144,7 @@ func NewRouter(config config.Config) (*Router, []module.ModuleError, []route.Rou
 	}
 
 	var routeErrors []route.RouteError
-	for routeIndex, routeDecl := range config.Routes {
+	for routeIndex, routeDecl := range routerConfig.Routes {
 		err := router.addRoute(routeDecl)
 		if err != nil {
 			if routeErrors == nil {

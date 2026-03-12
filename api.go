@@ -106,6 +106,7 @@ func (r *Router) handleConfigHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.WriteHeader(http.StatusOK)
+		r.ConfigChange <- newConfig
 	case http.MethodOptions:
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, PUT, OPTIONS")
