@@ -131,7 +131,7 @@ func NewRouter(config config.Config) (*Router, []module.ModuleError, []route.Rou
 			moduleErrors = append(moduleErrors, module.ModuleError{
 				Index:  moduleIndex,
 				Config: moduleDecl,
-				Error:  err,
+				Error:  err.Error(),
 			})
 			continue
 		}
@@ -148,7 +148,7 @@ func NewRouter(config config.Config) (*Router, []module.ModuleError, []route.Rou
 			routeErrors = append(routeErrors, route.RouteError{
 				Index:  routeIndex,
 				Config: routeDecl,
-				Error:  err,
+				Error:  err.Error(),
 			})
 			continue
 		}

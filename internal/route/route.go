@@ -13,9 +13,9 @@ import (
 )
 
 type RouteError struct {
-	Index  int
-	Config config.RouteConfig
-	Error  error
+	Index  int                `json:"index"`
+	Config config.RouteConfig `json:"config"`
+	Error  string             `json:"error"`
 }
 type Route struct {
 	input      string
