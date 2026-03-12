@@ -3,11 +3,10 @@ package showbridge
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 	"net/http"
+	"reflect"
 	"sync"
-	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -22,17 +21,21 @@ import (
 )
 
 type Router struct {
-	contextCancel   context.CancelFunc
-	Context         context.Context
+	contextCancel context.CancelFunc
+	Context       context.Context
+	// TODO(jwetzell): do these need to be guarded against concurrency?
 	ModuleInstances map[string]module.Module
 	// TODO(jwetzell): change to something easier to lookup
-	RouteInstances []*route.Route
-	moduleWait     sync.WaitGroup
-	logger         *slog.Logger
-	runningConfig  config.Config
-	wsConns        []*websocket.Conn
-	wsConnsMu      sync.Mutex
-	apiServer      *http.Server
+	RouteInstances    []*route.Route
+	moduleWait        sync.WaitGroup
+	logger            *slog.Logger
+	runningConfig     config.Config
+	runningConfigMu   sync.Mutex
+	wsConns           []*websocket.Conn
+	wsConnsMu         sync.Mutex
+	apiServer         *http.Server
+	apiServerMu       sync.Mutex
+	apiServerShutdown context.CancelFunc
 }
 
 func (r *Router) addModule(moduleDecl config.ModuleConfig) error {
@@ -162,32 +165,11 @@ func (r *Router) Start(ctx context.Context) {
 	routerContext, cancel := context.WithCancel(ctx)
 	r.Context = routerContext
 	r.contextCancel = cancel
-	contextWithRouter := context.WithValue(routerContext, common.RouterContextKey, r)
-
-	for moduleId := range r.ModuleInstances {
-		// TODO(jwetzell): handle module run errors
-		err := r.startModule(contextWithRouter, moduleId)
-		if err != nil {
-			r.logger.Error("error starting module", "moduleId", moduleId, "error", err)
-		}
-	}
-	apiShutdownCtx, apiShutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
-
-	go func() {
-		r.apiServer = &http.Server{
-			Addr: fmt.Sprintf(":%d", r.runningConfig.Api.Port),
-		}
-		http.HandleFunc("/ws", r.handleWebsocket)
-		http.HandleFunc("/api/v1/config", r.handleConfigHTTP)
-		http.HandleFunc("/api/v1/schema/{schema}", r.handleSchemaHTTP)
-		r.logger.Debug("starting api server", "port", r.runningConfig.Api.Port)
-		r.apiServer.ListenAndServe()
-		apiShutdownCancel()
-	}()
+	r.startModules()
+	r.startAPIServer(r.runningConfig.Api)
 	<-r.Context.Done()
 	r.logger.Debug("shutting down api server")
-	r.apiServer.Shutdown(apiShutdownCtx)
-	<-apiShutdownCtx.Done()
+	r.stopAPIServer()
 	r.logger.Debug("waiting for modules to exit")
 	r.moduleWait.Wait()
 	r.logger.Info("done")
@@ -199,6 +181,9 @@ func (r *Router) Stop() {
 }
 
 func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) (bool, []common.RouteIOError) {
+	r.runningConfigMu.Lock()
+	defer r.runningConfigMu.Unlock()
+
 	spanCtx, span := otel.Tracer("router").Start(ctx, "input", trace.WithAttributes(attribute.String("source.id", sourceId)), trace.WithNewRoot())
 	defer span.End()
 	var routeIOErrors []common.RouteIOError
@@ -298,6 +283,83 @@ func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload
 	return nil
 }
 
+func (r *Router) startModules() {
+	contextWithRouter := context.WithValue(r.Context, common.RouterContextKey, r)
+
+	for moduleId := range r.ModuleInstances {
+		// TODO(jwetzell): handle module run errors
+		err := r.startModule(contextWithRouter, moduleId)
+		if err != nil {
+			r.logger.Error("error starting module", "moduleId", moduleId, "error", err)
+		}
+	}
+}
+
 func (r *Router) RunningConfig() config.Config {
+	r.runningConfigMu.Lock()
+	defer r.runningConfigMu.Unlock()
 	return r.runningConfig
+}
+
+func (r *Router) UpdateConfig(newConfig config.Config) ([]module.ModuleError, []route.RouteError) {
+	r.runningConfigMu.Lock()
+	defer r.runningConfigMu.Unlock()
+	oldConfig := r.runningConfig
+	r.logger.Debug("received config update", "oldConfig", oldConfig, "newConfig", newConfig)
+
+	if !reflect.DeepEqual(oldConfig.Api, newConfig.Api) {
+		r.logger.Info("applying new API config")
+		r.stopAPIServer()
+		r.startAPIServer(newConfig.Api)
+		r.runningConfig.Api = newConfig.Api
+	}
+
+	// TODO(jwetzell): handle config update errors better
+	for _, moduleInstance := range r.ModuleInstances {
+		moduleInstance.Stop()
+	}
+	r.logger.Debug("waiting for modules to exit")
+	r.moduleWait.Wait()
+
+	r.ModuleInstances = make(map[string]module.Module)
+	r.RouteInstances = []*route.Route{}
+
+	var moduleErrors []module.ModuleError
+
+	for moduleIndex, moduleDecl := range newConfig.Modules {
+
+		err := r.addModule(moduleDecl)
+		if err != nil {
+			if moduleErrors == nil {
+				moduleErrors = []module.ModuleError{}
+			}
+			moduleErrors = append(moduleErrors, module.ModuleError{
+				Index:  moduleIndex,
+				Config: moduleDecl,
+				Error:  err.Error(),
+			})
+			continue
+		}
+
+	}
+
+	var routeErrors []route.RouteError
+	for routeIndex, routeDecl := range newConfig.Routes {
+		err := r.addRoute(routeDecl)
+		if err != nil {
+			if routeErrors == nil {
+				routeErrors = []route.RouteError{}
+			}
+			routeErrors = append(routeErrors, route.RouteError{
+				Index:  routeIndex,
+				Config: routeDecl,
+				Error:  err.Error(),
+			})
+			continue
+		}
+	}
+	r.runningConfig = newConfig
+	r.startModules()
+
+	return moduleErrors, routeErrors
 }

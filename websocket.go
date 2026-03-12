@@ -24,21 +24,39 @@ func (r *Router) handleWebsocket(w http.ResponseWriter, req *http.Request) {
 	r.wsConnsMu.Lock()
 	r.wsConns = append(r.wsConns, conn)
 	r.wsConnsMu.Unlock()
+READ_LOOP:
 	for {
-		_, message, err := conn.ReadMessage()
+		messageType, message, err := conn.ReadMessage()
 		if err != nil {
-			r.logger.Error("websocket read error", "error", err)
-			break
+			_, ok := err.(*websocket.CloseError)
+			if ok {
+				break READ_LOOP
+			}
 		}
 
-		event := Event{}
-		err = json.Unmarshal(message, &event)
-		if err != nil {
-			r.logger.Error("websocket message unmarshal error", "error", err)
+		switch messageType {
+		case websocket.TextMessage, websocket.BinaryMessage:
+			event := Event{}
+			err = json.Unmarshal(message, &event)
+			if err != nil {
+				r.logger.Error("websocket message unmarshal error", "error", err)
+				continue
+			}
+			r.handleEvent(event, conn)
+		case websocket.CloseMessage:
+			break READ_LOOP
+		case websocket.PingMessage:
+			err = conn.WriteMessage(websocket.PongMessage, nil)
+			if err != nil {
+				r.logger.Error("websocket pong error", "error", err)
+			}
+		default:
+			r.logger.Warn("unsupported websocket message type", "type", messageType)
 			continue
 		}
-		r.handleEvent(event)
+
 	}
+	//NOTE(jwetzell): remove ws connection
 	r.wsConnsMu.Lock()
 	for i, c := range r.wsConns {
 		if c == conn {
