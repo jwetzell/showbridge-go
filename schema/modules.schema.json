@@ -23,7 +23,7 @@
               "port": {
                 "title": "Port",
                 "type": "integer",
-                "minimum": 1,
+                "minimum": 1024,
                 "maximum": 65535
               }
             },
@@ -226,7 +226,7 @@
               "port": {
                 "title": "Port",
                 "type": "integer",
-                "minimum": 1,
+                "minimum": 1024,
                 "maximum": 65535,
                 "default": 4222
               }
@@ -305,7 +305,7 @@
               "port": {
                 "title": "Port",
                 "type": "integer",
-                "minimum": 1,
+                "minimum": 1024,
                 "maximum": 65535,
                 "default": 5060
               },
@@ -350,7 +350,7 @@
               "port": {
                 "title": "Port",
                 "type": "integer",
-                "minimum": 1,
+                "minimum": 1024,
                 "maximum": 65535,
                 "default": 5060
               },
@@ -438,7 +438,7 @@
               "port": {
                 "title": "Port",
                 "type": "integer",
-                "minimum": 1,
+                "minimum": 1024,
                 "maximum": 65535
               },
               "framing": {
@@ -507,7 +507,7 @@
               "port": {
                 "title": "Port",
                 "type": "integer",
-                "minimum": 1,
+                "minimum": 1024,
                 "maximum": 65535
               }
             },
@@ -540,7 +540,7 @@
               "port": {
                 "title": "Port",
                 "type": "integer",
-                "minimum": 1,
+                "minimum": 1024,
                 "maximum": 65535
               }
             },
