@@ -3,9 +3,13 @@ package showbridge
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
+	"net/http"
 	"sync"
+	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
@@ -26,6 +30,9 @@ type Router struct {
 	moduleWait     sync.WaitGroup
 	logger         *slog.Logger
 	runningConfig  config.Config
+	wsConns        []*websocket.Conn
+	wsConnsMu      sync.Mutex
+	apiServer      *http.Server
 }
 
 func (r *Router) addModule(moduleDecl config.ModuleConfig) error {
@@ -164,7 +171,23 @@ func (r *Router) Start(ctx context.Context) {
 			r.logger.Error("error starting module", "moduleId", moduleId, "error", err)
 		}
 	}
+	apiShutdownCtx, apiShutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
+
+	go func() {
+		r.apiServer = &http.Server{
+			Addr: fmt.Sprintf(":%d", r.runningConfig.Api.Port),
+		}
+		http.HandleFunc("/ws", r.handleWebsocket)
+		http.HandleFunc("/api/v1/config", r.handleConfigHTTP)
+		http.HandleFunc("/api/v1/schema/{schema}", r.handleSchemaHTTP)
+		r.logger.Debug("starting api server", "port", r.runningConfig.Api.Port)
+		r.apiServer.ListenAndServe()
+		apiShutdownCancel()
+	}()
 	<-r.Context.Done()
+	r.logger.Debug("shutting down api server")
+	r.apiServer.Shutdown(apiShutdownCtx)
+	<-apiShutdownCtx.Done()
 	r.logger.Debug("waiting for modules to exit")
 	r.moduleWait.Wait()
 	r.logger.Info("done")
@@ -180,6 +203,13 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 	defer span.End()
 	var routeIOErrors []common.RouteIOError
 	routeFound := false
+
+	r.broadcastEvent(Event{
+		Type: "input",
+		Data: map[string]any{
+			"source": sourceId,
+		},
+	})
 
 	var routeWaitGroup sync.WaitGroup
 
@@ -207,8 +237,21 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 						Index:        routeIndex,
 						ProcessError: err,
 					})
+					r.broadcastEvent(Event{
+						Type: "route",
+						Data: map[string]any{
+							"index": routeIndex,
+						},
+						Error: err.Error(),
+					})
 					return
 				}
+				r.broadcastEvent(Event{
+					Type: "route",
+					Data: map[string]any{
+						"index": routeIndex,
+					},
+				})
 				routeSpan.End()
 			})
 		}
@@ -220,7 +263,12 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload any) error {
 	spanCtx, span := otel.Tracer("router").Start(ctx, "output", trace.WithAttributes(attribute.String("destination.id", destinationId)))
 	defer span.End()
-
+	outputEvent := Event{
+		Type: "output",
+		Data: map[string]any{
+			"destination": destinationId,
+		},
+	}
 	destinationModule := r.getModule(destinationId)
 
 	if destinationModule == nil {
@@ -228,6 +276,8 @@ func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload
 		span.SetStatus(codes.Error, err.Error())
 		span.RecordError(err)
 		r.logger.Error("no module found for destination id", "destinationId", destinationId)
+		outputEvent.Error = err.Error()
+		r.broadcastEvent(outputEvent)
 		return err
 	}
 
@@ -238,11 +288,13 @@ func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload
 		moduleOutputSpan.SetStatus(codes.Error, err.Error())
 		moduleOutputSpan.RecordError(err)
 		r.logger.ErrorContext(moduleOutputCtx, "module output encountered error", "module", destinationModule.Id(), "error", err)
+		outputEvent.Error = err.Error()
+		r.broadcastEvent(outputEvent)
 		return err
 	} else {
 		moduleOutputSpan.SetStatus(codes.Ok, "module output successful")
 	}
-
+	r.broadcastEvent(outputEvent)
 	return nil
 }
 

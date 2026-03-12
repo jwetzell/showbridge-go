@@ -5,6 +5,16 @@
   "description": "showbridge configuration",
   "type": "object",
   "properties": {
+    "api": {
+      "type": "object",
+      "properties": {
+        "port": {
+          "type": "integer",
+          "description": "Port for the API server to listen on"
+        }
+      },
+      "required": ["port"]
+    },
     "modules": {
       "$ref": "https://showbridge.io/modules.schema.json"
     },

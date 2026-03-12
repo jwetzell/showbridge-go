@@ -8,8 +8,8 @@ type RouteIO interface {
 }
 
 type RouteIOError struct {
-	Index        int
-	OutputError  error
-	ProcessError error
-	InputError   error
+	Index        int   `json:"index"`
+	OutputError  error `json:"outputError"`
+	ProcessError error `json:"processError"`
+	InputError   error `json:"inputError"`
 }
