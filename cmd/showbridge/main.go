@@ -111,6 +111,20 @@ func readConfig(configPath string) (config.Config, error) {
 	return cfg, nil
 }
 
+func writeConfig(configPath string, newConfig config.Config) error {
+	configBytes, err := yaml.Marshal(newConfig)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(configPath, configBytes, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func run(ctx context.Context, c *cli.Command) error {
 	configPath := c.String("config")
 	if configPath == "" {
@@ -199,7 +213,7 @@ func run(ctx context.Context, c *cli.Command) error {
 	})
 	showbridgeApp.routerMutex.Unlock()
 
-	go showbridgeApp.handleHangup()
+	go showbridgeApp.handleChannels()
 
 	<-showbridgeApp.ctx.Done()
 	showbridgeApp.logger.Debug("shutting down router")
@@ -209,7 +223,7 @@ func run(ctx context.Context, c *cli.Command) error {
 	return nil
 }
 
-func (app *showbridgeApp) handleHangup() {
+func (app *showbridgeApp) handleChannels() {
 	for {
 		select {
 		case <-sigHangup:
@@ -225,6 +239,14 @@ func (app *showbridgeApp) handleHangup() {
 			app.logConfigErrors(moduleErrors, routeErrors)
 			app.logger.Info("configuration reloaded successfully")
 			app.routerMutex.Unlock()
+		case config := <-app.router.ConfigChange:
+			app.logger.Info("router config changed updating config file")
+			err := writeConfig(app.configPath, config)
+			if err != nil {
+				app.logger.Error("failed to write config file", "error", err)
+				continue
+			}
+			app.logger.Info("config file updated successfully")
 		case <-app.ctx.Done():
 			return
 		}
