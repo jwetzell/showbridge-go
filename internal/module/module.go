@@ -10,9 +10,9 @@ import (
 )
 
 type ModuleError struct {
-	Index  int
-	Config config.ModuleConfig
-	Error  error
+	Index  int                 `json:"index"`
+	Config config.ModuleConfig `json:"config"`
+	Error  string              `json:"error"`
 }
 
 type Module interface {

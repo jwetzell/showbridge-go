@@ -8,6 +8,7 @@ require (
 	github.com/emiago/sipgo v1.2.1
 	github.com/expr-lang/expr v1.17.8
 	github.com/extism/go-sdk v1.7.1
+	github.com/gorilla/websocket v1.5.3
 	github.com/jwetzell/artnet-go v0.2.1
 	github.com/jwetzell/free-d-go v0.1.0
 	github.com/jwetzell/osc-go v0.2.0
@@ -42,7 +43,6 @@ require (
 	github.com/gobwas/ws v1.4.0 // indirect
 	github.com/google/go-tpm v0.9.8 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.28.0 // indirect
 	github.com/ianlancetaylor/demangle v0.0.0-20240805132620-81f5be970eca // indirect
 	github.com/icholy/digest v1.1.0 // indirect

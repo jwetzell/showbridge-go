@@ -149,8 +149,8 @@ func TestNewRouterDuplicateModuleId(t *testing.T) {
 		t.Fatalf("router should have returned exactly 1 module error, got: %d", len(moduleErrors))
 	}
 
-	if moduleErrors[0].Error.Error() != "module id already exists" {
-		t.Fatalf("module error did not match expected, got: %s", moduleErrors[0].Error.Error())
+	if moduleErrors[0].Error != "module id already exists" {
+		t.Fatalf("module error did not match expected, got: %s", moduleErrors[0].Error)
 	}
 }
 
@@ -184,8 +184,8 @@ func TestNewRouterRouteWithUnknwonProcessor(t *testing.T) {
 		t.Fatalf("router should have returned exactly 1 route error, got: %d", len(routeErrors))
 	}
 
-	if routeErrors[0].Error.Error() != "problem loading processor registration for processor type: asdfasdf" {
-		t.Fatalf("route error did not match expected, got: %s", routeErrors[0].Error.Error())
+	if routeErrors[0].Error != "problem loading processor registration for processor type: asdfasdf" {
+		t.Fatalf("route error did not match expected, got: %s", routeErrors[0].Error)
 	}
 }
 

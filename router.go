@@ -4,8 +4,11 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"net/http"
+	"reflect"
 	"sync"
 
+	"github.com/gorilla/websocket"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
@@ -18,14 +21,22 @@ import (
 )
 
 type Router struct {
-	contextCancel   context.CancelFunc
-	Context         context.Context
+	contextCancel context.CancelFunc
+	Context       context.Context
+	// TODO(jwetzell): do these need to be guarded against concurrency?
 	ModuleInstances map[string]module.Module
 	// TODO(jwetzell): change to something easier to lookup
-	RouteInstances []*route.Route
-	moduleWait     sync.WaitGroup
-	logger         *slog.Logger
-	runningConfig  config.Config
+	RouteInstances    []*route.Route
+	ConfigChange      chan config.Config
+	moduleWait        sync.WaitGroup
+	logger            *slog.Logger
+	runningConfig     config.Config
+	runningConfigMu   sync.Mutex
+	wsConns           []*websocket.Conn
+	wsConnsMu         sync.Mutex
+	apiServer         *http.Server
+	apiServerMu       sync.Mutex
+	apiServerShutdown context.CancelFunc
 }
 
 func (r *Router) addModule(moduleDecl config.ModuleConfig) error {
@@ -102,19 +113,20 @@ func (r *Router) getModule(moduleId string) module.Module {
 	return moduleInstance
 }
 
-func NewRouter(config config.Config) (*Router, []module.ModuleError, []route.RouteError) {
+func NewRouter(routerConfig config.Config) (*Router, []module.ModuleError, []route.RouteError) {
 
 	router := Router{
 		ModuleInstances: make(map[string]module.Module),
 		RouteInstances:  []*route.Route{},
+		ConfigChange:    make(chan config.Config, 1),
 		logger:          slog.Default().With("component", "router"),
-		runningConfig:   config,
+		runningConfig:   routerConfig,
 	}
 	router.logger.Debug("creating")
 
 	var moduleErrors []module.ModuleError
 
-	for moduleIndex, moduleDecl := range config.Modules {
+	for moduleIndex, moduleDecl := range routerConfig.Modules {
 
 		err := router.addModule(moduleDecl)
 		if err != nil {
@@ -124,7 +136,7 @@ func NewRouter(config config.Config) (*Router, []module.ModuleError, []route.Rou
 			moduleErrors = append(moduleErrors, module.ModuleError{
 				Index:  moduleIndex,
 				Config: moduleDecl,
-				Error:  err,
+				Error:  err.Error(),
 			})
 			continue
 		}
@@ -132,7 +144,7 @@ func NewRouter(config config.Config) (*Router, []module.ModuleError, []route.Rou
 	}
 
 	var routeErrors []route.RouteError
-	for routeIndex, routeDecl := range config.Routes {
+	for routeIndex, routeDecl := range routerConfig.Routes {
 		err := router.addRoute(routeDecl)
 		if err != nil {
 			if routeErrors == nil {
@@ -141,7 +153,7 @@ func NewRouter(config config.Config) (*Router, []module.ModuleError, []route.Rou
 			routeErrors = append(routeErrors, route.RouteError{
 				Index:  routeIndex,
 				Config: routeDecl,
-				Error:  err,
+				Error:  err.Error(),
 			})
 			continue
 		}
@@ -155,16 +167,11 @@ func (r *Router) Start(ctx context.Context) {
 	routerContext, cancel := context.WithCancel(ctx)
 	r.Context = routerContext
 	r.contextCancel = cancel
-	contextWithRouter := context.WithValue(routerContext, common.RouterContextKey, r)
-
-	for moduleId := range r.ModuleInstances {
-		// TODO(jwetzell): handle module run errors
-		err := r.startModule(contextWithRouter, moduleId)
-		if err != nil {
-			r.logger.Error("error starting module", "moduleId", moduleId, "error", err)
-		}
-	}
+	r.startModules()
+	r.startAPIServer(r.runningConfig.Api)
 	<-r.Context.Done()
+	r.logger.Debug("shutting down api server")
+	r.stopAPIServer()
 	r.logger.Debug("waiting for modules to exit")
 	r.moduleWait.Wait()
 	r.logger.Info("done")
@@ -176,10 +183,20 @@ func (r *Router) Stop() {
 }
 
 func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) (bool, []common.RouteIOError) {
+	r.runningConfigMu.Lock()
+	defer r.runningConfigMu.Unlock()
+
 	spanCtx, span := otel.Tracer("router").Start(ctx, "input", trace.WithAttributes(attribute.String("source.id", sourceId)), trace.WithNewRoot())
 	defer span.End()
 	var routeIOErrors []common.RouteIOError
 	routeFound := false
+
+	r.broadcastEvent(Event{
+		Type: "input",
+		Data: map[string]any{
+			"source": sourceId,
+		},
+	})
 
 	var routeWaitGroup sync.WaitGroup
 
@@ -207,8 +224,21 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 						Index:        routeIndex,
 						ProcessError: err,
 					})
+					r.broadcastEvent(Event{
+						Type: "route",
+						Data: map[string]any{
+							"index": routeIndex,
+						},
+						Error: err.Error(),
+					})
 					return
 				}
+				r.broadcastEvent(Event{
+					Type: "route",
+					Data: map[string]any{
+						"index": routeIndex,
+					},
+				})
 				routeSpan.End()
 			})
 		}
@@ -220,7 +250,12 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload any) error {
 	spanCtx, span := otel.Tracer("router").Start(ctx, "output", trace.WithAttributes(attribute.String("destination.id", destinationId)))
 	defer span.End()
-
+	outputEvent := Event{
+		Type: "output",
+		Data: map[string]any{
+			"destination": destinationId,
+		},
+	}
 	destinationModule := r.getModule(destinationId)
 
 	if destinationModule == nil {
@@ -228,6 +263,8 @@ func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload
 		span.SetStatus(codes.Error, err.Error())
 		span.RecordError(err)
 		r.logger.Error("no module found for destination id", "destinationId", destinationId)
+		outputEvent.Error = err.Error()
+		r.broadcastEvent(outputEvent)
 		return err
 	}
 
@@ -238,14 +275,93 @@ func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload
 		moduleOutputSpan.SetStatus(codes.Error, err.Error())
 		moduleOutputSpan.RecordError(err)
 		r.logger.ErrorContext(moduleOutputCtx, "module output encountered error", "module", destinationModule.Id(), "error", err)
+		outputEvent.Error = err.Error()
+		r.broadcastEvent(outputEvent)
 		return err
 	} else {
 		moduleOutputSpan.SetStatus(codes.Ok, "module output successful")
 	}
-
+	r.broadcastEvent(outputEvent)
 	return nil
 }
 
+func (r *Router) startModules() {
+	contextWithRouter := context.WithValue(r.Context, common.RouterContextKey, r)
+
+	for moduleId := range r.ModuleInstances {
+		// TODO(jwetzell): handle module run errors
+		err := r.startModule(contextWithRouter, moduleId)
+		if err != nil {
+			r.logger.Error("error starting module", "moduleId", moduleId, "error", err)
+		}
+	}
+}
+
 func (r *Router) RunningConfig() config.Config {
+	r.runningConfigMu.Lock()
+	defer r.runningConfigMu.Unlock()
 	return r.runningConfig
+}
+
+func (r *Router) UpdateConfig(newConfig config.Config) ([]module.ModuleError, []route.RouteError) {
+	r.runningConfigMu.Lock()
+	defer r.runningConfigMu.Unlock()
+	oldConfig := r.runningConfig
+	r.logger.Debug("received config update", "oldConfig", oldConfig, "newConfig", newConfig)
+
+	if !reflect.DeepEqual(oldConfig.Api, newConfig.Api) {
+		r.logger.Info("applying new API config")
+		r.stopAPIServer()
+		r.startAPIServer(newConfig.Api)
+		r.runningConfig.Api = newConfig.Api
+	}
+
+	// TODO(jwetzell): handle config update errors better
+	for _, moduleInstance := range r.ModuleInstances {
+		moduleInstance.Stop()
+	}
+	r.logger.Debug("waiting for modules to exit")
+	r.moduleWait.Wait()
+
+	r.ModuleInstances = make(map[string]module.Module)
+	r.RouteInstances = []*route.Route{}
+
+	var moduleErrors []module.ModuleError
+
+	for moduleIndex, moduleDecl := range newConfig.Modules {
+
+		err := r.addModule(moduleDecl)
+		if err != nil {
+			if moduleErrors == nil {
+				moduleErrors = []module.ModuleError{}
+			}
+			moduleErrors = append(moduleErrors, module.ModuleError{
+				Index:  moduleIndex,
+				Config: moduleDecl,
+				Error:  err.Error(),
+			})
+			continue
+		}
+
+	}
+
+	var routeErrors []route.RouteError
+	for routeIndex, routeDecl := range newConfig.Routes {
+		err := r.addRoute(routeDecl)
+		if err != nil {
+			if routeErrors == nil {
+				routeErrors = []route.RouteError{}
+			}
+			routeErrors = append(routeErrors, route.RouteError{
+				Index:  routeIndex,
+				Config: routeDecl,
+				Error:  err.Error(),
+			})
+			continue
+		}
+	}
+	r.runningConfig = newConfig
+	r.startModules()
+
+	return moduleErrors, routeErrors
 }

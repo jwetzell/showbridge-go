@@ -13,6 +13,8 @@ import (
 
 	"github.com/jwetzell/showbridge-go"
 	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/internal/module"
+	"github.com/jwetzell/showbridge-go/internal/route"
 	"github.com/urfave/cli/v3"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
@@ -109,6 +111,20 @@ func readConfig(configPath string) (config.Config, error) {
 	return cfg, nil
 }
 
+func writeConfig(configPath string, newConfig config.Config) error {
+	configBytes, err := yaml.Marshal(newConfig)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(configPath, configBytes, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func run(ctx context.Context, c *cli.Command) error {
 	configPath := c.String("config")
 	if configPath == "" {
@@ -173,7 +189,19 @@ func run(ctx context.Context, c *cli.Command) error {
 		routerRunner: &sync.WaitGroup{},
 	}
 
-	router, err := showbridgeApp.getNewRouter()
+	config, err := readConfig(showbridgeApp.configPath)
+	if err != nil {
+		return err
+	}
+
+	router, moduleErrors, routeErrors := showbridge.NewRouter(config)
+
+	showbridgeApp.logConfigErrors(moduleErrors, routeErrors)
+
+	if moduleErrors != nil || routeErrors != nil {
+		return fmt.Errorf("errors initializing modules or routes")
+	}
+
 	if err != nil {
 		return fmt.Errorf("failed to initialize router: %w", err)
 	}
@@ -185,7 +213,7 @@ func run(ctx context.Context, c *cli.Command) error {
 	})
 	showbridgeApp.routerMutex.Unlock()
 
-	go showbridgeApp.handleHangup()
+	go showbridgeApp.handleChannels()
 
 	<-showbridgeApp.ctx.Done()
 	showbridgeApp.logger.Debug("shutting down router")
@@ -195,40 +223,37 @@ func run(ctx context.Context, c *cli.Command) error {
 	return nil
 }
 
-func (app *showbridgeApp) handleHangup() {
+func (app *showbridgeApp) handleChannels() {
 	for {
 		select {
 		case <-sigHangup:
 			app.logger.Info("received SIGHUP, reloading configuration")
-			newRouter, err := app.getNewRouter()
+			app.routerMutex.Lock()
+			config, err := readConfig(app.configPath)
 			if err != nil {
-				app.logger.Error("failed to reload configuration", "error", err)
+				app.logger.Error("failed to read config file", "error", err)
+				app.routerMutex.Unlock()
 				continue
 			}
-			app.routerMutex.Lock()
-			app.router.Stop()
-			app.routerRunner.Wait()
-			app.router = newRouter
-			app.routerRunner.Go(func() {
-				app.router.Start(context.Background())
-			})
+			moduleErrors, routeErrors := app.router.UpdateConfig(config)
+			app.logConfigErrors(moduleErrors, routeErrors)
 			app.logger.Info("configuration reloaded successfully")
 			app.routerMutex.Unlock()
+		case config := <-app.router.ConfigChange:
+			app.logger.Info("router config changed updating config file")
+			err := writeConfig(app.configPath, config)
+			if err != nil {
+				app.logger.Error("failed to write config file", "error", err)
+				continue
+			}
+			app.logger.Info("config file updated successfully")
 		case <-app.ctx.Done():
 			return
 		}
 	}
 }
 
-func (app *showbridgeApp) getNewRouter() (*showbridge.Router, error) {
-	// TODO(jwetzell): what should happen when the config file is unchanged?
-	config, err := readConfig(app.configPath)
-	if err != nil {
-		return nil, err
-	}
-
-	router, moduleErrors, routeErrors := showbridge.NewRouter(config)
-
+func (app *showbridgeApp) logConfigErrors(moduleErrors []module.ModuleError, routeErrors []route.RouteError) {
 	for _, moduleError := range moduleErrors {
 		app.logger.Error("problem initializing module", "index", moduleError.Index, "error", moduleError.Error)
 	}
@@ -236,12 +261,6 @@ func (app *showbridgeApp) getNewRouter() (*showbridge.Router, error) {
 	for _, routeError := range routeErrors {
 		app.logger.Error("problem initializing route", "index", routeError.Index, "error", routeError.Error)
 	}
-
-	if moduleErrors != nil || routeErrors != nil {
-		return nil, fmt.Errorf("errors initializing modules or routes")
-	}
-
-	return router, nil
 }
 
 func newTracerProvider(exp sdktrace.SpanExporter) *sdktrace.TracerProvider {
