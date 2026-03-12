@@ -1,3 +1,5 @@
+api:
+  port: 8080
 modules:
   - id: http
     type: http.server
