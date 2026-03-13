@@ -183,8 +183,6 @@ func (r *Router) Stop() {
 }
 
 func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) (bool, []common.RouteIOError) {
-	r.runningConfigMu.Lock()
-	defer r.runningConfigMu.Unlock()
 
 	spanCtx, span := otel.Tracer("router").Start(ctx, "input", trace.WithAttributes(attribute.String("source.id", sourceId)), trace.WithNewRoot())
 	defer span.End()
