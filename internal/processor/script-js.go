@@ -20,6 +20,18 @@ type ScriptJS struct {
 
 func (sj *ScriptJS) Process(ctx context.Context, payload any) (any, error) {
 
+	//NOTE(jwetzell): some weird conversion going on with these types
+	_, isUint8Slice := common.GetAnyAs[[]uint8](payload)
+	_, isbyteSlice := common.GetAnyAs[[]byte](payload)
+
+	if isUint8Slice || isbyteSlice {
+		intSlice, ok := common.GetAnyAsIntSlice(payload)
+
+		if ok {
+			payload = intSlice
+		}
+	}
+
 	sj.vm.SetProperty(sj.vm.GlobalObject(), sj.payloadAtom, payload)
 
 	sender := ctx.Value(common.SenderContextKey)
@@ -49,6 +61,7 @@ func (sj *ScriptJS) Process(ctx context.Context, payload any) (any, error) {
 
 	if ok {
 		var outputMap map[string]interface{}
+		fmt.Println(outputObject.String())
 		err := json.Unmarshal([]byte(outputObject.String()), &outputMap)
 		return outputMap, err
 	}
