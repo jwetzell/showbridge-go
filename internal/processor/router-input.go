@@ -26,7 +26,7 @@ func (ro *RouterInput) Process(ctx context.Context, payload any) (any, error) {
 	_, err := router.HandleInput(ctx, ro.SourceId, payload)
 
 	if err != nil {
-		return nil, fmt.Errorf("router.input failed to send input: %w", err)
+		return nil, errors.New("router.input failed to send input")
 	}
 
 	return payload, nil
