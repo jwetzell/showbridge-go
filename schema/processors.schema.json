@@ -651,6 +651,29 @@
       },
       {
         "type": "object",
+        "title": "Router Input",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "router.input"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "module": {
+                "title": "Source",
+                "type": "string",
+                "description": "source to report as to the router"
+              }
+            },
+            "required": ["module"]
+          }
+        },
+        "required": ["type", "params"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
         "title": "Router Output",
         "properties": {
           "type": {
