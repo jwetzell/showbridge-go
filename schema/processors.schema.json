@@ -660,13 +660,13 @@
           "params": {
             "type": "object",
             "properties": {
-              "module": {
+              "source": {
                 "title": "Source",
                 "type": "string",
                 "description": "source to report as to the router"
               }
             },
-            "required": ["module"]
+            "required": ["source"]
           }
         },
         "required": ["type", "params"],
