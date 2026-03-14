@@ -31,7 +31,7 @@ type Router struct {
 	moduleWait        sync.WaitGroup
 	logger            *slog.Logger
 	runningConfig     config.Config
-	runningConfigMu   sync.Mutex
+	runningConfigMu   sync.RWMutex
 	wsConns           []*websocket.Conn
 	wsConnsMu         sync.Mutex
 	apiServer         *http.Server
@@ -183,10 +183,10 @@ func (r *Router) Stop() {
 }
 
 func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) (bool, []common.RouteIOError) {
-	r.runningConfigMu.Lock()
-	defer r.runningConfigMu.Unlock()
+	r.runningConfigMu.RLock()
+	defer r.runningConfigMu.RUnlock()
 
-	spanCtx, span := otel.Tracer("router").Start(ctx, "input", trace.WithAttributes(attribute.String("source.id", sourceId)), trace.WithNewRoot())
+	spanCtx, span := otel.Tracer("router").Start(ctx, "input", trace.WithAttributes(attribute.String("source.id", sourceId)))
 	defer span.End()
 	var routeIOErrors []common.RouteIOError
 	routeFound := false
