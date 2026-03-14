@@ -49,7 +49,7 @@ func (r *Route) Input() string {
 
 func (r *Route) ProcessPayload(ctx context.Context, payload any) (any, error) {
 	tracer := otel.Tracer("route")
-	processCtx, processSpan := tracer.Start(ctx, "ProcessPayload")
+	processCtx, processSpan := tracer.Start(ctx, "ProcessPayload", trace.WithAttributes(attribute.String("payload.type", fmt.Sprintf("%T", payload))))
 	defer processSpan.End()
 	for processorIndex, processor := range r.processors {
 		processorCtx, processorSpan := otel.Tracer("processor").Start(processCtx, "process", trace.WithAttributes(attribute.Int("processor.index", processorIndex), attribute.String("processor.type", processor.Type())))
