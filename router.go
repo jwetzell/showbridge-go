@@ -20,6 +20,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+// TODO(jwetzell): can/should this be split into different components?
 type Router struct {
 	contextCancel context.CancelFunc
 	Context       context.Context
