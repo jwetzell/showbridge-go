@@ -298,8 +298,8 @@ func (r *Router) startModules() {
 }
 
 func (r *Router) RunningConfig() config.Config {
-	r.runningConfigMu.Lock()
-	defer r.runningConfigMu.Unlock()
+	r.runningConfigMu.RLock()
+	defer r.runningConfigMu.RLock()
 	return r.runningConfig
 }
 
