@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -12,20 +13,23 @@ type JsonEncode struct {
 	config config.ProcessorConfig
 }
 
-func (je *JsonEncode) Process(ctx context.Context, payload any) (any, error) {
+func (je *JsonEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
 	var payloadBuffer bytes.Buffer
 
 	err := json.NewEncoder(&payloadBuffer).Encode(payload)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	payloadBytes := payloadBuffer.Bytes()
 
 	payloadBytes = payloadBytes[0 : len(payloadBytes)-1]
 
-	return payloadBytes, nil
+	wrappedPayload.Payload = payloadBytes
+	return wrappedPayload, nil
 }
 
 func (je *JsonEncode) Type() string {

@@ -8,6 +8,7 @@ import (
 	"text/template"
 
 	freeD "github.com/jwetzell/free-d-go"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -24,15 +25,16 @@ type FreeDCreate struct {
 	Focus  *template.Template
 }
 
-func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
+func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
-	templateData := GetTemplateData(ctx, payload)
+	templateData := wrappedPayload
 
 	var idBuffer bytes.Buffer
 	err := fc.Id.Execute(&idBuffer, templateData)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	idString := idBuffer.String()
@@ -40,14 +42,16 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	idNum, err := strconv.ParseUint(idString, 10, 8)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	var panBuffer bytes.Buffer
 	err = fc.Pan.Execute(&panBuffer, templateData)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	panString := panBuffer.String()
@@ -55,14 +59,16 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	panNum, err := strconv.ParseFloat(panString, 32)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	var tiltBuffer bytes.Buffer
 	err = fc.Tilt.Execute(&tiltBuffer, templateData)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	tiltString := tiltBuffer.String()
@@ -70,14 +76,16 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	tiltNum, err := strconv.ParseFloat(tiltString, 32)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	var rollBuffer bytes.Buffer
 	err = fc.Tilt.Execute(&rollBuffer, templateData)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	rollString := rollBuffer.String()
@@ -85,14 +93,16 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	rollNum, err := strconv.ParseFloat(rollString, 32)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	var posXBuffer bytes.Buffer
 	err = fc.PosX.Execute(&posXBuffer, templateData)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	posXString := posXBuffer.String()
@@ -100,14 +110,16 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	posXNum, err := strconv.ParseFloat(posXString, 32)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	var posYBuffer bytes.Buffer
 	err = fc.PosY.Execute(&posYBuffer, templateData)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	posYString := posYBuffer.String()
@@ -115,14 +127,16 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	posYNum, err := strconv.ParseFloat(posYString, 32)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	var posZBuffer bytes.Buffer
 	err = fc.PosZ.Execute(&posZBuffer, templateData)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	posZString := posZBuffer.String()
@@ -130,14 +144,16 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	posZNum, err := strconv.ParseFloat(posZString, 32)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	var zoomBuffer bytes.Buffer
 	err = fc.Zoom.Execute(&zoomBuffer, templateData)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	zoomString := zoomBuffer.String()
@@ -145,14 +161,16 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	zoomNum, err := strconv.ParseInt(zoomString, 10, 32)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	var focusBuffer bytes.Buffer
 	err = fc.Focus.Execute(&focusBuffer, templateData)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	focusString := focusBuffer.String()
@@ -160,7 +178,8 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 	focusNum, err := strconv.ParseInt(focusString, 10, 32)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	payloadMessage := freeD.FreeDPosition{
@@ -175,7 +194,9 @@ func (fc *FreeDCreate) Process(ctx context.Context, payload any) (any, error) {
 		Focus: int32(focusNum),
 	}
 
-	return payloadMessage, nil
+	wrappedPayload.Payload = payloadMessage
+
+	return wrappedPayload, nil
 }
 
 func (fc *FreeDCreate) Type() string {

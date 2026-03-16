@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -14,30 +15,36 @@ type StructMethodGet struct {
 	Name   string
 }
 
-func (sm *StructMethodGet) Process(ctx context.Context, payload any) (any, error) {
+func (sm *StructMethodGet) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
 	s := reflect.ValueOf(payload)
 
 	if s.Kind() != reflect.Struct {
 		if s.Kind() == reflect.Pointer && s.Elem().Kind() == reflect.Struct {
 			s = s.Elem()
 		} else {
-			return nil, errors.New("struct.method.get processor only accepts a struct payload")
+			wrappedPayload.End = true
+			return wrappedPayload, errors.New("struct.method.get processor only accepts a struct payload")
 		}
 	}
 
 	method := s.MethodByName(sm.Name)
 	if !method.IsValid() {
-		return nil, fmt.Errorf("struct.method.get method '%s' does not exist", sm.Name)
+		wrappedPayload.End = true
+		return wrappedPayload, fmt.Errorf("struct.method.get method '%s' does not exist", sm.Name)
 	}
 
 	value := method.Call(nil)
 
 	if len(value) == 0 {
-		return nil, nil
+		wrappedPayload.End = true
+		wrappedPayload.Payload = nil
+		return wrappedPayload, nil
 	}
 
 	if len(value) == 1 {
-		return value[0].Interface(), nil
+		wrappedPayload.Payload = value[0].Interface()
+		return wrappedPayload, nil
 	}
 
 	results := make([]any, len(value))
@@ -46,7 +53,8 @@ func (sm *StructMethodGet) Process(ctx context.Context, payload any) (any, error
 		results[i] = v.Interface()
 	}
 
-	return results, nil
+	wrappedPayload.Payload = results
+	return wrappedPayload, nil
 }
 
 func (sm *StructMethodGet) Type() string {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand/v2"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -16,16 +17,19 @@ type FloatRandom struct {
 	config  config.ProcessorConfig
 }
 
-func (fr *FloatRandom) Process(ctx context.Context, payload any) (any, error) {
+func (fr *FloatRandom) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 	if fr.BitSize == 32 {
 		payloadFloat := rand.Float32()*(float32(fr.Max)-float32(fr.Min)) + float32(fr.Min)
-		return payloadFloat, nil
+		wrappedPayload.Payload = payloadFloat
+		return wrappedPayload, nil
 	}
 	if fr.BitSize == 64 {
 		payloadFloat := rand.Float64()*(fr.Max-fr.Min) + fr.Min
-		return payloadFloat, nil
+		wrappedPayload.Payload = payloadFloat
+		return wrappedPayload, nil
 	}
-	return nil, errors.New("float.random bitSize error: must be 32 or 64")
+	wrappedPayload.End = true
+	return wrappedPayload, errors.New("float.random bitSize error: must be 32 or 64")
 }
 
 func (fr *FloatRandom) Type() string {

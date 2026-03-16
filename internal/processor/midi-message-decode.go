@@ -15,16 +15,19 @@ type MIDIMessageDecode struct {
 	config config.ProcessorConfig
 }
 
-func (mmd *MIDIMessageDecode) Process(ctx context.Context, payload any) (any, error) {
+func (mmd *MIDIMessageDecode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
 	payloadBytes, ok := common.GetAnyAs[[]byte](payload)
 
 	if !ok {
-		return nil, errors.New("midi.message.decode processor only accepts a []byte")
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("midi.message.decode processor only accepts a []byte")
 	}
 
 	payloadMessage := midi.Message(payloadBytes)
 
-	return payloadMessage, nil
+	wrappedPayload.Payload = payloadMessage
+	return wrappedPayload, nil
 }
 
 func (mmd *MIDIMessageDecode) Type() string {

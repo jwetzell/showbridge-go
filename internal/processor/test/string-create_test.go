@@ -3,6 +3,7 @@ package processor_test
 import (
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -30,12 +31,12 @@ func TestStringCreateFromRegistry(t *testing.T) {
 	payload := "hello"
 	expected := "hello"
 
-	got, err := processorInstance.Process(t.Context(), payload)
+	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
 	if err != nil {
 		t.Fatalf("string.create processing failed: %s", err)
 	}
 
-	if got != expected {
+	if got.Payload != expected {
 		t.Fatalf("string.create got %+v, expected %+v", got, expected)
 	}
 }
@@ -96,18 +97,18 @@ func TestGoodStringCreate(t *testing.T) {
 				t.Fatalf("string.create failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err != nil {
 				t.Fatalf("string.create processing failed: %s", err)
 			}
 
-			gotStrings, ok := got.(string)
+			gotStrings, ok := got.Payload.(string)
 			if !ok {
-				t.Fatalf("string.create returned a %T payload: %s", got, got)
+				t.Fatalf("string.create returned a %T payload: %+v", got, got)
 			}
 			if gotStrings != test.expected {
-				t.Fatalf("string.create got %s, expected %s", got, test.expected)
+				t.Fatalf("string.create got %+v, expected %s", got, test.expected)
 			}
 		})
 	}
@@ -148,7 +149,7 @@ func TestBadStringCreate(t *testing.T) {
 			params: map[string]any{
 				"template": "{{.Invalid}}",
 			},
-			errorString: "template: template:1:2: executing \"template\" at <.Invalid>: can't evaluate field Invalid in type processor.TemplateData",
+			errorString: "template: template:1:2: executing \"template\" at <.Invalid>: can't evaluate field Invalid in type common.WrappedPayload",
 		},
 	}
 
@@ -172,10 +173,10 @@ func TestBadStringCreate(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
-				t.Fatalf("string.create expected to fail but got payload: %s", got)
+				t.Fatalf("string.create expected to fail but got payload: %+v", got)
 			}
 
 			if err.Error() != test.errorString {

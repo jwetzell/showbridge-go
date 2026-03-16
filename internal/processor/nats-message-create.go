@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"text/template"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -20,14 +21,16 @@ type NATSMessageCreate struct {
 	Payload *template.Template
 }
 
-func (nmc *NATSMessageCreate) Process(ctx context.Context, payload any) (any, error) {
-	templateData := GetTemplateData(ctx, payload)
+func (nmc *NATSMessageCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+
+	templateData := wrappedPayload
 
 	var payloadBuffer bytes.Buffer
 	err := nmc.Payload.Execute(&payloadBuffer, templateData)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	payloadString := payloadBuffer.String()
@@ -36,17 +39,18 @@ func (nmc *NATSMessageCreate) Process(ctx context.Context, payload any) (any, er
 	err = nmc.Subject.Execute(&subjectBuffer, templateData)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	subjectString := subjectBuffer.String()
 
-	message := NATSMessage{
+	wrappedPayload.Payload = NATSMessage{
 		Subject: subjectString,
 		Payload: []byte(payloadString),
 	}
 
-	return message, nil
+	return wrappedPayload, nil
 }
 
 func (nmc *NATSMessageCreate) Type() string {

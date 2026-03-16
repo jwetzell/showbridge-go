@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -31,12 +32,12 @@ func TestJsonDecodeFromRegistry(t *testing.T) {
 		"property": "hello",
 	}
 
-	got, err := processorInstance.Process(t.Context(), payload)
+	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
 	if err != nil {
 		t.Fatalf("json.decode processing failed: %s", err)
 	}
 
-	gotMap, ok := got.(map[string]any)
+	gotMap, ok := got.Payload.(map[string]any)
 
 	if !ok {
 		t.Fatalf("json.decode should return byte slice")
@@ -74,18 +75,18 @@ func TestGoodJsonDecode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := jsonDecoder.Process(t.Context(), test.payload)
+			got, err := jsonDecoder.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 			if err != nil {
 				t.Fatalf("json.decode processing failed: %s", err)
 			}
 
-			gotMap, ok := got.(map[string]any)
+			gotMap, ok := got.Payload.(map[string]any)
 			if !ok {
-				t.Fatalf("json.decode returned a %T payload: %s", got, got)
+				t.Fatalf("json.decode returned a %T payload: %+v", got, got)
 			}
 
 			if !reflect.DeepEqual(gotMap, test.expected) {
-				t.Fatalf("json.decode got %x, expected %s", got, test.expected)
+				t.Fatalf("json.decode got %+v, expected %s", got, test.expected)
 			}
 		})
 	}
@@ -112,7 +113,7 @@ func TestBadJsonDecode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := stringEncoder.Process(t.Context(), test.payload)
+			got, err := stringEncoder.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
 				t.Fatalf("json.decode expected to fail but got payload: %+v", got)

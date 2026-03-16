@@ -3,6 +3,7 @@ package processor_test
 import (
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -68,14 +69,14 @@ func TestGoodIntScale(t *testing.T) {
 				t.Fatalf("int.scale failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 			if err != nil {
 				t.Fatalf("int.scale processing failed: %s", err)
 			}
 
-			gotInt, ok := got.(int)
+			gotInt, ok := got.Payload.(int)
 			if !ok {
-				t.Fatalf("int.scale returned a %T payload: %s", got, got)
+				t.Fatalf("int.scale returned a %T payload: %+v", got, got)
 			}
 
 			if gotInt != test.expected {
@@ -156,10 +157,10 @@ func TestBadIntScale(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
-				t.Fatalf("int.scale expected to fail but got payload: %s", got)
+				t.Fatalf("int.scale expected to fail but got payload: %+v", got)
 			}
 
 			if err.Error() != test.errorString {

@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 	"gitlab.com/gomidi/midi/v2"
@@ -103,14 +104,14 @@ func TestGoodMIDIMessageCreate(t *testing.T) {
 				t.Fatalf("midi.message.create failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 			if err != nil {
 				t.Fatalf("midi.message.create processing failed: %s", err)
 			}
 
-			gotMessage, ok := got.(midi.Message)
+			gotMessage, ok := got.Payload.(midi.Message)
 			if !ok {
-				t.Fatalf("midi.message.create returned a %T payload: %s", got, got)
+				t.Fatalf("midi.message.create returned a %T payload: %+v", got, got)
 			}
 
 			if !reflect.DeepEqual(gotMessage, test.expected) {
@@ -279,7 +280,7 @@ func TestBadMIDIMessageCreate(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
 				t.Fatalf("midi.message.create expected to fail but succeeded, got: %v", got)

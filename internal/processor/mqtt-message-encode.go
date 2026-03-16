@@ -13,14 +13,16 @@ type MQTTMessageEncode struct {
 	config config.ProcessorConfig
 }
 
-func (mme *MQTTMessageEncode) Process(ctx context.Context, payload any) (any, error) {
+func (mme *MQTTMessageEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
 	payloadMessage, ok := common.GetAnyAs[mqtt.Message](payload)
 
 	if !ok {
-		return nil, errors.New("mqtt.message.encode processor only accepts an mqtt.Message")
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("mqtt.message.encode processor only accepts an mqtt.Message")
 	}
-
-	return payloadMessage.Payload(), nil
+	wrappedPayload.Payload = payloadMessage.Payload()
+	return wrappedPayload, nil
 }
 
 func (mme *MQTTMessageEncode) Type() string {

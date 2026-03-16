@@ -3,6 +3,7 @@ package processor_test
 import (
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -58,13 +59,13 @@ func TestGoodTimeSleep(t *testing.T) {
 				t.Fatalf("time.sleep failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err != nil {
 				t.Fatalf("time.sleep processing failed: %s", err)
 			}
 
-			if got != test.payload {
+			if got.Payload != test.payload {
 				t.Fatalf("time.sleep got %+v, expected %+v", got, test.payload)
 			}
 		})
@@ -113,7 +114,7 @@ func TestBadTimeSleep(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
 				t.Fatalf("time.sleep expected to fail but succeeded, got: %v", got)

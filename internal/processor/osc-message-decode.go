@@ -14,26 +14,32 @@ type OSCMessageDecode struct {
 	config config.ProcessorConfig
 }
 
-func (omd *OSCMessageDecode) Process(ctx context.Context, payload any) (any, error) {
+func (omd *OSCMessageDecode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
 	payloadBytes, ok := common.GetAnyAs[[]byte](payload)
 
 	if !ok {
-		return nil, errors.New("osc.message.decode processor only accepts a []byte payload")
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("osc.message.decode processor only accepts a []byte payload")
 	}
 
 	if len(payloadBytes) == 0 {
-		return nil, errors.New("osc.message.decode processor can't work on empty []byte")
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("osc.message.decode processor can't work on empty []byte")
 	}
 
 	if payloadBytes[0] != '/' {
-		return nil, errors.New("osc.message.decode processor needs an OSC looking []byte")
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("osc.message.decode processor needs an OSC looking []byte")
 	}
 
 	message, err := osc.MessageFromBytes(payloadBytes)
 	if err != nil {
-		return nil, fmt.Errorf("osc.message.decode processor failed to decode OSC message: %w", err)
+		wrappedPayload.End = true
+		return wrappedPayload, fmt.Errorf("osc.message.decode processor failed to decode OSC message: %w", err)
 	}
-	return message, nil
+	wrappedPayload.Payload = message
+	return wrappedPayload, nil
 }
 
 func (omd *OSCMessageDecode) Type() string {

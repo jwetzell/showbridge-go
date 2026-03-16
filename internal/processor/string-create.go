@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"text/template"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -14,19 +15,20 @@ type StringCreate struct {
 	Template *template.Template
 }
 
-func (sc *StringCreate) Process(ctx context.Context, payload any) (any, error) {
-	templateData := GetTemplateData(ctx, payload)
+func (sc *StringCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	templateData := wrappedPayload
 
 	var templateBuffer bytes.Buffer
 	err := sc.Template.Execute(&templateBuffer, templateData)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
-	payloadString := templateBuffer.String()
+	wrappedPayload.Payload = templateBuffer.String()
 
-	return payloadString, nil
+	return wrappedPayload, nil
 }
 
 func (sc *StringCreate) Type() string {

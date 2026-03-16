@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand/v2"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -15,9 +16,10 @@ type IntRandom struct {
 	config config.ProcessorConfig
 }
 
-func (ir *IntRandom) Process(ctx context.Context, payload any) (any, error) {
+func (ir *IntRandom) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 	payloadInt := rand.IntN(ir.Max-ir.Min+1) + ir.Min
-	return payloadInt, nil
+	wrappedPayload.Payload = payloadInt
+	return wrappedPayload, nil
 }
 
 func (ir *IntRandom) Type() string {

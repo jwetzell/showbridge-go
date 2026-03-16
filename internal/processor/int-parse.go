@@ -16,18 +16,22 @@ type IntParse struct {
 	config  config.ProcessorConfig
 }
 
-func (ip *IntParse) Process(ctx context.Context, payload any) (any, error) {
+func (ip *IntParse) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
 	payloadString, ok := common.GetAnyAs[string](payload)
 
 	if !ok {
-		return nil, errors.New("int.parse processor only accepts a string")
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("int.parse processor only accepts a string")
 	}
 
 	payloadInt, err := strconv.ParseInt(payloadString, ip.Base, ip.BitSize)
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
-	return payloadInt, nil
+	wrappedPayload.Payload = payloadInt
+	return wrappedPayload, nil
 }
 
 func (ip *IntParse) Type() string {

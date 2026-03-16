@@ -16,27 +16,32 @@ type ScriptWASM struct {
 	Function string
 }
 
-func (sw *ScriptWASM) Process(ctx context.Context, payload any) (any, error) {
+func (sw *ScriptWASM) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
+	payload := wrappedPayload.Payload
 	payloadBytes, ok := common.GetAnyAs[[]byte](payload)
 
 	if !ok {
-		return nil, fmt.Errorf("script.wasm can only process a byte array")
+		wrappedPayload.End = true
+		return wrappedPayload, fmt.Errorf("script.wasm can only process a byte array")
 	}
 
 	program, err := sw.Program.Instance(ctx, extism.PluginInstanceConfig{})
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	_, output, err := program.Call(sw.Function, payloadBytes)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
+	wrappedPayload.Payload = output
 
-	return output, nil
+	return wrappedPayload, nil
 }
 
 func (sw *ScriptWASM) Type() string {

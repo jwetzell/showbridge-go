@@ -45,36 +45,44 @@ type MIDIPitchBend struct {
 	Absolute uint16
 }
 
-func (mmu *MIDIMessageUnpack) Process(ctx context.Context, payload any) (any, error) {
+func (mmu *MIDIMessageUnpack) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
 	payloadMidi, ok := common.GetAnyAs[midi.Message](payload)
 
 	if !ok {
-		return nil, errors.New("midi.message.unpack processor only accepts a midi.Message")
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("midi.message.unpack processor only accepts a midi.Message")
 	}
 
 	switch payloadMidi.Type() {
 	case midi.NoteOnMsg:
 		noteOnMsg := MIDINoteOn{}
 		payloadMidi.GetNoteOn(&noteOnMsg.Channel, &noteOnMsg.Note, &noteOnMsg.Velocity)
-		return noteOnMsg, nil
+		wrappedPayload.Payload = noteOnMsg
+		return wrappedPayload, nil
 	case midi.NoteOffMsg:
 		noteOffMsg := MIDINoteOff{}
 		payloadMidi.GetNoteOff(&noteOffMsg.Channel, &noteOffMsg.Note, &noteOffMsg.Velocity)
-		return noteOffMsg, nil
+		wrappedPayload.Payload = noteOffMsg
+		return wrappedPayload, nil
 	case midi.ControlChangeMsg:
 		controlChangeMsg := MIDIControlChange{}
 		payloadMidi.GetControlChange(&controlChangeMsg.Channel, &controlChangeMsg.Control, &controlChangeMsg.Value)
-		return controlChangeMsg, nil
+		wrappedPayload.Payload = controlChangeMsg
+		return wrappedPayload, nil
 	case midi.ProgramChangeMsg:
 		programChangeMsg := MIDIProgramChange{}
 		payloadMidi.GetProgramChange(&programChangeMsg.Channel, &programChangeMsg.Program)
-		return programChangeMsg, nil
+		wrappedPayload.Payload = programChangeMsg
+		return wrappedPayload, nil
 	case midi.PitchBendMsg:
 		pitchBendMsg := MIDIPitchBend{}
 		payloadMidi.GetPitchBend(&pitchBendMsg.Channel, &pitchBendMsg.Relative, &pitchBendMsg.Absolute)
-		return pitchBendMsg, nil
+		wrappedPayload.Payload = pitchBendMsg
+		return wrappedPayload, nil
 	default:
-		return nil, fmt.Errorf("midi.message.unpack message type not supported %v", payloadMidi.Type())
+		wrappedPayload.End = true
+		return wrappedPayload, fmt.Errorf("midi.message.unpack message type not supported %v", payloadMidi.Type())
 	}
 }
 

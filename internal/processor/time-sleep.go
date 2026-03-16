@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -13,9 +14,9 @@ type TimeSleep struct {
 	Duration time.Duration
 }
 
-func (ts *TimeSleep) Process(ctx context.Context, payload any) (any, error) {
+func (ts *TimeSleep) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 	time.Sleep(ts.Duration)
-	return payload, nil
+	return wrappedPayload, nil
 }
 
 func (ts *TimeSleep) Type() string {

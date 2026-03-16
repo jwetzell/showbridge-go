@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/jwetzell/osc-go"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -59,14 +60,14 @@ func TestGoodOSCMessageEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 			if err != nil {
 				t.Fatalf("osc.message.encode processing failed: %s", err)
 			}
 
-			gotBytes, ok := got.([]byte)
+			gotBytes, ok := got.Payload.([]byte)
 			if !ok {
-				t.Fatalf("osc.message.encode returned a %T payload: %s", got, got)
+				t.Fatalf("osc.message.encode returned a %T payload: %+v", got, got)
 			}
 
 			if !slices.Equal(gotBytes, test.expected) {
@@ -92,10 +93,10 @@ func TestBadOSCMessageEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
-				t.Fatalf("osc.message.encode expected to fail but got payload: %s", got)
+				t.Fatalf("osc.message.encode expected to fail but got payload: %+v", got)
 			}
 			if err.Error() != test.errorString {
 				t.Fatalf("osc.message.encode got error '%s', expected '%s'", err.Error(), test.errorString)

@@ -10,6 +10,7 @@ import (
 	"text/template"
 
 	"github.com/jwetzell/osc-go"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -20,25 +21,28 @@ type OSCMessageCreate struct {
 	Types   string
 }
 
-func (omc *OSCMessageCreate) Process(ctx context.Context, payload any) (any, error) {
+func (omc *OSCMessageCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
-	templateData := GetTemplateData(ctx, payload)
+	templateData := wrappedPayload
 
 	var addressBuffer bytes.Buffer
 	err := omc.Address.Execute(&addressBuffer, templateData)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	addressString := addressBuffer.String()
 
 	if len(addressString) == 0 {
-		return nil, errors.New("osc.message.create address must not be empty")
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("osc.message.create address must not be empty")
 	}
 
 	if addressString[0] != '/' {
-		return nil, errors.New("osc.message.create address must start with '/'")
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("osc.message.create address must start with '/'")
 	}
 
 	payloadMessage := &osc.OSCMessage{
@@ -52,7 +56,8 @@ func (omc *OSCMessageCreate) Process(ctx context.Context, payload any) (any, err
 		err := argTemplate.Execute(&argBuffer, templateData)
 
 		if err != nil {
-			return nil, err
+			wrappedPayload.End = true
+			return wrappedPayload, err
 		}
 
 		argString := argBuffer.String()
@@ -60,7 +65,8 @@ func (omc *OSCMessageCreate) Process(ctx context.Context, payload any) (any, err
 		typedArg, err := argToTypedArg(argString, omc.Types[argIndex])
 
 		if err != nil {
-			return nil, err
+			wrappedPayload.End = true
+			return wrappedPayload, err
 		}
 
 		args = append(args, typedArg)
@@ -70,7 +76,8 @@ func (omc *OSCMessageCreate) Process(ctx context.Context, payload any) (any, err
 		payloadMessage.Args = args
 	}
 
-	return payloadMessage, nil
+	wrappedPayload.Payload = payloadMessage
+	return wrappedPayload, nil
 }
 
 func (omc *OSCMessageCreate) Type() string {

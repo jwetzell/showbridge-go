@@ -3,6 +3,7 @@ package processor_test
 import (
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -75,14 +76,14 @@ func TestGoodScriptExpr(t *testing.T) {
 				t.Fatalf("script.expr failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err != nil {
 				t.Fatalf("script.expr processing failed: %s", err)
 			}
 
 			//TODO(jwetzell): work out better way to compare the any/any
-			if got != test.expected {
+			if got.Payload != test.expected {
 				t.Fatalf("script.expr got %+v (%T), expected %+v (%T)", got, got, test.expected, test.expected)
 			}
 		})
@@ -133,7 +134,7 @@ func TestBadScriptExpr(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
 				t.Fatalf("script.expr expected to fail but succeeded, got: %v", got)

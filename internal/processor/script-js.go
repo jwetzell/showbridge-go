@@ -18,42 +18,45 @@ type ScriptJS struct {
 	Program     string
 }
 
-func (sj *ScriptJS) Process(ctx context.Context, payload any) (any, error) {
+func (sj *ScriptJS) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
 	//NOTE(jwetzell): some weird conversion going on with these types
-	_, isUint8Slice := common.GetAnyAs[[]uint8](payload)
-	_, isbyteSlice := common.GetAnyAs[[]byte](payload)
+	_, isUint8Slice := common.GetAnyAs[[]uint8](wrappedPayload.Payload)
+	_, isbyteSlice := common.GetAnyAs[[]byte](wrappedPayload.Payload)
 
 	if isUint8Slice || isbyteSlice {
-		intSlice, ok := common.GetAnyAsIntSlice(payload)
+		intSlice, ok := common.GetAnyAsIntSlice(wrappedPayload.Payload)
 
 		if ok {
-			payload = intSlice
+			wrappedPayload.Payload = intSlice
 		}
 	}
 
-	sj.vm.SetProperty(sj.vm.GlobalObject(), sj.payloadAtom, payload)
+	sj.vm.SetProperty(sj.vm.GlobalObject(), sj.payloadAtom, wrappedPayload.Payload)
 
-	sender := ctx.Value(common.SenderContextKey)
-	sj.vm.SetProperty(sj.vm.GlobalObject(), sj.senderAtom, sender)
+	sj.vm.SetProperty(sj.vm.GlobalObject(), sj.senderAtom, wrappedPayload.Sender)
 
 	_, err := sj.vm.Eval(sj.Program, quickjs.EvalGlobal)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	output, err := sj.vm.GetProperty(sj.vm.GlobalObject(), sj.payloadAtom)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	// NOTE(jwetzell): turn undefined into nil
 	_, ok := output.(quickjs.Undefined)
 
 	if ok {
-		return nil, nil
+		wrappedPayload.End = true
+		wrappedPayload.Payload = nil
+		return wrappedPayload, nil
 	}
 
 	// NOTE(jwetzell): turn object into map[string]interface{}
@@ -61,12 +64,13 @@ func (sj *ScriptJS) Process(ctx context.Context, payload any) (any, error) {
 
 	if ok {
 		var outputMap map[string]interface{}
-		fmt.Println(outputObject.String())
 		err := json.Unmarshal([]byte(outputObject.String()), &outputMap)
-		return outputMap, err
+		wrappedPayload.Payload = outputMap
+		return wrappedPayload, err
 	}
 
-	return output, nil
+	wrappedPayload.Payload = output
+	return wrappedPayload, nil
 }
 
 func (sj *ScriptJS) Type() string {

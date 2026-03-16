@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -60,17 +61,17 @@ func (mm MQTTMessage) Payload() []byte {
 
 func (mm MQTTMessage) Ack() {}
 
-func (mmc *MQTTMessageCreate) Process(ctx context.Context, payload any) (any, error) {
+func (mmc *MQTTMessageCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 	// TODO(jwetzell): support templating
 
-	message := MQTTMessage{
+	wrappedPayload.Payload = MQTTMessage{
 		topic:    mmc.Topic,
 		qos:      mmc.QoS,
 		retained: mmc.Retained,
 		payload:  mmc.Payload,
 	}
 
-	return message, nil
+	return wrappedPayload, nil
 }
 
 func (mmc *MQTTMessageCreate) Type() string {

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/jwetzell/artnet-go"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -57,15 +58,15 @@ func TestGoodArtnetPacketDecode(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			got, err := packetDecoder.Process(t.Context(), test.payload)
+			got, err := packetDecoder.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err != nil {
 				t.Fatalf("artnet.packet.decode processing failed: %s", err)
 			}
 
 			//TODO(jwetzell): work out better way to compare the any/any
-			if !reflect.DeepEqual(got, test.expected) {
-				t.Fatalf("artnet.packet.decode got %+v (%T), expected %+v (%T)", got, got, test.expected, test.expected)
+			if !reflect.DeepEqual(got.Payload, test.expected) {
+				t.Fatalf("artnet.packet.decode got %+v (%T), expected %+v (%T)", got.Payload, got.Payload, test.expected, test.expected)
 			}
 		})
 	}
@@ -93,7 +94,7 @@ func TestBadArtnetPacketDecode(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			got, err := packetDecoder.Process(t.Context(), test.payload)
+			got, err := packetDecoder.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
 				t.Fatalf("artnet.packet.decode expected to fail but succeeded, got: %v", got)

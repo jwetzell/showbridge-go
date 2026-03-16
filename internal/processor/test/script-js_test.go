@@ -4,6 +4,7 @@ import (
 	"maps"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -33,12 +34,12 @@ func TestScriptJSFromRegistry(t *testing.T) {
 	payload := 1
 	expected := 2
 
-	got, err := processorInstance.Process(t.Context(), payload)
+	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
 	if err != nil {
 		t.Fatalf("script.js processing failed: %s", err)
 	}
 
-	if got != expected {
+	if got.Payload != expected {
 		t.Fatalf("script.js got %+v, expected %+v", got, expected)
 	}
 }
@@ -142,7 +143,7 @@ func TestGoodScriptJS(t *testing.T) {
 				t.Fatalf("script.js failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err != nil {
 				t.Fatalf("script.js processing failed: %s", err)
@@ -150,7 +151,7 @@ func TestGoodScriptJS(t *testing.T) {
 
 			//TODO(jwetzell): work out better way to compare the any/any
 
-			gotMap, ok := got.(map[string]interface{})
+			gotMap, ok := got.Payload.(map[string]interface{})
 			if ok {
 				// got a map
 				expectedMap, ok := test.expected.(map[string]interface{})
@@ -162,8 +163,8 @@ func TestGoodScriptJS(t *testing.T) {
 					t.Fatalf("script.js got %+v, expected %+v", got, test.expected)
 				}
 			} else {
-				if got != test.expected {
-					t.Fatalf("script.js got %+v, expected %+v", got, test.expected)
+				if got.Payload != test.expected {
+					t.Fatalf("script.js got %+v, expected %+v", got.Payload, test.expected)
 				}
 			}
 		})
@@ -201,7 +202,7 @@ func TestBadScriptJS(t *testing.T) {
 				Params: test.params,
 			})
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
 				t.Fatalf("script.js expected to fail but succeeded, got: %v", got)

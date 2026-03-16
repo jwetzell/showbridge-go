@@ -9,6 +9,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -19,15 +20,16 @@ type HTTPRequestDo struct {
 	URL    *template.Template
 }
 
-func (hrd *HTTPRequestDo) Process(ctx context.Context, payload any) (any, error) {
+func (hrd *HTTPRequestDo) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
-	templateData := GetTemplateData(ctx, payload)
+	templateData := wrappedPayload
 
 	var urlBuffer bytes.Buffer
 	err := hrd.URL.Execute(&urlBuffer, templateData)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	urlString := urlBuffer.String()
@@ -36,26 +38,30 @@ func (hrd *HTTPRequestDo) Process(ctx context.Context, payload any) (any, error)
 	request, err := http.NewRequest(hrd.Method, urlString, bytes.NewBuffer([]byte{}))
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	response, err := hrd.client.Do(request)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	body, err := io.ReadAll(response.Body)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	//TODO(jwetzell): support headers, etc
-	return HTTPResponse{
+	wrappedPayload.Payload = HTTPResponse{
 		Status: response.StatusCode,
 		Body:   body,
-	}, nil
+	}
+	return wrappedPayload, nil
 }
 
 func (hrd *HTTPRequestDo) Type() string {

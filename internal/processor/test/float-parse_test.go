@@ -3,6 +3,7 @@ package processor_test
 import (
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -75,14 +76,14 @@ func TestGoodFloatParse(t *testing.T) {
 				t.Fatalf("float.parse failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 			if err != nil {
 				t.Fatalf("float.parse processing failed: %s", err)
 			}
 
-			gotFloat, ok := got.(float64)
+			gotFloat, ok := got.Payload.(float64)
 			if !ok {
-				t.Fatalf("float.parse returned a %T payload: %s", got, got)
+				t.Fatalf("float.parse returned a %T payload: %+v", got, got)
 			}
 			if gotFloat != test.expected {
 				t.Fatalf("float.parse got %f, expected %f", gotFloat, test.expected)
@@ -151,7 +152,7 @@ func TestBadFloatParse(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
 				t.Fatalf("float.parse expected to fail but succeeded, got: %v", got)
