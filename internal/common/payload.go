@@ -12,7 +12,10 @@ type WrappedPayload struct {
 }
 
 func GetWrappedPayload(ctx context.Context, payload any) WrappedPayload {
-	templateData := WrappedPayload{Payload: payload}
+	templateData := WrappedPayload{
+		Payload: payload,
+		End:     false,
+	}
 	modules := ctx.Value(ModulesContextKey)
 	if modules != nil {
 		templateData.Modules = modules
