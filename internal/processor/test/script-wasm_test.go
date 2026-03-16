@@ -4,6 +4,7 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -74,15 +75,15 @@ func TestGoodScriptWASM(t *testing.T) {
 				t.Fatalf("script.wasm failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err != nil {
 				t.Fatalf("script.wasm processing failed: %s", err)
 			}
 
-			gotBytes, ok := got.([]byte)
+			gotBytes, ok := got.Payload.([]byte)
 			if !ok {
-				t.Fatalf("script.wasm returned a %T payload: %s", got, got)
+				t.Fatalf("script.wasm returned a %T payload: %+v", got, got)
 			}
 
 			if !slices.Equal(gotBytes, test.expected) {
@@ -180,7 +181,7 @@ func TestBadScriptWASM(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
 				t.Fatalf("script.wasm expected to fail but succeeded, got: %v", got)

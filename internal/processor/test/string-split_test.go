@@ -4,6 +4,7 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -31,12 +32,12 @@ func TestStringSplitFromRegistry(t *testing.T) {
 	payload := "part1,part2,part3"
 	expected := []string{"part1", "part2", "part3"}
 
-	got, err := processorInstance.Process(t.Context(), payload)
+	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
 	if err != nil {
 		t.Fatalf("string.split processing failed: %s", err)
 	}
 
-	gotStrings, ok := got.([]string)
+	gotStrings, ok := got.Payload.([]string)
 
 	if !ok {
 		t.Fatalf("string.split should return a slice of strings")
@@ -78,14 +79,14 @@ func TestGoodStringSplit(t *testing.T) {
 				t.Fatalf("string.split failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 			if err != nil {
 				t.Fatalf("string.split processing failed: %s", err)
 			}
 
-			gotStrings, ok := got.([]string)
+			gotStrings, ok := got.Payload.([]string)
 			if !ok {
-				t.Fatalf("string.split returned a %T payload: %s", got, got)
+				t.Fatalf("string.split returned a %T payload: %+v", got, got)
 			}
 
 			if !slices.Equal(gotStrings, test.expected) {
@@ -141,10 +142,10 @@ func TestBadStringSplit(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
-				t.Fatalf("string.split expected error but got none, payload: %s", got)
+				t.Fatalf("string.split expected error but got none, payload: %+v", got)
 			}
 			if err.Error() != test.errorString {
 				t.Fatalf("string.split got error '%s', expected '%s'", err.Error(), test.errorString)

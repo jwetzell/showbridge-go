@@ -4,6 +4,7 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -28,12 +29,12 @@ func TestStringEncodeFromRegistry(t *testing.T) {
 	payload := "hello"
 	expected := []byte{'h', 'e', 'l', 'l', 'o'}
 
-	got, err := processorInstance.Process(t.Context(), payload)
+	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
 	if err != nil {
 		t.Fatalf("string.encode processing failed: %s", err)
 	}
 
-	gotBytes, ok := got.([]byte)
+	gotBytes, ok := got.Payload.([]byte)
 
 	if !ok {
 		t.Fatalf("string.encode should return byte slice")
@@ -60,14 +61,14 @@ func TestGoodStringEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := stringEncoder.Process(t.Context(), test.payload)
+			got, err := stringEncoder.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 			if err != nil {
 				t.Fatalf("string.encode processing failed: %s", err)
 			}
 
-			gotBytes, ok := got.([]byte)
+			gotBytes, ok := got.Payload.([]byte)
 			if !ok {
-				t.Fatalf("string.encode returned a %T payload: %s", got, got)
+				t.Fatalf("string.encode returned a %T payload: %+v", got, got)
 			}
 			if !slices.Equal(gotBytes, test.expected) {
 				t.Fatalf("string.encode got %+v, expected %+v", gotBytes, test.expected)
@@ -92,10 +93,10 @@ func TestBadStringEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := stringEncoder.Process(t.Context(), test.payload)
+			got, err := stringEncoder.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
-				t.Fatalf("string.encode expected to fail but got payload: %s", got)
+				t.Fatalf("string.encode expected to fail but got payload: %+v", got)
 			}
 			if err.Error() != test.errorString {
 				t.Fatalf("string.encode got error '%s', expected '%s'", err.Error(), test.errorString)

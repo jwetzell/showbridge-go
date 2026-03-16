@@ -16,20 +16,26 @@ type RouterInput struct {
 	logger   *slog.Logger
 }
 
-func (ro *RouterInput) Process(ctx context.Context, payload any) (any, error) {
+func (ro *RouterInput) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
+	payload := wrappedPayload.Payload
 	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
 	if !ok {
-		return nil, errors.New("router.input no router found")
+
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("router.input no router found")
 	}
 
 	_, err := router.HandleInput(ctx, ro.SourceId, payload)
 
 	if err != nil {
-		return nil, errors.New("router.input failed to send input")
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("router.input failed to send input")
 	}
 
-	return payload, nil
+	wrappedPayload.Payload = payload
+
+	return wrappedPayload, nil
 }
 
 func (ro *RouterInput) Type() string {

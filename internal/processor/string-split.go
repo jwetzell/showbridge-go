@@ -15,16 +15,18 @@ type StringSplit struct {
 	Separator string
 }
 
-func (ss *StringSplit) Process(ctx context.Context, payload any) (any, error) {
+func (ss *StringSplit) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
 	payloadString, ok := common.GetAnyAs[string](payload)
 
 	if !ok {
-		return nil, errors.New("string.split only accepts a string")
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("string.split only accepts a string")
 	}
 
-	payloadParts := strings.Split(payloadString, ss.Separator)
+	wrappedPayload.Payload = strings.Split(payloadString, ss.Separator)
 
-	return payloadParts, nil
+	return wrappedPayload, nil
 }
 
 func (ss *StringSplit) Type() string {

@@ -12,16 +12,18 @@ type StringEncode struct {
 	config config.ProcessorConfig
 }
 
-func (se *StringEncode) Process(ctx context.Context, payload any) (any, error) {
+func (se *StringEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
 	payloadString, ok := common.GetAnyAs[string](payload)
 
 	if !ok {
-		return nil, errors.New("string.encode processor only accepts a string")
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("string.encode processor only accepts a string")
 	}
 
-	payloadBytes := []byte(payloadString)
+	wrappedPayload.Payload = []byte(payloadString)
 
-	return payloadBytes, nil
+	return wrappedPayload, nil
 }
 
 func (se *StringEncode) Type() string {

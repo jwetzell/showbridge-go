@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"text/template"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -22,24 +23,26 @@ type SipAudioFileResponse struct {
 	AudioFile string
 }
 
-func (srac *SipResponseAudioCreate) Process(ctx context.Context, payload any) (any, error) {
+func (srac *SipResponseAudioCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
-	templateData := GetTemplateData(ctx, payload)
+	templateData := wrappedPayload
 
 	var audioFileBuffer bytes.Buffer
 	err := srac.AudioFile.Execute(&audioFileBuffer, templateData)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	audioFileString := audioFileBuffer.String()
 
-	return SipAudioFileResponse{
+	wrappedPayload.Payload = SipAudioFileResponse{
 		PreWait:   srac.PreWait,
 		PostWait:  srac.PostWait,
 		AudioFile: audioFileString,
-	}, nil
+	}
+	return wrappedPayload, nil
 }
 
 func (srac *SipResponseAudioCreate) Type() string {

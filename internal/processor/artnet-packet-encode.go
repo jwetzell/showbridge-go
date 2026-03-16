@@ -13,19 +13,24 @@ type ArtNetPacketEncode struct {
 	config config.ProcessorConfig
 }
 
-func (ape *ArtNetPacketEncode) Process(ctx context.Context, payload any) (any, error) {
+func (ape *ArtNetPacketEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
 	payloadPacket, ok := common.GetAnyAs[artnet.ArtNetPacket](payload)
 
 	if !ok {
-		return nil, fmt.Errorf("artnet.packet.encode processor only accepts an ArtNetPacket")
+		wrappedPayload.End = true
+		return wrappedPayload, fmt.Errorf("artnet.packet.encode processor only accepts an ArtNetPacket")
 	}
 
 	payloadBytes, err := payloadPacket.MarshalBinary()
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
-	return payloadBytes, nil
+	wrappedPayload.Payload = payloadBytes
+
+	return wrappedPayload, nil
 }
 
 func (ape *ArtNetPacketEncode) Type() string {

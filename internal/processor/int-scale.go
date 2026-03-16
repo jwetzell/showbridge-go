@@ -17,14 +17,17 @@ type IntScale struct {
 	config config.ProcessorConfig
 }
 
-func (ir *IntScale) Process(ctx context.Context, payload any) (any, error) {
+func (ir *IntScale) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
 	payloadInt, ok := common.GetAnyAs[int](payload)
 	if !ok {
-		return nil, errors.New("int.scale can only process an int")
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("int.scale can only process an int")
 	}
 
 	payloadInt = (payloadInt-ir.InMin)*(ir.OutMax-ir.OutMin)/(ir.InMax-ir.InMin) + ir.OutMin
-	return payloadInt, nil
+	wrappedPayload.Payload = payloadInt
+	return wrappedPayload, nil
 }
 
 func (ir *IntScale) Type() string {

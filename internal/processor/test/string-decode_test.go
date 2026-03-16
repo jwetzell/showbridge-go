@@ -3,6 +3,7 @@ package processor_test
 import (
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -27,12 +28,12 @@ func TestStringDecodeFromRegistry(t *testing.T) {
 	payload := []byte{'h', 'e', 'l', 'l', 'o'}
 	expected := "hello"
 
-	got, err := processorInstance.Process(t.Context(), payload)
+	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
 	if err != nil {
 		t.Fatalf("string.decode processing failed: %s", err)
 	}
 
-	if got != expected {
+	if got.Payload != expected {
 		t.Fatalf("string.decode got %+v, expected %+v", got, expected)
 	}
 }
@@ -53,18 +54,18 @@ func TestGoodStringDecode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := stringDecoder.Process(t.Context(), test.payload)
+			got, err := stringDecoder.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 			if err != nil {
 				t.Fatalf("string.decode processing failed: %s", err)
 			}
 
-			gotString, ok := got.(string)
+			gotString, ok := got.Payload.(string)
 			if !ok {
-				t.Fatalf("string.decode returned a %T payload: %s", got, got)
+				t.Fatalf("string.decode returned a %T payload: %+v", got, got)
 			}
 
 			if gotString != test.expected {
-				t.Fatalf("string.decode got %s, expected %s", got, test.expected)
+				t.Fatalf("string.decode got %+v, expected %s", got, test.expected)
 			}
 		})
 	}
@@ -86,10 +87,10 @@ func TestBadStringDecode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := stringDecoder.Process(t.Context(), test.payload)
+			got, err := stringDecoder.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
-				t.Fatalf("string.decode expected to fail but got payload: %s", got)
+				t.Fatalf("string.decode expected to fail but got payload: %+v", got)
 			}
 			if err.Error() != test.errorString {
 				t.Fatalf("string.decode got error '%s', expected '%s'", err.Error(), test.errorString)

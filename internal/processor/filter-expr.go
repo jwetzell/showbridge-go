@@ -6,6 +6,7 @@ import (
 
 	"github.com/expr-lang/expr"
 	"github.com/expr-lang/expr/vm"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -15,24 +16,29 @@ type FilterExpr struct {
 	Program *vm.Program
 }
 
-func (fe *FilterExpr) Process(ctx context.Context, payload any) (any, error) {
+func (fe *FilterExpr) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
-	exprEnv := GetEnvData(ctx, payload)
+	exprEnv := wrappedPayload
 
 	output, err := expr.Run(fe.Program, exprEnv)
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	outputBool, ok := output.(bool)
 	if !ok {
-		return nil, fmt.Errorf("filter.expr expression did not return a boolean")
+		wrappedPayload.End = true
+		return wrappedPayload, fmt.Errorf("filter.expr expression did not return a boolean")
 	}
 	if !outputBool {
-		return nil, nil
+		wrappedPayload.End = true
+		return wrappedPayload, nil
 	}
 
-	return payload, nil
+	wrappedPayload.Payload = exprEnv.Payload
+
+	return wrappedPayload, nil
 }
 
 func (fe *FilterExpr) Type() string {

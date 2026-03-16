@@ -13,20 +13,25 @@ type ArtNetPacketDecode struct {
 	config config.ProcessorConfig
 }
 
-func (apd *ArtNetPacketDecode) Process(ctx context.Context, payload any) (any, error) {
+func (apd *ArtNetPacketDecode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
 	payloadBytes, ok := common.GetAnyAs[[]byte](payload)
 
 	if !ok {
-		return nil, fmt.Errorf("artnet.packet.decode processor only accepts a []byte")
+		wrappedPayload.End = true
+		return wrappedPayload, fmt.Errorf("artnet.packet.decode processor only accepts a []byte")
 	}
 
 	payloadMessage, err := artnet.Decode(payloadBytes)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
-	return payloadMessage, nil
+	wrappedPayload.Payload = payloadMessage
+
+	return wrappedPayload, nil
 }
 
 func (apd *ArtNetPacketDecode) Type() string {

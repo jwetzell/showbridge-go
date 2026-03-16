@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/jwetzell/osc-go"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -149,22 +150,22 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 				t.Fatalf("osc.message.create failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err != nil {
 				t.Fatalf("osc.message.create processing failed: %s", err)
 			}
 
 			if test.expected == nil {
-				if got != nil {
+				if got.Payload != nil {
 					t.Fatalf("osc.message.create got %+v, expected nil", got)
 				}
 				return
 			}
 
-			gotMessage, ok := got.(*osc.OSCMessage)
+			gotMessage, ok := got.Payload.(*osc.OSCMessage)
 			if !ok {
-				t.Fatalf("osc.message.create returned a %T payload: %s", got, got)
+				t.Fatalf("osc.message.create returned a %T payload: %+v", got, got)
 			}
 
 			if !reflect.DeepEqual(gotMessage, test.expected) {
@@ -286,7 +287,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 				"address": "/test/{{.missing}}",
 			},
 			payload:     "test",
-			errorString: "template: address:1:8: executing \"address\" at <.missing>: can't evaluate field missing in type processor.TemplateData",
+			errorString: "template: address:1:8: executing \"address\" at <.missing>: can't evaluate field missing in type common.WrappedPayload",
 		},
 		{
 			name: "address doesn't start with slash",
@@ -304,7 +305,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 				"types":   "s",
 			},
 			payload:     "test",
-			errorString: "template: arg:1:2: executing \"arg\" at <.missing>: can't evaluate field missing in type processor.TemplateData",
+			errorString: "template: arg:1:2: executing \"arg\" at <.missing>: can't evaluate field missing in type common.WrappedPayload",
 		},
 	}
 
@@ -327,7 +328,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
 				t.Fatalf("osc.message.create expected to fail but succeeded, got: %v", got)

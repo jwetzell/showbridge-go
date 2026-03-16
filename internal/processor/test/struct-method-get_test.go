@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -31,12 +32,12 @@ func TestStructMethodGetFromRegistry(t *testing.T) {
 	payload := TestStruct{Data: "hello"}
 	expected := "hello"
 
-	got, err := processorInstance.Process(t.Context(), payload)
+	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
 	if err != nil {
 		t.Fatalf("struct.method.get processing failed: %s", err)
 	}
 
-	if got != expected {
+	if got.Payload != expected {
 		t.Fatalf("struct.method.get got %+v, expected %+v", got, expected)
 	}
 }
@@ -115,14 +116,14 @@ func TestGoodStructMethodGet(t *testing.T) {
 				t.Fatalf("struct.method.get failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err != nil {
 				t.Fatalf("struct.method.get processing failed: %s", err)
 			}
 
-			if !reflect.DeepEqual(got, test.expected) {
-				t.Fatalf("struct.method.get got %+v, expected %+v", got, test.expected)
+			if !reflect.DeepEqual(got.Payload, test.expected) {
+				t.Fatalf("struct.method.get got payload: %+v, expected %+v", got.Payload, test.expected)
 			}
 		})
 	}
@@ -187,10 +188,10 @@ func TestBadStructMethodGet(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
-				t.Fatalf("struct.method.get expected to fail but got payload: %s", got)
+				t.Fatalf("struct.method.get expected to fail but got payload: %+v", got)
 			}
 
 			if err.Error() != test.errorString {

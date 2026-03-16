@@ -11,7 +11,7 @@ import (
 
 type Processor interface {
 	Type() string
-	Process(context.Context, any) (any, error)
+	Process(context.Context, common.WrappedPayload) (common.WrappedPayload, error)
 }
 
 type ProcessorRegistration struct {
@@ -41,38 +41,3 @@ var (
 	processorRegistryMu sync.RWMutex
 	ProcessorRegistry   = make(map[string]ProcessorRegistration)
 )
-
-type TemplateData struct {
-	Payload any
-	Modules any
-	Sender  any
-}
-
-type EnvData struct {
-	Payload any
-	Sender  any
-}
-
-func GetTemplateData(ctx context.Context, payload any) TemplateData {
-	templateData := TemplateData{Payload: payload}
-	modules := ctx.Value(common.ModulesContextKey)
-	if modules != nil {
-		templateData.Modules = modules
-	}
-
-	sender := ctx.Value(common.SenderContextKey)
-	if sender != nil {
-		templateData.Sender = sender
-	}
-	return templateData
-}
-
-func GetEnvData(ctx context.Context, payload any) EnvData {
-	envData := EnvData{Payload: payload}
-
-	sender := ctx.Value(common.SenderContextKey)
-	if sender != nil {
-		envData.Sender = sender
-	}
-	return envData
-}

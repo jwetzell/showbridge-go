@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"text/template"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -25,28 +26,31 @@ type SipDTMFResponse struct {
 	Digits   string
 }
 
-func (srdc *SipResponseDTMFCreate) Process(ctx context.Context, payload any) (any, error) {
+func (srdc *SipResponseDTMFCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
-	templateData := GetTemplateData(ctx, payload)
+	templateData := wrappedPayload
 
 	var digitsBuffer bytes.Buffer
 	err := srdc.Digits.Execute(&digitsBuffer, templateData)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
 	digitsString := digitsBuffer.String()
 
 	if !srdc.validDTMF.MatchString(digitsString) {
-		return nil, errors.New("sip.response.dtmf.create result of digits template contains invalid characters")
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("sip.response.dtmf.create result of digits template contains invalid characters")
 	}
 
-	return SipDTMFResponse{
+	wrappedPayload.Payload = SipDTMFResponse{
 		PreWait:  srdc.PreWait,
 		PostWait: srdc.PostWait,
 		Digits:   digitsString,
-	}, nil
+	}
+	return wrappedPayload, nil
 }
 
 func (srdc *SipResponseDTMFCreate) Type() string {

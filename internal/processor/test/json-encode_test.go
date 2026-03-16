@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/jwetzell/osc-go"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -34,15 +35,15 @@ func TestJsonEncodeFromRegistry(t *testing.T) {
 
 	expected := []byte("{\"property\":\"hello\"}")
 
-	got, err := processorInstance.Process(t.Context(), payload)
+	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
 	if err != nil {
 		t.Fatalf("json.encode processing failed: %s", err)
 	}
 
-	gotBytes, ok := got.([]byte)
+	gotBytes, ok := got.Payload.([]byte)
 
 	if !ok {
-		t.Fatalf("json.encode should return byte slice")
+		t.Fatalf("json.encode should return byte slice got %T: %+v", got.Payload, got.Payload)
 	}
 
 	if !slices.Equal(gotBytes, expected) {
@@ -68,18 +69,18 @@ func TestGoodJsonEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := jsonEncoder.Process(t.Context(), test.payload)
+			got, err := jsonEncoder.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 			if err != nil {
 				t.Fatalf("json.encode processing failed: %s", err)
 			}
 
-			gotBytes, ok := got.([]byte)
+			gotBytes, ok := got.Payload.([]byte)
 			if !ok {
-				t.Fatalf("json.encode returned a %T payload: %s", got, got)
+				t.Fatalf("json.encode returned a %T payload: %+v", got.Payload, got.Payload)
 			}
 
 			if !slices.Equal(gotBytes, test.expected) {
-				t.Fatalf("json.encode got %x, expected %s", got, test.expected)
+				t.Fatalf("json.encode got %+v, expected %s", got, test.expected)
 			}
 		})
 	}
@@ -101,7 +102,7 @@ func TestBadJsonEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := stringEncoder.Process(t.Context(), test.payload)
+			got, err := stringEncoder.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
 				t.Fatalf("json.encode expected to fail but got payload: %+v", got)

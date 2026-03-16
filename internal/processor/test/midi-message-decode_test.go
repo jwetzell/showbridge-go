@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 	"gitlab.com/gomidi/midi/v2"
@@ -44,14 +45,14 @@ func TestGoodMIDIMessageDecode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 			if err != nil {
 				t.Fatalf("midi.message.decode processing failed: %s", err)
 			}
 
-			gotMessage, ok := got.(midi.Message)
+			gotMessage, ok := got.Payload.(midi.Message)
 			if !ok {
-				t.Fatalf("midi.message.decode returned a %T payload: %s", got, got)
+				t.Fatalf("midi.message.decode returned a %T payload: %+v", got, got)
 			}
 
 			if !reflect.DeepEqual(gotMessage, test.expected) {
@@ -78,7 +79,7 @@ func TestBadMIDIMessageDecode(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
 				t.Fatalf("midi.message.decode expected to fail but succeeded, got: %v", got)

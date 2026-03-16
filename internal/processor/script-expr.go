@@ -6,6 +6,7 @@ import (
 
 	"github.com/expr-lang/expr"
 	"github.com/expr-lang/expr/vm"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -15,16 +16,18 @@ type ScriptExpr struct {
 	Program *vm.Program
 }
 
-func (se *ScriptExpr) Process(ctx context.Context, payload any) (any, error) {
+func (se *ScriptExpr) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
-	exprEnv := GetEnvData(ctx, payload)
+	exprEnv := wrappedPayload
 
 	output, err := expr.Run(se.Program, exprEnv)
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
-	return output, nil
+	wrappedPayload.Payload = output
+	return wrappedPayload, nil
 }
 
 func (se *ScriptExpr) Type() string {

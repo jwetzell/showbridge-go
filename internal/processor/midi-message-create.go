@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"text/template"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"gitlab.com/gomidi/midi/v2"
 )
@@ -16,11 +17,11 @@ import (
 // TODO(jwetzell): support using numbers in config file treated as hardcoded values
 type MIDIMessageCreate struct {
 	config      config.ProcessorConfig
-	ProcessFunc func(ctx context.Context, payload any) (any, error)
+	ProcessFunc func(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error)
 }
 
-func (mmc *MIDIMessageCreate) Process(ctx context.Context, payload any) (any, error) {
-	return mmc.ProcessFunc(ctx, payload)
+func (mmc *MIDIMessageCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	return mmc.ProcessFunc(ctx, wrappedPayload)
 }
 
 func (mmc *MIDIMessageCreate) Type() string {
@@ -64,14 +65,15 @@ func newMidiNoteOnCreate(config config.ProcessorConfig) (Processor, error) {
 		return nil, err
 	}
 
-	return &MIDIMessageCreate{config: config, ProcessFunc: func(ctx context.Context, payload any) (any, error) {
-		templateData := GetTemplateData(ctx, payload)
+	return &MIDIMessageCreate{config: config, ProcessFunc: func(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+		templateData := wrappedPayload
 
 		var channelBuffer bytes.Buffer
 		err := channelTemplate.Execute(&channelBuffer, templateData)
 
 		if err != nil {
-			return nil, err
+			wrappedPayload.End = true
+			return wrappedPayload, err
 		}
 
 		channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
@@ -80,7 +82,8 @@ func newMidiNoteOnCreate(config config.ProcessorConfig) (Processor, error) {
 		err = noteTemplate.Execute(&noteBuffer, templateData)
 
 		if err != nil {
-			return nil, err
+			wrappedPayload.End = true
+			return wrappedPayload, err
 		}
 
 		noteValue, err := strconv.ParseUint(noteBuffer.String(), 10, 8)
@@ -89,12 +92,14 @@ func newMidiNoteOnCreate(config config.ProcessorConfig) (Processor, error) {
 		err = velocityTemplate.Execute(&velocityBuffer, templateData)
 
 		if err != nil {
-			return nil, err
+			wrappedPayload.End = true
+			return wrappedPayload, err
 		}
 
 		velocityValue, err := strconv.ParseUint(velocityBuffer.String(), 10, 8)
 		payloadMessage := midi.NoteOn(uint8(channelValue), uint8(noteValue), uint8(velocityValue))
-		return payloadMessage, nil
+		wrappedPayload.Payload = payloadMessage
+		return wrappedPayload, nil
 	}}, nil
 }
 
@@ -135,15 +140,16 @@ func newMidiNoteOffCreate(config config.ProcessorConfig) (Processor, error) {
 		return nil, err
 	}
 
-	return &MIDIMessageCreate{config: config, ProcessFunc: func(ctx context.Context, payload any) (any, error) {
+	return &MIDIMessageCreate{config: config, ProcessFunc: func(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
-		templateData := GetTemplateData(ctx, payload)
+		templateData := wrappedPayload
 
 		var channelBuffer bytes.Buffer
 		err := channelTemplate.Execute(&channelBuffer, templateData)
 
 		if err != nil {
-			return nil, err
+			wrappedPayload.End = true
+			return wrappedPayload, err
 		}
 
 		channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
@@ -152,7 +158,8 @@ func newMidiNoteOffCreate(config config.ProcessorConfig) (Processor, error) {
 		err = noteTemplate.Execute(&noteBuffer, templateData)
 
 		if err != nil {
-			return nil, err
+			wrappedPayload.End = true
+			return wrappedPayload, err
 		}
 
 		noteValue, err := strconv.ParseUint(noteBuffer.String(), 10, 8)
@@ -161,13 +168,15 @@ func newMidiNoteOffCreate(config config.ProcessorConfig) (Processor, error) {
 		err = velocityTemplate.Execute(&velocityBuffer, templateData)
 
 		if err != nil {
-			return nil, err
+			wrappedPayload.End = true
+			return wrappedPayload, err
 		}
 
 		velocityValue, err := strconv.ParseUint(velocityBuffer.String(), 10, 8)
 
 		payloadMessage := midi.NoteOffVelocity(uint8(channelValue), uint8(noteValue), uint8(velocityValue))
-		return payloadMessage, nil
+		wrappedPayload.Payload = payloadMessage
+		return wrappedPayload, nil
 	}}, nil
 }
 
@@ -208,15 +217,16 @@ func newMidiControlChangeCreate(config config.ProcessorConfig) (Processor, error
 		return nil, err
 	}
 
-	return &MIDIMessageCreate{config: config, ProcessFunc: func(ctx context.Context, payload any) (any, error) {
+	return &MIDIMessageCreate{config: config, ProcessFunc: func(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
-		templateData := GetTemplateData(ctx, payload)
+		templateData := wrappedPayload
 
 		var channelBuffer bytes.Buffer
 		err := channelTemplate.Execute(&channelBuffer, templateData)
 
 		if err != nil {
-			return nil, err
+			wrappedPayload.End = true
+			return wrappedPayload, err
 		}
 
 		channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
@@ -225,7 +235,8 @@ func newMidiControlChangeCreate(config config.ProcessorConfig) (Processor, error
 		err = controlTemplate.Execute(&controlBuffer, templateData)
 
 		if err != nil {
-			return nil, err
+			wrappedPayload.End = true
+			return wrappedPayload, err
 		}
 
 		controlValue, err := strconv.ParseUint(controlBuffer.String(), 10, 8)
@@ -234,13 +245,15 @@ func newMidiControlChangeCreate(config config.ProcessorConfig) (Processor, error
 		err = valueTemplate.Execute(&valueBuffer, templateData)
 
 		if err != nil {
-			return nil, err
+			wrappedPayload.End = true
+			return wrappedPayload, err
 		}
 
 		valueValue, err := strconv.ParseUint(valueBuffer.String(), 10, 8)
 
 		payloadMessage := midi.ControlChange(uint8(channelValue), uint8(controlValue), uint8(valueValue))
-		return payloadMessage, nil
+		wrappedPayload.Payload = payloadMessage
+		return wrappedPayload, nil
 	}}, nil
 }
 
@@ -270,14 +283,15 @@ func newMidiProgramChangeCreate(config config.ProcessorConfig) (Processor, error
 		return nil, err
 	}
 
-	return &MIDIMessageCreate{config: config, ProcessFunc: func(ctx context.Context, payload any) (any, error) {
-		templateData := GetTemplateData(ctx, payload)
+	return &MIDIMessageCreate{config: config, ProcessFunc: func(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+		templateData := wrappedPayload
 
 		var channelBuffer bytes.Buffer
 		err := channelTemplate.Execute(&channelBuffer, templateData)
 
 		if err != nil {
-			return nil, err
+			wrappedPayload.End = true
+			return wrappedPayload, err
 		}
 
 		channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
@@ -286,13 +300,15 @@ func newMidiProgramChangeCreate(config config.ProcessorConfig) (Processor, error
 		err = programTemplate.Execute(&programBuffer, templateData)
 
 		if err != nil {
-			return nil, err
+			wrappedPayload.End = true
+			return wrappedPayload, err
 		}
 
 		programValue, err := strconv.ParseUint(programBuffer.String(), 10, 8)
 
 		payloadMessage := midi.ProgramChange(uint8(channelValue), uint8(programValue))
-		return payloadMessage, nil
+		wrappedPayload.Payload = payloadMessage
+		return wrappedPayload, nil
 	}}, nil
 }
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -44,8 +45,8 @@ type TestProcessor struct {
 func (p *TestProcessor) Type() string {
 	return "test"
 }
-func (p *TestProcessor) Process(ctx context.Context, input any) (any, error) {
-	return input, nil
+func (p *TestProcessor) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	return wrappedPayload, nil
 }
 
 func TestProcessorBadRegistrationNoType(t *testing.T) {

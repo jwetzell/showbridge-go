@@ -13,14 +13,16 @@ type JsonDecode struct {
 	config config.ProcessorConfig
 }
 
-func (jd *JsonDecode) Process(ctx context.Context, payload any) (any, error) {
+func (jd *JsonDecode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
 
 	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 
 	if !ok {
 		payloadString, ok := common.GetAnyAs[string](payload)
 		if !ok {
-			return nil, errors.New("json.decode can only process a string or []byte")
+			wrappedPayload.End = true
+			return wrappedPayload, errors.New("json.decode can only process a string or []byte")
 		}
 		payloadBytes = []byte(payloadString)
 	}
@@ -29,10 +31,12 @@ func (jd *JsonDecode) Process(ctx context.Context, payload any) (any, error) {
 
 	err := json.Unmarshal(payloadBytes, &payloadJson)
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
 
-	return payloadJson, nil
+	wrappedPayload.Payload = payloadJson
+	return wrappedPayload, nil
 
 }
 

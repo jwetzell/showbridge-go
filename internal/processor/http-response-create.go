@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"text/template"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -20,20 +21,21 @@ type HTTPResponse struct {
 	Body   []byte
 }
 
-func (hrc *HTTPResponseCreate) Process(ctx context.Context, payload any) (any, error) {
-	templateData := GetTemplateData(ctx, payload)
+func (hrc *HTTPResponseCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	templateData := wrappedPayload
 
 	var bodyBuffer bytes.Buffer
 	err := hrc.BodyTmpl.Execute(&bodyBuffer, templateData)
 
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
-
-	return HTTPResponse{
+	wrappedPayload.Payload = HTTPResponse{
 		Status: hrc.Status,
 		Body:   bodyBuffer.Bytes(),
-	}, nil
+	}
+	return wrappedPayload, nil
 }
 
 func (hrc *HTTPResponseCreate) Type() string {

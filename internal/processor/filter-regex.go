@@ -15,18 +15,22 @@ type FilterRegex struct {
 	Pattern *regexp.Regexp
 }
 
-func (fr *FilterRegex) Process(ctx context.Context, payload any) (any, error) {
+func (fr *FilterRegex) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
 	payloadString, ok := common.GetAnyAs[string](payload)
 
 	if !ok {
-		return nil, errors.New("filter.regex processor only accepts a string")
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("filter.regex processor only accepts a string")
 	}
 
 	if !fr.Pattern.MatchString(payloadString) {
-		return nil, nil
+		wrappedPayload.End = true
+		return wrappedPayload, nil
 	}
 
-	return payloadString, nil
+	wrappedPayload.Payload = payloadString
+	return wrappedPayload, nil
 }
 
 func (fr *FilterRegex) Type() string {

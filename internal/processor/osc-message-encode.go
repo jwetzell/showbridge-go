@@ -13,15 +13,17 @@ type OSCMessageEncode struct {
 	config config.ProcessorConfig
 }
 
-func (ome *OSCMessageEncode) Process(ctx context.Context, payload any) (any, error) {
+func (ome *OSCMessageEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
 	payloadMessage, ok := common.GetAnyAs[*osc.OSCMessage](payload)
 
 	if !ok {
-		return nil, errors.New("osc.message.encode processor only accepts an *OSCMessage")
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("osc.message.encode processor only accepts an *OSCMessage")
 	}
 
-	bytes := payloadMessage.ToBytes()
-	return bytes, nil
+	wrappedPayload.Payload = payloadMessage.ToBytes()
+	return wrappedPayload, nil
 }
 
 func (ome *OSCMessageEncode) Type() string {

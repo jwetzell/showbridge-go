@@ -13,15 +13,19 @@ type FreeDEncode struct {
 	config config.ProcessorConfig
 }
 
-func (fe *FreeDEncode) Process(ctx context.Context, payload any) (any, error) {
+func (fe *FreeDEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
 	payloadPosition, ok := common.GetAnyAs[freeD.FreeDPosition](payload)
 
 	if !ok {
-		return nil, errors.New("freed.decode processor only accepts a FreeDEncode")
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("freed.decode processor only accepts a FreeDEncode")
 	}
 
 	payloadBytes := freeD.Encode(payloadPosition)
-	return payloadBytes, nil
+
+	wrappedPayload.Payload = payloadBytes
+	return wrappedPayload, nil
 }
 
 func (fe *FreeDEncode) Type() string {

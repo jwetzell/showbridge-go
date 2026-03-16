@@ -1,9 +1,9 @@
 package processor_test
 
 import (
-	"reflect"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -31,12 +31,12 @@ func TestStringFilterFromRegistry(t *testing.T) {
 	payload := "hello"
 	expected := "hello"
 
-	got, err := processorInstance.Process(t.Context(), payload)
+	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
 	if err != nil {
 		t.Fatalf("filter.regex processing failed: %s", err)
 	}
 
-	gotString, ok := got.(string)
+	gotString, ok := got.Payload.(string)
 
 	if !ok {
 		t.Fatalf("filter.regex should return byte slice")
@@ -49,28 +49,28 @@ func TestStringFilterFromRegistry(t *testing.T) {
 
 func TestGoodStringFilter(t *testing.T) {
 	tests := []struct {
-		name     string
-		params   map[string]any
-		payload  string
-		expected any
+		name    string
+		params  map[string]any
+		payload string
+		match   bool
 	}{
 		{
-			name:     "matches pattern",
-			payload:  "hello",
-			params:   map[string]any{"pattern": "hello"},
-			expected: "hello",
+			name:    "matches pattern",
+			payload: "hello",
+			params:  map[string]any{"pattern": "hello"},
+			match:   true,
 		},
 		{
-			name:     "does not match pattern",
-			payload:  "hello",
-			params:   map[string]any{"pattern": "world"},
-			expected: nil,
+			name:    "does not match pattern",
+			payload: "hello",
+			params:  map[string]any{"pattern": "world"},
+			match:   false,
 		},
 		{
-			name:     "basic regex",
-			payload:  "hello world",
-			params:   map[string]any{"pattern": ".* world"},
-			expected: "hello world",
+			name:    "basic regex",
+			payload: "hello world",
+			params:  map[string]any{"pattern": ".* world"},
+			match:   true,
 		},
 	}
 
@@ -90,26 +90,14 @@ func TestGoodStringFilter(t *testing.T) {
 				t.Fatalf("filter.regex failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err != nil {
 				t.Fatalf("filter.regex processing failed: %s", err)
 			}
 
-			if test.expected == nil {
-				if got != nil {
-					t.Fatalf("filter.regex got %+v, expected nil", got)
-				}
-				return
-			}
-
-			gotString, ok := got.(string)
-			if !ok {
-				t.Fatalf("filter.regex returned a %T payload: %s", got, got)
-			}
-
-			if !reflect.DeepEqual(gotString, test.expected) {
-				t.Fatalf("filter.regex got %+v, expected %+v", gotString, test.expected)
+			if got.End != !test.match {
+				t.Fatalf("filter.regex did not filter properly %+v, expected %+v", got, test.match)
 			}
 		})
 	}
@@ -173,10 +161,10 @@ func TestBadStringFilter(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
-				t.Fatalf("filter.regex expected to fail but got payload: %s", got)
+				t.Fatalf("filter.regex expected to fail but got payload: %+v", got)
 			}
 
 			if err.Error() != test.errorString {

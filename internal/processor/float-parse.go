@@ -15,18 +15,22 @@ type FloatParse struct {
 	config  config.ProcessorConfig
 }
 
-func (fp *FloatParse) Process(ctx context.Context, payload any) (any, error) {
+func (fp *FloatParse) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
 	payloadString, ok := common.GetAnyAs[string](payload)
 
 	if !ok {
-		return nil, errors.New("float.parse processor only accepts a string")
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("float.parse processor only accepts a string")
 	}
 
 	payloadFloat, err := strconv.ParseFloat(payloadString, fp.BitSize)
 	if err != nil {
-		return nil, err
+		wrappedPayload.End = true
+		return wrappedPayload, err
 	}
-	return payloadFloat, nil
+	wrappedPayload.Payload = payloadFloat
+	return wrappedPayload, nil
 }
 
 func (fp *FloatParse) Type() string {

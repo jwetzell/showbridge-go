@@ -120,7 +120,7 @@ func TestRouteHandleNilPayload(t *testing.T) {
 		t.Fatalf("route ProcessPayload returned error: %v", err)
 	}
 	if payload != nil {
-		t.Fatalf("route returned the wrong payload")
+		t.Fatalf("route returned the wrong payload: expected nil got %+v (%T)", payload, payload)
 	}
 }
 
@@ -143,13 +143,9 @@ func TestRouteHandleNilPayloadFromProcessor(t *testing.T) {
 		t.Fatalf("route failed to create: %v", err)
 	}
 
-	payload, err := testRoute.ProcessPayload(context.WithValue(t.Context(), common.RouterContextKey, &MockRouter{}), "test")
+	_, err = testRoute.ProcessPayload(context.WithValue(t.Context(), common.RouterContextKey, &MockRouter{}), "test")
 	if err != nil {
 		t.Fatalf("route HandleOutput returned error for nil payload: %v", err)
-	}
-
-	if payload != nil {
-		t.Fatalf("route returned the wrong payload")
 	}
 }
 

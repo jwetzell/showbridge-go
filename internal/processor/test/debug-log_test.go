@@ -3,6 +3,7 @@ package processor_test
 import (
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -28,12 +29,12 @@ func TestDebugLogFromRegistry(t *testing.T) {
 	payload := "test"
 	expected := "test"
 
-	got, err := processorInstance.Process(t.Context(), payload)
+	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
 	if err != nil {
 		t.Fatalf("debug.log processing failed: %s", err)
 	}
 
-	if got != expected {
+	if got.Payload != expected {
 		t.Fatalf("debug.log got %+v, expected %+v", got, expected)
 	}
 }

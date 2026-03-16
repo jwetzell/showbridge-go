@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -103,22 +104,22 @@ func TestGoodMQTTMessageCreate(t *testing.T) {
 				t.Fatalf("mqtt.message.create failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err != nil {
 				t.Fatalf("mqtt.message.create processing failed: %s", err)
 			}
 
 			if test.expected == nil {
-				if got != nil {
+				if got.Payload != nil {
 					t.Fatalf("mqtt.message.create got %+v, expected nil", got)
 				}
 				return
 			}
 
-			gotMessage, ok := got.(mqtt.Message)
+			gotMessage, ok := got.Payload.(mqtt.Message)
 			if !ok {
-				t.Fatalf("mqtt.message.create returned a %T payload: %s", got, got)
+				t.Fatalf("mqtt.message.create returned a %T payload: %+v", got, got)
 			}
 
 			if !reflect.DeepEqual(gotMessage, test.expected) {
@@ -227,7 +228,7 @@ func TestBadMQTTMessageCreate(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
 				t.Fatalf("mqtt.message.create expected to fail but succeeded, got: %v", got)

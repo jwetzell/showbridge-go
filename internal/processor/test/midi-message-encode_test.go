@@ -4,6 +4,7 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 	"gitlab.com/gomidi/midi/v2"
@@ -44,14 +45,14 @@ func TestGoodMIDIMessageEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := midiMessageEncoder.Process(t.Context(), test.payload)
+			got, err := midiMessageEncoder.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 			if err != nil {
 				t.Fatalf("midi.message.encode processing failed: %s", err)
 			}
 
-			gotBytes, ok := got.([]byte)
+			gotBytes, ok := got.Payload.([]byte)
 			if !ok {
-				t.Fatalf("midi.message.encode returned a %T payload: %s", got, got)
+				t.Fatalf("midi.message.encode returned a %T payload: %+v", got, got)
 			}
 
 			if !slices.Equal(gotBytes, test.expected) {
@@ -77,10 +78,10 @@ func TestBadMIDIMessageEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := midiMessageEncoder.Process(t.Context(), test.payload)
+			got, err := midiMessageEncoder.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
-				t.Fatalf("midi.message.encode expected to fail but got payload: %s", got)
+				t.Fatalf("midi.message.encode expected to fail but got payload: %+v", got)
 			}
 			if err.Error() != test.errorString {
 				t.Fatalf("midi.message.encode got error '%s', expected '%s'", err.Error(), test.errorString)

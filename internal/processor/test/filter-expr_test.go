@@ -1,9 +1,9 @@
 package processor_test
 
 import (
-	"reflect"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -31,10 +31,10 @@ func TestFilterExprFromRegistry(t *testing.T) {
 
 func TestGoodFilterExpr(t *testing.T) {
 	tests := []struct {
-		name     string
-		params   map[string]any
-		payload  any
-		expected any
+		name    string
+		params  map[string]any
+		payload any
+		match   bool
 	}{
 		{
 			name: "number",
@@ -44,9 +44,7 @@ func TestGoodFilterExpr(t *testing.T) {
 			payload: TestStruct{
 				Int: 1,
 			},
-			expected: TestStruct{
-				Int: 1,
-			},
+			match: true,
 		},
 		{
 			name: "string",
@@ -56,9 +54,7 @@ func TestGoodFilterExpr(t *testing.T) {
 			payload: TestStruct{
 				String: "hello",
 			},
-			expected: TestStruct{
-				String: "hello",
-			},
+			match: true,
 		},
 		{
 			name: "not matching",
@@ -68,7 +64,7 @@ func TestGoodFilterExpr(t *testing.T) {
 			payload: TestStruct{
 				Int: 0,
 			},
-			expected: nil,
+			match: false,
 		},
 	}
 
@@ -88,15 +84,15 @@ func TestGoodFilterExpr(t *testing.T) {
 				t.Fatalf("filter.expr failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err != nil {
 				t.Fatalf("filter.expr processing failed: %s", err)
 			}
 
 			//TODO(jwetzell): work out better way to compare the any/any
-			if !reflect.DeepEqual(got, test.expected) {
-				t.Fatalf("filter.expr got %+v (%T), expected %+v (%T)", got, got, test.expected, test.expected)
+			if got.End != !test.match {
+				t.Fatalf("filter.expr did fitler properly %+v (%T), expected %+v (%T)", got, got, test.match, test.match)
 			}
 		})
 	}
@@ -162,7 +158,7 @@ func TestBadFilterExpr(t *testing.T) {
 				}
 				return
 			}
-			got, err := processorInstance.Process(t.Context(), test.payload)
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
 				t.Fatalf("filter.expr expected to fail but succeeded, got: %v", got)
