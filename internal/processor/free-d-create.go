@@ -228,12 +228,20 @@ func init() {
 
 			panTemplate, err := template.New("pan").Parse(panString)
 
+			if err != nil {
+				return nil, err
+			}
+
 			tiltString, err := params.GetString("tilt")
 			if err != nil {
 				return nil, fmt.Errorf("freed.create tilt error: %w", err)
 			}
 
 			tiltTemplate, err := template.New("tilt").Parse(tiltString)
+
+			if err != nil {
+				return nil, err
+			}
 
 			rollString, err := params.GetString("roll")
 			if err != nil {
@@ -286,12 +294,19 @@ func init() {
 
 			zoomTemplate, err := template.New("zoom").Parse(zoomString)
 
+			if err != nil {
+				return nil, err
+			}
+
 			focusString, err := params.GetString("focus")
 			if err != nil {
 				return nil, fmt.Errorf("freed.create focus error: %w", err)
 			}
 
 			focusTemplate, err := template.New("focus").Parse(focusString)
+			if err != nil {
+				return nil, err
+			}
 
 			return &FreeDCreate{
 				config: config,
