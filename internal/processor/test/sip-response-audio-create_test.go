@@ -40,7 +40,38 @@ func TestGoodSipResponseAudioCreate(t *testing.T) {
 		params   map[string]any
 		payload  any
 		expected any
-	}{}
+	}{
+		{
+			name: "basic",
+			params: map[string]any{
+				"preWait":   0,
+				"audioFile": "good.wav",
+				"postWait":  0,
+			},
+			payload: nil,
+			expected: processor.SipAudioFileResponse{
+				PreWait:   0,
+				PostWait:  0,
+				AudioFile: "good.wav",
+			},
+		},
+		{
+			name: "template audio file",
+			params: map[string]any{
+				"preWait":   1,
+				"audioFile": "{{.Payload.SomeField}}.wav",
+				"postWait":  2,
+			},
+			payload: map[string]any{
+				"SomeField": "templated",
+			},
+			expected: processor.SipAudioFileResponse{
+				PreWait:   1,
+				PostWait:  2,
+				AudioFile: "templated.wav",
+			},
+		},
+	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

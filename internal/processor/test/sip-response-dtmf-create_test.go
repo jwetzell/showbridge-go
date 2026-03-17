@@ -40,7 +40,36 @@ func TestGoodSipResponseDTMFCreate(t *testing.T) {
 		params   map[string]any
 		payload  any
 		expected any
-	}{}
+	}{
+		{
+			name: "basic",
+			params: map[string]any{
+				"preWait":  0,
+				"digits":   "12345",
+				"postWait": 0,
+			},
+			payload: nil,
+			expected: processor.SipDTMFResponse{
+				PreWait:  0,
+				PostWait: 0,
+				Digits:   "12345",
+			},
+		},
+		{
+			name: "template digits",
+			params: map[string]any{
+				"preWait":  0,
+				"digits":   "{{.Payload}}",
+				"postWait": 0,
+			},
+			payload: "67890",
+			expected: processor.SipDTMFResponse{
+				PreWait:  0,
+				PostWait: 0,
+				Digits:   "67890",
+			},
+		},
+	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
