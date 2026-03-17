@@ -19,7 +19,7 @@ func (fe *FreeDEncode) Process(ctx context.Context, wrappedPayload common.Wrappe
 
 	if !ok {
 		wrappedPayload.End = true
-		return wrappedPayload, errors.New("freed.decode processor only accepts a FreeDEncode")
+		return wrappedPayload, errors.New("freed.encode processor only accepts a FreeDPosition")
 	}
 
 	payloadBytes := freeD.Encode(payloadPosition)
