@@ -77,7 +77,87 @@ func TestBadSipResponseDTMFCreate(t *testing.T) {
 		params      map[string]any
 		payload     any
 		errorString string
-	}{}
+	}{
+		{
+			name: "missing preWait param",
+			params: map[string]any{
+				"digits":   "good.wav",
+				"postWait": 0,
+			},
+			errorString: "sip.response.dtmf.create preWait error: not found",
+		},
+		{
+			name: "non-numeric preWait param",
+			params: map[string]any{
+				"preWait":  "not a number",
+				"digits":   "good.wav",
+				"postWait": 0,
+			},
+			errorString: "sip.response.dtmf.create preWait error: not a number",
+		},
+		{
+			name: "missing digits param",
+			params: map[string]any{
+				"preWait":  0,
+				"postWait": 0,
+			},
+			errorString: "sip.response.dtmf.create digits error: not found",
+		},
+		{
+			name: "non-string digits param",
+			params: map[string]any{
+				"preWait":  0,
+				"digits":   12345,
+				"postWait": 0,
+			},
+			errorString: "sip.response.dtmf.create digits error: not a string",
+		},
+		{
+			name: "digits template syntax error",
+			params: map[string]any{
+				"preWait":  0,
+				"digits":   "{{.Unclosed",
+				"postWait": 0,
+			},
+			errorString: "template: digits:1: unclosed action",
+		},
+		{
+			name: "digits template error",
+			params: map[string]any{
+				"preWait":  0,
+				"digits":   "{{.NonExistentField}}	",
+				"postWait": 0,
+			},
+			errorString: "template: digits:1:2: executing \"digits\" at <.NonExistentField>: can't evaluate field NonExistentField in type common.WrappedPayload",
+		},
+		{
+			name:    "invalid digits template result",
+			payload: "nhf",
+			params: map[string]any{
+				"preWait":  0,
+				"digits":   "{{.Payload}}",
+				"postWait": 0,
+			},
+			errorString: "sip.response.dtmf.create result of digits template contains invalid characters",
+		},
+		{
+			name: "missing postWait param",
+			params: map[string]any{
+				"preWait": 0,
+				"digits":  "good.wav",
+			},
+			errorString: "sip.response.dtmf.create postWait error: not found",
+		},
+		{
+			name: "non-numeric postWait param",
+			params: map[string]any{
+				"preWait":  0,
+				"digits":   "good.wav",
+				"postWait": "not a number",
+			},
+			errorString: "sip.response.dtmf.create postWait error: not a number",
+		},
+	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
