@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"reflect"
 	"sync"
 	"testing"
 	"time"
@@ -80,7 +81,7 @@ func TestNewRouter(t *testing.T) {
 		},
 	}
 
-	_, moduleErrors, routeErrors := showbridge.NewRouter(routerConfig)
+	router, moduleErrors, routeErrors := showbridge.NewRouter(routerConfig)
 
 	if moduleErrors != nil {
 		t.Fatalf("router should not have returned any module errors: %v", moduleErrors)
@@ -88,6 +89,10 @@ func TestNewRouter(t *testing.T) {
 
 	if routeErrors != nil {
 		t.Fatalf("router should not have returned any route errors: %v", routeErrors)
+	}
+
+	if !reflect.DeepEqual(routerConfig, router.RunningConfig()) {
+		t.Fatalf("router running config did not match expected, got: %v, expected: %v", router.RunningConfig(), routerConfig)
 	}
 }
 
