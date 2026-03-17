@@ -81,7 +81,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload common.Wrappe
 	}
 
 	var rollBuffer bytes.Buffer
-	err = fc.Tilt.Execute(&rollBuffer, templateData)
+	err = fc.Roll.Execute(&rollBuffer, templateData)
 
 	if err != nil {
 		wrappedPayload.End = true
