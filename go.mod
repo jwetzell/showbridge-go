@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/eclipse/paho.mqtt.golang v1.5.1
-	github.com/emiago/diago v0.27.0
+	github.com/emiago/diago v0.28.0
 	github.com/emiago/sipgo v1.2.1
 	github.com/expr-lang/expr v1.17.8
 	github.com/extism/go-sdk v1.7.1
