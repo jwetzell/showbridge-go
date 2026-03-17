@@ -1,7 +1,7 @@
 package processor_test
 
 import (
-	"slices"
+	"reflect"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -34,15 +34,14 @@ func TestScriptWASMFromRegistry(t *testing.T) {
 func TestGoodScriptWASM(t *testing.T) {
 	tests := []struct {
 		name     string
-		payload  []byte
+		payload  any
 		params   map[string]any
-		expected []byte
+		expected any
 	}{
 		{
 			name: "string input, default process function with wasi",
 			params: map[string]any{
-				"path":       "good.wasm",
-				"enableWasi": true,
+				"path": "good.wasm",
 			},
 			payload:  []byte("hello"),
 			expected: []byte("Processed: hello"),
@@ -50,9 +49,8 @@ func TestGoodScriptWASM(t *testing.T) {
 		{
 			name: "string input, specified function with wasi",
 			params: map[string]any{
-				"path":       "good.wasm",
-				"enableWasi": true,
-				"function":   "greet",
+				"path":     "good.wasm",
+				"function": "greet",
 			},
 			payload:  []byte("world"),
 			expected: []byte("Hello, world"),
@@ -86,7 +84,7 @@ func TestGoodScriptWASM(t *testing.T) {
 				t.Fatalf("script.wasm returned a %T payload: %+v", got, got)
 			}
 
-			if !slices.Equal(gotBytes, test.expected) {
+			if !reflect.DeepEqual(gotBytes, test.expected) {
 				t.Fatalf("script.wasm got %+v, expected %+v", gotBytes, test.expected)
 			}
 		})
@@ -117,9 +115,8 @@ func TestBadScriptWASM(t *testing.T) {
 		{
 			name: "non-string function",
 			params: map[string]any{
-				"path":       "good.wasm",
-				"enableWasi": true,
-				"function":   12345,
+				"path":     "good.wasm",
+				"function": 12345,
 			},
 			payload:     []byte("hello"),
 			errorString: "script.wasm function error: not a string",
@@ -136,8 +133,7 @@ func TestBadScriptWASM(t *testing.T) {
 		{
 			name: "non-byte slice input",
 			params: map[string]any{
-				"path":       "good.wasm",
-				"enableWasi": true,
+				"path": "good.wasm",
 			},
 			payload:     "hello",
 			errorString: "script.wasm can only process a byte array",
@@ -145,9 +141,8 @@ func TestBadScriptWASM(t *testing.T) {
 		{
 			name: "function not found in module",
 			params: map[string]any{
-				"path":       "good.wasm",
-				"enableWasi": true,
-				"function":   "asdf",
+				"path":     "good.wasm",
+				"function": "asdf",
 			},
 			payload:     []byte("hello"),
 			errorString: "unknown function: asdf",
