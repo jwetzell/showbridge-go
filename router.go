@@ -25,7 +25,7 @@ type Router struct {
 	contextCancel context.CancelFunc
 	Context       context.Context
 	// TODO(jwetzell): do these need to be guarded against concurrency?
-	ModuleInstances map[string]module.Module
+	ModuleInstances map[string]common.Module
 	// TODO(jwetzell): change to something easier to lookup
 	RouteInstances    []*route.Route
 	ConfigChange      chan config.Config
@@ -106,7 +106,7 @@ func (r *Router) addRoute(routeDecl config.RouteConfig) error {
 	return nil
 }
 
-func (r *Router) getModule(moduleId string) module.Module {
+func (r *Router) getModule(moduleId string) common.Module {
 	moduleInstance, ok := r.ModuleInstances[moduleId]
 	if !ok {
 		return nil
@@ -117,7 +117,7 @@ func (r *Router) getModule(moduleId string) module.Module {
 func NewRouter(routerConfig config.Config) (*Router, []module.ModuleError, []route.RouteError) {
 
 	router := Router{
-		ModuleInstances: make(map[string]module.Module),
+		ModuleInstances: make(map[string]common.Module),
 		RouteInstances:  []*route.Route{},
 		ConfigChange:    make(chan config.Config, 1),
 		logger:          slog.Default().With("component", "router"),
@@ -324,7 +324,7 @@ func (r *Router) UpdateConfig(newConfig config.Config) ([]module.ModuleError, []
 	r.logger.Debug("waiting for modules to exit")
 	r.moduleWait.Wait()
 
-	r.ModuleInstances = make(map[string]module.Module)
+	r.ModuleInstances = make(map[string]common.Module)
 	r.RouteInstances = []*route.Route{}
 
 	var moduleErrors []module.ModuleError

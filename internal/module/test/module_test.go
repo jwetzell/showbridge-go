@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
 )
@@ -43,7 +44,7 @@ func TestModuleBadRegistrationNoType(t *testing.T) {
 
 	module.RegisterModule(module.ModuleRegistration{
 		Type: "",
-		New: func(config config.ModuleConfig) (module.Module, error) {
+		New: func(config config.ModuleConfig) (common.Module, error) {
 			return &TestModule{}, nil
 		},
 	})
@@ -71,14 +72,14 @@ func TestModuleBadRegistrationExistingType(t *testing.T) {
 
 	module.RegisterModule(module.ModuleRegistration{
 		Type: "module.test",
-		New: func(config config.ModuleConfig) (module.Module, error) {
+		New: func(config config.ModuleConfig) (common.Module, error) {
 			return &TestModule{}, nil
 		},
 	})
 
 	module.RegisterModule(module.ModuleRegistration{
 		Type: "module.test",
-		New: func(config config.ModuleConfig) (module.Module, error) {
+		New: func(config config.ModuleConfig) (common.Module, error) {
 			return &TestModule{}, nil
 		},
 	})

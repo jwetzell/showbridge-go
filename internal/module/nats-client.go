@@ -25,7 +25,7 @@ type NATSClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "nats.client",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params
 			urlString, err := params.GetString("url")
 			if err != nil {

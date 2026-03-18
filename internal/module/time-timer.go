@@ -24,7 +24,7 @@ type TimeTimer struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "time.timer",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params
 
 			durationNum, err := params.GetInt("duration")

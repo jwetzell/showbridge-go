@@ -46,7 +46,7 @@ type SIPDTMFCall struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "sip.dtmf.server",
-		New: func(moduleConfig config.ModuleConfig) (Module, error) {
+		New: func(moduleConfig config.ModuleConfig) (common.Module, error) {
 			params := moduleConfig.Params
 
 			portNum, err := params.GetInt("port")

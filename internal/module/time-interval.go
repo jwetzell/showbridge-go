@@ -24,7 +24,7 @@ type TimeInterval struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "time.interval",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params
 
 			durationInt, err := params.GetInt("duration")

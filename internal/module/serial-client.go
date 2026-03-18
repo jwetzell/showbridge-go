@@ -30,7 +30,7 @@ type SerialClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "serial.client",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params
 			portString, err := params.GetString("port")
 			if err != nil {

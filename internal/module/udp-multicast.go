@@ -25,7 +25,7 @@ type UDPMulticast struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.udp.multicast",
-		New: func(moduleConfig config.ModuleConfig) (Module, error) {
+		New: func(moduleConfig config.ModuleConfig) (common.Module, error) {
 			params := moduleConfig.Params
 			ipString, err := params.GetString("ip")
 			if err != nil {

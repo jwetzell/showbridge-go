@@ -65,7 +65,7 @@ func (mcm *MockCounterModule) Stop() {
 func init() {
 	module.RegisterModule(module.ModuleRegistration{
 		Type: "mock.counter",
-		New: func(config config.ModuleConfig) (module.Module, error) {
+		New: func(config config.ModuleConfig) (common.Module, error) {
 			return &MockCounterModule{config: config, logger: slog.Default()}, nil
 		},
 	})

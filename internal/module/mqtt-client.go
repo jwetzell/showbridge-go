@@ -26,7 +26,7 @@ type MQTTClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "mqtt.client",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params
 			brokerString, err := params.GetString("broker")
 

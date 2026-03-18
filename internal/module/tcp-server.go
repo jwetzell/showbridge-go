@@ -33,7 +33,7 @@ type TCPServer struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.tcp.server",
-		New: func(moduleConfig config.ModuleConfig) (Module, error) {
+		New: func(moduleConfig config.ModuleConfig) (common.Module, error) {
 			params := moduleConfig.Params
 			portNum, err := params.GetInt("port")
 			if err != nil {

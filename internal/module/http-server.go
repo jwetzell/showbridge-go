@@ -56,7 +56,7 @@ func (hsrw *HTTPServerResponseWriter) Write(data []byte) (int, error) {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "http.server",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params
 			portNum, err := params.GetInt("port")
 			if err != nil {

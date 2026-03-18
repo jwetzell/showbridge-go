@@ -25,7 +25,7 @@ type UDPClient struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "net.udp.client",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params
 			hostString, err := params.GetString("host")
 			if err != nil {

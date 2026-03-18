@@ -1,11 +1,11 @@
 package module
 
 import (
-	"context"
 	"fmt"
 	"log/slog"
 	"sync"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
@@ -15,18 +15,9 @@ type ModuleError struct {
 	Error  string              `json:"error"`
 }
 
-type Module interface {
-	Id() string
-	Type() string
-	Start(context.Context) error
-	Stop()
-	Output(context.Context, any) error
-	Get(key string) (any, error)
-}
-
 type ModuleRegistration struct {
 	Type string `json:"type"`
-	New  func(config.ModuleConfig) (Module, error)
+	New  func(config.ModuleConfig) (common.Module, error)
 }
 
 func RegisterModule(mod ModuleRegistration) {

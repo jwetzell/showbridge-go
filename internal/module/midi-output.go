@@ -27,7 +27,7 @@ type MIDIOutput struct {
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type: "midi.output",
-		New: func(config config.ModuleConfig) (Module, error) {
+		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params
 
 			portString, err := params.GetString("port")
