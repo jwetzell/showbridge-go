@@ -112,14 +112,3 @@ func (pc *PSNClient) Output(ctx context.Context, payload any) error {
 func (pc *PSNClient) Stop() {
 	pc.cancel()
 }
-
-func (pc *PSNClient) Get(key string) (any, error) {
-	switch key {
-	case "trackers":
-		return pc.decoder.Trackers, nil
-	case "name":
-		return pc.decoder.SystemName, nil
-	default:
-		return nil, errors.New("psn.client key not found")
-	}
-}

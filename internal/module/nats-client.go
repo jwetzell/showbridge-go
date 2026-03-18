@@ -116,7 +116,3 @@ func (nc *NATSClient) Output(ctx context.Context, payload any) error {
 func (nc *NATSClient) Stop() {
 	nc.cancel()
 }
-
-func (nc *NATSClient) Get(key string) (any, error) {
-	return nil, errors.New("nats.client does not support Get")
-}

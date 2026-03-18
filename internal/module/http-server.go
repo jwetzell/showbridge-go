@@ -205,7 +205,3 @@ func (hs *HTTPServer) Output(ctx context.Context, payload any) error {
 func (hs *HTTPServer) Stop() {
 	hs.cancel()
 }
-
-func (hs *HTTPServer) Get(key string) (any, error) {
-	return nil, errors.New("http.server does not support Get")
-}

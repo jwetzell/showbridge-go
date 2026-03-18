@@ -221,7 +221,3 @@ func (scs *SIPCallServer) Output(ctx context.Context, payload any) error {
 func (scs *SIPCallServer) Stop() {
 	scs.cancel()
 }
-
-func (scs *SIPCallServer) Get(key string) (any, error) {
-	return nil, errors.New("sip.call.server does not support Get")
-}

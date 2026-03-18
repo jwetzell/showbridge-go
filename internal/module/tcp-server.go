@@ -232,14 +232,3 @@ func (ts *TCPServer) Stop() {
 	ts.cancel()
 	ts.wg.Wait()
 }
-
-func (ts *TCPServer) Get(key string) (any, error) {
-	switch key {
-	case "ip":
-		return ts.Addr.IP.String(), nil
-	case "port":
-		return ts.Addr.Port, nil
-	default:
-		return nil, errors.New("net.tcp.server key not found")
-	}
-}
