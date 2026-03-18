@@ -73,11 +73,6 @@ func (t *TimeTimer) Start(ctx context.Context) error {
 	}
 }
 
-func (t *TimeTimer) Output(ctx context.Context, payload any) error {
-	t.timer.Reset(time.Millisecond * time.Duration(t.Duration))
-	return nil
-}
-
 func (t *TimeTimer) Stop() {
 	t.cancel()
 }

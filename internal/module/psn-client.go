@@ -3,7 +3,6 @@ package module
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 	"net"
 	"time"
@@ -103,10 +102,6 @@ func (pc *PSNClient) Start(ctx context.Context) error {
 			}
 		}
 	}
-}
-
-func (pc *PSNClient) Output(ctx context.Context, payload any) error {
-	return fmt.Errorf("psn.client output is not implemented")
 }
 
 func (pc *PSNClient) Stop() {

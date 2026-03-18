@@ -12,10 +12,6 @@ import (
 type TestModule struct {
 }
 
-func (m *TestModule) Output(ctx context.Context, payload any) error {
-	return nil
-}
-
 func (m *TestModule) Start(ctx context.Context) error {
 	<-ctx.Done()
 	return nil

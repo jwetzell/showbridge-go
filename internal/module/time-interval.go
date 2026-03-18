@@ -74,11 +74,6 @@ func (i *TimeInterval) Start(ctx context.Context) error {
 
 }
 
-func (i *TimeInterval) Output(ctx context.Context, payload any) error {
-	i.ticker.Reset(time.Millisecond * time.Duration(i.Duration))
-	return nil
-}
-
 func (i *TimeInterval) Stop() {
 	i.cancel()
 }

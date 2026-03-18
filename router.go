@@ -269,9 +269,20 @@ func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload
 		return err
 	}
 
+	outputModule, ok := destinationModule.(common.OutputModule)
+	if !ok {
+		err := errors.New("module does not support output")
+		span.SetStatus(codes.Error, err.Error())
+		span.RecordError(err)
+		r.logger.Error("module does not support output", "destinationId", destinationId)
+		outputEvent.Error = err.Error()
+		r.broadcastEvent(outputEvent)
+		return err
+	}
+
 	moduleOutputCtx, moduleOutputSpan := otel.Tracer("module").Start(spanCtx, "output", trace.WithAttributes(attribute.String("module.id", destinationModule.Id()), attribute.String("module.type", destinationModule.Type())))
 	defer moduleOutputSpan.End()
-	err := destinationModule.Output(moduleOutputCtx, payload)
+	err := outputModule.Output(moduleOutputCtx, payload)
 	if err != nil {
 		moduleOutputSpan.SetStatus(codes.Error, err.Error())
 		moduleOutputSpan.RecordError(err)

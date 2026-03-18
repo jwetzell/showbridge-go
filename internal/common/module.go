@@ -10,6 +10,9 @@ type Module interface {
 	Type() string
 	Start(context.Context) error
 	Stop()
+}
+
+type OutputModule interface {
 	Output(context.Context, any) error
 }
 

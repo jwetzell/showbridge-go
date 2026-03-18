@@ -102,10 +102,6 @@ func (ns *NATSServer) Start(ctx context.Context) error {
 	return nil
 }
 
-func (ns *NATSServer) Output(ctx context.Context, payload any) error {
-	return errors.New("nats.server does not support output")
-}
-
 func (ns *NATSServer) Stop() {
 	ns.cancel()
 	if ns.server != nil {

@@ -82,10 +82,6 @@ func (mi *MIDIInput) Start(ctx context.Context) error {
 	return nil
 }
 
-func (mi *MIDIInput) Output(ctx context.Context, payload any) error {
-	return errors.New("midi.input output is not implemented")
-}
-
 func (mi *MIDIInput) Stop() {
 	mi.cancel()
 }
