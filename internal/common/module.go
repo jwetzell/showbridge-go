@@ -2,6 +2,7 @@ package common
 
 import (
 	"context"
+	"database/sql"
 )
 
 type Module interface {
@@ -15,4 +16,8 @@ type Module interface {
 type KeyValueModule interface {
 	Get(key string) (any, error)
 	Set(key string, value any) error
+}
+
+type DatabaseModule interface {
+	Database() *sql.DB
 }
