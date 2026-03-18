@@ -106,8 +106,15 @@ func TestGoodStructMethodGet(t *testing.T) {
 			payload:  TestStruct{IntSlice: []int{1, 2, 3}},
 			expected: []int{1, 2, 3},
 		},
+		{
+			name: "multiple return values",
+			params: map[string]any{
+				"name": "MultipleReturnValues",
+			},
+			payload:  TestStruct{String: "hello", Int: 42},
+			expected: []any{"hello", 42},
+		},
 	}
-
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			registration, ok := processor.ProcessorRegistry["struct.method.get"]

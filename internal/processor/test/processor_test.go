@@ -44,6 +44,10 @@ func (t TestStruct) GetIntSlice() []int {
 
 func (t TestStruct) Void() {}
 
+func (t TestStruct) MultipleReturnValues() (string, int) {
+	return t.String, t.Int
+}
+
 type TestProcessor struct {
 }
 
