@@ -7,7 +7,8 @@ type Config struct {
 }
 
 type ApiConfig struct {
-	Port int `json:"port"`
+	Enabled bool `json:"enabled"`
+	Port    int  `json:"port"`
 }
 type ModuleConfig struct {
 	Id     string `json:"id"`

@@ -1,4 +1,5 @@
 api:
+  enabled: true
   port: 8080
 modules:
   - id: http

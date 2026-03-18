@@ -8,6 +8,10 @@
     "api": {
       "type": "object",
       "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether the API server is enabled"
+        },
         "port": {
           "type": "integer",
           "description": "Port for the API server to listen on"
