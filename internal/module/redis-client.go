@@ -89,20 +89,20 @@ func (rc *RedisClient) Stop() {
 }
 
 func (rc *RedisClient) Get(key string) (any, error) {
-
-	switch key {
-	case "host":
-		return rc.Host, nil
-	case "port":
-		return rc.Port, nil
-	default:
-		if rc.client != nil {
-			val, err := rc.client.Get(rc.ctx, key).Result()
-			if err != nil {
-				return nil, err
-			}
-			return val, nil
+	if rc.client != nil {
+		val, err := rc.client.Get(rc.ctx, key).Result()
+		if err != nil {
+			return nil, err
 		}
-		return nil, errors.New("redis.client key not found")
+		return val, nil
 	}
+	return nil, errors.New("redis.client not setup")
+}
+
+func (rc *RedisClient) Set(key string, value any) error {
+	if rc.client != nil {
+		status := rc.client.Set(rc.ctx, key, value, 0)
+		return status.Err()
+	}
+	return errors.New("redis.client not setup")
 }

@@ -163,20 +163,3 @@ func (tc *TCPClient) Output(ctx context.Context, payload any) error {
 func (tc *TCPClient) Stop() {
 	tc.cancel()
 }
-
-func (tc *TCPClient) Get(key string) (any, error) {
-	switch key {
-	case "host":
-		host, err := tc.config.Params.GetString("host")
-		if err != nil {
-			return nil, fmt.Errorf("net.tcp.client host error: %w", err)
-		}
-		return host, nil
-	case "ip":
-		return tc.Addr.IP.String(), nil
-	case "port":
-		return tc.Addr.Port, nil
-	default:
-		return nil, errors.New("net.tcp.client key not found")
-	}
-}

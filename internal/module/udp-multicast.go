@@ -124,14 +124,3 @@ func (um *UDPMulticast) Output(ctx context.Context, payload any) error {
 func (um *UDPMulticast) Stop() {
 	um.cancel()
 }
-
-func (um *UDPMulticast) Get(key string) (any, error) {
-	switch key {
-	case "ip":
-		return um.Addr.IP.String(), nil
-	case "port":
-		return um.Addr.Port, nil
-	default:
-		return nil, errors.New("net.udp.multicast key not found")
-	}
-}

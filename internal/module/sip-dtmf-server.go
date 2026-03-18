@@ -249,7 +249,3 @@ func (sds *SIPDTMFServer) Output(ctx context.Context, payload any) error {
 func (sds *SIPDTMFServer) Stop() {
 	sds.cancel()
 }
-
-func (sds *SIPDTMFServer) Get(key string) (any, error) {
-	return nil, errors.New("sip.dtmf.server does not support Get")
-}

@@ -11,3 +11,8 @@ type Module interface {
 	Stop()
 	Output(context.Context, any) error
 }
+
+type KeyValueModule interface {
+	Get(key string) (any, error)
+	Set(key string, value any) error
+}

@@ -81,12 +81,3 @@ func (t *TimeTimer) Output(ctx context.Context, payload any) error {
 func (t *TimeTimer) Stop() {
 	t.cancel()
 }
-
-func (t *TimeTimer) Get(key string) (any, error) {
-	switch key {
-	case "duration":
-		return t.Duration, nil
-	default:
-		return nil, errors.New("time.timer key not found")
-	}
-}

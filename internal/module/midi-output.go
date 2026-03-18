@@ -96,12 +96,3 @@ func (mo *MIDIOutput) Output(ctx context.Context, payload any) error {
 func (mo *MIDIOutput) Stop() {
 	mo.cancel()
 }
-
-func (mo *MIDIOutput) Get(key string) (any, error) {
-	switch key {
-	case "port":
-		return mo.Port, nil
-	default:
-		return nil, errors.New("midi.output key not found")
-	}
-}
