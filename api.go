@@ -15,6 +15,10 @@ import (
 )
 
 func (r *Router) startAPIServer(config config.ApiConfig) {
+	if !config.Enabled {
+		r.logger.Warn("API not enabled")
+		return
+	}
 	r.logger.Debug("starting API server", "port", config.Port)
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ws", r.handleWebsocket)
@@ -36,6 +40,9 @@ func (r *Router) startAPIServer(config config.ApiConfig) {
 }
 
 func (r *Router) stopAPIServer() {
+	if r.apiServer == nil {
+		return
+	}
 	r.logger.Debug("stopping API server")
 	r.apiServerMu.Lock()
 	defer r.apiServerMu.Unlock()
