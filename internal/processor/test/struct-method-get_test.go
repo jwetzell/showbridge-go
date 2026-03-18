@@ -98,6 +98,14 @@ func TestGoodStructMethodGet(t *testing.T) {
 			payload:  &TestStruct{Data: "hello"},
 			expected: "hello",
 		},
+		{
+			name: "int slice",
+			params: map[string]any{
+				"name": "GetIntSlice",
+			},
+			payload:  TestStruct{IntSlice: []int{1, 2, 3}},
+			expected: []int{1, 2, 3},
+		},
 	}
 
 	for _, test := range tests {

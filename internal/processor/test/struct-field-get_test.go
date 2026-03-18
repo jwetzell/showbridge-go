@@ -1,6 +1,7 @@
 package processor_test
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -79,6 +80,14 @@ func TestGoodStructFieldGet(t *testing.T) {
 			payload:  &TestStruct{Data: "hello"},
 			expected: "hello",
 		},
+		{
+			name: "int slice",
+			params: map[string]any{
+				"name": "IntSlice",
+			},
+			payload:  TestStruct{IntSlice: []int{1, 2, 3}},
+			expected: []int{1, 2, 3},
+		},
 	}
 
 	for _, test := range tests {
@@ -103,7 +112,7 @@ func TestGoodStructFieldGet(t *testing.T) {
 				t.Fatalf("struct.field.get processing failed: %s", err)
 			}
 
-			if got.Payload != test.expected {
+			if !reflect.DeepEqual(got.Payload, test.expected) {
 				t.Fatalf("struct.field.get got %+v, expected %s", got, test.expected)
 			}
 		})
