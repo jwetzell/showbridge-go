@@ -6,30 +6,35 @@ import (
 
 type WrappedPayload struct {
 	Payload any
-	Modules any
+	Modules map[string]Module
 	Sender  any
 	Source  string
 	End     bool
 }
 
 func GetWrappedPayload(ctx context.Context, payload any) WrappedPayload {
-	templateData := WrappedPayload{
+	wrappedPayload := WrappedPayload{
 		Payload: payload,
 		End:     false,
 	}
 	modules := ctx.Value(ModulesContextKey)
 	if modules != nil {
-		templateData.Modules = modules
+		moduleMap, ok := modules.(map[string]Module)
+		if ok {
+			wrappedPayload.Modules = moduleMap
+		} else {
+			wrappedPayload.Modules = make(map[string]Module)
+		}
 	}
 
 	sender := ctx.Value(SenderContextKey)
 	if sender != nil {
-		templateData.Sender = sender
+		wrappedPayload.Sender = sender
 	}
 
 	source := ctx.Value(SourceContextKey)
 	if source != nil {
-		templateData.Source = source.(string)
+		wrappedPayload.Source = source.(string)
 	}
-	return templateData
+	return wrappedPayload
 }

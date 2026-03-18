@@ -18,19 +18,12 @@ type KVGet struct {
 }
 
 func (kvg *KVGet) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
-	ctxModules := ctx.Value(common.ModulesContextKey)
-	if ctxModules == nil {
+	if wrappedPayload.Modules == nil {
 		wrappedPayload.End = true
-		return wrappedPayload, errors.New("kv.get unable to get modules from context")
+		return wrappedPayload, errors.New("kv.get wrapped payload has no modules")
 	}
 
-	moduleMap, ok := ctxModules.(map[string]common.Module)
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("kv.get modules from context has wrong type")
-	}
-
-	module, ok := moduleMap[kvg.ModuleId]
+	module, ok := wrappedPayload.Modules[kvg.ModuleId]
 	if !ok {
 		wrappedPayload.End = true
 		return wrappedPayload, fmt.Errorf("kv.get unable to find module with id: %s", kvg.ModuleId)

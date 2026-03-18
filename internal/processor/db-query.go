@@ -18,19 +18,12 @@ type DbQuery struct {
 }
 
 func (dq *DbQuery) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
-	ctxModules := ctx.Value(common.ModulesContextKey)
-	if ctxModules == nil {
+	if wrappedPayload.Modules == nil {
 		wrappedPayload.End = true
-		return wrappedPayload, errors.New("db.query unable to get modules from context")
+		return wrappedPayload, errors.New("db.query wrapped payload has no modules")
 	}
 
-	moduleMap, ok := ctxModules.(map[string]common.Module)
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("db.query modules from context has wrong type")
-	}
-
-	module, ok := moduleMap[dq.ModuleId]
+	module, ok := wrappedPayload.Modules[dq.ModuleId]
 	if !ok {
 		wrappedPayload.End = true
 		return wrappedPayload, fmt.Errorf("db.query unable to find module with id: %s", dq.ModuleId)
