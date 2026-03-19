@@ -206,7 +206,7 @@ AcceptLoop:
 }
 
 func (ts *TCPServer) Output(ctx context.Context, payload any) error {
-	payloadBytes, ok := common.GetAnyAs[[]byte](payload)
+	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 
 	if !ok {
 		return errors.New("net.tcp.server is only able to output bytes")

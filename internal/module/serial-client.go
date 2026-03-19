@@ -156,10 +156,10 @@ func (sc *SerialClient) Start(ctx context.Context) error {
 
 func (sc *SerialClient) Output(ctx context.Context, payload any) error {
 
-	payloadBytes, ok := common.GetAnyAs[[]byte](payload)
+	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 
 	if !ok {
-		return errors.New("serial.client can only ouptut bytes")
+		return errors.New("serial.client can only output bytes")
 	}
 
 	_, err := sc.port.Write(sc.Framer.Encode(payloadBytes))

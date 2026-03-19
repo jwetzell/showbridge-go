@@ -87,7 +87,7 @@ func (mo *MIDIOutput) Output(ctx context.Context, payload any) error {
 	payloadMessage, ok := common.GetAnyAs[midi.Message](payload)
 
 	if !ok {
-		return errors.New("midi.output can only ouptut midi.Message")
+		return errors.New("midi.output can only output midi.Message")
 	}
 
 	return mo.SendFunc(payloadMessage)

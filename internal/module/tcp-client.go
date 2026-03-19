@@ -152,7 +152,7 @@ func (tc *TCPClient) Output(ctx context.Context, payload any) error {
 			return err
 		}
 	}
-	payloadBytes, ok := common.GetAnyAs[[]byte](payload)
+	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 	if !ok {
 		return errors.New("net.tcp.client is only able to output bytes")
 	}

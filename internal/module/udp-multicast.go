@@ -108,7 +108,7 @@ func (um *UDPMulticast) Start(ctx context.Context) error {
 
 func (um *UDPMulticast) Output(ctx context.Context, payload any) error {
 
-	payloadBytes, ok := common.GetAnyAs[[]byte](payload)
+	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 	if !ok {
 		return errors.New("net.udp.multicast can only output bytes")
 	}

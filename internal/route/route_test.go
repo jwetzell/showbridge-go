@@ -60,7 +60,7 @@ func TestGoodRouteHandleInput(t *testing.T) {
 		t.Fatalf("route ProcessPayload returned error: %v", err)
 	}
 
-	payloadBytes, ok := common.GetAnyAs[[]byte](payload)
+	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 	if !ok {
 		t.Fatalf("payload should be []byte got %T", payload)
 	}

@@ -14,7 +14,7 @@ type StringDecode struct {
 
 func (sd *StringDecode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
-	payloadBytes, ok := common.GetAnyAs[[]byte](payload)
+	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 
 	if !ok {
 		wrappedPayload.End = true

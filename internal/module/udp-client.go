@@ -87,7 +87,7 @@ func (uc *UDPClient) Start(ctx context.Context) error {
 
 func (uc *UDPClient) Output(ctx context.Context, payload any) error {
 
-	payloadBytes, ok := common.GetAnyAs[[]byte](payload)
+	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 	if !ok {
 		return errors.New("net.udp.client is only able to output bytes")
 	}
