@@ -1,6 +1,7 @@
 package processor
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -38,7 +39,15 @@ func (kvs *KVSet) Process(ctx context.Context, wrappedPayload common.WrappedPayl
 		return wrappedPayload, fmt.Errorf("kv.set module with id %s is not a KeyValueModule", kvs.ModuleId)
 	}
 
-	err := kvModule.Set(kvs.Key, wrappedPayload.Payload)
+	var valueBuffer bytes.Buffer
+	err := kvs.Value.Execute(&valueBuffer, wrappedPayload)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	err = kvModule.Set(kvs.Key, valueBuffer.String())
 	if err != nil {
 		wrappedPayload.End = true
 		return wrappedPayload, fmt.Errorf("kv.set error setting key: %w", err)
