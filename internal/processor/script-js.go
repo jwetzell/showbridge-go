@@ -2,7 +2,6 @@ package processor
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -63,10 +62,25 @@ func (sj *ScriptJS) Process(ctx context.Context, wrappedPayload common.WrappedPa
 	outputObject, ok := output.(*quickjs.Object)
 
 	if ok {
-		var outputMap map[string]interface{}
-		err := json.Unmarshal([]byte(outputObject.String()), &outputMap)
-		wrappedPayload.Payload = outputMap
-		return wrappedPayload, err
+		var outputSlice []interface{}
+
+		err = outputObject.Into(&outputSlice)
+
+		if err != nil {
+			var outputMap map[string]interface{}
+			err = outputObject.Into(&outputMap)
+			if err != nil {
+				wrappedPayload.End = true
+				return wrappedPayload, err
+			} else {
+				wrappedPayload.Payload = outputMap
+				return wrappedPayload, nil
+			}
+
+		} else {
+			wrappedPayload.Payload = outputSlice
+			return wrappedPayload, nil
+		}
 	}
 
 	wrappedPayload.Payload = output
