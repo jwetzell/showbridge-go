@@ -1,10 +1,12 @@
 package processor
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
 	"log/slog"
+	"text/template"
 
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -13,7 +15,7 @@ import (
 type DbQuery struct {
 	config   config.ProcessorConfig
 	ModuleId string
-	Query    string
+	Query    *template.Template
 	logger   *slog.Logger
 }
 
@@ -41,7 +43,16 @@ func (dq *DbQuery) Process(ctx context.Context, wrappedPayload common.WrappedPay
 		return wrappedPayload, fmt.Errorf("db.query module with id %s returned nil database", dq.ModuleId)
 	}
 
-	rows, err := db.QueryContext(ctx, dq.Query)
+	var queryBuffer bytes.Buffer
+	err := dq.Query.Execute(&queryBuffer, wrappedPayload)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	// support proper parameterized queries
+	rows, err := db.QueryContext(ctx, queryBuffer.String())
 	if err != nil {
 		wrappedPayload.End = true
 		return wrappedPayload, fmt.Errorf("db.query error executing query: %w", err)
@@ -70,7 +81,8 @@ func (dq *DbQuery) Process(ctx context.Context, wrappedPayload common.WrappedPay
 
 		rowMap := make(map[string]any)
 		for i, colName := range columns {
-			rowMap[colName] = columnValues[i]
+			value := *columnValues[i].(*interface{})
+			rowMap[colName] = value
 		}
 		results = append(results, rowMap)
 	}
@@ -106,7 +118,13 @@ func init() {
 			if err != nil {
 				return nil, fmt.Errorf("db.query query error: %w", err)
 			}
-			return &DbQuery{config: config, ModuleId: moduleIdString, Query: queryString, logger: slog.Default().With("component", "processor", "type", config.Type)}, nil
+
+			queryTemplate, err := template.New("query").Parse(queryString)
+
+			if err != nil {
+				return nil, err
+			}
+			return &DbQuery{config: config, ModuleId: moduleIdString, Query: queryTemplate, logger: slog.Default().With("component", "processor", "type", config.Type)}, nil
 		},
 	})
 }
