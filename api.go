@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"time"
 
@@ -13,6 +14,9 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/module"
 	"github.com/jwetzell/showbridge-go/internal/route"
 )
+
+//go:embed schema
+var schema embed.FS
 
 func (r *Router) startAPIServer(config config.ApiConfig) {
 	if !config.Enabled {
@@ -23,7 +27,7 @@ func (r *Router) startAPIServer(config config.ApiConfig) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ws", r.handleWebsocket)
 	mux.HandleFunc("/health", r.handleHealthHTTP)
-	mux.HandleFunc("/schema/{schema}", r.handleSchemaHTTP)
+	mux.Handle("/schema/{schema}", HandleFS(schema))
 	mux.HandleFunc("/api/v1/config", r.handleConfigHTTP)
 
 	r.apiServerMu.Lock()
@@ -130,28 +134,11 @@ func (r *Router) handleConfigHTTP(w http.ResponseWriter, req *http.Request) {
 
 }
 
-//go:embed schema
-var schema embed.FS
-
-func (r *Router) handleSchemaHTTP(w http.ResponseWriter, req *http.Request) {
-	switch req.Method {
-	case http.MethodGet:
-		schemaName := req.PathValue("schema")
+func HandleFS(fs fs.FS) http.HandlerFunc {
+	handler := http.FileServerFS(fs)
+	return func(w http.ResponseWriter, req *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Content-Type", "application/json")
-		configSchema, err := schema.ReadFile(fmt.Sprintf("schema/%s.schema.json", schemaName))
-		if err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-		w.Write(configSchema)
-	case http.MethodOptions:
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.WriteHeader(http.StatusOK)
-	default:
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.WriteHeader(http.StatusMethodNotAllowed)
+		handler.ServeHTTP(w, req)
 	}
 }
