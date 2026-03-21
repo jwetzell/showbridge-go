@@ -38,6 +38,7 @@ type Router struct {
 	apiServer         *http.Server
 	apiServerMu       sync.Mutex
 	apiServerShutdown context.CancelFunc
+	updatingConfig    bool
 }
 
 func (r *Router) addModule(moduleDecl config.ModuleConfig) error {
@@ -122,6 +123,7 @@ func NewRouter(routerConfig config.Config) (*Router, []module.ModuleError, []rou
 		ConfigChange:    make(chan config.Config, 1),
 		logger:          slog.Default().With("component", "router"),
 		runningConfig:   routerConfig,
+		updatingConfig:  false,
 	}
 	router.logger.Debug("creating")
 
@@ -318,6 +320,10 @@ func (r *Router) RunningConfig() config.Config {
 func (r *Router) UpdateConfig(newConfig config.Config) ([]module.ModuleError, []route.RouteError) {
 	r.runningConfigMu.Lock()
 	defer r.runningConfigMu.Unlock()
+	r.updatingConfig = true
+	defer func() {
+		r.updatingConfig = false
+	}()
 	oldConfig := r.runningConfig
 	r.logger.Debug("received config update", "oldConfig", oldConfig, "newConfig", newConfig)
 

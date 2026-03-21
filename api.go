@@ -85,6 +85,10 @@ func (r *Router) handleConfigHTTP(w http.ResponseWriter, req *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(configJSON)
 	case http.MethodPut:
+		if r.updatingConfig {
+			http.Error(w, "Config update in progress.", http.StatusConflict)
+			return
+		}
 		var newConfig config.Config
 		err := json.NewDecoder(req.Body).Decode(&newConfig)
 		if err != nil {
