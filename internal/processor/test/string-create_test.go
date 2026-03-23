@@ -6,6 +6,7 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
+	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
 func TestStringCreateFromRegistry(t *testing.T) {
@@ -70,13 +71,13 @@ func TestGoodStringCreate(t *testing.T) {
 		{
 			name:     "struct payload - field",
 			params:   map[string]any{"template": "{{.Payload.Data}}"},
-			payload:  TestStruct{Data: "test"},
+			payload:  test.TestStruct{Data: "test"},
 			expected: "test",
 		},
 		{
 			name:     "struct payload - method",
 			params:   map[string]any{"template": "{{.Payload.GetData}}"},
-			payload:  TestStruct{Data: "test"},
+			payload:  test.TestStruct{Data: "test"},
 			expected: "test",
 		},
 	}

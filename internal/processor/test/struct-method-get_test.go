@@ -7,6 +7,7 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
+	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
 func TestStructMethodGetFromRegistry(t *testing.T) {
@@ -29,7 +30,7 @@ func TestStructMethodGetFromRegistry(t *testing.T) {
 		t.Fatalf("struct.method.get processor has wrong type: %s", processorInstance.Type())
 	}
 
-	payload := TestStruct{Data: "hello"}
+	payload := test.TestStruct{Data: "hello"}
 	expected := "hello"
 
 	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
@@ -53,25 +54,25 @@ func TestGoodStructMethodGet(t *testing.T) {
 		{
 			name:     "string field",
 			params:   map[string]any{"name": "GetString"},
-			payload:  TestStruct{String: "hello"},
+			payload:  test.TestStruct{String: "hello"},
 			expected: "hello",
 		},
 		{
 			name:     "int field",
 			params:   map[string]any{"name": "GetInt"},
-			payload:  TestStruct{Int: 42},
+			payload:  test.TestStruct{Int: 42},
 			expected: 42,
 		},
 		{
 			name:     "float field",
 			params:   map[string]any{"name": "GetFloat"},
-			payload:  TestStruct{Float: 3.14},
+			payload:  test.TestStruct{Float: 3.14},
 			expected: 3.14,
 		},
 		{
 			name:     "bool field",
 			params:   map[string]any{"name": "GetBool"},
-			payload:  TestStruct{Bool: true},
+			payload:  test.TestStruct{Bool: true},
 			expected: true,
 		},
 		{
@@ -79,7 +80,7 @@ func TestGoodStructMethodGet(t *testing.T) {
 			params: map[string]any{
 				"name": "GetData",
 			},
-			payload:  TestStruct{Data: []string{"hello"}},
+			payload:  test.TestStruct{Data: []string{"hello"}},
 			expected: []string{"hello"},
 		},
 		{
@@ -87,7 +88,7 @@ func TestGoodStructMethodGet(t *testing.T) {
 			params: map[string]any{
 				"name": "Void",
 			},
-			payload:  TestStruct{},
+			payload:  test.TestStruct{},
 			expected: nil,
 		},
 		{
@@ -95,7 +96,7 @@ func TestGoodStructMethodGet(t *testing.T) {
 			params: map[string]any{
 				"name": "GetData",
 			},
-			payload:  &TestStruct{Data: "hello"},
+			payload:  &test.TestStruct{Data: "hello"},
 			expected: "hello",
 		},
 		{
@@ -103,7 +104,7 @@ func TestGoodStructMethodGet(t *testing.T) {
 			params: map[string]any{
 				"name": "GetIntSlice",
 			},
-			payload:  TestStruct{IntSlice: []int{1, 2, 3}},
+			payload:  test.TestStruct{IntSlice: []int{1, 2, 3}},
 			expected: []int{1, 2, 3},
 		},
 		{
@@ -111,7 +112,7 @@ func TestGoodStructMethodGet(t *testing.T) {
 			params: map[string]any{
 				"name": "MultipleReturnValues",
 			},
-			payload:  TestStruct{String: "hello", Int: 42},
+			payload:  test.TestStruct{String: "hello", Int: 42},
 			expected: []any{"hello", 42},
 		},
 	}
@@ -153,13 +154,13 @@ func TestBadStructMethodGet(t *testing.T) {
 	}{
 		{
 			name:        "no name param",
-			payload:     TestStruct{Data: "hello"},
+			payload:     test.TestStruct{Data: "hello"},
 			params:      map[string]any{},
 			errorString: "struct.method.get name error: not found",
 		},
 		{
 			name:    "non string name",
-			payload: TestStruct{Data: "hello"},
+			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"name": 1,
 			},
@@ -167,7 +168,7 @@ func TestBadStructMethodGet(t *testing.T) {
 		},
 		{
 			name:    "missing method",
-			payload: TestStruct{String: "hello"},
+			payload: test.TestStruct{String: "hello"},
 			params: map[string]any{
 				"name": "NonExistentMethod",
 			},

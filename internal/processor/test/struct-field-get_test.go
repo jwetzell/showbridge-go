@@ -7,6 +7,7 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
+	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
 func TestStructFieldGetFromRegistry(t *testing.T) {
@@ -29,7 +30,7 @@ func TestStructFieldGetFromRegistry(t *testing.T) {
 		t.Fatalf("struct.field.get processor has wrong type: %s", processorInstance.Type())
 	}
 
-	payload := TestStruct{Data: "hello"}
+	payload := test.TestStruct{Data: "hello"}
 	expected := "hello"
 
 	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
@@ -53,31 +54,31 @@ func TestGoodStructFieldGet(t *testing.T) {
 		{
 			name:     "string field",
 			params:   map[string]any{"name": "String"},
-			payload:  TestStruct{String: "hello"},
+			payload:  test.TestStruct{String: "hello"},
 			expected: "hello",
 		},
 		{
 			name:     "int field",
 			params:   map[string]any{"name": "Int"},
-			payload:  TestStruct{Int: 42},
+			payload:  test.TestStruct{Int: 42},
 			expected: 42,
 		},
 		{
 			name:     "float field",
 			params:   map[string]any{"name": "Float"},
-			payload:  TestStruct{Float: 3.14},
+			payload:  test.TestStruct{Float: 3.14},
 			expected: 3.14,
 		},
 		{
 			name:     "bool field",
 			params:   map[string]any{"name": "Bool"},
-			payload:  TestStruct{Bool: true},
+			payload:  test.TestStruct{Bool: true},
 			expected: true,
 		},
 		{
 			name:     "pointer to struct payload",
 			params:   map[string]any{"name": "Data"},
-			payload:  &TestStruct{Data: "hello"},
+			payload:  &test.TestStruct{Data: "hello"},
 			expected: "hello",
 		},
 		{
@@ -85,7 +86,7 @@ func TestGoodStructFieldGet(t *testing.T) {
 			params: map[string]any{
 				"name": "IntSlice",
 			},
-			payload:  TestStruct{IntSlice: []int{1, 2, 3}},
+			payload:  test.TestStruct{IntSlice: []int{1, 2, 3}},
 			expected: []int{1, 2, 3},
 		},
 	}
@@ -128,13 +129,13 @@ func TestBadStructFieldGet(t *testing.T) {
 	}{
 		{
 			name:        "no name param",
-			payload:     TestStruct{Data: "hello"},
+			payload:     test.TestStruct{Data: "hello"},
 			params:      map[string]any{},
 			errorString: "struct.field.get name error: not found",
 		},
 		{
 			name:    "non string name",
-			payload: TestStruct{Data: "hello"},
+			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"name": 1,
 			},
@@ -142,7 +143,7 @@ func TestBadStructFieldGet(t *testing.T) {
 		},
 		{
 			name:    "missing field",
-			payload: TestStruct{String: "hello"},
+			payload: test.TestStruct{String: "hello"},
 			params: map[string]any{
 				"name": "NonExistentField",
 			},

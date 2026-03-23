@@ -1,31 +1,13 @@
 package module_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
+	"github.com/jwetzell/showbridge-go/internal/test"
 )
-
-type TestModule struct {
-}
-
-func (m *TestModule) Start(ctx context.Context) error {
-	<-ctx.Done()
-	return nil
-}
-
-func (m *TestModule) Stop() {}
-
-func (m *TestModule) Type() string {
-	return "module.test"
-}
-
-func (m *TestModule) Id() string {
-	return "test"
-}
 
 func TestModuleBadRegistrationNoType(t *testing.T) {
 	defer func() {
@@ -37,7 +19,7 @@ func TestModuleBadRegistrationNoType(t *testing.T) {
 	module.RegisterModule(module.ModuleRegistration{
 		Type: "",
 		New: func(config config.ModuleConfig) (common.Module, error) {
-			return &TestModule{}, nil
+			return &test.TestModule{}, nil
 		},
 	})
 }
@@ -65,14 +47,14 @@ func TestModuleBadRegistrationExistingType(t *testing.T) {
 	module.RegisterModule(module.ModuleRegistration{
 		Type: "module.test",
 		New: func(config config.ModuleConfig) (common.Module, error) {
-			return &TestModule{}, nil
+			return &test.TestModule{}, nil
 		},
 	})
 
 	module.RegisterModule(module.ModuleRegistration{
 		Type: "module.test",
 		New: func(config config.ModuleConfig) (common.Module, error) {
-			return &TestModule{}, nil
+			return &test.TestModule{}, nil
 		},
 	})
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
+	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
 func TestKvSetFromRegistry(t *testing.T) {
@@ -35,10 +36,10 @@ func TestKvSetFromRegistry(t *testing.T) {
 	payload := ""
 	expected := ""
 
-	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetContextWithModules(
+	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(test.GetContextWithModules(
 		t.Context(),
 		map[string]common.Module{
-			"test": &TestKVModule{},
+			"test": &test.TestKVModule{},
 		},
 	), payload))
 	if err != nil {
@@ -52,7 +53,7 @@ func TestKvSetFromRegistry(t *testing.T) {
 
 func TestGoodKvSet(t *testing.T) {
 
-	tests := []struct {
+	testCases := []struct {
 		name     string
 		params   map[string]any
 		payload  any
@@ -69,8 +70,8 @@ func TestGoodKvSet(t *testing.T) {
 			expected: "",
 		},
 	}
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
 			registration, ok := processor.ProcessorRegistry["kv.set"]
 			if !ok {
 				t.Fatalf("kv.set processor not registered")
@@ -78,33 +79,33 @@ func TestGoodKvSet(t *testing.T) {
 
 			processorInstance, err := registration.New(config.ProcessorConfig{
 				Type:   "kv.set",
-				Params: test.params,
+				Params: testCase.params,
 			})
 
 			if err != nil {
 				t.Fatalf("kv.set failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetContextWithModules(
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(test.GetContextWithModules(
 				t.Context(),
 				map[string]common.Module{
-					"test": &TestKVModule{},
+					"test": &test.TestKVModule{},
 				},
-			), test.payload))
+			), testCase.payload))
 
 			if err != nil {
 				t.Fatalf("kv.set processing failed: %s", err)
 			}
 
-			if !reflect.DeepEqual(got.Payload, test.expected) {
-				t.Fatalf("kv.set got payload: %+v, expected %+v", got.Payload, test.expected)
+			if !reflect.DeepEqual(got.Payload, testCase.expected) {
+				t.Fatalf("kv.set got payload: %+v, expected %+v", got.Payload, testCase.expected)
 			}
 		})
 	}
 }
 
 func TestBadKvSet(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		name              string
 		params            map[string]any
 		payload           any
@@ -113,82 +114,82 @@ func TestBadKvSet(t *testing.T) {
 	}{
 		{
 			name:    "no module param",
-			payload: TestStruct{Data: "hello"},
+			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"key":   "test",
 				"value": "test",
 			},
-			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestKVModule{},
+			wrappedPayloadCtx: test.GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &test.TestKVModule{},
 			}),
 			errorString: "kv.set module error: not found",
 		},
 		{
 			name:    "non string module",
-			payload: TestStruct{Data: "hello"},
+			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": 1,
 				"key":    "test",
 				"value":  "test",
 			},
-			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestKVModule{},
+			wrappedPayloadCtx: test.GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &test.TestKVModule{},
 			}),
 			errorString: "kv.set module error: not a string",
 		},
 		{
 			name:    "no key param",
-			payload: TestStruct{Data: "hello"},
+			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"value":  "test",
 			},
-			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestKVModule{},
+			wrappedPayloadCtx: test.GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &test.TestKVModule{},
 			}),
 			errorString: "kv.set key error: not found",
 		},
 		{
 			name:    "non string key",
-			payload: TestStruct{Data: "hello"},
+			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"key":    1,
 				"value":  "test",
 			},
-			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestKVModule{},
+			wrappedPayloadCtx: test.GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &test.TestKVModule{},
 			}),
 			errorString: "kv.set key error: not a string",
 		},
 		{
 			name:    "no value param",
-			payload: TestStruct{Data: "hello"},
+			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"key":    "test",
 			},
-			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestKVModule{},
+			wrappedPayloadCtx: test.GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &test.TestKVModule{},
 			}),
 			errorString: "kv.set value error: not found",
 		},
 		{
 			name:    "non string value",
-			payload: TestStruct{Data: "hello"},
+			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"key":    "test",
 				"value":  1,
 			},
-			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestKVModule{},
+			wrappedPayloadCtx: test.GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &test.TestKVModule{},
 			}),
 			errorString: "kv.set value error: not a string",
 		},
 		{
 			name:    "no modules in context",
-			payload: TestStruct{Data: "hello"},
+			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"key":    "test",
@@ -199,58 +200,58 @@ func TestBadKvSet(t *testing.T) {
 		},
 		{
 			name:    "value template syntax error",
-			payload: TestStruct{Data: "hello"},
+			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"key":    "test",
 				"value":  "{{",
 			},
-			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestKVModule{},
+			wrappedPayloadCtx: test.GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &test.TestKVModule{},
 			}),
 			errorString: "template: template:1: unclosed action",
 		},
 		{
 			name:    "value template execution error",
-			payload: TestStruct{Data: "hello"},
+			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"key":    "test",
 				"value":  "{{.Data}}",
 			},
-			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestKVModule{},
+			wrappedPayloadCtx: test.GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &test.TestKVModule{},
 			}),
 			errorString: "template: template:1:2: executing \"template\" at <.Data>: can't evaluate field Data in type common.WrappedPayload",
 		},
 		{
 			name:    "module not found in context",
-			payload: TestStruct{Data: "hello"},
+			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"key":    "test",
 				"value":  "hello",
 			},
-			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{}),
+			wrappedPayloadCtx: test.GetContextWithModules(t.Context(), map[string]common.Module{}),
 			errorString:       "kv.set unable to find module with id: test",
 		},
 		{
 			name:    "module not a kv module",
-			payload: TestStruct{Data: "hello"},
+			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"key":    "test",
 				"value":  "hello",
 			},
-			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": NewTestDBModule("test"),
+			wrappedPayloadCtx: test.GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": test.NewTestDBModule("test"),
 			}),
 			errorString: "kv.set module with id test is not a KeyValueModule",
 		},
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
 
 			registration, ok := processor.ProcessorRegistry["kv.set"]
 			if !ok {
@@ -259,24 +260,24 @@ func TestBadKvSet(t *testing.T) {
 
 			processorInstance, err := registration.New(config.ProcessorConfig{
 				Type:   "kv.set",
-				Params: test.params,
+				Params: testCase.params,
 			})
 
 			if err != nil {
-				if test.errorString != err.Error() {
-					t.Fatalf("kv.set got error '%s', expected '%s'", err.Error(), test.errorString)
+				if testCase.errorString != err.Error() {
+					t.Fatalf("kv.set got error '%s', expected '%s'", err.Error(), testCase.errorString)
 				}
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(test.wrappedPayloadCtx, test.payload))
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(testCase.wrappedPayloadCtx, testCase.payload))
 
 			if err == nil {
 				t.Fatalf("kv.set expected to fail but got payload: %+v", got)
 			}
 
-			if err.Error() != test.errorString {
-				t.Fatalf("kv.set got error '%s', expected '%s'", err.Error(), test.errorString)
+			if err.Error() != testCase.errorString {
+				t.Fatalf("kv.set got error '%s', expected '%s'", err.Error(), testCase.errorString)
 			}
 		})
 	}

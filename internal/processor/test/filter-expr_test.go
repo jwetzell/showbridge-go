@@ -6,6 +6,7 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
+	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
 func TestFilterExprFromRegistry(t *testing.T) {
@@ -30,7 +31,7 @@ func TestFilterExprFromRegistry(t *testing.T) {
 }
 
 func TestGoodFilterExpr(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		name    string
 		params  map[string]any
 		payload any
@@ -41,7 +42,7 @@ func TestGoodFilterExpr(t *testing.T) {
 			params: map[string]any{
 				"expression": "Payload.Int > 0",
 			},
-			payload: TestStruct{
+			payload: test.TestStruct{
 				Int: 1,
 			},
 			match: true,
@@ -51,7 +52,7 @@ func TestGoodFilterExpr(t *testing.T) {
 			params: map[string]any{
 				"expression": "Payload.String == 'hello'",
 			},
-			payload: TestStruct{
+			payload: test.TestStruct{
 				String: "hello",
 			},
 			match: true,
@@ -61,15 +62,15 @@ func TestGoodFilterExpr(t *testing.T) {
 			params: map[string]any{
 				"expression": "Payload.Int > 0",
 			},
-			payload: TestStruct{
+			payload: test.TestStruct{
 				Int: 0,
 			},
 			match: false,
 		},
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
 			registration, ok := processor.ProcessorRegistry["filter.expr"]
 			if !ok {
 				t.Fatalf("filter.expr processor not registered")
@@ -77,22 +78,22 @@ func TestGoodFilterExpr(t *testing.T) {
 
 			processorInstance, err := registration.New(config.ProcessorConfig{
 				Type:   "filter.expr",
-				Params: test.params,
+				Params: testCase.params,
 			})
 
 			if err != nil {
 				t.Fatalf("filter.expr failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), testCase.payload))
 
 			if err != nil {
 				t.Fatalf("filter.expr processing failed: %s", err)
 			}
 
 			//TODO(jwetzell): work out better way to compare the any/any
-			if got.End != !test.match {
-				t.Fatalf("filter.expr did fitler properly %+v (%T), expected %+v (%T)", got, got, test.match, test.match)
+			if got.End != !testCase.match {
+				t.Fatalf("filter.expr did fitler properly %+v (%T), expected %+v (%T)", got, got, testCase.match, testCase.match)
 			}
 		})
 	}
@@ -110,7 +111,7 @@ func TestBadFilterExpr(t *testing.T) {
 			params: map[string]any{
 				// no expression parameter
 			},
-			payload:     TestStruct{},
+			payload:     test.TestStruct{},
 			errorString: "filter.expr expression error: not found",
 		},
 		{
@@ -118,7 +119,7 @@ func TestBadFilterExpr(t *testing.T) {
 			params: map[string]any{
 				"expression": 12345,
 			},
-			payload:     TestStruct{},
+			payload:     test.TestStruct{},
 			errorString: "filter.expr expression error: not a string",
 		},
 		{
@@ -126,7 +127,7 @@ func TestBadFilterExpr(t *testing.T) {
 			params: map[string]any{
 				"expression": "foo +",
 			},
-			payload:     TestStruct{},
+			payload:     test.TestStruct{},
 			errorString: "unexpected token EOF (1:5)\n | foo +\n | ....^",
 		},
 		{

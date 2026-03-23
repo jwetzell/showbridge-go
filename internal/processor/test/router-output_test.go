@@ -8,6 +8,7 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
+	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
 func TestRouterInputFromRegistry(t *testing.T) {
@@ -34,7 +35,7 @@ func TestRouterInputFromRegistry(t *testing.T) {
 	payload := "test"
 	expected := "test"
 
-	got, err := processorInstance.Process(GetContextWithRouter(t.Context()), common.GetWrappedPayload(t.Context(), payload))
+	got, err := processorInstance.Process(test.GetContextWithRouter(t.Context()), common.GetWrappedPayload(t.Context(), payload))
 	if err != nil {
 		t.Fatalf("router.input processing failed: %s", err)
 	}
@@ -46,15 +47,15 @@ func TestRouterInputFromRegistry(t *testing.T) {
 
 func TestGoodRouterInput(t *testing.T) {
 
-	tests := []struct {
+	testCases := []struct {
 		name     string
 		params   map[string]any
 		payload  any
 		expected any
 	}{}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
 
 			registration, ok := processor.ProcessorRegistry["router.input"]
 			if !ok {
@@ -63,27 +64,27 @@ func TestGoodRouterInput(t *testing.T) {
 
 			processorInstance, err := registration.New(config.ProcessorConfig{
 				Type:   "router.input",
-				Params: test.params,
+				Params: testCase.params,
 			})
 
 			if err != nil {
 				t.Fatalf("router.input failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetContextWithRouter(t.Context()), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(test.GetContextWithRouter(t.Context()), testCase.payload))
 			if err != nil {
 				t.Fatalf("router.input processing failed: %s", err)
 			}
 
-			if !reflect.DeepEqual(got.Payload, test.expected) {
-				t.Fatalf("router.input got %+v (%T), expected %+v (%T)", got.Payload, got.Payload, test.expected, test.expected)
+			if !reflect.DeepEqual(got.Payload, testCase.expected) {
+				t.Fatalf("router.input got %+v (%T), expected %+v (%T)", got.Payload, got.Payload, testCase.expected, testCase.expected)
 			}
 		})
 	}
 }
 
 func TestBadRouterInput(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		name              string
 		params            map[string]any
 		payload           any
@@ -95,7 +96,7 @@ func TestBadRouterInput(t *testing.T) {
 			name:              "no source param",
 			params:            map[string]any{},
 			payload:           "test",
-			processCtx:        GetContextWithRouter(t.Context()),
+			processCtx:        test.GetContextWithRouter(t.Context()),
 			wrappedPayloadCtx: t.Context(),
 			errorString:       "router.input source error: not found",
 		},
@@ -105,7 +106,7 @@ func TestBadRouterInput(t *testing.T) {
 				"source": 123,
 			},
 			payload:           "test",
-			processCtx:        GetContextWithRouter(t.Context()),
+			processCtx:        test.GetContextWithRouter(t.Context()),
 			wrappedPayloadCtx: t.Context(),
 			errorString:       "router.input source error: not a string",
 		},
@@ -121,8 +122,8 @@ func TestBadRouterInput(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
 
 			registration, ok := processor.ProcessorRegistry["router.input"]
 			if !ok {
@@ -131,24 +132,24 @@ func TestBadRouterInput(t *testing.T) {
 
 			processorInstance, err := registration.New(config.ProcessorConfig{
 				Type:   "router.input",
-				Params: test.params,
+				Params: testCase.params,
 			})
 
 			if err != nil {
-				if test.errorString != err.Error() {
-					t.Fatalf("router.input got error '%s', expected '%s'", err.Error(), test.errorString)
+				if testCase.errorString != err.Error() {
+					t.Fatalf("router.input got error '%s', expected '%s'", err.Error(), testCase.errorString)
 				}
 				return
 			}
 
-			got, err := processorInstance.Process(test.processCtx, common.GetWrappedPayload(test.wrappedPayloadCtx, test.payload))
+			got, err := processorInstance.Process(testCase.processCtx, common.GetWrappedPayload(testCase.wrappedPayloadCtx, testCase.payload))
 
 			if err == nil {
 				t.Fatalf("router.input expected to fail but succeeded, got: %v", got)
 			}
 
-			if err.Error() != test.errorString {
-				t.Fatalf("router.input got error '%s', expected '%s'", err.Error(), test.errorString)
+			if err.Error() != testCase.errorString {
+				t.Fatalf("router.input got error '%s', expected '%s'", err.Error(), testCase.errorString)
 			}
 		})
 	}
