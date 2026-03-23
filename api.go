@@ -10,8 +10,8 @@ import (
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
-	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/route"
+	"github.com/jwetzell/showbridge-go/internal/schema"
 )
 
 func (r *Router) startAPIServer(config config.ApiConfig) {
@@ -135,7 +135,7 @@ func (r *Router) handleConfigHTTP(w http.ResponseWriter, req *http.Request) {
 func handleConfigSchema(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case http.MethodGet:
-		schemaJSON, err := json.Marshal(config.ConfigSchema)
+		schemaJSON, err := json.Marshal(schema.ConfigSchema)
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
@@ -157,7 +157,7 @@ func handleConfigSchema(w http.ResponseWriter, req *http.Request) {
 func handleRoutesSchema(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case http.MethodGet:
-		schemaJSON, err := json.Marshal(config.RoutesConfigSchema)
+		schemaJSON, err := json.Marshal(schema.RoutesConfigSchema)
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
@@ -179,7 +179,7 @@ func handleRoutesSchema(w http.ResponseWriter, req *http.Request) {
 func handleModulesSchema(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case http.MethodGet:
-		schemaJSON, err := json.Marshal(module.GetModulesSchema())
+		schemaJSON, err := json.Marshal(schema.GetModulesSchema())
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
@@ -201,7 +201,7 @@ func handleModulesSchema(w http.ResponseWriter, req *http.Request) {
 func handleProcessorsSchema(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case http.MethodGet:
-		schemaJSON, err := json.Marshal(processor.GetProcessorsSchema())
+		schemaJSON, err := json.Marshal(schema.GetProcessorsSchema())
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
