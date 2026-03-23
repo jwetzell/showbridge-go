@@ -1,7 +1,7 @@
 package processor_test
 
 import (
-	"maps"
+	"reflect"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -125,6 +125,28 @@ func TestGoodScriptJS(t *testing.T) {
 			payload:  "1",
 			expected: nil,
 		},
+		{
+			name: "byte slice input",
+			params: map[string]any{
+				"program": `
+					outputString = "";
+					for (let i = 0; i < payload.length; i++) {
+						outputString += String.fromCharCode(payload[i]);
+					}
+					payload = outputString;
+				`,
+			},
+			payload:  []byte("test"),
+			expected: "test",
+		},
+		{
+			name: "slice output",
+			params: map[string]any{
+				"program": "",
+			},
+			payload:  []byte("test"),
+			expected: []interface{}{float64('t'), float64('e'), float64('s'), float64('t')},
+		},
 	}
 
 	for _, test := range tests {
@@ -149,23 +171,8 @@ func TestGoodScriptJS(t *testing.T) {
 				t.Fatalf("script.js processing failed: %s", err)
 			}
 
-			//TODO(jwetzell): work out better way to compare the any/any
-
-			gotMap, ok := got.Payload.(map[string]interface{})
-			if ok {
-				// got a map
-				expectedMap, ok := test.expected.(map[string]interface{})
-				if ok {
-					if !maps.Equal(gotMap, expectedMap) {
-						t.Fatalf("script.js got %+v, expected %+v", got, test.expected)
-					}
-				} else {
-					t.Fatalf("script.js got %+v, expected %+v", got, test.expected)
-				}
-			} else {
-				if got.Payload != test.expected {
-					t.Fatalf("script.js got %+v, expected %+v", got.Payload, test.expected)
-				}
+			if !reflect.DeepEqual(got.Payload, test.expected) {
+				t.Fatalf("script.js got %+v - %T, expected %+v - %T", got.Payload, got.Payload, test.expected, test.expected)
 			}
 		})
 	}
