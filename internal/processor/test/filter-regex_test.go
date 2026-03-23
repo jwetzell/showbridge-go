@@ -8,7 +8,7 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-func TestStringFilterFromRegistry(t *testing.T) {
+func TestFilterRegexFromRegistry(t *testing.T) {
 	registration, ok := processor.ProcessorRegistry["filter.regex"]
 	if !ok {
 		t.Fatalf("filter.regex processor not registered")
@@ -39,7 +39,7 @@ func TestStringFilterFromRegistry(t *testing.T) {
 	gotString, ok := got.Payload.(string)
 
 	if !ok {
-		t.Fatalf("filter.regex should return byte slice")
+		t.Fatalf("filter.regex should return string")
 	}
 
 	if gotString != expected {
@@ -47,7 +47,7 @@ func TestStringFilterFromRegistry(t *testing.T) {
 	}
 }
 
-func TestGoodStringFilter(t *testing.T) {
+func TestGoodFilterRegex(t *testing.T) {
 	tests := []struct {
 		name    string
 		params  map[string]any
@@ -103,7 +103,7 @@ func TestGoodStringFilter(t *testing.T) {
 	}
 }
 
-func TestBadStringFilter(t *testing.T) {
+func TestBadFilterRegex(t *testing.T) {
 	tests := []struct {
 		name        string
 		params      map[string]any
