@@ -38,7 +38,7 @@ func TestKvSetFromRegistry(t *testing.T) {
 	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetContextWithModules(
 		t.Context(),
 		map[string]common.Module{
-			"test": &TestModule{},
+			"test": &TestKVModule{},
 		},
 	), payload))
 	if err != nil {
@@ -88,7 +88,7 @@ func TestGoodKvSet(t *testing.T) {
 			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetContextWithModules(
 				t.Context(),
 				map[string]common.Module{
-					"test": &TestModule{},
+					"test": &TestKVModule{},
 				},
 			), test.payload))
 
@@ -119,7 +119,7 @@ func TestBadKvSet(t *testing.T) {
 				"value": "test",
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestModule{},
+				"test": &TestKVModule{},
 			}),
 			errorString: "kv.set module error: not found",
 		},
@@ -132,7 +132,7 @@ func TestBadKvSet(t *testing.T) {
 				"value":  "test",
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestModule{},
+				"test": &TestKVModule{},
 			}),
 			errorString: "kv.set module error: not a string",
 		},
@@ -144,7 +144,7 @@ func TestBadKvSet(t *testing.T) {
 				"value":  "test",
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestModule{},
+				"test": &TestKVModule{},
 			}),
 			errorString: "kv.set key error: not found",
 		},
@@ -157,7 +157,7 @@ func TestBadKvSet(t *testing.T) {
 				"value":  "test",
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestModule{},
+				"test": &TestKVModule{},
 			}),
 			errorString: "kv.set key error: not a string",
 		},
@@ -169,7 +169,7 @@ func TestBadKvSet(t *testing.T) {
 				"key":    "test",
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestModule{},
+				"test": &TestKVModule{},
 			}),
 			errorString: "kv.set value error: not found",
 		},
@@ -182,7 +182,7 @@ func TestBadKvSet(t *testing.T) {
 				"value":  1,
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestModule{},
+				"test": &TestKVModule{},
 			}),
 			errorString: "kv.set value error: not a string",
 		},
@@ -198,6 +198,32 @@ func TestBadKvSet(t *testing.T) {
 			errorString:       "kv.set wrapped payload has no modules",
 		},
 		{
+			name:    "value template syntax error",
+			payload: TestStruct{Data: "hello"},
+			params: map[string]any{
+				"module": "test",
+				"key":    "test",
+				"value":  "{{",
+			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &TestKVModule{},
+			}),
+			errorString: "template: template:1: unclosed action",
+		},
+		{
+			name:    "value template execution error",
+			payload: TestStruct{Data: "hello"},
+			params: map[string]any{
+				"module": "test",
+				"key":    "test",
+				"value":  "{{.Data}}",
+			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &TestKVModule{},
+			}),
+			errorString: "template: template:1:2: executing \"template\" at <.Data>: can't evaluate field Data in type common.WrappedPayload",
+		},
+		{
 			name:    "module not found in context",
 			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
@@ -207,6 +233,19 @@ func TestBadKvSet(t *testing.T) {
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{}),
 			errorString:       "kv.set unable to find module with id: test",
+		},
+		{
+			name:    "module not a kv module",
+			payload: TestStruct{Data: "hello"},
+			params: map[string]any{
+				"module": "test",
+				"key":    "test",
+				"value":  "hello",
+			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": NewTestDBModule("test"),
+			}),
+			errorString: "kv.set module with id test is not a KeyValueModule",
 		},
 	}
 

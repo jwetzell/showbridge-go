@@ -59,17 +59,60 @@ func (p *TestProcessor) Process(ctx context.Context, wrappedPayload common.Wrapp
 	return wrappedPayload, nil
 }
 
-type TestModule struct {
-	kvData map[string]any
-	db     *sql.DB
+func NewTestKVModule(id string) *TestKVModule {
+	return &TestKVModule{
+		id: id,
+	}
 }
 
-func (m *TestModule) Start(ctx context.Context) error {
+type TestKVModule struct {
+	id     string
+	kvData map[string]any
+}
+
+func (m *TestKVModule) Start(ctx context.Context) error {
 	<-ctx.Done()
 	return nil
 }
 
-func (m *TestModule) Database() *sql.DB {
+func (m *TestKVModule) Stop() {}
+
+func (m *TestKVModule) Type() string {
+	return "module.test.kv"
+}
+
+func (m *TestKVModule) Id() string {
+	return m.id
+}
+
+func (m *TestKVModule) Get(key string) (any, error) {
+	return key, nil
+}
+
+func (m *TestKVModule) Set(key string, value any) error {
+	if m.kvData == nil {
+		m.kvData = make(map[string]any)
+	}
+	m.kvData[key] = value
+	return nil
+}
+func NewTestDBModule(id string) *TestDBModule {
+	return &TestDBModule{
+		id: id,
+	}
+}
+
+type TestDBModule struct {
+	id string
+	db *sql.DB
+}
+
+func (m *TestDBModule) Start(ctx context.Context) error {
+	<-ctx.Done()
+	return nil
+}
+
+func (m *TestDBModule) Database() *sql.DB {
 	if m.db == nil {
 		db, _ := sql.Open("sqlite", ":memory:")
 
@@ -86,26 +129,14 @@ func (m *TestModule) Database() *sql.DB {
 	return m.db
 }
 
-func (m *TestModule) Stop() {}
+func (m *TestDBModule) Stop() {}
 
-func (m *TestModule) Type() string {
-	return "module.test"
+func (m *TestDBModule) Type() string {
+	return "module.test.db"
 }
 
-func (m *TestModule) Id() string {
-	return "test"
-}
-
-func (m *TestModule) Get(key string) (any, error) {
-	return key, nil
-}
-
-func (m *TestModule) Set(key string, value any) error {
-	if m.kvData == nil {
-		m.kvData = make(map[string]any)
-	}
-	m.kvData[key] = value
-	return nil
+func (m *TestDBModule) Id() string {
+	return m.id
 }
 
 func GetContextWithModules(ctx context.Context, modules map[string]common.Module) context.Context {

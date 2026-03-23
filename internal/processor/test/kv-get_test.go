@@ -37,7 +37,7 @@ func TestKvGetFromRegistry(t *testing.T) {
 	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetContextWithModules(
 		t.Context(),
 		map[string]common.Module{
-			"test": &TestModule{},
+			"test": NewTestKVModule("test"),
 		},
 	), payload))
 	if err != nil {
@@ -97,7 +97,7 @@ func TestGoodKvGet(t *testing.T) {
 			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetContextWithModules(
 				t.Context(),
 				map[string]common.Module{
-					"test": &TestModule{},
+					"test": NewTestKVModule("test"),
 				},
 			), test.payload))
 
@@ -127,7 +127,7 @@ func TestBadKvGet(t *testing.T) {
 				"key": "test",
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestModule{},
+				"test": NewTestKVModule("test"),
 			}),
 			errorString: "kv.get module error: not found",
 		},
@@ -139,7 +139,7 @@ func TestBadKvGet(t *testing.T) {
 				"key":    "test",
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestModule{},
+				"test": NewTestKVModule("test"),
 			}),
 			errorString: "kv.get module error: not a string",
 		},
@@ -150,7 +150,7 @@ func TestBadKvGet(t *testing.T) {
 				"module": "test",
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestModule{},
+				"test": NewTestKVModule("test"),
 			}),
 			errorString: "kv.get key error: not found",
 		},
@@ -162,7 +162,7 @@ func TestBadKvGet(t *testing.T) {
 				"key":    1,
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestModule{},
+				"test": NewTestKVModule("test"),
 			}),
 			errorString: "kv.get key error: not a string",
 		},
@@ -185,6 +185,18 @@ func TestBadKvGet(t *testing.T) {
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{}),
 			errorString:       "kv.get unable to find module with id: test",
+		},
+		{
+			name:    "module not a kv module",
+			payload: TestStruct{Data: "hello"},
+			params: map[string]any{
+				"module": "test",
+				"key":    "test",
+			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": NewTestDBModule("test"),
+			}),
+			errorString: "kv.get module with id test is not a KeyValueModule",
 		},
 	}
 

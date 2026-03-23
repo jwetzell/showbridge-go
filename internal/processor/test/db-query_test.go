@@ -38,7 +38,7 @@ func TestDbQueryFromRegistry(t *testing.T) {
 	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetContextWithModules(
 		t.Context(),
 		map[string]common.Module{
-			"test": &TestModule{},
+			"test": NewTestDBModule("test"),
 		},
 	), payload))
 	if err != nil {
@@ -108,7 +108,7 @@ func TestGoodDbQuery(t *testing.T) {
 			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetContextWithModules(
 				t.Context(),
 				map[string]common.Module{
-					"test": &TestModule{},
+					"test": NewTestDBModule("test"),
 				},
 			), test.payload))
 
@@ -138,7 +138,7 @@ func TestBadDbQuery(t *testing.T) {
 				"query": "SELECT sqlite_version();",
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestModule{},
+				"test": NewTestDBModule("test"),
 			}),
 			errorString: "db.query module error: not found",
 		},
@@ -150,7 +150,7 @@ func TestBadDbQuery(t *testing.T) {
 				"query":  "SELECT sqlite_version();",
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestModule{},
+				"test": NewTestDBModule("test"),
 			}),
 			errorString: "db.query module error: not a string",
 		},
@@ -161,7 +161,7 @@ func TestBadDbQuery(t *testing.T) {
 				"module": "test",
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestModule{},
+				"test": NewTestDBModule("test"),
 			}),
 			errorString: "db.query query error: not found",
 		},
@@ -173,7 +173,7 @@ func TestBadDbQuery(t *testing.T) {
 				"query":  1,
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestModule{},
+				"test": NewTestDBModule("test"),
 			}),
 			errorString: "db.query query error: not a string",
 		},
@@ -185,7 +185,7 @@ func TestBadDbQuery(t *testing.T) {
 				"query":  "select * from {{",
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestModule{},
+				"test": NewTestDBModule("test"),
 			}),
 			errorString: "template: query:1: unclosed action",
 		},
@@ -197,7 +197,7 @@ func TestBadDbQuery(t *testing.T) {
 				"query":  "select * from {{.Data}}",
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestModule{},
+				"test": NewTestDBModule("test"),
 			}),
 			errorString: "template: query:1:16: executing \"query\" at <.Data>: can't evaluate field Data in type common.WrappedPayload",
 		},
@@ -209,7 +209,7 @@ func TestBadDbQuery(t *testing.T) {
 				"query":  "select * from asdf;",
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
-				"test": &TestModule{},
+				"test": NewTestDBModule("test"),
 			}),
 			errorString: "db.query error executing query: SQL logic error: no such table: asdf (1)",
 		},
@@ -232,6 +232,28 @@ func TestBadDbQuery(t *testing.T) {
 			},
 			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{}),
 			errorString:       "db.query unable to find module with id: test",
+		},
+		{
+			name:    "module not found in context",
+			payload: TestStruct{Data: "hello"},
+			params: map[string]any{
+				"module": "test",
+				"query":  "select * from test;",
+			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{}),
+			errorString:       "db.query unable to find module with id: test",
+		},
+		{
+			name:    "module not a DatabseModule",
+			payload: TestStruct{Data: "hello"},
+			params: map[string]any{
+				"module": "test",
+				"query":  "select * from test;",
+			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": NewTestKVModule("test"),
+			}),
+			errorString: "db.query module with id test is not a DatabaseModule",
 		},
 	}
 
