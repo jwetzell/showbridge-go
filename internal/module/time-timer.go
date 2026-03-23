@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -23,7 +24,20 @@ type TimeTimer struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "time.timer",
+		Type:  "time.timer",
+		Title: "Timer",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"duration": {
+					Title:       "Duration",
+					Type:        "integer",
+					Description: "Interval duration in milliseconds",
+				},
+			},
+			Required:             []string{"duration"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params
 

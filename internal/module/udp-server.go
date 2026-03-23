@@ -8,6 +8,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -24,7 +25,25 @@ type UDPServer struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "net.udp.server",
+		Type:  "net.udp.server",
+		Title: "UDP Server",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"ip": {
+					Title: "IP",
+					Type:  "string",
+				},
+				"port": {
+					Title:   "Port",
+					Type:    "integer",
+					Minimum: jsonschema.Ptr[float64](1024),
+					Maximum: jsonschema.Ptr[float64](65535),
+				},
+			},
+			Required:             []string{"ip", "port"},
+			AdditionalProperties: nil,
+		},
 		New: func(moduleConfig config.ModuleConfig) (common.Module, error) {
 			params := moduleConfig.Params
 			portNum, err := params.GetInt("port")

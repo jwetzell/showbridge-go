@@ -40,7 +40,8 @@ func (apd *ArtNetPacketDecode) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "artnet.packet.decode",
+		Type:  "artnet.packet.decode",
+		Title: "Decode ArtNet Packet",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			return &ArtNetPacketDecode{config: config}, nil
 		},

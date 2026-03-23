@@ -28,7 +28,8 @@ func (dl *DebugLog) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "debug.log",
+		Type:  "debug.log",
+		Title: "Debug Log",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			return &DebugLog{config: config, logger: slog.Default().With("component", "processor", "type", config.Type)}, nil
 		},

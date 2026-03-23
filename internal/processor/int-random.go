@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand/v2"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -28,7 +29,23 @@ func (ir *IntRandom) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "int.random",
+		Type:  "int.random",
+		Title: "Random Int",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"min": {
+					Title: "Minimum",
+					Type:  "integer",
+				},
+				"max": {
+					Title: "Maximum",
+					Type:  "integer",
+				},
+			},
+			Required:             []string{"min", "max"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 

@@ -2,10 +2,12 @@ package processor
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 
 	extism "github.com/extism/go-sdk"
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -50,7 +52,29 @@ func (sw *ScriptWASM) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "script.wasm",
+		Type:  "script.wasm",
+		Title: "Run WASM Plugin",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"path": {
+					Title: "Path",
+					Type:  "string",
+				},
+				"function": {
+					Title:   "Function",
+					Type:    "string",
+					Default: json.RawMessage(`"process"`),
+				},
+				"enableWasi": {
+					Title:   "Enable WASI",
+					Type:    "boolean",
+					Default: json.RawMessage("false"),
+				},
+			},
+			Required:             []string{"path"},
+			AdditionalProperties: nil,
+		},
 		New: func(processorConfig config.ProcessorConfig) (Processor, error) {
 			params := processorConfig.Params
 

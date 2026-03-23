@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -44,7 +45,20 @@ func (ro *RouterInput) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "router.input",
+		Type:  "router.input",
+		Title: "Router Input",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"source": {
+					Title:       "Source",
+					Type:        "string",
+					Description: "source to report as to the router",
+				},
+			},
+			Required:             []string{"source"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 
 			params := config.Params

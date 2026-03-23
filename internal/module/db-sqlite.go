@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 
@@ -24,7 +25,18 @@ type DbSqlite struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "db.sqlite",
+		Type:  "db.sqlite",
+		Title: "SQLite Database",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"dsn": {
+					Type:      "string",
+					MinLength: jsonschema.Ptr(1),
+				},
+			},
+			Required: []string{"dsn"},
+		},
 		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params
 

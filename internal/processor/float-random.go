@@ -2,10 +2,12 @@ package processor
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/rand/v2"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -38,7 +40,29 @@ func (fr *FloatRandom) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "float.random",
+		Type:  "float.random",
+		Title: "Random Float",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"bitSize": {
+					Title:   "Bit Size",
+					Type:    "integer",
+					Enum:    []any{32, 64},
+					Default: json.RawMessage("32"),
+				},
+				"min": {
+					Title: "Minimum",
+					Type:  "number",
+				},
+				"max": {
+					Title: "Maximum",
+					Type:  "number",
+				},
+			},
+			Required:             []string{"min", "max"},
+			AdditionalProperties: nil,
+		},
 		New: func(processorConfig config.ProcessorConfig) (Processor, error) {
 			params := processorConfig.Params
 

@@ -92,7 +92,8 @@ func (mmu *MIDIMessageUnpack) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "midi.message.unpack",
+		Type:  "midi.message.unpack",
+		Title: "Unpack MIDI Message",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			return &MIDIMessageUnpack{config: config}, nil
 		},

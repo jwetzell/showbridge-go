@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"text/template"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	freeD "github.com/jwetzell/free-d-go"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -205,7 +206,61 @@ func (fc *FreeDCreate) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "freed.create",
+		Type:  "freed.create",
+		Title: "Create FreeD",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"id": {
+					Title: "Camera ID",
+					Type:  "string",
+				},
+				"pan": {
+					Title: "Pan",
+					Type:  "string",
+				},
+				"tilt": {
+					Title: "Tilt",
+					Type:  "string",
+				},
+				"roll": {
+					Title: "Roll",
+					Type:  "string",
+				},
+				"posX": {
+					Title: "Position X",
+					Type:  "string",
+				},
+				"posY": {
+					Title: "Position Y",
+					Type:  "string",
+				},
+				"posZ": {
+					Title: "Position Z",
+					Type:  "string",
+				},
+				"zoom": {
+					Title: "Zoom",
+					Type:  "string",
+				},
+				"focus": {
+					Title: "Focus",
+					Type:  "string",
+				},
+			},
+			Required: []string{
+				"id",
+				"pan",
+				"tilt",
+				"roll",
+				"posX",
+				"posY",
+				"posZ",
+				"zoom",
+				"focus",
+			},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 
 			// TODO(jwetzell): make some params optional

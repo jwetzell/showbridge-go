@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
@@ -24,7 +25,23 @@ type NATSClient struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "nats.client",
+		Type:  "nats.client",
+		Title: "NATS Client",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"url": {
+					Title: "NATS Server URL",
+					Type:  "string",
+				},
+				"subject": {
+					Title: "Subject",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"url", "subject"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params
 			urlString, err := params.GetString("url")

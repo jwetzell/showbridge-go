@@ -39,7 +39,8 @@ func (ape *ArtNetPacketEncode) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "artnet.packet.encode",
+		Type:  "artnet.packet.encode",
+		Title: "Encode ArtNet Packet",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			return &ArtNetPacketEncode{config: config}, nil
 		},

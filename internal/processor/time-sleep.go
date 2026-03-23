@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -25,7 +26,19 @@ func (ts *TimeSleep) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "time.sleep",
+		Type:  "time.sleep",
+		Title: "Sleep",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"duration": {
+					Title:       "Duration",
+					Type:        "integer",
+					Description: "Duration to sleep in milliseconds",
+				},
+			},
+			Required: []string{"duration"},
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 

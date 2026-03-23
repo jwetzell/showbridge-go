@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -80,7 +81,31 @@ func (mmc *MQTTMessageCreate) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "mqtt.message.create",
+		Type:  "mqtt.message.create",
+		Title: "Create MQTT Message",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"topic": {
+					Title: "Topic",
+					Type:  "string",
+				},
+				"qos": {
+					Title: "QoS",
+					Type:  "number",
+				},
+				"retained": {
+					Title: "Retained",
+					Type:  "boolean",
+				},
+				"payload": {
+					Title: "Payload",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"topic", "qos", "retained", "payload"},
+			AdditionalProperties: nil,
+		},
 		New: func(processorConfig config.ProcessorConfig) (Processor, error) {
 			params := processorConfig.Params
 			topicString, err := params.GetString("topic")

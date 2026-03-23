@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -44,7 +45,18 @@ func (sf *StructFieldGet) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "struct.field.get",
+		Type:  "struct.field.get",
+		Title: "Get Struct Field",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"name": {
+					Title: "Field Name",
+					Type:  "string",
+				},
+			},
+			Required: []string{"name"},
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 			nameString, err := params.GetString("name")

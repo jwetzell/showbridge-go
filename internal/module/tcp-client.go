@@ -8,6 +8,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/framer"
@@ -26,7 +27,30 @@ type TCPClient struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "net.tcp.client",
+		Type:  "net.tcp.client",
+		Title: "TCP Client",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"host": {
+					Title: "Host",
+					Type:  "string",
+				},
+				"port": {
+					Title:   "Port",
+					Type:    "integer",
+					Minimum: jsonschema.Ptr[float64](1),
+					Maximum: jsonschema.Ptr[float64](65535),
+				},
+				"framing": {
+					Title: "Framing Method",
+					Type:  "string",
+					Enum:  []any{"LF", "CR", "CRLF", "SLIP", "RAW"},
+				},
+			},
+			Required:             []string{"host", "port", "framing"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params
 			hostString, err := params.GetString("host")

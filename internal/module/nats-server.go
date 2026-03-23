@@ -2,12 +2,14 @@ package module
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
 	"net"
 	"time"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/nats-io/nats-server/v2/server"
@@ -26,7 +28,28 @@ type NATSServer struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "nats.server",
+		Type:  "nats.server",
+		Title: "NATS Server",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"ip": {
+					Title:   "IP",
+					Type:    "string",
+					Default: json.RawMessage(`"0.0.0.0"`),
+				},
+				"port": {
+					Title:   "Port",
+					Type:    "integer",
+					Minimum: jsonschema.Ptr[float64](1024),
+					Maximum: jsonschema.Ptr[float64](65535),
+					Default: json.RawMessage(`4222`),
+				},
+			},
+			Required: []string{},
+
+			AdditionalProperties: nil,
+		},
 		New: func(moduleConfig config.ModuleConfig) (common.Module, error) {
 			params := moduleConfig.Params
 			portNum, err := params.GetInt("port")

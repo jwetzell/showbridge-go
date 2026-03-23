@@ -9,6 +9,7 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/framer"
@@ -29,7 +30,23 @@ type SerialClient struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "serial.client",
+		Type:  "serial.client",
+		Title: "Serial Client",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"port": {
+					Title: "Port",
+					Type:  "string",
+				},
+				"baudRate": {
+					Title: "Baud Rate",
+					Type:  "integer",
+				},
+			},
+			Required:             []string{"port", "baudRate"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params
 			portString, err := params.GetString("port")

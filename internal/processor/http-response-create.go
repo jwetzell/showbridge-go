@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"text/template"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -44,7 +45,23 @@ func (hrc *HTTPResponseCreate) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "http.response.create",
+		Type:  "http.response.create",
+		Title: "Create HTTP Response",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"status": {
+					Title: "Status Code",
+					Type:  "integer",
+				},
+				"body": {
+					Title: "Body",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"status", "body"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 

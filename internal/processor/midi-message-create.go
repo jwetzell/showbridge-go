@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"text/template"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"gitlab.com/gomidi/midi/v2"
@@ -314,7 +315,105 @@ func newMidiProgramChangeCreate(config config.ProcessorConfig) (Processor, error
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "midi.message.create",
+		Type:  "midi.message.create",
+		Title: "Create MIDI Message",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			OneOf: []*jsonschema.Schema{
+				{
+					Type: "object",
+					Properties: map[string]*jsonschema.Schema{
+						"type": {
+							Title: "MIDI Message Type",
+							Type:  "string",
+							Enum:  []any{"NoteOn", "noteon", "note_on"},
+						},
+						"channel": {
+							Title: "Channel",
+							Type:  "string",
+						},
+						"note": {
+							Title: "Note",
+							Type:  "string",
+						},
+						"velocity": {
+							Title: "Velocity",
+							Type:  "string",
+						},
+					},
+					Required:             []string{"type", "channel", "note", "velocity"},
+					AdditionalProperties: nil,
+				},
+				{
+					Type: "object",
+					Properties: map[string]*jsonschema.Schema{
+						"type": {
+							Title: "MIDI Message Type",
+							Type:  "string",
+							Enum:  []any{"NoteOff", "noteoff", "note_off"},
+						},
+						"channel": {
+							Title: "Channel",
+							Type:  "string",
+						},
+						"note": {
+							Title: "Note",
+							Type:  "string",
+						},
+						"velocity": {
+							Title: "Velocity",
+							Type:  "string",
+						},
+					},
+					Required:             []string{"type", "channel", "note", "velocity"},
+					AdditionalProperties: nil,
+				},
+				{
+					Type: "object",
+					Properties: map[string]*jsonschema.Schema{
+						"type": {
+							Title: "MIDI Message Type",
+							Type:  "string",
+							Enum:  []any{"ControlChange", "controlchange", "control_change"},
+						},
+						"channel": {
+							Title: "Channel",
+							Type:  "string",
+						},
+						"control": {
+							Title: "Control",
+							Type:  "string",
+						},
+						"value": {
+							Title: "Value",
+							Type:  "string",
+						},
+					},
+					Required:             []string{"type", "channel", "control", "value"},
+					AdditionalProperties: nil,
+				},
+				{
+					Type: "object",
+					Properties: map[string]*jsonschema.Schema{
+						"type": {
+							Title: "MIDI Message Type",
+							Type:  "string",
+							Enum:  []any{"ProgramChange", "programchange", "program_change"},
+						},
+						"channel": {
+							Title: "Channel",
+							Type:  "string",
+						},
+						"program": {
+							Title: "Program",
+							Type:  "string",
+						},
+					},
+					Required:             []string{"type", "channel", "program"},
+					AdditionalProperties: nil,
+				},
+			},
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 

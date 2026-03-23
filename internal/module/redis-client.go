@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/redis/go-redis/v9"
@@ -24,7 +25,23 @@ type RedisClient struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "redis.client",
+		Type:  "redis.client",
+		Title: "Redis Client",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"host": {
+					Type: "string",
+				},
+				"port": {
+					Type:    "integer",
+					Minimum: jsonschema.Ptr[float64](1),
+					Maximum: jsonschema.Ptr[float64](65535),
+				},
+			},
+			Required:             []string{"host", "port"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params
 			hostString, err := params.GetString("host")

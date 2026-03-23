@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"text/template"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -37,7 +38,19 @@ func (sc *StringCreate) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "string.create",
+		Type:  "string.create",
+		Title: "Create String",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"template": {
+					Title: "Template",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"template"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 			templateString, err := params.GetString("template")

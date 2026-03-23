@@ -34,7 +34,8 @@ func (fe *FreeDEncode) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "freed.encode",
+		Type:  "freed.encode",
+		Title: "Encode FreeD",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			return &FreeDEncode{config: config}, nil
 		},

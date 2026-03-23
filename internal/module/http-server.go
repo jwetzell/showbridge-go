@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
@@ -55,7 +56,21 @@ func (hsrw *HTTPServerResponseWriter) Write(data []byte) (int, error) {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "http.server",
+		Type:  "http.server",
+		Title: "HTTP Server",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"port": {
+					Title:   "Port",
+					Type:    "integer",
+					Minimum: jsonschema.Ptr[float64](1024),
+					Maximum: jsonschema.Ptr[float64](65535),
+				},
+			},
+			Required:             []string{"port"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params
 			portNum, err := params.GetInt("port")

@@ -2,21 +2,17 @@ package showbridge
 
 import (
 	"context"
-	"embed"
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"io/fs"
 	"net/http"
 	"time"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
+	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/route"
 )
-
-//go:embed schema
-var schema embed.FS
 
 func (r *Router) startAPIServer(config config.ApiConfig) {
 	if !config.Enabled {
@@ -27,8 +23,11 @@ func (r *Router) startAPIServer(config config.ApiConfig) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ws", r.handleWebsocket)
 	mux.HandleFunc("/health", r.handleHealthHTTP)
-	mux.Handle("/schema/{schema}", HandleFS(schema))
 	mux.HandleFunc("/api/v1/config", r.handleConfigHTTP)
+	mux.HandleFunc("/schema/config.schema.json", handleConfigSchema)
+	mux.HandleFunc("/schema/routes.schema.json", handleRoutesSchema)
+	mux.HandleFunc("/schema/modules.schema.json", handleModulesSchema)
+	mux.HandleFunc("/schema/processors.schema.json", handleProcessorsSchema)
 
 	r.apiServerMu.Lock()
 	defer r.apiServerMu.Unlock()
@@ -131,14 +130,92 @@ func (r *Router) handleConfigHTTP(w http.ResponseWriter, req *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
-
 }
 
-func HandleFS(fs fs.FS) http.HandlerFunc {
-	handler := http.FileServerFS(fs)
-	return func(w http.ResponseWriter, req *http.Request) {
+func handleConfigSchema(w http.ResponseWriter, req *http.Request) {
+	switch req.Method {
+	case http.MethodGet:
+		schemaJSON, err := json.Marshal(config.ConfigSchema)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Content-Type", "application/json")
-		handler.ServeHTTP(w, req)
+		w.Write(schemaJSON)
+	case http.MethodOptions:
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.WriteHeader(http.StatusOK)
+	default:
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}
+
+func handleRoutesSchema(w http.ResponseWriter, req *http.Request) {
+	switch req.Method {
+	case http.MethodGet:
+		schemaJSON, err := json.Marshal(config.RoutesConfigSchema)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(schemaJSON)
+	case http.MethodOptions:
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.WriteHeader(http.StatusOK)
+	default:
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}
+
+func handleModulesSchema(w http.ResponseWriter, req *http.Request) {
+	switch req.Method {
+	case http.MethodGet:
+		schemaJSON, err := json.Marshal(module.GetModulesSchema())
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(schemaJSON)
+	case http.MethodOptions:
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.WriteHeader(http.StatusOK)
+	default:
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}
+
+func handleProcessorsSchema(w http.ResponseWriter, req *http.Request) {
+	switch req.Method {
+	case http.MethodGet:
+		schemaJSON, err := json.Marshal(processor.GetProcessorsSchema())
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(schemaJSON)
+	case http.MethodOptions:
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.WriteHeader(http.StatusOK)
+	default:
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
