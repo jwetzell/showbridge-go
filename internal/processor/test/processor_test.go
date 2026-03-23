@@ -139,8 +139,28 @@ func (m *TestDBModule) Id() string {
 	return m.id
 }
 
+func GetNewTestRouter() *TestRouter {
+	return &TestRouter{}
+}
+
+type TestRouter struct {
+}
+
+func (r *TestRouter) HandleInput(ctx context.Context, sourceId string, payload any) (bool, []common.RouteIOError) {
+	return false, nil
+}
+
+func (r *TestRouter) HandleOutput(ctx context.Context, destinationId string, payload any) error {
+	return nil
+}
+
 func GetContextWithModules(ctx context.Context, modules map[string]common.Module) context.Context {
 	ctx = context.WithValue(ctx, common.ModulesContextKey, modules)
+	return ctx
+}
+
+func GetContextWithRouter(ctx context.Context) context.Context {
+	ctx = context.WithValue(ctx, common.RouterContextKey, GetNewTestRouter())
 	return ctx
 }
 
