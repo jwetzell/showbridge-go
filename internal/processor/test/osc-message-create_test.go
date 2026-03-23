@@ -132,6 +132,16 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 			payload:  map[string]any{"Value": "value"},
 			expected: &osc.OSCMessage{Address: "/test/value", Args: []osc.OSCArg{{Value: nil, Type: "N"}}},
 		},
+		{
+			name: "blob arg",
+			params: map[string]any{
+				"address": "/test",
+				"args":    []interface{}{"deadbeef"},
+				"types":   "b",
+			},
+			payload:  "",
+			expected: &osc.OSCMessage{Address: "/test", Args: []osc.OSCArg{{Value: []byte{0xde, 0xad, 0xbe, 0xef}, Type: "b"}}},
+		},
 	}
 
 	for _, test := range tests {
@@ -306,6 +316,56 @@ func TestBadOSCMessageCreate(t *testing.T) {
 			},
 			payload:     "test",
 			errorString: "template: arg:1:2: executing \"arg\" at <.missing>: can't evaluate field missing in type common.WrappedPayload",
+		},
+		{
+			name: "wrong arg type for int arg",
+			params: map[string]any{
+				"address": "/test",
+				"args":    []interface{}{"{{.Payload}}"},
+				"types":   "i",
+			},
+			payload:     "test",
+			errorString: "strconv.ParseInt: parsing \"test\": invalid syntax",
+		},
+		{
+			name: "wrong arg type for float arg",
+			params: map[string]any{
+				"address": "/test",
+				"args":    []interface{}{"{{.Payload}}"},
+				"types":   "f",
+			},
+			payload:     "test",
+			errorString: "strconv.ParseFloat: parsing \"test\": invalid syntax",
+		},
+		{
+			name: "wrong arg type for blob arg",
+			params: map[string]any{
+				"address": "/test",
+				"args":    []interface{}{"{{.Payload}}"},
+				"types":   "b",
+			},
+			payload:     "test",
+			errorString: "encoding/hex: invalid byte: U+0074 't'",
+		},
+		{
+			name: "wrong arg type for int64 arg",
+			params: map[string]any{
+				"address": "/test",
+				"args":    []interface{}{"{{.Payload}}"},
+				"types":   "h",
+			},
+			payload:     "test",
+			errorString: "strconv.ParseInt: parsing \"test\": invalid syntax",
+		},
+		{
+			name: "wrong arg type for double arg",
+			params: map[string]any{
+				"address": "/test",
+				"args":    []interface{}{"{{.Payload}}"},
+				"types":   "d",
+			},
+			payload:     "test",
+			errorString: "strconv.ParseFloat: parsing \"test\": invalid syntax",
 		},
 	}
 
