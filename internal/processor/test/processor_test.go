@@ -2,6 +2,7 @@ package processor_test
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -56,6 +57,63 @@ func (p *TestProcessor) Type() string {
 }
 func (p *TestProcessor) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 	return wrappedPayload, nil
+}
+
+type TestModule struct {
+	kvData map[string]any
+	db     *sql.DB
+}
+
+func (m *TestModule) Start(ctx context.Context) error {
+	<-ctx.Done()
+	return nil
+}
+
+func (m *TestModule) Database() *sql.DB {
+	if m.db == nil {
+		db, _ := sql.Open("sqlite", ":memory:")
+
+		db.Exec(`
+		CREATE TABLE test (
+			id INTEGER PRIMARY KEY,
+			value TEXT
+		);
+		INSERT INTO test (id, value) VALUES (1, 'test-1'), (2, 'test-2');
+		
+		`)
+		m.db = db
+	}
+	return m.db
+}
+
+func (m *TestModule) Stop() {}
+
+func (m *TestModule) Type() string {
+	return "module.test"
+}
+
+func (m *TestModule) Id() string {
+	return "test"
+}
+
+func (m *TestModule) Get(key string) (any, error) {
+	return key, nil
+}
+
+func (m *TestModule) Set(key string, value any) error {
+	if m.kvData == nil {
+		m.kvData = make(map[string]any)
+	}
+	m.kvData[key] = value
+	return nil
+}
+
+func GetTestContext(ctx context.Context) context.Context {
+	testModule := &TestModule{}
+	ctx = context.WithValue(ctx, common.ModulesContextKey, map[string]common.Module{
+		"test": testModule,
+	})
+	return ctx
 }
 
 func TestProcessorBadRegistrationNoType(t *testing.T) {
