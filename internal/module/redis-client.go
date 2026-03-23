@@ -79,11 +79,6 @@ func (rc *RedisClient) Start(ctx context.Context) error {
 	return nil
 }
 
-func (rc *RedisClient) Output(ctx context.Context, payload any) error {
-
-	return errors.ErrUnsupported
-}
-
 func (rc *RedisClient) Stop() {
 	rc.cancel()
 }

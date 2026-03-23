@@ -66,10 +66,6 @@ func (t *DbSqlite) Start(ctx context.Context) error {
 	return nil
 }
 
-func (t *DbSqlite) Output(ctx context.Context, payload any) error {
-	return nil
-}
-
 func (t *DbSqlite) Stop() {
 	if t.db != nil {
 		t.db.Close()
