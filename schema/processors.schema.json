@@ -90,6 +90,18 @@
       },
       {
         "type": "object",
+        "title": "Filter Unique Values",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "filter.unique"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
         "title": "Parse Float",
         "properties": {
           "type": {
