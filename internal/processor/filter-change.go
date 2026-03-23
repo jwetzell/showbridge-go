@@ -8,32 +8,32 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type FilterUnique struct {
+type FilterChange struct {
 	config   config.ProcessorConfig
 	previous any
 }
 
-func (fr *FilterUnique) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (fc *FilterChange) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 
-	if reflect.DeepEqual(payload, fr.previous) {
+	if reflect.DeepEqual(payload, fc.previous) {
 		wrappedPayload.End = true
 		return wrappedPayload, nil
 	}
-	fr.previous = payload
+	fc.previous = payload
 
 	return wrappedPayload, nil
 }
 
-func (fr *FilterUnique) Type() string {
-	return fr.config.Type
+func (fc *FilterChange) Type() string {
+	return fc.config.Type
 }
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "filter.unique",
+		Type: "filter.change",
 		New: func(config config.ProcessorConfig) (Processor, error) {
-			return &FilterUnique{config: config}, nil
+			return &FilterChange{config: config}, nil
 		},
 	})
 }
