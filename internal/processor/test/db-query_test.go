@@ -88,6 +88,15 @@ func TestGoodDbQuery(t *testing.T) {
 				{"id": int64(2), "value": "test-2"},
 			},
 		},
+		{
+			name: "no rows",
+			params: map[string]any{
+				"module": "test",
+				"query":  "select * from test where id = -1;",
+			},
+			payload:  "",
+			expected: nil,
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
