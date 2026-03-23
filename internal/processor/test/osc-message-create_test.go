@@ -241,7 +241,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 				"types":   "ss",
 			},
 			payload:     "test",
-			errorString: "osc.message.create args error: element at index 1 is not a string",
+			errorString: "osc.message.create args error: not a string slice",
 		},
 		{
 			name: "bad arg template",

@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/jwetzell/showbridge-go/internal/common"
 )
@@ -10,14 +9,15 @@ import (
 type Params map[string]any
 
 var (
-	ErrParamNotFound     = errors.New("not found")
-	ErrParamNotString    = errors.New("not a string")
-	ErrParamNotNumber    = errors.New("not a number")
-	ErrParamNotInteger   = errors.New("not an integer")
-	ErrParamNotBool      = errors.New("not a boolean")
-	ErrParamNotSlice     = errors.New("not a slice")
-	ErrParamNotByteSlice = errors.New("not a byte slice")
-	ErrParamNotIntSlice  = errors.New("not an int slice")
+	ErrParamNotFound       = errors.New("not found")
+	ErrParamNotString      = errors.New("not a string")
+	ErrParamNotNumber      = errors.New("not a number")
+	ErrParamNotInteger     = errors.New("not an integer")
+	ErrParamNotBool        = errors.New("not a boolean")
+	ErrParamNotSlice       = errors.New("not a slice")
+	ErrParamNotStringSlice = errors.New("not a string slice")
+	ErrParamNotByteSlice   = errors.New("not a byte slice")
+	ErrParamNotIntSlice    = errors.New("not an int slice")
 )
 
 func (p Params) GetString(key string) (string, error) {
@@ -103,7 +103,7 @@ func (p Params) GetStringSlice(key string) ([]string, error) {
 	for i, v := range interfaceSlice {
 		str, ok := v.(string)
 		if !ok {
-			return nil, fmt.Errorf("element at index %d is not a string", i)
+			return nil, ErrParamNotStringSlice
 		}
 		stringSlice[i] = str
 	}
