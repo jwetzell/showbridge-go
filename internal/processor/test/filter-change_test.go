@@ -9,21 +9,21 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-func TestFilterUniqueFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["filter.unique"]
+func TestFilterChangeFromRegistry(t *testing.T) {
+	registration, ok := processor.ProcessorRegistry["filter.change"]
 	if !ok {
-		t.Fatalf("filter.unique processor not registered")
+		t.Fatalf("filter.change processor not registered")
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
-		Type: "filter.unique",
+		Type: "filter.change",
 	})
 	if err != nil {
-		t.Fatalf("failed to create filter.unique processor: %s", err)
+		t.Fatalf("failed to create filter.change processor: %s", err)
 	}
 
-	if processorInstance.Type() != "filter.unique" {
-		t.Fatalf("filter.unique processor has wrong type: %s", processorInstance.Type())
+	if processorInstance.Type() != "filter.change" {
+		t.Fatalf("filter.change processor has wrong type: %s", processorInstance.Type())
 	}
 
 	payload := "hello"
@@ -31,15 +31,15 @@ func TestFilterUniqueFromRegistry(t *testing.T) {
 
 	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
 	if err != nil {
-		t.Fatalf("filter.unique processing failed: %s", err)
+		t.Fatalf("filter.change processing failed: %s", err)
 	}
 
 	if !reflect.DeepEqual(got.Payload, expected) {
-		t.Fatalf("filter.unique got %+v, expected %+v", got.Payload, expected)
+		t.Fatalf("filter.change got %+v, expected %+v", got.Payload, expected)
 	}
 }
 
-func TestGoodFilterUnique(t *testing.T) {
+func TestGoodFilterChange(t *testing.T) {
 	tests := []struct {
 		name    string
 		params  map[string]any
@@ -56,34 +56,34 @@ func TestGoodFilterUnique(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["filter.unique"]
+			registration, ok := processor.ProcessorRegistry["filter.change"]
 			if !ok {
-				t.Fatalf("filter.unique processor not registered")
+				t.Fatalf("filter.change processor not registered")
 			}
 
 			processorInstance, err := registration.New(config.ProcessorConfig{
-				Type:   "filter.unique",
+				Type:   "filter.change",
 				Params: test.params,
 			})
 
 			if err != nil {
-				t.Fatalf("filter.unique failed to create processor: %s", err)
+				t.Fatalf("filter.change failed to create processor: %s", err)
 			}
 
 			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err != nil {
-				t.Fatalf("filter.unique processing failed: %s", err)
+				t.Fatalf("filter.change processing failed: %s", err)
 			}
 
 			if got.End != !test.match {
-				t.Fatalf("filter.unique did not filter properly %+v, expected %+v", got, test.match)
+				t.Fatalf("filter.change did not filter properly %+v, expected %+v", got, test.match)
 			}
 		})
 	}
 }
 
-func TestBadFilterUnique(t *testing.T) {
+func TestBadFilterChange(t *testing.T) {
 	tests := []struct {
 		name        string
 		params      map[string]any
@@ -93,19 +93,19 @@ func TestBadFilterUnique(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["filter.unique"]
+			registration, ok := processor.ProcessorRegistry["filter.change"]
 			if !ok {
-				t.Fatalf("filter.unique processor not registered")
+				t.Fatalf("filter.change processor not registered")
 			}
 
 			processorInstance, err := registration.New(config.ProcessorConfig{
-				Type:   "filter.unique",
+				Type:   "filter.change",
 				Params: test.params,
 			})
 
 			if err != nil {
 				if test.errorString != err.Error() {
-					t.Fatalf("filter.unique got error '%s', expected '%s'", err.Error(), test.errorString)
+					t.Fatalf("filter.change got error '%s', expected '%s'", err.Error(), test.errorString)
 				}
 				return
 			}
@@ -113,11 +113,11 @@ func TestBadFilterUnique(t *testing.T) {
 			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
 
 			if err == nil {
-				t.Fatalf("filter.unique expected to fail but got payload: %+v", got)
+				t.Fatalf("filter.change expected to fail but got payload: %+v", got)
 			}
 
 			if err.Error() != test.errorString {
-				t.Fatalf("filter.unique got error '%s', expected '%s'", err.Error(), test.errorString)
+				t.Fatalf("filter.change got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
 	}
