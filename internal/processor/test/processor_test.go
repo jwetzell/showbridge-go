@@ -108,11 +108,8 @@ func (m *TestModule) Set(key string, value any) error {
 	return nil
 }
 
-func GetTestContext(ctx context.Context) context.Context {
-	testModule := &TestModule{}
-	ctx = context.WithValue(ctx, common.ModulesContextKey, map[string]common.Module{
-		"test": testModule,
-	})
+func GetContextWithModules(ctx context.Context, modules map[string]common.Module) context.Context {
+	ctx = context.WithValue(ctx, common.ModulesContextKey, modules)
 	return ctx
 }
 

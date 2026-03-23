@@ -1,6 +1,7 @@
 package processor_test
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
@@ -34,7 +35,12 @@ func TestKvSetFromRegistry(t *testing.T) {
 	payload := ""
 	expected := ""
 
-	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetTestContext(t.Context()), payload))
+	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetContextWithModules(
+		t.Context(),
+		map[string]common.Module{
+			"test": &TestModule{},
+		},
+	), payload))
 	if err != nil {
 		t.Fatalf("kv.set processing failed: %s", err)
 	}
@@ -79,7 +85,12 @@ func TestGoodKvSet(t *testing.T) {
 				t.Fatalf("kv.set failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetTestContext(t.Context()), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetContextWithModules(
+				t.Context(),
+				map[string]common.Module{
+					"test": &TestModule{},
+				},
+			), test.payload))
 
 			if err != nil {
 				t.Fatalf("kv.set processing failed: %s", err)
@@ -94,10 +105,11 @@ func TestGoodKvSet(t *testing.T) {
 
 func TestBadKvSet(t *testing.T) {
 	tests := []struct {
-		name        string
-		params      map[string]any
-		payload     any
-		errorString string
+		name              string
+		params            map[string]any
+		payload           any
+		wrappedPayloadCtx context.Context
+		errorString       string
 	}{
 		{
 			name:    "no module param",
@@ -106,6 +118,9 @@ func TestBadKvSet(t *testing.T) {
 				"key":   "test",
 				"value": "test",
 			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &TestModule{},
+			}),
 			errorString: "kv.set module error: not found",
 		},
 		{
@@ -116,6 +131,9 @@ func TestBadKvSet(t *testing.T) {
 				"key":    "test",
 				"value":  "test",
 			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &TestModule{},
+			}),
 			errorString: "kv.set module error: not a string",
 		},
 		{
@@ -125,6 +143,9 @@ func TestBadKvSet(t *testing.T) {
 				"module": "test",
 				"value":  "test",
 			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &TestModule{},
+			}),
 			errorString: "kv.set key error: not found",
 		},
 		{
@@ -135,6 +156,9 @@ func TestBadKvSet(t *testing.T) {
 				"key":    1,
 				"value":  "test",
 			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &TestModule{},
+			}),
 			errorString: "kv.set key error: not a string",
 		},
 		{
@@ -144,6 +168,9 @@ func TestBadKvSet(t *testing.T) {
 				"module": "test",
 				"key":    "test",
 			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &TestModule{},
+			}),
 			errorString: "kv.set value error: not found",
 		},
 		{
@@ -154,7 +181,32 @@ func TestBadKvSet(t *testing.T) {
 				"key":    "test",
 				"value":  1,
 			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &TestModule{},
+			}),
 			errorString: "kv.set value error: not a string",
+		},
+		{
+			name:    "no modules in context",
+			payload: TestStruct{Data: "hello"},
+			params: map[string]any{
+				"module": "test",
+				"key":    "test",
+				"value":  "hello",
+			},
+			wrappedPayloadCtx: t.Context(),
+			errorString:       "kv.set wrapped payload has no modules",
+		},
+		{
+			name:    "module not found in context",
+			payload: TestStruct{Data: "hello"},
+			params: map[string]any{
+				"module": "test",
+				"key":    "test",
+				"value":  "hello",
+			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{}),
+			errorString:       "kv.set unable to find module with id: test",
 		},
 	}
 
@@ -178,7 +230,7 @@ func TestBadKvSet(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetTestContext(t.Context()), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(test.wrappedPayloadCtx, test.payload))
 
 			if err == nil {
 				t.Fatalf("kv.set expected to fail but got payload: %+v", got)

@@ -1,6 +1,7 @@
 package processor_test
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
@@ -34,7 +35,12 @@ func TestDbQueryFromRegistry(t *testing.T) {
 	payload := "hello"
 	expected := map[string]any{"sqlite_version()": "3.51.3"}
 
-	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetTestContext(t.Context()), payload))
+	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetContextWithModules(
+		t.Context(),
+		map[string]common.Module{
+			"test": &TestModule{},
+		},
+	), payload))
 	if err != nil {
 		t.Fatalf("db.query processing failed: %s", err)
 	}
@@ -99,7 +105,12 @@ func TestGoodDbQuery(t *testing.T) {
 				t.Fatalf("db.query failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetTestContext(t.Context()), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetContextWithModules(
+				t.Context(),
+				map[string]common.Module{
+					"test": &TestModule{},
+				},
+			), test.payload))
 
 			if err != nil {
 				t.Fatalf("db.query processing failed: %s", err)
@@ -114,10 +125,11 @@ func TestGoodDbQuery(t *testing.T) {
 
 func TestBadDbQuery(t *testing.T) {
 	tests := []struct {
-		name        string
-		params      map[string]any
-		payload     any
-		errorString string
+		name              string
+		params            map[string]any
+		payload           any
+		wrappedPayloadCtx context.Context
+		errorString       string
 	}{
 		{
 			name:    "no module param",
@@ -125,6 +137,9 @@ func TestBadDbQuery(t *testing.T) {
 			params: map[string]any{
 				"query": "SELECT sqlite_version();",
 			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &TestModule{},
+			}),
 			errorString: "db.query module error: not found",
 		},
 		{
@@ -134,6 +149,9 @@ func TestBadDbQuery(t *testing.T) {
 				"module": 1,
 				"query":  "SELECT sqlite_version();",
 			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &TestModule{},
+			}),
 			errorString: "db.query module error: not a string",
 		},
 		{
@@ -142,6 +160,9 @@ func TestBadDbQuery(t *testing.T) {
 			params: map[string]any{
 				"module": "test",
 			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &TestModule{},
+			}),
 			errorString: "db.query query error: not found",
 		},
 		{
@@ -151,6 +172,9 @@ func TestBadDbQuery(t *testing.T) {
 				"module": "test",
 				"query":  1,
 			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &TestModule{},
+			}),
 			errorString: "db.query query error: not a string",
 		},
 		{
@@ -160,6 +184,9 @@ func TestBadDbQuery(t *testing.T) {
 				"module": "test",
 				"query":  "select * from {{",
 			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &TestModule{},
+			}),
 			errorString: "template: query:1: unclosed action",
 		},
 		{
@@ -169,6 +196,9 @@ func TestBadDbQuery(t *testing.T) {
 				"module": "test",
 				"query":  "select * from {{.Data}}",
 			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &TestModule{},
+			}),
 			errorString: "template: query:1:16: executing \"query\" at <.Data>: can't evaluate field Data in type common.WrappedPayload",
 		},
 		{
@@ -178,7 +208,30 @@ func TestBadDbQuery(t *testing.T) {
 				"module": "test",
 				"query":  "select * from asdf;",
 			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{
+				"test": &TestModule{},
+			}),
 			errorString: "db.query error executing query: SQL logic error: no such table: asdf (1)",
+		},
+		{
+			name:    "no modules in context",
+			payload: TestStruct{Data: "hello"},
+			params: map[string]any{
+				"module": "test",
+				"query":  "select * from test;",
+			},
+			wrappedPayloadCtx: t.Context(),
+			errorString:       "db.query wrapped payload has no modules",
+		},
+		{
+			name:    "module not found in context",
+			payload: TestStruct{Data: "hello"},
+			params: map[string]any{
+				"module": "test",
+				"query":  "select * from test;",
+			},
+			wrappedPayloadCtx: GetContextWithModules(t.Context(), map[string]common.Module{}),
+			errorString:       "db.query unable to find module with id: test",
 		},
 	}
 
@@ -202,7 +255,7 @@ func TestBadDbQuery(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(GetTestContext(t.Context()), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(test.wrappedPayloadCtx, test.payload))
 
 			if err == nil {
 				t.Fatalf("db.query expected to fail but got payload: %+v", got)
