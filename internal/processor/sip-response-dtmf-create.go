@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"text/template"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -59,7 +60,26 @@ func (srdc *SipResponseDTMFCreate) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "sip.response.dtmf.create",
+		Type:  "sip.response.dtmf.create",
+		Title: "Create SIP DTMF Response",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"preWait": {
+					Title: "Pre Wait (ms)",
+					Type:  "integer",
+				},
+				"postWait": {
+					Title: "Post Wait (ms)",
+					Type:  "integer",
+				},
+				"digits": {
+					Type: "string",
+				},
+			},
+			Required:             []string{"preWait", "postWait", "digits"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 

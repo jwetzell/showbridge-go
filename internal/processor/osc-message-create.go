@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"text/template"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/osc-go"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
@@ -86,7 +87,30 @@ func (omc *OSCMessageCreate) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "osc.message.create",
+		Type:  "osc.message.create",
+		Title: "Create OSC Message",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"address": {
+					Title: "Address",
+					Type:  "string",
+				},
+				"args": {
+					Title: "Arguments",
+					Type:  "array",
+					Items: &jsonschema.Schema{
+						Type: "string",
+					},
+				},
+				"types": {
+					Title: "Argument Types",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"address"},
+			AdditionalProperties: nil,
+		},
 		New: func(processorConfig config.ProcessorConfig) (Processor, error) {
 			params := processorConfig.Params
 			addressString, err := params.GetString("address")

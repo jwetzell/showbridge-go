@@ -48,7 +48,8 @@ func (omd *OSCMessageDecode) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "osc.message.decode",
+		Type:  "osc.message.decode",
+		Title: "Decode OSC Message",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			return &OSCMessageDecode{config: config}, nil
 		},

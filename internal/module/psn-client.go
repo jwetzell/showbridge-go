@@ -24,7 +24,8 @@ type PSNClient struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "psn.client",
+		Type:  "psn.client",
+		Title: "PosiStageNet Client",
 		New: func(config config.ModuleConfig) (common.Module, error) {
 
 			return &PSNClient{config: config, decoder: psn.NewDecoder(), logger: CreateLogger(config)}, nil

@@ -9,6 +9,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -70,7 +71,24 @@ func (hrd *HTTPRequestDo) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "http.request.do",
+		Type:  "http.request.do",
+		Title: "Do HTTP Request",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"method": {
+					Title: "HTTP Method",
+					Type:  "string",
+					Enum:  []any{"GET", "POST"},
+				},
+				"url": {
+					Title: "URL",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"method", "url"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 

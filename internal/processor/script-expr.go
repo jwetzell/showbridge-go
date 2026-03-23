@@ -6,6 +6,7 @@ import (
 
 	"github.com/expr-lang/expr"
 	"github.com/expr-lang/expr/vm"
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -36,7 +37,19 @@ func (se *ScriptExpr) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "script.expr",
+		Type:  "script.expr",
+		Title: "Evaluate Expr Expression",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"expression": {
+					Title: "Expression",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"expression"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 

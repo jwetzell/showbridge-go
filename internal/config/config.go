@@ -1,27 +1,28 @@
 package config
 
+import (
+	"github.com/google/jsonschema-go/jsonschema"
+)
+
 type Config struct {
 	Api     ApiConfig      `json:"api"`
 	Modules []ModuleConfig `json:"modules"`
 	Routes  []RouteConfig  `json:"routes"`
 }
 
-type ApiConfig struct {
-	Enabled bool `json:"enabled"`
-	Port    int  `json:"port"`
-}
-type ModuleConfig struct {
-	Id     string `json:"id"`
-	Type   string `json:"type"`
-	Params Params `json:"params,omitempty"`
-}
-
-type RouteConfig struct {
-	Input      string            `json:"input"`
-	Processors []ProcessorConfig `json:"processors"`
-}
-
-type ProcessorConfig struct {
-	Type   string `json:"type"`
-	Params Params `json:"params,omitempty"`
+var ConfigSchema = jsonschema.Schema{
+	Schema:      "https://json-schema.org/draft/2020-12/schema",
+	ID:          "https://showbridge.io/config.schema.json",
+	Title:       "Config",
+	Description: "showbridge configuration",
+	Type:        "object",
+	Properties: map[string]*jsonschema.Schema{
+		"api": &ApiConfigSchema,
+		"modules": {
+			Ref: "https://showbridge.io/modules.schema.json",
+		},
+		"routes": {
+			Ref: "https://showbridge.io/routes.schema.json",
+		},
+	},
 }

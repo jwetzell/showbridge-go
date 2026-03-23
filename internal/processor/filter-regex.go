@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -39,7 +40,19 @@ func (fr *FilterRegex) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "filter.regex",
+		Type:  "filter.regex",
+		Title: "Filter by Regex",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"pattern": {
+					Title: "Pattern",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"pattern"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 

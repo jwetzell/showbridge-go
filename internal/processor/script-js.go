@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"modernc.org/quickjs"
@@ -21,9 +22,9 @@ func (sj *ScriptJS) Process(ctx context.Context, wrappedPayload common.WrappedPa
 
 	//NOTE(jwetzell): some weird conversion going on with these types
 	_, isUint8Slice := common.GetAnyAs[[]uint8](wrappedPayload.Payload)
-	_, isbyteSlice := common.GetAnyAs[[]byte](wrappedPayload.Payload)
+	_, isByteSlice := common.GetAnyAs[[]byte](wrappedPayload.Payload)
 
-	if isUint8Slice || isbyteSlice {
+	if isUint8Slice || isByteSlice {
 		intSlice, ok := common.GetAnyAsIntSlice(wrappedPayload.Payload)
 
 		if ok {
@@ -93,7 +94,19 @@ func (sj *ScriptJS) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "script.js",
+		Type:  "script.js",
+		Title: "Run JavaScript",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"program": {
+					Title: "Program",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"program"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 

@@ -6,6 +6,7 @@ import (
 
 	"github.com/expr-lang/expr"
 	"github.com/expr-lang/expr/vm"
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -47,7 +48,19 @@ func (fe *FilterExpr) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "filter.expr",
+		Type:  "filter.expr",
+		Title: "Filter by Expr expression",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"expression": {
+					Title: "Expression",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"expression"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 

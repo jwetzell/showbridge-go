@@ -2,6 +2,7 @@ package module
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -14,6 +15,7 @@ import (
 	"github.com/emiago/diago/media"
 	"github.com/emiago/sipgo"
 	"github.com/emiago/sipgo/sip"
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
@@ -45,7 +47,38 @@ type sipCallContextKey string
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "sip.call.server",
+		Type:  "sip.call.server",
+		Title: "SIP Call Server",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"ip": {
+					Title:   "IP",
+					Type:    "string",
+					Default: json.RawMessage(`"0.0.0.0"`),
+				},
+				"port": {
+					Title:   "Port",
+					Type:    "integer",
+					Minimum: jsonschema.Ptr[float64](1024),
+					Maximum: jsonschema.Ptr[float64](65535),
+					Default: json.RawMessage(`5060`),
+				},
+				"transport": {
+					Title:   "Transport",
+					Type:    "string",
+					Enum:    []any{"udp", "tcp", "ws", "udp4", "tcp4"},
+					Default: json.RawMessage(`"udp"`),
+				},
+				"userAgent": {
+					Title:   "User Agent",
+					Type:    "string",
+					Default: json.RawMessage(`"showbridge"`),
+				},
+			},
+			Required:             []string{},
+			AdditionalProperties: nil,
+		},
 		New: func(moduleConfig config.ModuleConfig) (common.Module, error) {
 			params := moduleConfig.Params
 			portNum, err := params.GetInt("port")

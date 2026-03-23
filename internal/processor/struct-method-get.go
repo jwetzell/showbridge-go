@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -63,7 +64,18 @@ func (sm *StructMethodGet) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "struct.method.get",
+		Type:  "struct.method.get",
+		Title: "Get Struct Method",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"name": {
+					Title: "Method Name",
+					Type:  "string",
+				},
+			},
+			Required: []string{"name"},
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 			nameString, err := params.GetString("name")

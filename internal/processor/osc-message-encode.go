@@ -32,7 +32,8 @@ func (ome *OSCMessageEncode) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "osc.message.encode",
+		Type:  "osc.message.encode",
+		Title: "Encode OSC Message",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			return &OSCMessageEncode{config: config}, nil
 		},

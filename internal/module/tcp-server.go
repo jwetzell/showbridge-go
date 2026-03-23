@@ -2,6 +2,7 @@ package module
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -11,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/framer"
@@ -32,7 +34,31 @@ type TCPServer struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "net.tcp.server",
+		Type:  "net.tcp.server",
+		Title: "TCP Server",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"ip": {
+					Title:   "IP",
+					Type:    "string",
+					Default: json.RawMessage(`"0.0.0.0"`),
+				},
+				"port": {
+					Title:   "Port",
+					Type:    "integer",
+					Minimum: jsonschema.Ptr[float64](1024),
+					Maximum: jsonschema.Ptr[float64](65535),
+				},
+				"framing": {
+					Title: "Framing Method",
+					Type:  "string",
+					Enum:  []any{"LF", "CR", "CRLF", "SLIP", "RAW"},
+				},
+			},
+			Required:             []string{"port", "framing"},
+			AdditionalProperties: nil,
+		},
 		New: func(moduleConfig config.ModuleConfig) (common.Module, error) {
 			params := moduleConfig.Params
 			portNum, err := params.GetInt("port")

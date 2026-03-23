@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"text/template"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -59,7 +60,23 @@ func (nmc *NATSMessageCreate) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "nats.message.create",
+		Type:  "nats.message.create",
+		Title: "Create NATS Message",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"subject": {
+					Title: "Subject",
+					Type:  "string",
+				},
+				"payload": {
+					Title: "Payload",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"subject", "payload"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 			subjectString, err := params.GetString("subject")

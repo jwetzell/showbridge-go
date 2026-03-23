@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -24,7 +25,25 @@ type UDPClient struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "net.udp.client",
+		Type:  "net.udp.client",
+		Title: "UDP Client",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"host": {
+					Title: "Host",
+					Type:  "string",
+				},
+				"port": {
+					Title:   "Port",
+					Type:    "integer",
+					Minimum: jsonschema.Ptr[float64](1),
+					Maximum: jsonschema.Ptr[float64](65535),
+				},
+			},
+			Required:             []string{"host", "port"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params
 			hostString, err := params.GetString("host")

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -35,7 +36,19 @@ func (ss *StringSplit) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "string.split",
+		Type:  "string.split",
+		Title: "Split String",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"separator": {
+					Title: "Separator",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"separator"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 

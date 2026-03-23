@@ -36,7 +36,8 @@ func (mmd *MIDIMessageDecode) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "midi.message.decode",
+		Type:  "midi.message.decode",
+		Title: "Decode MIDI Message",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			return &MIDIMessageDecode{config: config}, nil
 		},

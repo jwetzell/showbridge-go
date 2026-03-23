@@ -2,10 +2,12 @@ package processor
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -40,7 +42,26 @@ func (ip *IntParse) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "int.parse",
+		Type:  "int.parse",
+		Title: "Parse Int",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"base": {
+					Title:   "Base",
+					Type:    "integer",
+					Enum:    []any{0, 2, 8, 10, 16},
+					Default: json.RawMessage("10"),
+				},
+				"bitSize": {
+					Title:   "Bit Size",
+					Type:    "integer",
+					Enum:    []any{0, 8, 16, 32, 64},
+					Default: json.RawMessage("64"),
+				},
+			},
+			AdditionalProperties: nil,
+		},
 		New: func(moduleConfig config.ProcessorConfig) (Processor, error) {
 			params := moduleConfig.Params
 

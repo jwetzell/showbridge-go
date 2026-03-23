@@ -32,7 +32,8 @@ func (se *StringEncode) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "string.encode",
+		Type:  "string.encode",
+		Title: "Encode String",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			return &StringEncode{config: config}, nil
 		},

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"gitlab.com/gomidi/midi/v2"
@@ -26,7 +27,19 @@ type MIDIOutput struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "midi.output",
+		Type:  "midi.output",
+		Title: "MIDI Output",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"port": {
+					Title: "Port",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"port"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params
 

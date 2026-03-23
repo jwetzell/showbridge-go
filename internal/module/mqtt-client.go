@@ -7,6 +7,7 @@ import (
 	"log/slog"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -25,7 +26,27 @@ type MQTTClient struct {
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type: "mqtt.client",
+		Type:  "mqtt.client",
+		Title: "MQTT Client",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"broker": {
+					Title: "Broker URL",
+					Type:  "string",
+				},
+				"topic": {
+					Title: "Topic",
+					Type:  "string",
+				},
+				"clientId": {
+					Title: "Client ID",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"broker", "topic", "clientId"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params
 			brokerString, err := params.GetString("broker")

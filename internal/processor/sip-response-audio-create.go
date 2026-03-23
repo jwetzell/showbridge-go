@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"text/template"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -51,7 +52,26 @@ func (srac *SipResponseAudioCreate) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "sip.response.audio.create",
+		Type:  "sip.response.audio.create",
+		Title: "Create SIP Audio Response",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"preWait": {
+					Title: "Pre Wait (ms)",
+					Type:  "integer",
+				},
+				"postWait": {
+					Title: "Post Wait (ms)",
+					Type:  "integer",
+				},
+				"audioFile": {
+					Type: "string",
+				},
+			},
+			Required:             []string{"preWait", "postWait", "audioFile"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 

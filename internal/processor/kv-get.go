@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -51,7 +52,23 @@ func (kvg *KVGet) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "kv.get",
+		Type:  "kv.get",
+		Title: "Get Key",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"module": {
+					Title: "Module ID",
+					Type:  "string",
+				},
+				"key": {
+					Title: "Key",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"module", "key"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 
 			params := config.Params

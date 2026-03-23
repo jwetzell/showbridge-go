@@ -104,7 +104,8 @@ func (dq *DbQuery) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "db.query",
+		Type:  "db.query",
+		Title: "Query Database",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 
 			params := config.Params

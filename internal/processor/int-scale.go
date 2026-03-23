@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -36,7 +37,31 @@ func (ir *IntScale) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "int.scale",
+		Type:  "int.scale",
+		Title: "Scale Int",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"inMin": {
+					Title: "Input Minimum",
+					Type:  "integer",
+				},
+				"inMax": {
+					Title: "Input Maximum",
+					Type:  "integer",
+				},
+				"outMin": {
+					Title: "Output Minimum",
+					Type:  "integer",
+				},
+				"outMax": {
+					Title: "Output Maximum",
+					Type:  "integer",
+				},
+			},
+			Required:             []string{"inMin", "inMax", "outMin", "outMax"},
+			AdditionalProperties: nil,
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 

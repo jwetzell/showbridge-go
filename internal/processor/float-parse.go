@@ -2,10 +2,12 @@ package processor
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -39,7 +41,20 @@ func (fp *FloatParse) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "float.parse",
+		Type:  "float.parse",
+		Title: "Parse Float",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"bitSize": {
+					Title:   "Bit Size",
+					Type:    "integer",
+					Enum:    []any{32, 64},
+					Default: json.RawMessage("64"),
+				},
+			},
+			AdditionalProperties: nil,
+		},
 		New: func(moduleConfig config.ProcessorConfig) (Processor, error) {
 			params := moduleConfig.Params
 

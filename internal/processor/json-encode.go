@@ -38,7 +38,8 @@ func (je *JsonEncode) Type() string {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type: "json.encode",
+		Type:  "json.encode",
+		Title: "Encode JSON",
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			return &JsonEncode{config: config}, nil
 		},
