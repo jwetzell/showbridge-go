@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -92,8 +93,41 @@ func (r *Router) handleConfigHTTP(w http.ResponseWriter, req *http.Request) {
 			http.Error(w, "Config update in progress.", http.StatusConflict)
 			return
 		}
+		//TODO(jwetzell): again way too much marshaling
+		cfgBytes, err := io.ReadAll(req.Body)
+		if err != nil {
+			http.Error(w, "Bad request", http.StatusBadRequest)
+			return
+		}
+		cfgMap := make(map[string]any)
+		err = json.Unmarshal(cfgBytes, &cfgMap)
+		if err != nil {
+			http.Error(w, "Bad request", http.StatusBadRequest)
+			return
+		}
+
+		err = schema.ApplyDefaults(&cfgMap)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		err = schema.ValidateConfig(cfgMap)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		validCfgBytes, err := json.Marshal(cfgMap)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
 		var newConfig config.Config
-		err := json.NewDecoder(req.Body).Decode(&newConfig)
+		err = json.Unmarshal(validCfgBytes, &newConfig)
 		if err != nil {
 			http.Error(w, "Bad request", http.StatusBadRequest)
 			return
