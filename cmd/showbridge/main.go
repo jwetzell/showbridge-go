@@ -38,9 +38,10 @@ func main() {
 		Version: version,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:  "config",
-				Value: "./config.yaml",
-				Usage: "path to config file",
+				Name:    "config",
+				Value:   "./config.yaml",
+				Usage:   "path to config file",
+				Sources: cli.EnvVars("SHOWBRIDGE_CONFIG"),
 			},
 			&cli.StringFlag{
 				Name:  "log-level",
@@ -53,6 +54,7 @@ func main() {
 					}
 					return nil
 				},
+				Sources: cli.EnvVars("SHOWBRIDGE_LOG_LEVEL"),
 			},
 			&cli.StringFlag{
 				Name:  "log-format",
@@ -65,11 +67,13 @@ func main() {
 					}
 					return nil
 				},
+				Sources: cli.EnvVars("SHOWBRIDGE_LOG_FORMAT"),
 			},
 			&cli.BoolFlag{
-				Name:  "trace",
-				Value: false,
-				Usage: "enable OpenTelemetry tracing",
+				Name:    "trace",
+				Value:   false,
+				Usage:   "enable OpenTelemetry tracing",
+				Sources: cli.EnvVars("SHOWBRIDGE_TRACE"),
 			},
 		},
 		Action: run,
