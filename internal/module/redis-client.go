@@ -68,7 +68,13 @@ func (rc *RedisClient) Type() string {
 	return rc.config.Type
 }
 
+func (rc *RedisClient) Printf(ctx context.Context, format string, v ...interface{}) {
+	msg := fmt.Sprintf(format, v...)
+	rc.logger.Debug(msg)
+}
+
 func (rc *RedisClient) Start(ctx context.Context) error {
+	redis.SetLogger(rc)
 	rc.logger.Debug("running")
 	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
 
