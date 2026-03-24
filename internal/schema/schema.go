@@ -8,9 +8,7 @@ import (
 )
 
 func GetResolvedConfigSchema() (*jsonschema.Resolved, error) {
-	configSchema := ConfigSchema
-
-	return configSchema.Resolve(&jsonschema.ResolveOptions{
+	return ConfigSchema.Resolve(&jsonschema.ResolveOptions{
 		Loader: func(uri *url.URL) (*jsonschema.Schema, error) {
 			switch uri.String() {
 			case "https://showbridge.io/modules.schema.json":
@@ -23,5 +21,6 @@ func GetResolvedConfigSchema() (*jsonschema.Resolved, error) {
 				return nil, fmt.Errorf("unknown schema reference: %s", uri.String())
 			}
 		},
+		ValidateDefaults: true,
 	})
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -15,6 +16,7 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
 	"github.com/jwetzell/showbridge-go/internal/route"
+	"github.com/jwetzell/showbridge-go/internal/schema"
 	"github.com/urfave/cli/v3"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
@@ -103,7 +105,28 @@ func readConfig(configPath string) (config.Config, error) {
 		return config.Config{}, err
 	}
 
-	err = yaml.Unmarshal(configBytes, &cfg)
+	//TODO(jwetzell): this is an annoying amount of marshaling
+
+	yamlMap := make(map[string]any)
+
+	err = yaml.Unmarshal(configBytes, &yamlMap)
+	if err != nil {
+		return config.Config{}, err
+	}
+
+	err = schema.ApplyDefaults(&yamlMap)
+	if err != nil {
+		return config.Config{}, err
+	}
+
+	err = schema.ValidateConfig(yamlMap)
+	if err != nil {
+		return config.Config{}, err
+	}
+
+	validatedConfigBytes, err := json.Marshal(yamlMap)
+
+	err = json.Unmarshal(validatedConfigBytes, &cfg)
 	if err != nil {
 		return config.Config{}, err
 	}

@@ -1,10 +1,7 @@
 package schema
 
 import (
-	"encoding/json"
-
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
 var ConfigSchema = jsonschema.Schema{
@@ -24,22 +21,19 @@ var ConfigSchema = jsonschema.Schema{
 	},
 }
 
-func ValidateConfig(config config.Config) error {
+func ApplyDefaults(cfg *map[string]any) error {
 	resolvedSchema, err := GetResolvedConfigSchema()
 	if err != nil {
 		return err
 	}
 
-	jsonBytes, err := json.Marshal(config)
+	return resolvedSchema.ApplyDefaults(cfg)
+}
+
+func ValidateConfig(cfg map[string]any) error {
+	resolvedSchema, err := GetResolvedConfigSchema()
 	if err != nil {
 		return err
 	}
-
-	jsonMap := make(map[string]any)
-	err = json.Unmarshal(jsonBytes, &jsonMap)
-	if err != nil {
-		return err
-	}
-
-	return resolvedSchema.Validate(jsonMap)
+	return resolvedSchema.Validate(cfg)
 }
