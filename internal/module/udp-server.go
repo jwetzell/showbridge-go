@@ -32,8 +32,9 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"ip": {
-					Title: "IP",
-					Type:  "string",
+					Title:   "IP",
+					Type:    "string",
+					Default: json.RawMessage(`"0.0.0.0"`),
 				},
 				"port": {
 					Title:   "Port",
@@ -49,7 +50,7 @@ func init() {
 					Default: json.RawMessage("2048"),
 				},
 			},
-			Required:             []string{"ip", "port"},
+			Required:             []string{"port"},
 			AdditionalProperties: nil,
 		},
 		New: func(moduleConfig config.ModuleConfig) (common.Module, error) {
