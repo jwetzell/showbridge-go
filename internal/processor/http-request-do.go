@@ -79,7 +79,7 @@ func init() {
 				"method": {
 					Title: "HTTP Method",
 					Type:  "string",
-					Enum:  []any{"GET", "POST"},
+					Enum:  []any{"GET", "POST", "PUT", "PATCH", "DELETE"},
 				},
 				"url": {
 					Title: "URL",
