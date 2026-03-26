@@ -2,6 +2,7 @@ package module
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -39,6 +40,13 @@ func init() {
 					Type:    "integer",
 					Minimum: jsonschema.Ptr[float64](1024),
 					Maximum: jsonschema.Ptr[float64](65535),
+				},
+				"bufferSize": {
+					Title:   "Buffer Size",
+					Type:    "integer",
+					Minimum: jsonschema.Ptr[float64](1),
+					Maximum: jsonschema.Ptr[float64](65535),
+					Default: json.RawMessage("2048"),
 				},
 			},
 			Required:             []string{"ip", "port"},
