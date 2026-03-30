@@ -1,4 +1,4 @@
-//go:build cgo
+//go:build cgo || js
 
 package module
 
@@ -12,7 +12,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"gitlab.com/gomidi/midi/v2"
-	_ "gitlab.com/gomidi/midi/v2/drivers/rtmididrv"
 )
 
 type MIDIInput struct {

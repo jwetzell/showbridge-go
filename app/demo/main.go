@@ -23,76 +23,26 @@ func main() {
 		},
 		Modules: []config.ModuleConfig{
 			{
-				Id:   "timer",
-				Type: "time.interval",
+				Id:   "midi",
+				Type: "midi.input",
 				Params: map[string]any{
-					"duration": 1000,
-				},
-			},
-			{
-				Id:   "button1",
-				Type: "web.onclick",
-				Params: map[string]any{
-					"id": "button1",
-				},
-			},
-			{
-				Id:   "button2",
-				Type: "web.onclick",
-				Params: map[string]any{
-					"id": "button2",
+					"port": "Launchpad S",
 				},
 			},
 		},
 		Routes: []config.RouteConfig{
 			{
-				Input: "timer",
+				Input: "midi",
 				Processors: []config.ProcessorConfig{
-					{
-						Type: "debug.log",
-					},
-				},
-			},
-			{
-				Input: "button1",
-				Processors: []config.ProcessorConfig{
-					{
-						Type: "string.create",
-						Params: map[string]any{
-							"template": "{{.Payload.UnixMilli}}",
-						},
-					},
 					{
 						Type: "debug.log",
 					},
 					{
 						Type: "web.set",
 						Params: map[string]any{
-							"id":       "output1",
-							"property": "innerText",
-							"value":    "Button1 Pressed @ {{.Payload}}",
-						},
-					},
-				},
-			},
-			{
-				Input: "button2",
-				Processors: []config.ProcessorConfig{
-					{
-						Type: "string.create",
-						Params: map[string]any{
-							"template": "{{.Payload.UnixMilli}}",
-						},
-					},
-					{
-						Type: "debug.log",
-					},
-					{
-						Type: "web.set",
-						Params: map[string]any{
-							"id":       "output2",
-							"property": "innerText",
-							"value":    "Button2 Pressed @ {{.Payload}}",
+							"id":       "output",
+							"property": "textContent",
+							"value":    "{{.Payload}}",
 						},
 					},
 				},
