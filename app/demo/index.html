@@ -1,0 +1,74 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="wasm_exec.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+      }
+      #editor-container {
+        flex-grow: 1;
+      }
+      #log-container {
+        background-color: #1e1e1e;
+        width: 100%;
+        height: 200px;
+        overflow-y: auto;
+        overflow-x: scroll;
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+      }
+      #logs {
+        margin: 0;
+        padding-left: 2px;
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        font-size: 13px;
+        line-height: 1.4;
+        color: #a8cc8c;
+      }
+    </style>
+
+    <script>
+      const container = document.getElementById("log-container");
+
+      function isScrolledToBottom() {
+        const scrollThreshold = 1;
+        return (
+          container.scrollHeight - container.clientHeight <=
+          container.scrollTop + scrollThreshold
+        );
+      }
+      function scrollToBottomManual() {
+        const container = document.getElementById("log-container");
+        // Set scrollTop to the maximum value possible (scrollHeight - clientHeight)
+        container.scrollTop = container.scrollHeight - container.clientHeight;
+      }
+    </script>
+  </head>
+  <body>
+    <div id="editor-container">
+      <button id="button1">Button 1</button>
+      <button id="button2">Button 2</button>
+      <div id="output1"></div>
+      <div id="output2"></div>
+    </div>
+
+    <div id="log-container">
+      <pre id="logs"></pre>
+    </div>
+
+    <script>
+      const go = new Go();
+      WebAssembly.instantiateStreaming(
+        fetch("main.wasm"),
+        go.importObject,
+      ).then((result) => {
+        go.run(result.instance);
+      });
+    </script>
+  </body>
+</html>

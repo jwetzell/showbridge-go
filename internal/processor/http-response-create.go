@@ -1,3 +1,5 @@
+//go:build !js
+
 package processor
 
 import (
@@ -15,11 +17,6 @@ type HTTPResponseCreate struct {
 	Status   int
 	BodyTmpl *template.Template
 	config   config.ProcessorConfig
-}
-
-type HTTPResponse struct {
-	Status int
-	Body   []byte
 }
 
 func (hrc *HTTPResponseCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {

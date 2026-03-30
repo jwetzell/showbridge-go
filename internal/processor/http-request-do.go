@@ -21,6 +21,11 @@ type HTTPRequestDo struct {
 	URL    *template.Template
 }
 
+type HTTPResponse struct {
+	Status int
+	Body   []byte
+}
+
 func (hrd *HTTPRequestDo) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
 	templateData := wrappedPayload
