@@ -23,4 +23,5 @@ var ApiConfigSchema = jsonschema.Schema{
 		},
 	},
 	Required: []string{"port"},
+	Default:  json.RawMessage(`{"enabled": false, "port": 8080}`),
 }
