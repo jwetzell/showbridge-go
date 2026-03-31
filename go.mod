@@ -25,7 +25,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.42.0
 	go.opentelemetry.io/otel/trace v1.42.0
 	modernc.org/quickjs v0.17.1
-	modernc.org/sqlite v1.47.0
+	modernc.org/sqlite v1.48.0
 	sigs.k8s.io/yaml v1.6.0
 )
 
