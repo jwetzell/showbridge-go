@@ -40,7 +40,7 @@ func init() {
 				},
 			},
 			Required:             []string{"url", "subject"},
-			AdditionalProperties: nil,
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params

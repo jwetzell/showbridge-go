@@ -7,6 +7,7 @@ import (
 )
 
 var ApiConfigSchema = jsonschema.Schema{
+	ID:   "https://showbridge.io/api.schema.json",
 	Type: "object",
 	Properties: map[string]*jsonschema.Schema{
 		"enabled": {
@@ -22,6 +23,7 @@ var ApiConfigSchema = jsonschema.Schema{
 			Default:     json.RawMessage(`8080`),
 		},
 	},
-	Required: []string{"port"},
-	Default:  json.RawMessage(`{"enabled": false, "port": 8080}`),
+	Required:             []string{"port"},
+	Default:              json.RawMessage(`{"enabled": false, "port": 8080}`),
+	AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 }

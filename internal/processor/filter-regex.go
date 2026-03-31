@@ -51,7 +51,7 @@ func init() {
 				},
 			},
 			Required:             []string{"pattern"},
-			AdditionalProperties: nil,
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params

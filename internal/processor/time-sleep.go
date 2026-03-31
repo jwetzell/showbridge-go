@@ -37,7 +37,8 @@ func init() {
 					Description: "Duration to sleep in milliseconds",
 				},
 			},
-			Required: []string{"duration"},
+			Required:             []string{"duration"},
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params

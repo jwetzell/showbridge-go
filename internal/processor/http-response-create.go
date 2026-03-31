@@ -60,7 +60,7 @@ func init() {
 				},
 			},
 			Required:             []string{"status", "body"},
-			AdditionalProperties: nil,
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params

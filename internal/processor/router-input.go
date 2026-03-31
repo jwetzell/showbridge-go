@@ -57,7 +57,7 @@ func init() {
 				},
 			},
 			Required:             []string{"source"},
-			AdditionalProperties: nil,
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 

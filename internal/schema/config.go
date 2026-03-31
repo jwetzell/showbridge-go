@@ -19,6 +19,7 @@ var ConfigSchema = jsonschema.Schema{
 			Ref: "https://showbridge.io/routes.schema.json",
 		},
 	},
+	AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 }
 
 func ApplyDefaults(cfg *map[string]any) error {

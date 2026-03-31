@@ -104,7 +104,7 @@ func init() {
 				},
 			},
 			Required:             []string{"topic", "qos", "retained", "payload"},
-			AdditionalProperties: nil,
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(processorConfig config.ProcessorConfig) (Processor, error) {
 			params := processorConfig.Params

@@ -78,7 +78,7 @@ func init() {
 				},
 			},
 			Required:             []string{"preWait", "postWait", "digits"},
-			AdditionalProperties: nil,
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params

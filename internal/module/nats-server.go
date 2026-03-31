@@ -46,9 +46,8 @@ func init() {
 					Default: json.RawMessage(`4222`),
 				},
 			},
-			Required: []string{},
-
-			AdditionalProperties: nil,
+			Required:             []string{},
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(moduleConfig config.ModuleConfig) (common.Module, error) {
 			params := moduleConfig.Params

@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"encoding/json"
+
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
@@ -13,11 +15,13 @@ func GetProcessorsSchema() *jsonschema.Schema {
 		Title:       "Processors",
 		Description: "processor configurations",
 		Type:        "array",
+		Default:     json.RawMessage(`[]`),
 	}
 
 	processorDefinitionSchemas := []*jsonschema.Schema{}
 	for _, proc := range processor.ProcessorRegistry {
 		processorSchema := &jsonschema.Schema{
+			ID:   proc.Type,
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"type": {
@@ -25,7 +29,7 @@ func GetProcessorsSchema() *jsonschema.Schema {
 				},
 			},
 			Required:             []string{"type"},
-			AdditionalProperties: nil,
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		}
 		if proc.Title != "" {
 			processorSchema.Title = proc.Title

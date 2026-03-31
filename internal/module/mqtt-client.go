@@ -45,7 +45,7 @@ func init() {
 				},
 			},
 			Required:             []string{"broker", "topic", "clientId"},
-			AdditionalProperties: nil,
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params

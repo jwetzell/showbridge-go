@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"encoding/json"
+
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/module"
 )
@@ -13,11 +15,13 @@ func GetModulesSchema() *jsonschema.Schema {
 		Title:       "Modules",
 		Description: "module configurations",
 		Type:        "array",
+		Default:     json.RawMessage(`[]`),
 	}
 
 	moduleDefinitionSchemas := []*jsonschema.Schema{}
 	for _, mod := range module.ModuleRegistry {
 		moduleSchema := &jsonschema.Schema{
+			ID:   mod.Type,
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"id": {
@@ -29,7 +33,7 @@ func GetModulesSchema() *jsonschema.Schema {
 				},
 			},
 			Required:             []string{"id", "type"},
-			AdditionalProperties: nil,
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		}
 		if mod.Title != "" {
 			moduleSchema.Title = mod.Title

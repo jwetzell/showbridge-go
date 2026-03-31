@@ -27,7 +27,6 @@ func init() {
 		Type:  "psn.client",
 		Title: "PosiStageNet Client",
 		New: func(config config.ModuleConfig) (common.Module, error) {
-
 			return &PSNClient{config: config, decoder: psn.NewDecoder(), logger: CreateLogger(config)}, nil
 		},
 	})

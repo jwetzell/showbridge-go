@@ -40,7 +40,7 @@ func init() {
 				},
 			},
 			Required:             []string{"host", "port"},
-			AdditionalProperties: nil,
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params

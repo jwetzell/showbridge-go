@@ -35,7 +35,8 @@ func init() {
 					MinLength: jsonschema.Ptr(1),
 				},
 			},
-			Required: []string{"dsn"},
+			Required:             []string{"dsn"},
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(config config.ModuleConfig) (common.Module, error) {
 			params := config.Params

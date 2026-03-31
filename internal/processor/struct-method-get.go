@@ -74,7 +74,8 @@ func init() {
 					Type:  "string",
 				},
 			},
-			Required: []string{"name"},
+			Required:             []string{"name"},
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params

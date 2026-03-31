@@ -1,6 +1,10 @@
 package schema
 
-import "github.com/google/jsonschema-go/jsonschema"
+import (
+	"encoding/json"
+
+	"github.com/google/jsonschema-go/jsonschema"
+)
 
 var RoutesConfigSchema = jsonschema.Schema{
 	Schema:      "https://json-schema.org/draft/2020-12/schema",
@@ -19,6 +23,8 @@ var RoutesConfigSchema = jsonschema.Schema{
 				Ref: "https://showbridge.io/processors.schema.json",
 			},
 		},
-		Required: []string{"input"},
+		Required:             []string{"input"},
+		AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 	},
+	Default: json.RawMessage(`[]`),
 }

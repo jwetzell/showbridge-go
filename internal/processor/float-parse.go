@@ -53,7 +53,7 @@ func init() {
 					Default: json.RawMessage("64"),
 				},
 			},
-			AdditionalProperties: nil,
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(moduleConfig config.ProcessorConfig) (Processor, error) {
 			params := moduleConfig.Params

@@ -61,7 +61,7 @@ func init() {
 				},
 			},
 			Required:             []string{"min", "max"},
-			AdditionalProperties: nil,
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(processorConfig config.ProcessorConfig) (Processor, error) {
 			params := processorConfig.Params
