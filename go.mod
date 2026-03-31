@@ -17,7 +17,7 @@ require (
 	github.com/nats-io/nats-server/v2 v2.12.6
 	github.com/nats-io/nats.go v1.49.0
 	github.com/redis/go-redis/v9 v9.18.0
-	github.com/urfave/cli/v3 v3.7.0
+	github.com/urfave/cli/v3 v3.8.0
 	gitlab.com/gomidi/midi/v2 v2.3.23
 	go.bug.st/serial v1.6.4
 	go.opentelemetry.io/otel v1.42.0
