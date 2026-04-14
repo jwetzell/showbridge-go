@@ -104,7 +104,7 @@ func TestBadOSCMessageDecode(t *testing.T) {
 		{
 			name:        "invalid OSC payload",
 			payload:     []byte{47, 116, 101, 115, 116, 0},
-			errorString: "osc.message.decode processor failed to decode OSC message: string data is not properly padded",
+			errorString: "osc.message.decode processor failed to decode OSC message: OSC string is not properly padded",
 		},
 	}
 
