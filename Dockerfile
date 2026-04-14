@@ -1,6 +1,6 @@
 ARG GO_VERSION=1.26.2
 FROM golang:${GO_VERSION}-alpine AS build
-RUN apk --no-cache add ca-certificates tzdata
+RUN apk --no-cache add ca-certificates tzdata git
 WORKDIR /build
 COPY go.mod go.sum ./
 RUN go mod download
