@@ -89,6 +89,14 @@ func TestBadOSCMessageEncode(t *testing.T) {
 			payload:     "test",
 			errorString: "osc.message.encode processor only accepts an *OSCMessage",
 		},
+		{
+			name: "invalid OSC message argument",
+			payload: &osc.OSCMessage{
+				Address: "test",
+				Args:    []osc.OSCArg{},
+			},
+			errorString: "osc.message.encode processor failed to encode OSCMessage: OSC Message address must start with /",
+		},
 	}
 
 	for _, test := range tests {

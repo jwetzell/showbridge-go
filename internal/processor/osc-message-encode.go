@@ -3,6 +3,7 @@ package processor
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	osc "github.com/jwetzell/osc-go"
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -22,7 +23,12 @@ func (ome *OSCMessageEncode) Process(ctx context.Context, wrappedPayload common.
 		return wrappedPayload, errors.New("osc.message.encode processor only accepts an *OSCMessage")
 	}
 
-	wrappedPayload.Payload = payloadMessage.ToBytes()
+	bytes, err := payloadMessage.ToBytes()
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, fmt.Errorf("osc.message.encode processor failed to encode OSCMessage: %w", err)
+	}
+	wrappedPayload.Payload = bytes
 	return wrappedPayload, nil
 }
 
