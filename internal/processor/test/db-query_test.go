@@ -34,7 +34,7 @@ func TestDbQueryFromRegistry(t *testing.T) {
 	}
 
 	payload := "hello"
-	expected := map[string]any{"sqlite_version()": "3.51.3"}
+	expected := map[string]any{"sqlite_version()": "3.53.0"}
 
 	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(test.GetContextWithModules(
 		t.Context(),
