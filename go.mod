@@ -14,7 +14,7 @@ require (
 	github.com/jwetzell/free-d-go v0.1.0
 	github.com/jwetzell/osc-go v0.3.0
 	github.com/jwetzell/psn-go v0.3.0
-	github.com/nats-io/nats-server/v2 v2.12.6
+	github.com/nats-io/nats-server/v2 v2.12.7
 	github.com/nats-io/nats.go v1.51.0
 	github.com/redis/go-redis/v9 v9.18.0
 	github.com/urfave/cli/v3 v3.8.0
