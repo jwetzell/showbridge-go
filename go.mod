@@ -8,7 +8,7 @@ require (
 	github.com/emiago/sipgo v1.3.0
 	github.com/expr-lang/expr v1.17.8
 	github.com/extism/go-sdk v1.7.1
-	github.com/google/jsonschema-go v0.4.2
+	github.com/google/jsonschema-go v0.4.3
 	github.com/gorilla/websocket v1.5.3
 	github.com/jwetzell/artnet-go v0.2.1
 	github.com/jwetzell/free-d-go v0.1.0
