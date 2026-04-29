@@ -16,7 +16,7 @@ require (
 	github.com/jwetzell/psn-go v0.3.0
 	github.com/nats-io/nats-server/v2 v2.12.8
 	github.com/nats-io/nats.go v1.51.0
-	github.com/redis/go-redis/v9 v9.18.0
+	github.com/redis/go-redis/v9 v9.19.0
 	github.com/urfave/cli/v3 v3.8.0
 	gitlab.com/gomidi/midi/v2 v2.3.23
 	go.bug.st/serial v1.6.4
@@ -34,7 +34,6 @@ require (
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/creack/goselect v0.1.2 // indirect
-	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/dylibso/observe-sdk/go v0.0.0-20240819160327-2d926c5d788a // indirect
 	github.com/emiago/dtls/v3 v3.0.0-20260122183559-8b8d23e359c0 // indirect
