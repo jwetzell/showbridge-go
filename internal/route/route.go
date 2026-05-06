@@ -13,11 +13,6 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type RouteError struct {
-	Index  int                `json:"index"`
-	Config config.RouteConfig `json:"config"`
-	Error  string             `json:"error"`
-}
 type Route struct {
 	input      string
 	processors []processor.Processor

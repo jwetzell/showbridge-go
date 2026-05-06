@@ -91,8 +91,8 @@ func TestNewRouter(t *testing.T) {
 		t.Fatalf("router should not have returned any route errors: %v", routeErrors)
 	}
 
-	if !reflect.DeepEqual(routerConfig, router.RunningConfig()) {
-		t.Fatalf("router running config did not match expected, got: %v, expected: %v", router.RunningConfig(), routerConfig)
+	if !reflect.DeepEqual(routerConfig, router.GetRunningConfig()) {
+		t.Fatalf("router running config did not match expected, got: %v, expected: %v", router.GetRunningConfig(), routerConfig)
 	}
 }
 

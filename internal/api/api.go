@@ -1,4 +1,4 @@
-package showbridge
+package api
 
 import (
 	"context"
@@ -6,60 +6,80 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
+	"sync"
 	"time"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
-	"github.com/jwetzell/showbridge-go/internal/module"
-	"github.com/jwetzell/showbridge-go/internal/route"
 	"github.com/jwetzell/showbridge-go/internal/schema"
 )
 
-func (r *Router) startAPIServer(config config.ApiConfig) {
-	if !config.Enabled {
-		r.logger.Warn("API not enabled")
+type ApiServer struct {
+	config             config.ApiConfig
+	serverMu           sync.Mutex
+	server             *http.Server
+	shutdown           context.CancelFunc
+	logger             *slog.Logger
+	configurableRouter config.Configurable
+	eventRouter        common.EventRouter
+}
+
+func NewApiServer(configurableRouter config.Configurable, eventRouter common.EventRouter) *ApiServer {
+	return &ApiServer{
+		configurableRouter: configurableRouter,
+		eventRouter:        eventRouter,
+		logger:             slog.Default().With("component", "api"),
+	}
+}
+
+func (as *ApiServer) Start(config config.ApiConfig) {
+	as.config = config
+	if !as.config.Enabled {
+		as.logger.Warn("not enabled")
 		return
 	}
-	r.logger.Debug("starting API server", "port", config.Port)
+	as.logger.Debug("starting", "port", as.config.Port)
 	mux := http.NewServeMux()
-	mux.HandleFunc("/ws", r.handleWebsocket)
-	mux.HandleFunc("/health", r.handleHealthHTTP)
-	mux.HandleFunc("/api/v1/config", r.handleConfigHTTP)
+	mux.HandleFunc("/ws", as.handleWebsocket)
+	mux.HandleFunc("/health", as.handleHealthHTTP)
+	mux.HandleFunc("/api/v1/config", as.handleConfigHTTP)
 	mux.HandleFunc("/schema/config.schema.json", handleConfigSchema)
 	mux.HandleFunc("/schema/routes.schema.json", handleRoutesSchema)
 	mux.HandleFunc("/schema/modules.schema.json", handleModulesSchema)
 	mux.HandleFunc("/schema/processors.schema.json", handleProcessorsSchema)
 
-	r.apiServerMu.Lock()
-	defer r.apiServerMu.Unlock()
-	r.apiServer = &http.Server{
-		Addr:    fmt.Sprintf(":%d", config.Port),
+	as.serverMu.Lock()
+	defer as.serverMu.Unlock()
+	as.server = &http.Server{
+		Addr:    fmt.Sprintf(":%d", as.config.Port),
 		Handler: mux,
 	}
 
 	go func() {
-		r.apiServer.ListenAndServe()
-		r.apiServerShutdown()
+		as.server.ListenAndServe()
+		as.shutdown()
 	}()
 }
 
-func (r *Router) stopAPIServer() {
-	if r.apiServer == nil {
+func (as *ApiServer) Stop() {
+	if as.server == nil {
 		return
 	}
-	r.logger.Debug("stopping API server")
-	r.apiServerMu.Lock()
-	defer r.apiServerMu.Unlock()
-	if r.apiServer != nil {
+	as.logger.Debug("stopping")
+	as.serverMu.Lock()
+	defer as.serverMu.Unlock()
+	if as.server != nil {
 		apiShutdownCtx, apiShutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
-		r.apiServerShutdown = apiShutdownCancel
-		r.apiServer.Shutdown(apiShutdownCtx)
+		as.shutdown = apiShutdownCancel
+		as.server.Shutdown(apiShutdownCtx)
 		<-apiShutdownCtx.Done()
-		r.apiServer = nil
+		as.server = nil
 	}
 }
 
-func (r *Router) handleHealthHTTP(w http.ResponseWriter, req *http.Request) {
+func (as *ApiServer) handleHealthHTTP(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case http.MethodGet:
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -75,11 +95,11 @@ func (r *Router) handleHealthHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (r *Router) handleConfigHTTP(w http.ResponseWriter, req *http.Request) {
+func (as *ApiServer) handleConfigHTTP(w http.ResponseWriter, req *http.Request) {
 
 	switch req.Method {
 	case http.MethodGet:
-		configJSON, err := json.Marshal(r.runningConfig)
+		configJSON, err := json.Marshal(as.configurableRouter.GetRunningConfig())
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
@@ -89,10 +109,6 @@ func (r *Router) handleConfigHTTP(w http.ResponseWriter, req *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(configJSON)
 	case http.MethodPut:
-		if r.updatingConfig {
-			http.Error(w, "Config update in progress.", http.StatusConflict)
-			return
-		}
 		//TODO(jwetzell): again way too much marshaling
 		cfgBytes, err := io.ReadAll(req.Body)
 		if err != nil {
@@ -132,11 +148,15 @@ func (r *Router) handleConfigHTTP(w http.ResponseWriter, req *http.Request) {
 			http.Error(w, "Bad request", http.StatusBadRequest)
 			return
 		}
-		moduleErrors, routeErrors := r.UpdateConfig(newConfig)
+		err, moduleErrors, routeErrors := as.configurableRouter.UpdateConfig(newConfig, true)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusConflict)
+			return
+		}
 		if len(moduleErrors) > 0 || len(routeErrors) > 0 {
 			errorResponse := struct {
-				ModuleErrors []module.ModuleError `json:"moduleErrors,omitempty"`
-				RouteErrors  []route.RouteError   `json:"routeErrors,omitempty"`
+				ModuleErrors []config.ModuleError `json:"moduleErrors,omitempty"`
+				RouteErrors  []config.RouteError  `json:"routeErrors,omitempty"`
 			}{
 				ModuleErrors: moduleErrors,
 				RouteErrors:  routeErrors,
@@ -154,7 +174,6 @@ func (r *Router) handleConfigHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.WriteHeader(http.StatusOK)
-		r.ConfigChange <- newConfig
 	case http.MethodOptions:
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, PUT, OPTIONS")

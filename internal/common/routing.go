@@ -1,6 +1,8 @@
 package common
 
-import "context"
+import (
+	"context"
+)
 
 type RouteIO interface {
 	HandleInput(ctx context.Context, sourceId string, payload any) (bool, []RouteIOError)

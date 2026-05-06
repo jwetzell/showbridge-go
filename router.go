@@ -4,11 +4,9 @@ import (
 	"context"
 	"errors"
 	"log/slog"
-	"net/http"
-	"reflect"
 	"sync"
 
-	"github.com/gorilla/websocket"
+	"github.com/jwetzell/showbridge-go/internal/api"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
@@ -20,25 +18,22 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-// TODO(jwetzell): can/should this be split into different components?
+// TODO(jwetzell): can/should this be split into different "components"?
 type Router struct {
 	contextCancel context.CancelFunc
 	Context       context.Context
 	// TODO(jwetzell): do these need to be guarded against concurrency?
 	ModuleInstances map[string]common.Module
 	// TODO(jwetzell): change to something easier to lookup
-	RouteInstances    []*route.Route
-	ConfigChange      chan config.Config
-	moduleWait        sync.WaitGroup
-	logger            *slog.Logger
-	runningConfig     config.Config
-	runningConfigMu   sync.RWMutex
-	wsConns           []*websocket.Conn
-	wsConnsMu         sync.Mutex
-	apiServer         *http.Server
-	apiServerMu       sync.Mutex
-	apiServerShutdown context.CancelFunc
-	updatingConfig    bool
+	RouteInstances      []*route.Route
+	ConfigChange        chan config.Config
+	moduleWait          sync.WaitGroup
+	logger              *slog.Logger
+	runningConfig       config.Config
+	runningConfigMu     sync.RWMutex
+	apiServer           *api.ApiServer
+	eventDestinations   []common.EventDestination
+	eventDestinationsMu sync.Mutex
 }
 
 func (r *Router) addModule(moduleDecl config.ModuleConfig) error {
@@ -115,7 +110,7 @@ func (r *Router) getModule(moduleId string) common.Module {
 	return moduleInstance
 }
 
-func NewRouter(routerConfig config.Config) (*Router, []module.ModuleError, []route.RouteError) {
+func NewRouter(routerConfig config.Config) (*Router, []config.ModuleError, []config.RouteError) {
 
 	router := Router{
 		ModuleInstances: make(map[string]common.Module),
@@ -123,20 +118,19 @@ func NewRouter(routerConfig config.Config) (*Router, []module.ModuleError, []rou
 		ConfigChange:    make(chan config.Config, 1),
 		logger:          slog.Default().With("component", "router"),
 		runningConfig:   routerConfig,
-		updatingConfig:  false,
 	}
 	router.logger.Debug("creating")
 
-	var moduleErrors []module.ModuleError
+	var moduleErrors []config.ModuleError
 
 	for moduleIndex, moduleDecl := range routerConfig.Modules {
 
 		err := router.addModule(moduleDecl)
 		if err != nil {
 			if moduleErrors == nil {
-				moduleErrors = []module.ModuleError{}
+				moduleErrors = []config.ModuleError{}
 			}
-			moduleErrors = append(moduleErrors, module.ModuleError{
+			moduleErrors = append(moduleErrors, config.ModuleError{
 				Index:  moduleIndex,
 				Config: moduleDecl,
 				Error:  err.Error(),
@@ -146,14 +140,14 @@ func NewRouter(routerConfig config.Config) (*Router, []module.ModuleError, []rou
 
 	}
 
-	var routeErrors []route.RouteError
+	var routeErrors []config.RouteError
 	for routeIndex, routeDecl := range routerConfig.Routes {
 		err := router.addRoute(routeDecl)
 		if err != nil {
 			if routeErrors == nil {
-				routeErrors = []route.RouteError{}
+				routeErrors = []config.RouteError{}
 			}
-			routeErrors = append(routeErrors, route.RouteError{
+			routeErrors = append(routeErrors, config.RouteError{
 				Index:  routeIndex,
 				Config: routeDecl,
 				Error:  err.Error(),
@@ -161,6 +155,10 @@ func NewRouter(routerConfig config.Config) (*Router, []module.ModuleError, []rou
 			continue
 		}
 	}
+
+	apiServer := api.NewApiServer(&router, &router)
+
+	router.apiServer = apiServer
 
 	return &router, moduleErrors, routeErrors
 }
@@ -171,10 +169,10 @@ func (r *Router) Start(ctx context.Context) {
 	r.Context = routerContext
 	r.contextCancel = cancel
 	r.startModules()
-	r.startAPIServer(r.runningConfig.Api)
+	r.apiServer.Start(r.GetRunningConfig().Api)
 	<-r.Context.Done()
 	r.logger.Debug("shutting down api server")
-	r.stopAPIServer()
+	r.apiServer.Stop()
 	r.logger.Debug("waiting for modules to exit")
 	r.moduleWait.Wait()
 	r.logger.Info("done")
@@ -194,7 +192,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 	var routeIOErrors []common.RouteIOError
 	routeFound := false
 
-	r.broadcastEvent(Event{
+	r.broadcastEvent(common.Event{
 		Type: "input",
 		Data: map[string]any{
 			"source": sourceId,
@@ -227,7 +225,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 						Index:        routeIndex,
 						ProcessError: err,
 					})
-					r.broadcastEvent(Event{
+					r.broadcastEvent(common.Event{
 						Type: "route",
 						Data: map[string]any{
 							"index": routeIndex,
@@ -236,7 +234,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 					})
 					return
 				}
-				r.broadcastEvent(Event{
+				r.broadcastEvent(common.Event{
 					Type: "route",
 					Data: map[string]any{
 						"index": routeIndex,
@@ -253,7 +251,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload any) error {
 	spanCtx, span := otel.Tracer("router").Start(ctx, "output", trace.WithAttributes(attribute.String("destination.id", destinationId)))
 	defer span.End()
-	outputEvent := Event{
+	outputEvent := common.Event{
 		Type: "output",
 		Data: map[string]any{
 			"destination": destinationId,
@@ -309,77 +307,4 @@ func (r *Router) startModules() {
 			r.logger.Error("error starting module", "moduleId", moduleId, "error", err)
 		}
 	}
-}
-
-func (r *Router) RunningConfig() config.Config {
-	r.runningConfigMu.RLock()
-	defer r.runningConfigMu.RLock()
-	return r.runningConfig
-}
-
-func (r *Router) UpdateConfig(newConfig config.Config) ([]module.ModuleError, []route.RouteError) {
-	r.runningConfigMu.Lock()
-	defer r.runningConfigMu.Unlock()
-	r.updatingConfig = true
-	defer func() {
-		r.updatingConfig = false
-	}()
-	oldConfig := r.runningConfig
-	r.logger.Debug("received config update", "oldConfig", oldConfig, "newConfig", newConfig)
-
-	if !reflect.DeepEqual(oldConfig.Api, newConfig.Api) {
-		r.logger.Info("applying new API config")
-		r.stopAPIServer()
-		r.startAPIServer(newConfig.Api)
-		r.runningConfig.Api = newConfig.Api
-	}
-
-	// TODO(jwetzell): handle config update errors better
-	for _, moduleInstance := range r.ModuleInstances {
-		moduleInstance.Stop()
-	}
-	r.logger.Debug("waiting for modules to exit")
-	r.moduleWait.Wait()
-
-	r.ModuleInstances = make(map[string]common.Module)
-	r.RouteInstances = []*route.Route{}
-
-	var moduleErrors []module.ModuleError
-
-	for moduleIndex, moduleDecl := range newConfig.Modules {
-
-		err := r.addModule(moduleDecl)
-		if err != nil {
-			if moduleErrors == nil {
-				moduleErrors = []module.ModuleError{}
-			}
-			moduleErrors = append(moduleErrors, module.ModuleError{
-				Index:  moduleIndex,
-				Config: moduleDecl,
-				Error:  err.Error(),
-			})
-			continue
-		}
-
-	}
-
-	var routeErrors []route.RouteError
-	for routeIndex, routeDecl := range newConfig.Routes {
-		err := r.addRoute(routeDecl)
-		if err != nil {
-			if routeErrors == nil {
-				routeErrors = []route.RouteError{}
-			}
-			routeErrors = append(routeErrors, route.RouteError{
-				Index:  routeIndex,
-				Config: routeDecl,
-				Error:  err.Error(),
-			})
-			continue
-		}
-	}
-	r.runningConfig = newConfig
-	r.startModules()
-
-	return moduleErrors, routeErrors
 }
