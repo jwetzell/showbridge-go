@@ -10,12 +10,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type ModuleError struct {
-	Index  int                 `json:"index"`
-	Config config.ModuleConfig `json:"config"`
-	Error  string              `json:"error"`
-}
-
 type ModuleRegistration struct {
 	Type         string             `json:"type"`
 	Title        string             `json:"title,omitempty"`

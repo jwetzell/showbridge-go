@@ -14,8 +14,6 @@ import (
 
 	"github.com/jwetzell/showbridge-go"
 	"github.com/jwetzell/showbridge-go/internal/config"
-	"github.com/jwetzell/showbridge-go/internal/module"
-	"github.com/jwetzell/showbridge-go/internal/route"
 	"github.com/jwetzell/showbridge-go/internal/schema"
 	"github.com/urfave/cli/v3"
 	"go.opentelemetry.io/otel"
@@ -262,7 +260,12 @@ func (app *showbridgeApp) handleChannels() {
 				app.routerMutex.Unlock()
 				continue
 			}
-			moduleErrors, routeErrors := app.router.UpdateConfig(config)
+			err, moduleErrors, routeErrors := app.router.UpdateConfig(config, false)
+			if err != nil {
+				app.logger.Error("failed to update router config", "error", err)
+				app.routerMutex.Unlock()
+				continue
+			}
 			app.logConfigErrors(moduleErrors, routeErrors)
 			app.logger.Info("configuration reloaded successfully")
 			app.routerMutex.Unlock()
@@ -280,7 +283,7 @@ func (app *showbridgeApp) handleChannels() {
 	}
 }
 
-func (app *showbridgeApp) logConfigErrors(moduleErrors []module.ModuleError, routeErrors []route.RouteError) {
+func (app *showbridgeApp) logConfigErrors(moduleErrors []config.ModuleError, routeErrors []config.RouteError) {
 	for _, moduleError := range moduleErrors {
 		app.logger.Error("problem initializing module", "index", moduleError.Index, "error", moduleError.Error)
 	}
