@@ -35,7 +35,7 @@ func TestJsonEncodeFromRegistry(t *testing.T) {
 
 	expected := []byte("{\"property\":\"hello\"}")
 
-	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
+	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: payload})
 	if err != nil {
 		t.Fatalf("json.encode processing failed: %s", err)
 	}
@@ -69,7 +69,7 @@ func TestGoodJsonEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := jsonEncoder.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := jsonEncoder.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 			if err != nil {
 				t.Fatalf("json.encode processing failed: %s", err)
 			}
@@ -102,7 +102,7 @@ func TestBadJsonEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := stringEncoder.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := stringEncoder.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err == nil {
 				t.Fatalf("json.encode expected to fail but got payload: %+v", got)

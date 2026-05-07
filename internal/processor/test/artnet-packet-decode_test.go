@@ -58,7 +58,7 @@ func TestGoodArtnetPacketDecode(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			got, err := packetDecoder.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := packetDecoder.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err != nil {
 				t.Fatalf("artnet.packet.decode processing failed: %s", err)
@@ -94,7 +94,7 @@ func TestBadArtnetPacketDecode(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			got, err := packetDecoder.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := packetDecoder.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err == nil {
 				t.Fatalf("artnet.packet.decode expected to fail but succeeded, got: %v", got)

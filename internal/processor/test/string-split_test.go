@@ -32,7 +32,7 @@ func TestStringSplitFromRegistry(t *testing.T) {
 	payload := "part1,part2,part3"
 	expected := []string{"part1", "part2", "part3"}
 
-	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
+	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: payload})
 	if err != nil {
 		t.Fatalf("string.split processing failed: %s", err)
 	}
@@ -79,7 +79,7 @@ func TestGoodStringSplit(t *testing.T) {
 				t.Fatalf("string.split failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 			if err != nil {
 				t.Fatalf("string.split processing failed: %s", err)
 			}
@@ -142,7 +142,7 @@ func TestBadStringSplit(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err == nil {
 				t.Fatalf("string.split expected error but got none, payload: %+v", got)

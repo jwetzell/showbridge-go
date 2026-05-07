@@ -31,7 +31,7 @@ func TestFilterRegexFromRegistry(t *testing.T) {
 	payload := "hello"
 	expected := "hello"
 
-	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
+	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: payload})
 	if err != nil {
 		t.Fatalf("filter.regex processing failed: %s", err)
 	}
@@ -90,7 +90,7 @@ func TestGoodFilterRegex(t *testing.T) {
 				t.Fatalf("filter.regex failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err != nil {
 				t.Fatalf("filter.regex processing failed: %s", err)
@@ -161,7 +161,7 @@ func TestBadFilterRegex(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err == nil {
 				t.Fatalf("filter.regex expected to fail but got payload: %+v", got)

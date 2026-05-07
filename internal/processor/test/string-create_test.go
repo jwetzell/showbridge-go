@@ -32,7 +32,7 @@ func TestStringCreateFromRegistry(t *testing.T) {
 	payload := "hello"
 	expected := "hello"
 
-	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
+	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: payload})
 	if err != nil {
 		t.Fatalf("string.create processing failed: %s", err)
 	}
@@ -98,7 +98,7 @@ func TestGoodStringCreate(t *testing.T) {
 				t.Fatalf("string.create failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err != nil {
 				t.Fatalf("string.create processing failed: %s", err)
@@ -174,7 +174,7 @@ func TestBadStringCreate(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err == nil {
 				t.Fatalf("string.create expected to fail but got payload: %+v", got)

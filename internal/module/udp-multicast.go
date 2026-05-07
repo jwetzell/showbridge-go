@@ -73,13 +73,8 @@ func (um *UDPMulticast) Type() string {
 	return um.config.Type
 }
 
-func (um *UDPMulticast) Start(ctx context.Context) error {
+func (um *UDPMulticast) Start(ctx context.Context, router common.RouteIO) error {
 	um.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-
-	if !ok {
-		return errors.New("net.udp.multicast unable to get router from context")
-	}
 	um.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	um.ctx = moduleContext

@@ -104,7 +104,7 @@ func TestGoodMQTTMessageCreate(t *testing.T) {
 				t.Fatalf("mqtt.message.create failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err != nil {
 				t.Fatalf("mqtt.message.create processing failed: %s", err)
@@ -228,7 +228,7 @@ func TestBadMQTTMessageCreate(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err == nil {
 				t.Fatalf("mqtt.message.create expected to fail but succeeded, got: %v", got)

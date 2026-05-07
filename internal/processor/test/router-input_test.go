@@ -1,7 +1,6 @@
 package processor_test
 
 import (
-	"context"
 	"reflect"
 	"testing"
 
@@ -35,7 +34,10 @@ func TestRouterOutputFromRegistry(t *testing.T) {
 	payload := "test"
 	expected := "test"
 
-	got, err := processorInstance.Process(test.GetContextWithRouter(t.Context()), common.GetWrappedPayload(t.Context(), payload))
+	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
+		Router:  test.GetNewTestRouter(),
+		Payload: payload,
+	})
 	if err != nil {
 		t.Fatalf("router.output processing failed: %s", err)
 	}
@@ -71,7 +73,7 @@ func TestGoodRouterOutput(t *testing.T) {
 				t.Fatalf("router.output failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(test.GetContextWithRouter(t.Context()), testCase.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: testCase.payload})
 			if err != nil {
 				t.Fatalf("router.output processing failed: %s", err)
 			}
@@ -85,40 +87,37 @@ func TestGoodRouterOutput(t *testing.T) {
 
 func TestBadRouterOutput(t *testing.T) {
 	testCases := []struct {
-		name              string
-		params            map[string]any
-		payload           any
-		processCtx        context.Context
-		wrappedPayloadCtx context.Context
-		errorString       string
+		name        string
+		params      map[string]any
+		payload     any
+		router      common.RouteIO
+		errorString string
 	}{
 		{
-			name:              "no module param",
-			params:            map[string]any{},
-			payload:           "test",
-			processCtx:        test.GetContextWithRouter(t.Context()),
-			wrappedPayloadCtx: t.Context(),
-			errorString:       "router.output module error: not found",
+			name:        "no module param",
+			params:      map[string]any{},
+			payload:     "test",
+			router:      test.GetNewTestRouter(),
+			errorString: "router.output module error: not found",
 		},
 		{
 			name: "non-string module",
 			params: map[string]any{
 				"module": 123,
 			},
-			payload:           "test",
-			processCtx:        test.GetContextWithRouter(t.Context()),
-			wrappedPayloadCtx: t.Context(),
-			errorString:       "router.output module error: not a string",
+			payload: "test",
+			router:  test.GetNewTestRouter(),
+
+			errorString: "router.output module error: not a string",
 		},
 		{
 			name: "router not found in context",
 			params: map[string]any{
 				"module": "test",
 			},
-			payload:           "test",
-			processCtx:        t.Context(),
-			wrappedPayloadCtx: t.Context(),
-			errorString:       "router.output no router found",
+			payload:     "test",
+			router:      nil,
+			errorString: "router.output no router found",
 		},
 	}
 
@@ -142,7 +141,7 @@ func TestBadRouterOutput(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(testCase.processCtx, common.GetWrappedPayload(testCase.wrappedPayloadCtx, testCase.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Router: testCase.router, Payload: testCase.payload})
 
 			if err == nil {
 				t.Fatalf("router.output expected to fail but succeeded, got: %v", got)

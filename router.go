@@ -74,7 +74,7 @@ func (r *Router) startModule(ctx context.Context, moduleId string) error {
 		return errors.New("module id not found")
 	}
 	r.moduleWait.Go(func() {
-		err := moduleInstance.Start(ctx)
+		err := moduleInstance.Start(ctx, r)
 		if err != nil {
 			// TODO(jwetzell): propagate module run errors better
 			r.logger.Error("error encountered running module", "moduleId", moduleId, "error", err)
@@ -210,12 +210,15 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 			routeWaitGroup.Go(func() {
 
 				routeFound = true
-				routeContext := context.WithValue(spanCtx, common.SourceContextKey, sourceId)
-				routeContext = context.WithValue(routeContext, common.RouterContextKey, r)
-				routeContext = context.WithValue(routeContext, common.ModulesContextKey, r.ModuleInstances)
 
-				routeCtx, routeSpan := otel.Tracer("router").Start(routeContext, "route", trace.WithAttributes(attribute.Int("route.index", routeIndex), attribute.String("route.input", routeInstance.Input())))
-				_, err := routeInstance.ProcessPayload(routeCtx, payload)
+				routeCtx, routeSpan := otel.Tracer("router").Start(spanCtx, "route", trace.WithAttributes(attribute.Int("route.index", routeIndex), attribute.String("route.input", routeInstance.Input())))
+				_, err := routeInstance.ProcessPayload(routeCtx, common.WrappedPayload{
+					Payload: payload,
+					Source:  sourceId,
+					Modules: r.ModuleInstances,
+					Router:  r,
+					End:     false,
+				})
 				if err != nil {
 					if routeIOErrors == nil {
 						routeIOErrors = []common.RouteIOError{}
@@ -298,11 +301,10 @@ func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload
 }
 
 func (r *Router) startModules() {
-	contextWithRouter := context.WithValue(r.Context, common.RouterContextKey, r)
 
 	for moduleId := range r.ModuleInstances {
 		// TODO(jwetzell): handle module run errors
-		err := r.startModule(contextWithRouter, moduleId)
+		err := r.startModule(r.Context, moduleId)
 		if err != nil {
 			r.logger.Error("error starting module", "moduleId", moduleId, "error", err)
 		}

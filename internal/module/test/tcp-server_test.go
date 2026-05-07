@@ -120,7 +120,7 @@ func TestBadTCPServer(t *testing.T) {
 				return
 			}
 
-			err = moduleInstance.Start(t.Context())
+			err = moduleInstance.Start(t.Context(), nil)
 
 			if err == nil {
 				t.Fatalf("net.tcp.server expected to fail")

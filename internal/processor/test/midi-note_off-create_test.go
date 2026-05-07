@@ -70,7 +70,7 @@ func TestGoodMIDINoteOffCretea(t *testing.T) {
 				t.Fatalf("midi.note_off.create failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 			if err != nil {
 				t.Fatalf("midi.note_off.create processing failed: %s", err)
 			}
@@ -146,7 +146,7 @@ func TestBadMIDINoteOffCretea(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err == nil {
 				t.Fatalf("midi.note_off.create expected to fail but succeeded, got: %v", got)

@@ -107,7 +107,7 @@ func TestBadSIPDTMFServer(t *testing.T) {
 				return
 			}
 
-			err = moduleInstance.Start(t.Context())
+			err = moduleInstance.Start(t.Context(), nil)
 
 			if err == nil {
 				t.Fatalf("sip.dtmf.server expected to fail")

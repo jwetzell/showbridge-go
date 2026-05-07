@@ -69,7 +69,7 @@ func TestGoodMIDIProgramChangeCreate(t *testing.T) {
 				t.Fatalf("midi.program_change.create failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 			if err != nil {
 				t.Fatalf("midi.program_change.create processing failed: %s", err)
 			}
@@ -133,7 +133,7 @@ func TestBadMIDIProgramChangeCreate(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err == nil {
 				t.Fatalf("midi.program_change.create expected to fail but succeeded, got: %v", got)

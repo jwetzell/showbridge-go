@@ -86,14 +86,8 @@ func (ns *NATSServer) Type() string {
 	return ns.config.Type
 }
 
-func (ns *NATSServer) Start(ctx context.Context) error {
+func (ns *NATSServer) Start(ctx context.Context, router common.RouteIO) error {
 	ns.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-
-	if !ok {
-		return errors.New("nats.server unable to get router from context")
-	}
-
 	ns.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	ns.ctx = moduleContext

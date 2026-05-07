@@ -80,13 +80,8 @@ func (mc *MQTTClient) Type() string {
 	return mc.config.Type
 }
 
-func (mc *MQTTClient) Start(ctx context.Context) error {
+func (mc *MQTTClient) Start(ctx context.Context, router common.RouteIO) error {
 	mc.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-
-	if !ok {
-		return errors.New("mqtt.client unable to get router from context")
-	}
 	mc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	mc.ctx = moduleContext

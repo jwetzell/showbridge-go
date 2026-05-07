@@ -19,13 +19,12 @@ type RouterOutput struct {
 
 func (ro *RouterOutput) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-	if !ok {
+	if wrappedPayload.Router == nil {
 		wrappedPayload.End = true
 		return wrappedPayload, errors.New("router.output no router found")
 	}
 
-	err := router.HandleOutput(ctx, ro.ModuleId, wrappedPayload.Payload)
+	err := wrappedPayload.Router.HandleOutput(ctx, ro.ModuleId, wrappedPayload.Payload)
 
 	if err != nil {
 		wrappedPayload.End = true

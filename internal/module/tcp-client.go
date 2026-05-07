@@ -91,13 +91,8 @@ func (tc *TCPClient) Type() string {
 	return tc.config.Type
 }
 
-func (tc *TCPClient) Start(ctx context.Context) error {
+func (tc *TCPClient) Start(ctx context.Context, router common.RouteIO) error {
 	tc.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-
-	if !ok {
-		return errors.New("net.tcp.client unable to get router from context")
-	}
 	tc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	tc.ctx = moduleContext

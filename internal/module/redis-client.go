@@ -73,15 +73,9 @@ func (rc *RedisClient) Printf(ctx context.Context, format string, v ...interface
 	rc.logger.Debug(msg)
 }
 
-func (rc *RedisClient) Start(ctx context.Context) error {
+func (rc *RedisClient) Start(ctx context.Context, router common.RouteIO) error {
 	redis.SetLogger(rc)
 	rc.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-
-	if !ok {
-		return errors.New("redis.client unable to get router from context")
-	}
-
 	rc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	rc.ctx = moduleContext

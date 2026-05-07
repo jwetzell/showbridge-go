@@ -1,7 +1,6 @@
 package processor_test
 
 import (
-	"context"
 	"reflect"
 	"testing"
 
@@ -35,12 +34,12 @@ func TestKvGetFromRegistry(t *testing.T) {
 	payload := "hello"
 	expected := "test"
 
-	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(test.GetContextWithModules(
-		t.Context(),
-		map[string]common.Module{
+	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
+		Modules: map[string]common.Module{
 			"test": test.NewTestKVModule("test"),
 		},
-	), payload))
+		Payload: payload,
+	})
 	if err != nil {
 		t.Fatalf("kv.get processing failed: %s", err)
 	}
@@ -95,12 +94,12 @@ func TestGoodKvGet(t *testing.T) {
 				t.Fatalf("kv.get failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(test.GetContextWithModules(
-				t.Context(),
-				map[string]common.Module{
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
+				Modules: map[string]common.Module{
 					"test": test.NewTestKVModule("test"),
 				},
-			), testCase.payload))
+				Payload: testCase.payload,
+			})
 
 			if err != nil {
 				t.Fatalf("kv.get processing failed: %s", err)
@@ -115,11 +114,11 @@ func TestGoodKvGet(t *testing.T) {
 
 func TestBadKvGet(t *testing.T) {
 	tests := []struct {
-		name              string
-		params            map[string]any
-		payload           any
-		wrappedPayloadCtx context.Context
-		errorString       string
+		name                  string
+		params                map[string]any
+		payload               any
+		wrappedPayloadModules map[string]common.Module
+		errorString           string
 	}{
 		{
 			name:    "no module param",
@@ -127,9 +126,9 @@ func TestBadKvGet(t *testing.T) {
 			params: map[string]any{
 				"key": "test",
 			},
-			wrappedPayloadCtx: test.GetContextWithModules(t.Context(), map[string]common.Module{
+			wrappedPayloadModules: map[string]common.Module{
 				"test": test.NewTestKVModule("test"),
-			}),
+			},
 			errorString: "kv.get module error: not found",
 		},
 		{
@@ -139,9 +138,9 @@ func TestBadKvGet(t *testing.T) {
 				"module": 1,
 				"key":    "test",
 			},
-			wrappedPayloadCtx: test.GetContextWithModules(t.Context(), map[string]common.Module{
+			wrappedPayloadModules: map[string]common.Module{
 				"test": test.NewTestKVModule("test"),
-			}),
+			},
 			errorString: "kv.get module error: not a string",
 		},
 		{
@@ -150,9 +149,9 @@ func TestBadKvGet(t *testing.T) {
 			params: map[string]any{
 				"module": "test",
 			},
-			wrappedPayloadCtx: test.GetContextWithModules(t.Context(), map[string]common.Module{
+			wrappedPayloadModules: map[string]common.Module{
 				"test": test.NewTestKVModule("test"),
-			}),
+			},
 			errorString: "kv.get key error: not found",
 		},
 		{
@@ -162,9 +161,9 @@ func TestBadKvGet(t *testing.T) {
 				"module": "test",
 				"key":    1,
 			},
-			wrappedPayloadCtx: test.GetContextWithModules(t.Context(), map[string]common.Module{
+			wrappedPayloadModules: map[string]common.Module{
 				"test": test.NewTestKVModule("test"),
-			}),
+			},
 			errorString: "kv.get key error: not a string",
 		},
 		{
@@ -174,8 +173,8 @@ func TestBadKvGet(t *testing.T) {
 				"module": "test",
 				"key":    "test",
 			},
-			wrappedPayloadCtx: t.Context(),
-			errorString:       "kv.get wrapped payload has no modules",
+			wrappedPayloadModules: nil,
+			errorString:           "kv.get wrapped payload has no modules",
 		},
 		{
 			name:    "module not found in context",
@@ -184,8 +183,8 @@ func TestBadKvGet(t *testing.T) {
 				"module": "test",
 				"key":    "test",
 			},
-			wrappedPayloadCtx: test.GetContextWithModules(t.Context(), map[string]common.Module{}),
-			errorString:       "kv.get unable to find module with id: test",
+			wrappedPayloadModules: map[string]common.Module{},
+			errorString:           "kv.get unable to find module with id: test",
 		},
 		{
 			name:    "module not a kv module",
@@ -194,9 +193,9 @@ func TestBadKvGet(t *testing.T) {
 				"module": "test",
 				"key":    "test",
 			},
-			wrappedPayloadCtx: test.GetContextWithModules(t.Context(), map[string]common.Module{
+			wrappedPayloadModules: map[string]common.Module{
 				"test": test.NewTestDBModule("test"),
-			}),
+			},
 			errorString: "kv.get module with id test is not a KeyValueModule",
 		},
 	}
@@ -221,7 +220,7 @@ func TestBadKvGet(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(test.wrappedPayloadCtx, test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Modules: test.wrappedPayloadModules, Payload: test.payload})
 
 			if err == nil {
 				t.Fatalf("kv.get expected to fail but got payload: %+v", got)

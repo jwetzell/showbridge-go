@@ -61,14 +61,9 @@ func (mo *MIDIOutput) Type() string {
 	return mo.config.Type
 }
 
-func (mo *MIDIOutput) Start(ctx context.Context) error {
+func (mo *MIDIOutput) Start(ctx context.Context, router common.RouteIO) error {
 	mo.logger.Debug("running")
 	defer midi.CloseDriver()
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-
-	if !ok {
-		return errors.New("midi.output unable to get router from context")
-	}
 	mo.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	mo.ctx = moduleContext

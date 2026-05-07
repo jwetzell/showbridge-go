@@ -131,13 +131,8 @@ func (scs *SIPCallServer) Type() string {
 	return scs.config.Type
 }
 
-func (scs *SIPCallServer) Start(ctx context.Context) error {
+func (scs *SIPCallServer) Start(ctx context.Context, router common.RouteIO) error {
 	scs.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-
-	if !ok {
-		return errors.New("sip.call.server unable to get router from context")
-	}
 	scs.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	scs.ctx = moduleContext

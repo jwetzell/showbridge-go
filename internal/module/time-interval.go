@@ -2,7 +2,6 @@ package module
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -58,13 +57,8 @@ func (i *TimeInterval) Type() string {
 	return i.config.Type
 }
 
-func (i *TimeInterval) Start(ctx context.Context) error {
+func (i *TimeInterval) Start(ctx context.Context, router common.RouteIO) error {
 	i.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-
-	if !ok {
-		return errors.New("time.interval unable to get router from context")
-	}
 	i.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	i.ctx = moduleContext

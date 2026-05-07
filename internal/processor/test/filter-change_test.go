@@ -29,7 +29,9 @@ func TestFilterChangeFromRegistry(t *testing.T) {
 	payload := "hello"
 	expected := "hello"
 
-	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
+	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
+		Payload: payload,
+	})
 	if err != nil {
 		t.Fatalf("filter.change processing failed: %s", err)
 	}
@@ -70,7 +72,7 @@ func TestGoodFilterChange(t *testing.T) {
 				t.Fatalf("filter.change failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err != nil {
 				t.Fatalf("filter.change processing failed: %s", err)
@@ -110,7 +112,7 @@ func TestBadFilterChange(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err == nil {
 				t.Fatalf("filter.change expected to fail but got payload: %+v", got)

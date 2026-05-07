@@ -73,7 +73,7 @@ func TestGoodScriptWASM(t *testing.T) {
 				t.Fatalf("script.wasm failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err != nil {
 				t.Fatalf("script.wasm processing failed: %s", err)
@@ -176,7 +176,7 @@ func TestBadScriptWASM(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err == nil {
 				t.Fatalf("script.wasm expected to fail but succeeded, got: %v", got)
