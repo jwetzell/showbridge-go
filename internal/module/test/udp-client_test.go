@@ -95,7 +95,7 @@ func TestBadUDPClient(t *testing.T) {
 				return
 			}
 
-			err = moduleInstance.Start(t.Context())
+			err = moduleInstance.Start(t.Context(), nil)
 
 			if err == nil {
 				t.Fatalf("net.udp.client expected to fail")

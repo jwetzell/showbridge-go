@@ -166,10 +166,9 @@ ClientRead:
 					messages := ts.Framer.Decode(buffer[0:byteCount])
 					for _, message := range messages {
 						if ts.router != nil {
-							senderAddr, ok := client.RemoteAddr().(*net.TCPAddr)
+							_, ok := client.RemoteAddr().(*net.TCPAddr)
 							if ok {
-								senderCtx := context.WithValue(ts.ctx, common.SenderContextKey, senderAddr)
-								ts.router.HandleInput(senderCtx, ts.Id(), message)
+								ts.router.HandleInput(ts.ctx, ts.Id(), message)
 							} else {
 								ts.router.HandleInput(ts.ctx, ts.Id(), message)
 							}
@@ -183,13 +182,8 @@ ClientRead:
 	}
 }
 
-func (ts *TCPServer) Start(ctx context.Context) error {
+func (ts *TCPServer) Start(ctx context.Context, router common.RouteIO) error {
 	ts.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-
-	if !ok {
-		return errors.New("net.tcp.server unable to get router from context")
-	}
 	ts.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	ts.ctx = moduleContext

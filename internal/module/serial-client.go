@@ -99,14 +99,8 @@ func (sc *SerialClient) SetupPort() error {
 	return nil
 }
 
-func (sc *SerialClient) Start(ctx context.Context) error {
+func (sc *SerialClient) Start(ctx context.Context, router common.RouteIO) error {
 	sc.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-
-	if !ok {
-		return errors.New("serial.client unable to get router from context")
-	}
-
 	sc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	sc.ctx = moduleContext

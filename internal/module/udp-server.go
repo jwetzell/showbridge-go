@@ -95,13 +95,8 @@ func (us *UDPServer) Type() string {
 	return us.config.Type
 }
 
-func (us *UDPServer) Start(ctx context.Context) error {
+func (us *UDPServer) Start(ctx context.Context, router common.RouteIO) error {
 	us.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-
-	if !ok {
-		return errors.New("net.udp.server unable to get router from context")
-	}
 	us.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	us.ctx = moduleContext
@@ -124,7 +119,7 @@ func (us *UDPServer) Start(ctx context.Context) error {
 		default:
 			listener.SetDeadline(time.Now().Add(time.Millisecond * 200))
 
-			numBytes, senderAddr, err := listener.ReadFromUDP(buffer)
+			numBytes, _, err := listener.ReadFromUDP(buffer)
 			if err != nil {
 				//NOTE(jwetzell) we hit deadline
 				if opErr, ok := err.(*net.OpError); ok && opErr.Timeout() {
@@ -134,8 +129,7 @@ func (us *UDPServer) Start(ctx context.Context) error {
 			}
 			message := buffer[:numBytes]
 			if us.router != nil {
-				senderCtx := context.WithValue(us.ctx, common.SenderContextKey, senderAddr)
-				us.router.HandleInput(senderCtx, us.Id(), message)
+				us.router.HandleInput(us.ctx, us.Id(), message)
 			} else {
 				us.logger.Error("input received but no router is configured")
 			}

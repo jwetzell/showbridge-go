@@ -150,13 +150,8 @@ func (sds *SIPDTMFServer) Type() string {
 	return sds.config.Type
 }
 
-func (sds *SIPDTMFServer) Start(ctx context.Context) error {
+func (sds *SIPDTMFServer) Start(ctx context.Context, router common.RouteIO) error {
 	sds.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-
-	if !ok {
-		return errors.New("sip.dtmf.server unable to get router from context")
-	}
 	sds.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	sds.ctx = moduleContext

@@ -103,7 +103,7 @@ func TestGoodFreeDCreate(t *testing.T) {
 				t.Fatalf("freed.create failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 			if err != nil {
 				t.Fatalf("freed.create processing failed: %s", err)
 			}
@@ -865,7 +865,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err == nil {
 				t.Fatalf("freed.create expected to fail but succeeded, got: %v", got)

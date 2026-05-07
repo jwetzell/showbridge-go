@@ -4,13 +4,14 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/jwetzell/showbridge-go/internal/common"
 	_ "modernc.org/sqlite"
 )
 
 type TestModule struct {
 }
 
-func (m *TestModule) Start(ctx context.Context) error {
+func (m *TestModule) Start(ctx context.Context, router common.RouteIO) error {
 	<-ctx.Done()
 	return nil
 }
@@ -36,7 +37,7 @@ type TestKVModule struct {
 	kvData map[string]any
 }
 
-func (m *TestKVModule) Start(ctx context.Context) error {
+func (m *TestKVModule) Start(ctx context.Context, router common.RouteIO) error {
 	<-ctx.Done()
 	return nil
 }
@@ -73,7 +74,7 @@ type TestDBModule struct {
 	db *sql.DB
 }
 
-func (m *TestDBModule) Start(ctx context.Context) error {
+func (m *TestDBModule) Start(ctx context.Context, router common.RouteIO) error {
 	<-ctx.Done()
 	return nil
 }

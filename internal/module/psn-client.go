@@ -2,7 +2,6 @@ package module
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 	"net"
 	"time"
@@ -40,13 +39,8 @@ func (pc *PSNClient) Type() string {
 	return pc.config.Type
 }
 
-func (pc *PSNClient) Start(ctx context.Context) error {
+func (pc *PSNClient) Start(ctx context.Context, router common.RouteIO) error {
 	pc.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-
-	if !ok {
-		return errors.New("psn.client unable to get router from context")
-	}
 	pc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	pc.ctx = moduleContext

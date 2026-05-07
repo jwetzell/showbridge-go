@@ -28,7 +28,7 @@ func TestStringDecodeFromRegistry(t *testing.T) {
 	payload := []byte{'h', 'e', 'l', 'l', 'o'}
 	expected := "hello"
 
-	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
+	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: payload})
 	if err != nil {
 		t.Fatalf("string.decode processing failed: %s", err)
 	}
@@ -54,7 +54,7 @@ func TestGoodStringDecode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := stringDecoder.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := stringDecoder.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 			if err != nil {
 				t.Fatalf("string.decode processing failed: %s", err)
 			}
@@ -87,7 +87,7 @@ func TestBadStringDecode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := stringDecoder.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := stringDecoder.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err == nil {
 				t.Fatalf("string.decode expected to fail but got payload: %+v", got)

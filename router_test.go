@@ -33,12 +33,7 @@ func (mcm *MockCounterModule) Output(context.Context, any) error {
 	return nil
 }
 
-func (mcm *MockCounterModule) Start(ctx context.Context) error {
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-
-	if !ok {
-		return fmt.Errorf("mock.counter could not get router from context")
-	}
+func (mcm *MockCounterModule) Start(ctx context.Context, router common.RouteIO) error {
 	mcm.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	mcm.ctx = moduleContext

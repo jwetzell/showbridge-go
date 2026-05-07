@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"net"
 	"net/http"
 
 	"github.com/google/jsonschema-go/jsonschema"
@@ -99,10 +98,6 @@ func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if hs.router != nil {
 		inputContext := context.WithValue(hs.ctx, httpServerContextKey("responseWriter"), &responseWriter)
-		senderAddr, err := net.ResolveTCPAddr("tcp", r.RemoteAddr)
-		if err == nil {
-			inputContext = context.WithValue(inputContext, common.SenderContextKey, senderAddr)
-		}
 		aRouteFound, routingErrors := hs.router.HandleInput(inputContext, hs.Id(), r)
 		if !responseWriter.done {
 			if aRouteFound {
@@ -160,13 +155,8 @@ func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (hs *HTTPServer) Start(ctx context.Context) error {
+func (hs *HTTPServer) Start(ctx context.Context, router common.RouteIO) error {
 	hs.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-
-	if !ok {
-		return errors.New("http.server unable to get router from context")
-	}
 	hs.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	hs.ctx = moduleContext

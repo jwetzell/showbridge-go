@@ -76,7 +76,7 @@ func TestGoodFloatParse(t *testing.T) {
 				t.Fatalf("float.parse failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 			if err != nil {
 				t.Fatalf("float.parse processing failed: %s", err)
 			}
@@ -152,7 +152,7 @@ func TestBadFloatParse(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err == nil {
 				t.Fatalf("float.parse expected to fail but succeeded, got: %v", got)

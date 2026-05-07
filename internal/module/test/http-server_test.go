@@ -73,7 +73,7 @@ func TestBadHTTPServer(t *testing.T) {
 				return
 			}
 
-			err = moduleInstance.Start(t.Context())
+			err = moduleInstance.Start(t.Context(), nil)
 
 			if err == nil {
 				t.Fatalf("http.server expected to fail")

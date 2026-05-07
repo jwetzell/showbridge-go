@@ -55,7 +55,10 @@ func TestGoodRouteHandleInput(t *testing.T) {
 	}
 
 	inputData := "test input data"
-	payload, err := testRoute.ProcessPayload(context.WithValue(t.Context(), common.RouterContextKey, &MockRouter{}), inputData)
+	payload, err := testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
+		Router:  &MockRouter{},
+		Payload: inputData,
+	})
 	if err != nil {
 		t.Fatalf("route ProcessPayload returned error: %v", err)
 	}
@@ -90,7 +93,10 @@ func TestRouteHandleInputWithProcessorError(t *testing.T) {
 	}
 
 	inputData := "test input data"
-	_, err = testRoute.ProcessPayload(context.WithValue(t.Context(), common.RouterContextKey, &MockRouter{}), inputData)
+	_, err = testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
+		Router:  &MockRouter{},
+		Payload: inputData,
+	})
 	if err == nil {
 		t.Fatalf("route HandleOutput did not return error for bad processor")
 	}
@@ -115,7 +121,10 @@ func TestRouteHandleNilPayload(t *testing.T) {
 		return
 	}
 
-	payload, err := testRoute.ProcessPayload(context.WithValue(t.Context(), common.RouterContextKey, &MockRouter{}), nil)
+	payload, err := testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
+		Router:  &MockRouter{},
+		Payload: nil,
+	})
 	if err != nil {
 		t.Fatalf("route ProcessPayload returned error: %v", err)
 	}
@@ -143,7 +152,10 @@ func TestRouteHandleNilPayloadFromProcessor(t *testing.T) {
 		t.Fatalf("route failed to create: %v", err)
 	}
 
-	_, err = testRoute.ProcessPayload(context.WithValue(t.Context(), common.RouterContextKey, &MockRouter{}), "test")
+	_, err = testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
+		Router:  &MockRouter{},
+		Payload: "test",
+	})
 	if err != nil {
 		t.Fatalf("route HandleOutput returned error for nil payload: %v", err)
 	}

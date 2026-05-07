@@ -34,7 +34,7 @@ func TestScriptJSFromRegistry(t *testing.T) {
 	payload := 1
 	expected := 2
 
-	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
+	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: payload})
 	if err != nil {
 		t.Fatalf("script.js processing failed: %s", err)
 	}
@@ -165,7 +165,7 @@ func TestGoodScriptJS(t *testing.T) {
 				t.Fatalf("script.js failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err != nil {
 				t.Fatalf("script.js processing failed: %s", err)
@@ -209,7 +209,7 @@ func TestBadScriptJS(t *testing.T) {
 				Params: test.params,
 			})
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err == nil {
 				t.Fatalf("script.js expected to fail but succeeded, got: %v", got)

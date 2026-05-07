@@ -43,10 +43,9 @@ func (r *Route) Input() string {
 	return r.input
 }
 
-func (r *Route) ProcessPayload(ctx context.Context, payload any) (any, error) {
-	wrappedPayload := common.GetWrappedPayload(ctx, payload)
+func (r *Route) ProcessPayload(ctx context.Context, wrappedPayload common.WrappedPayload) (any, error) {
 	tracer := otel.Tracer("route")
-	processCtx, processSpan := tracer.Start(ctx, "ProcessPayload", trace.WithAttributes(attribute.String("payload.type", fmt.Sprintf("%T", payload))))
+	processCtx, processSpan := tracer.Start(ctx, "ProcessPayload", trace.WithAttributes(attribute.String("payload.type", fmt.Sprintf("%T", wrappedPayload.Payload))))
 	defer processSpan.End()
 	for processorIndex, processor := range r.processors {
 		processorCtx, processorSpan := otel.Tracer("processor").Start(processCtx, "process", trace.WithAttributes(attribute.Int("processor.index", processorIndex), attribute.String("processor.type", processor.Type())))

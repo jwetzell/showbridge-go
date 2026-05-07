@@ -3,7 +3,6 @@ package module
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"log/slog"
 
@@ -59,13 +58,8 @@ func (t *DbSqlite) Type() string {
 	return t.config.Type
 }
 
-func (t *DbSqlite) Start(ctx context.Context) error {
+func (t *DbSqlite) Start(ctx context.Context, router common.RouteIO) error {
 	t.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-
-	if !ok {
-		return errors.New("db.sqlite unable to get router from context")
-	}
 	t.router = router
 	t.ctx = ctx
 

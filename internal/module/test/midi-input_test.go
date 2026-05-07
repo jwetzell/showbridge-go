@@ -73,7 +73,7 @@ func TestBadMIDIInput(t *testing.T) {
 				return
 			}
 
-			err = moduleInstance.Start(t.Context())
+			err = moduleInstance.Start(t.Context(), nil)
 
 			if err == nil {
 				t.Fatalf("midi.input expected to fail")

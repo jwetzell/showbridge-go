@@ -34,8 +34,6 @@ func (sj *ScriptJS) Process(ctx context.Context, wrappedPayload common.WrappedPa
 
 	sj.vm.SetProperty(sj.vm.GlobalObject(), sj.payloadAtom, wrappedPayload.Payload)
 
-	sj.vm.SetProperty(sj.vm.GlobalObject(), sj.senderAtom, wrappedPayload.Sender)
-
 	_, err := sj.vm.Eval(sj.Program, quickjs.EvalGlobal)
 
 	if err != nil {

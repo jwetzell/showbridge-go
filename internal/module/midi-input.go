@@ -4,7 +4,6 @@ package module
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log/slog"
 
@@ -60,14 +59,9 @@ func (mi *MIDIInput) Type() string {
 	return mi.config.Type
 }
 
-func (mi *MIDIInput) Start(ctx context.Context) error {
+func (mi *MIDIInput) Start(ctx context.Context, router common.RouteIO) error {
 	mi.logger.Debug("running")
 	defer midi.CloseDriver()
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-
-	if !ok {
-		return errors.New("midi.input unable to get router from context")
-	}
 	mi.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	mi.ctx = moduleContext

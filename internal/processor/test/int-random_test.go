@@ -51,7 +51,7 @@ func TestIntRandomGoodConfig(t *testing.T) {
 
 	payload := "12345"
 
-	got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), payload))
+	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: payload})
 	if err != nil {
 		t.Fatalf("int.random processing failed: %s", err)
 	}
@@ -98,7 +98,7 @@ func TestGoodIntRandom(t *testing.T) {
 				t.Fatalf("int.random failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 			if err != nil {
 				t.Fatalf("int.random processing failed: %s", err)
 			}
@@ -183,7 +183,7 @@ func TestBadIntRandom(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err == nil {
 				t.Fatalf("int.random expected to fail but got payload: %+v", got)

@@ -97,7 +97,7 @@ func TestGoodIntParse(t *testing.T) {
 				t.Fatalf("int.parse failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 			if err != nil {
 				t.Fatalf("int.parse processing failed: %s", err)
 			}
@@ -186,7 +186,7 @@ func TestBadIntParse(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.GetWrappedPayload(t.Context(), test.payload))
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err == nil {
 				t.Fatalf("int.parse expected to fail but succeeded, got: %v", got)

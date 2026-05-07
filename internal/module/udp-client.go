@@ -79,13 +79,8 @@ func (uc *UDPClient) SetupConn() error {
 	return err
 }
 
-func (uc *UDPClient) Start(ctx context.Context) error {
+func (uc *UDPClient) Start(ctx context.Context, router common.RouteIO) error {
 	uc.logger.Debug("running")
-	router, ok := ctx.Value(common.RouterContextKey).(common.RouteIO)
-
-	if !ok {
-		return errors.New("net.udp.client unable to get router from context")
-	}
 	uc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	uc.ctx = moduleContext
