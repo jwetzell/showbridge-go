@@ -145,7 +145,7 @@ func TestGoodScriptJS(t *testing.T) {
 				"program": "",
 			},
 			payload:  []byte("test"),
-			expected: []interface{}{float64('t'), float64('e'), float64('s'), float64('t')},
+			expected: []any{float64('t'), float64('e'), float64('s'), float64('t')},
 		},
 	}
 

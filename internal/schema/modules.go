@@ -26,7 +26,7 @@ func GetModulesSchema() *jsonschema.Schema {
 			Properties: map[string]*jsonschema.Schema{
 				"id": {
 					Type:      "string",
-					MinLength: jsonschema.Ptr(1),
+					MinLength: new(1),
 				},
 				"type": {
 					Const: jsonschema.Ptr[any](mod.Type),

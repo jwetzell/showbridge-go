@@ -78,8 +78,8 @@ func init() {
 				"separator": {
 					Title:     "DTMF Separator",
 					Type:      "string",
-					MinLength: jsonschema.Ptr(1),
-					MaxLength: jsonschema.Ptr(1),
+					MinLength: new(1),
+					MaxLength: new(1),
 				},
 			},
 			Required:             []string{"separator"},

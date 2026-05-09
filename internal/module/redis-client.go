@@ -68,7 +68,7 @@ func (rc *RedisClient) Type() string {
 	return rc.config.Type
 }
 
-func (rc *RedisClient) Printf(ctx context.Context, format string, v ...interface{}) {
+func (rc *RedisClient) Printf(ctx context.Context, format string, v ...any) {
 	msg := fmt.Sprintf(format, v...)
 	rc.logger.Debug(msg)
 }

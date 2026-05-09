@@ -31,7 +31,7 @@ func init() {
 			Properties: map[string]*jsonschema.Schema{
 				"dsn": {
 					Type:      "string",
-					MinLength: jsonschema.Ptr(1),
+					MinLength: new(1),
 				},
 			},
 			Required:             []string{"dsn"},

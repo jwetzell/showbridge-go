@@ -68,10 +68,10 @@ func (dq *DbQuery) Process(ctx context.Context, wrappedPayload common.WrappedPay
 	results := make([]map[string]any, 0)
 
 	for rows.Next() {
-		columnValues := make([]interface{}, len(columns))
+		columnValues := make([]any, len(columns))
 
 		for i := range columnValues {
-			columnValues[i] = new(interface{})
+			columnValues[i] = new(any)
 		}
 
 		if err := rows.Scan(columnValues...); err != nil {
@@ -81,7 +81,7 @@ func (dq *DbQuery) Process(ctx context.Context, wrappedPayload common.WrappedPay
 
 		rowMap := make(map[string]any)
 		for i, colName := range columns {
-			value := *columnValues[i].(*interface{})
+			value := *columnValues[i].(*any)
 			rowMap[colName] = value
 		}
 		results = append(results, rowMap)

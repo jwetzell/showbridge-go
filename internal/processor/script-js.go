@@ -61,12 +61,12 @@ func (sj *ScriptJS) Process(ctx context.Context, wrappedPayload common.WrappedPa
 	outputObject, ok := output.(*quickjs.Object)
 
 	if ok {
-		var outputSlice []interface{}
+		var outputSlice []any
 
 		err = outputObject.Into(&outputSlice)
 
 		if err != nil {
-			var outputMap map[string]interface{}
+			var outputMap map[string]any
 			err = outputObject.Into(&outputMap)
 			if err != nil {
 				wrappedPayload.End = true

@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"net"
 	"slices"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -24,7 +25,7 @@ type TCPServer struct {
 	Framer        framer.Framer
 	ctx           context.Context
 	router        common.RouteIO
-	quit          chan interface{}
+	quit          chan any
 	wg            sync.WaitGroup
 	connections   []*net.TCPConn
 	connectionsMu sync.RWMutex
@@ -90,7 +91,7 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			return &TCPServer{Framer: framer, Addr: addr, config: moduleConfig, quit: make(chan interface{}), logger: CreateLogger(moduleConfig)}, nil
+			return &TCPServer{Framer: framer, Addr: addr, config: moduleConfig, quit: make(chan any), logger: CreateLogger(moduleConfig)}, nil
 		},
 	})
 }
@@ -213,11 +214,9 @@ AcceptLoop:
 				ts.logger.Debug("problem with listener", "error", err)
 			}
 		} else {
-			ts.wg.Add(1)
-			go func() {
+			ts.wg.Go(func() {
 				ts.handleClient(conn)
-				ts.wg.Done()
-			}()
+			})
 		}
 	}
 	ts.wg.Done()
@@ -232,20 +231,20 @@ func (ts *TCPServer) Output(ctx context.Context, payload any) error {
 		return errors.New("net.tcp.server is only able to output bytes")
 	}
 	ts.connectionsMu.Lock()
-	errorString := ""
+	var errorString strings.Builder
 
 	for _, connection := range ts.connections {
 		_, err := connection.Write(payloadBytes)
 		if err != nil {
-			errorString += fmt.Sprintf("%s\n", err.Error())
+			errorString.WriteString(fmt.Sprintf("%s\n", err.Error()))
 		}
 	}
 	ts.connectionsMu.Unlock()
 
-	if errorString == "" {
+	if errorString.String() == "" {
 		return nil
 	}
-	return fmt.Errorf("net.tcp.server error during output: %s", errorString)
+	return fmt.Errorf("net.tcp.server error during output: %s", errorString.String())
 }
 
 func (ts *TCPServer) Stop() {
