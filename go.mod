@@ -17,7 +17,7 @@ require (
 	github.com/nats-io/nats-server/v2 v2.14.0
 	github.com/nats-io/nats.go v1.52.0
 	github.com/redis/go-redis/v9 v9.19.0
-	github.com/urfave/cli/v3 v3.8.0
+	github.com/urfave/cli/v3 v3.9.0
 	gitlab.com/gomidi/midi/v2 v2.3.23
 	go.bug.st/serial v1.6.4
 	go.opentelemetry.io/otel v1.43.0
@@ -61,7 +61,6 @@ require (
 	github.com/pion/rtcp v1.2.16 // indirect
 	github.com/pion/rtp v1.10.2 // indirect
 	github.com/pion/srtp/v3 v3.0.10 // indirect
-	github.com/pion/transport/v3 v3.1.1 // indirect
 	github.com/pion/transport/v4 v4.0.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/tetratelabs/wabin v0.0.0-20230304001439-f6f874872834 // indirect
