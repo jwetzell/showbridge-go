@@ -21,7 +21,7 @@ func TestDbQueryFromRegistry(t *testing.T) {
 		Type: "db.query",
 		Params: map[string]any{
 			"module": "test",
-			"query":  "SELECT sqlite_version();",
+			"query":  "SELECT 1;",
 		},
 	})
 	if err != nil {
@@ -33,7 +33,7 @@ func TestDbQueryFromRegistry(t *testing.T) {
 	}
 
 	payload := "hello"
-	expected := map[string]any{"sqlite_version()": "3.53.0"}
+	expected := map[string]any{"1": int64(1)}
 
 	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
 		Payload: payload,
