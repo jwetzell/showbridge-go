@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/url"
+	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/gorilla/websocket"
@@ -80,11 +81,17 @@ func (wc *WebSocketClient) Start(ctx context.Context, router common.RouteIO) err
 	wc.ctx = moduleContext
 	wc.cancel = cancel
 
-	err := wc.SetupConn()
-	if err != nil {
-		return err
+	for wc.ctx.Err() == nil {
+		err := wc.SetupConn()
+		if err != nil {
+			wc.logger.Error("connection error", "error", err)
+		} else {
+			// NOTE(jwetzell): enter read loop until an error occurs
+			wc.readLoop()
+		}
+		// NOTE(jwetzell): if connection is lost or read error wait before trying again
+		time.Sleep(2 * time.Second)
 	}
-	go wc.readLoop()
 
 	<-wc.ctx.Done()
 	wc.logger.Debug("done")
@@ -95,16 +102,16 @@ func (wc *WebSocketClient) Start(ctx context.Context, router common.RouteIO) err
 }
 
 func (wc *WebSocketClient) readLoop() {
-	for {
+	for wc.ctx.Err() == nil {
 		if wc.conn == nil {
-			wc.SetupConn()
-			continue
+			wc.logger.Error("websocket connection is not established")
+			return
 		}
 
 		messageType, message, err := wc.conn.ReadMessage()
 		if err != nil {
 			wc.logger.Error("read error", "error", err)
-			continue
+			return
 		}
 		if wc.router != nil {
 			switch messageType {
