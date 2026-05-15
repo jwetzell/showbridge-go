@@ -14,7 +14,7 @@ import (
 
 type ScriptWASM struct {
 	config   config.ProcessorConfig
-	Program  *extism.CompiledPlugin
+	Program  *extism.Plugin
 	Function string
 }
 
@@ -28,14 +28,7 @@ func (sw *ScriptWASM) Process(ctx context.Context, wrappedPayload common.Wrapped
 		return wrappedPayload, fmt.Errorf("script.wasm can only process a byte array")
 	}
 
-	program, err := sw.Program.Instance(ctx, extism.PluginInstanceConfig{})
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	_, output, err := program.Call(sw.Function, payloadBytes)
+	_, output, err := sw.Program.Call(sw.Function, payloadBytes)
 
 	if err != nil {
 		wrappedPayload.End = true
@@ -117,7 +110,13 @@ func init() {
 				return nil, err
 			}
 
-			return &ScriptWASM{config: processorConfig, Program: program, Function: functionString}, nil
+			programInstance, err := program.Instance(context.Background(), extism.PluginInstanceConfig{})
+
+			if err != nil {
+				return nil, err
+			}
+
+			return &ScriptWASM{config: processorConfig, Program: programInstance, Function: functionString}, nil
 		},
 	})
 }
