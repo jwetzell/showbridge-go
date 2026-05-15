@@ -171,3 +171,30 @@ func TestBadFilterExpr(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkFilterExpr(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["filter.expr"]
+	if !ok {
+		b.Fatalf("filter.expr processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "filter.expr",
+		Params: map[string]any{
+			"expression": "Payload % 2 == 0",
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("filter.expr failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: count})
+		if err != nil {
+			b.Fatalf("filter.expr processing failed: %s", err)
+		}
+		count++
+	}
+}

@@ -221,3 +221,30 @@ func TestBadScriptJS(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkScriptJS(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["script.js"]
+	if !ok {
+		b.Fatalf("script.js processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "script.js",
+		Params: map[string]any{
+			"program": "payload = payload + 1",
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("script.js failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: count})
+		if err != nil {
+			b.Fatalf("script.js processing failed: %s", err)
+		}
+		count++
+	}
+}

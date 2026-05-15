@@ -208,3 +208,31 @@ func TestBadNATSMessageCreate(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkNATSMessageCreate(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["nats.message.create"]
+	if !ok {
+		b.Fatalf("nats.message.create processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "nats.message.create",
+		Params: map[string]any{
+			"subject": "test.subject",
+			"payload": "{{.Payload}}",
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("nats.message.create failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: count})
+		if err != nil {
+			b.Fatalf("nats.message.create processing failed: %s", err)
+		}
+		count++
+	}
+}

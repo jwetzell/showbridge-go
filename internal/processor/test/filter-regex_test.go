@@ -1,6 +1,7 @@
 package processor_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -171,5 +172,32 @@ func TestBadFilterRegex(t *testing.T) {
 				t.Fatalf("filter.regex got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
+	}
+}
+
+func BenchmarkFilterRegex(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["filter.regex"]
+	if !ok {
+		b.Fatalf("filter.regex processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "filter.regex",
+		Params: map[string]any{
+			"pattern": ".*",
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("filter.regex failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: fmt.Sprintf("%d", count)})
+		if err != nil {
+			b.Fatalf("filter.regex processing failed: %s", err)
+		}
+		count++
 	}
 }

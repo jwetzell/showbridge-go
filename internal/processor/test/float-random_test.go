@@ -184,3 +184,29 @@ func TestBadFloatRandom(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkFloatRandom(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["float.random"]
+	if !ok {
+		b.Fatalf("float.random processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "float.random",
+		Params: map[string]any{
+			"min": 0.0,
+			"max": 1.0,
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("float.random failed to create processor: %s", err)
+	}
+
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: nil})
+		if err != nil {
+			b.Fatalf("float.random processing failed: %s", err)
+		}
+	}
+}

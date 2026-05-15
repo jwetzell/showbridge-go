@@ -281,3 +281,35 @@ func TestBadKvSet(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkKvSet(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["kv.set"]
+	if !ok {
+		b.Fatalf("kv.set processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "kv.set",
+		Params: map[string]any{
+			"module": "test",
+			"key":    "test",
+			"value":  "{{.Payload}}",
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("kv.set failed to create processor: %s", err)
+	}
+	modules := map[string]common.Module{
+		"test": test.NewTestKVModule("test"),
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: count, Modules: modules})
+		if err != nil {
+			b.Fatalf("kv.set processing failed: %s", err)
+		}
+		count++
+	}
+}

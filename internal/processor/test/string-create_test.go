@@ -186,3 +186,30 @@ func TestBadStringCreate(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkStringCreate(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["string.create"]
+	if !ok {
+		b.Fatalf("string.create processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "string.create",
+		Params: map[string]any{
+			"template": "{{.Payload}}",
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("string.create failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: count})
+		if err != nil {
+			b.Fatalf("string.create processing failed: %s", err)
+		}
+		count++
+	}
+}

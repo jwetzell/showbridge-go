@@ -1,6 +1,7 @@
 package processor_test
 
 import (
+	"fmt"
 	"slices"
 	"testing"
 
@@ -151,5 +152,32 @@ func TestBadStringSplit(t *testing.T) {
 				t.Fatalf("string.split got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
+	}
+}
+
+func BenchmarkStringSplit(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["string.split"]
+	if !ok {
+		b.Fatalf("string.split processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "string.split",
+		Params: map[string]any{
+			"separator": ",",
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("string.split failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: fmt.Sprintf("%d,%d,%d", count, count, count)})
+		if err != nil {
+			b.Fatalf("string.split processing failed: %s", err)
+		}
+		count++
 	}
 }

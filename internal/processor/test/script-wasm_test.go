@@ -1,6 +1,7 @@
 package processor_test
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -186,5 +187,32 @@ func TestBadScriptWASM(t *testing.T) {
 				t.Fatalf("script.wasm got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
+	}
+}
+
+func BenchmarkScriptWASM(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["script.wasm"]
+	if !ok {
+		b.Fatalf("script.wasm processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "script.wasm",
+		Params: map[string]any{
+			"path": "good.wasm",
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("script.wasm failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: []byte(fmt.Sprintf("%d", count))})
+		if err != nil {
+			b.Fatalf("script.wasm processing failed: %s", err)
+		}
+		count++
 	}
 }

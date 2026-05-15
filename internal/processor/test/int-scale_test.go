@@ -169,3 +169,33 @@ func TestBadIntScale(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkIntScale(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["int.scale"]
+	if !ok {
+		b.Fatalf("int.scale processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "int.scale",
+		Params: map[string]any{
+			"inMin":  0,
+			"inMax":  100,
+			"outMin": 0,
+			"outMax": 127,
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("int.scale failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: count % 100})
+		if err != nil {
+			b.Fatalf("int.scale processing failed: %s", err)
+		}
+		count++
+	}
+}

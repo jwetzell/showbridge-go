@@ -191,3 +191,30 @@ func TestBadStructFieldGet(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkStructFieldGet(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["struct.field.get"]
+	if !ok {
+		b.Fatalf("struct.field.get processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "struct.field.get",
+		Params: map[string]any{
+			"name": "Data",
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("struct.field.get failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: test.TestStruct{Data: count}})
+		if err != nil {
+			b.Fatalf("struct.field.get processing failed: %s", err)
+		}
+		count++
+	}
+}

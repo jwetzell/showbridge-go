@@ -146,3 +146,30 @@ func TestBadScriptExpr(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkScriptExpr(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["script.expr"]
+	if !ok {
+		b.Fatalf("script.expr processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "script.expr",
+		Params: map[string]any{
+			"expression": "Payload % 2",
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("script.expr failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: count})
+		if err != nil {
+			b.Fatalf("script.expr processing failed: %s", err)
+		}
+		count++
+	}
+}

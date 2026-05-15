@@ -121,3 +121,15 @@ func TestBadOSCMessageDecode(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkOSCMessageDecode(b *testing.B) {
+	processorInstance := processor.OSCMessageDecode{}
+	payload := []byte{47, 116, 101, 115, 116, 0, 0, 0, 44, 105, 0, 0, 0, 0, 0, 42}
+
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: payload})
+		if err != nil {
+			b.Fatalf("osc.message.decode processing failed: %s", err)
+		}
+	}
+}

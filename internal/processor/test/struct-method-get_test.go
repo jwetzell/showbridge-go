@@ -216,3 +216,30 @@ func TestBadStructMethodGet(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkStructMethodGet(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["struct.method.get"]
+	if !ok {
+		b.Fatalf("struct.method.get processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "struct.method.get",
+		Params: map[string]any{
+			"name": "GetData",
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("struct.method.get failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: test.TestStruct{Data: count}})
+		if err != nil {
+			b.Fatalf("struct.method.get processing failed: %s", err)
+		}
+		count++
+	}
+}

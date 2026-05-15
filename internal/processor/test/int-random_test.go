@@ -195,3 +195,29 @@ func TestBadIntRandom(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkIntRandom(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["int.random"]
+	if !ok {
+		b.Fatalf("int.random processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "int.random",
+		Params: map[string]any{
+			"min": 0,
+			"max": 100,
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("int.random failed to create processor: %s", err)
+	}
+
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: nil})
+		if err != nil {
+			b.Fatalf("int.random processing failed: %s", err)
+		}
+	}
+}

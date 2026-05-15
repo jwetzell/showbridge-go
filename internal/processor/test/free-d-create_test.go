@@ -877,3 +877,38 @@ func TestBadFreeDCreate(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkFreeDCreate(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["freed.create"]
+	if !ok {
+		b.Fatalf("freed.create processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "freed.create",
+		Params: map[string]any{
+			"id":    "0",
+			"pan":   "0",
+			"tilt":  "0",
+			"roll":  "0",
+			"posX":  "0",
+			"posY":  "0",
+			"posZ":  "0",
+			"zoom":  "0",
+			"focus": "0",
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("freed.create failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: count})
+		if err != nil {
+			b.Fatalf("freed.create processing failed: %s", err)
+		}
+		count++
+	}
+}

@@ -220,3 +220,32 @@ func TestBadSipResponseDTMFCreate(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkSipResponseDTMFCreate(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["sip.response.dtmf.create"]
+	if !ok {
+		b.Fatalf("sip.response.dtmf.create processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "sip.response.dtmf.create",
+		Params: map[string]any{
+			"preWait":  0,
+			"digits":   "{{.Payload}}",
+			"postWait": 0,
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("sip.response.dtmf.create failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: count})
+		if err != nil {
+			b.Fatalf("sip.response.dtmf.create processing failed: %s", err)
+		}
+		count++
+	}
+}
