@@ -212,3 +212,32 @@ func TestBadSipResponseAudioCreate(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkSipResponseAudioCreate(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["sip.response.audio.create"]
+	if !ok {
+		b.Fatalf("sip.response.audio.create processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "sip.response.audio.create",
+		Params: map[string]any{
+			"preWait":   0,
+			"audioFile": "good.wav",
+			"postWait":  0,
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("sip.response.audio.create failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: count})
+		if err != nil {
+			b.Fatalf("sip.response.audio.create processing failed: %s", err)
+		}
+		count++
+	}
+}

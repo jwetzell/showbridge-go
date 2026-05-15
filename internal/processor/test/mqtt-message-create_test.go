@@ -240,3 +240,33 @@ func TestBadMQTTMessageCreate(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkMQTTMessageCreate(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["mqtt.message.create"]
+	if !ok {
+		b.Fatalf("mqtt.message.create processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "mqtt.message.create",
+		Params: map[string]any{
+			"topic":    "test/topic",
+			"qos":      1,
+			"retained": true,
+			"payload":  "{{.Payload}}",
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("mqtt.message.create failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: count})
+		if err != nil {
+			b.Fatalf("mqtt.message.create processing failed: %s", err)
+		}
+		count++
+	}
+}

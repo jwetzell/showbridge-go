@@ -1,6 +1,7 @@
 package processor_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -162,5 +163,30 @@ func TestBadFloatParse(t *testing.T) {
 				t.Fatalf("float.parse got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
+	}
+}
+
+func BenchmarkFloatParse(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["float.parse"]
+	if !ok {
+		b.Fatalf("float.parse processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type:   "float.parse",
+		Params: nil,
+	})
+
+	if err != nil {
+		b.Fatalf("float.parse failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: fmt.Sprintf("%d", count)})
+		if err != nil {
+			b.Fatalf("float.parse processing failed: %s", err)
+		}
+		count++
 	}
 }

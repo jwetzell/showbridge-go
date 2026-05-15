@@ -1,6 +1,7 @@
 package processor_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -196,5 +197,30 @@ func TestBadIntParse(t *testing.T) {
 				t.Fatalf("int.parse got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
+	}
+}
+
+func BenchmarkIntParse(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["int.parse"]
+	if !ok {
+		b.Fatalf("int.parse processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type:   "int.parse",
+		Params: nil,
+	})
+
+	if err != nil {
+		b.Fatalf("int.parse failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: fmt.Sprintf("%d", count)})
+		if err != nil {
+			b.Fatalf("int.parse processing failed: %s", err)
+		}
+		count++
 	}
 }

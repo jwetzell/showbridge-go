@@ -1,6 +1,7 @@
 package processor_test
 
 import (
+	"fmt"
 	"slices"
 	"testing"
 
@@ -111,5 +112,29 @@ func TestBadJsonEncode(t *testing.T) {
 				t.Fatalf("json.encode got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
+	}
+}
+
+func BenchmarkJsonEncode(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["json.encode"]
+	if !ok {
+		b.Fatalf("json.encode processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "json.encode",
+	})
+
+	if err != nil {
+		b.Fatalf("json.encode failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: fmt.Sprintf("{\"key\":%d}", count)})
+		if err != nil {
+			b.Fatalf("json.encode processing failed: %s", err)
+		}
+		count++
 	}
 }

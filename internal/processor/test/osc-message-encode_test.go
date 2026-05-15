@@ -112,3 +112,23 @@ func TestBadOSCMessageEncode(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkOSCMessageEncode(b *testing.B) {
+	processorInstance := processor.OSCMessageEncode{}
+	payload := &osc.OSCMessage{
+		Address: "/test",
+		Args: []osc.OSCArg{
+			{
+				Type:  "i",
+				Value: int32(42),
+			},
+		},
+	}
+
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: payload})
+		if err != nil {
+			b.Fatalf("osc.message.encode processing failed: %s", err)
+		}
+	}
+}

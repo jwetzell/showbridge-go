@@ -102,3 +102,25 @@ func TestBadFreeDEncode(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkFreeDEncode(b *testing.B) {
+	processorInstance := processor.FreeDEncode{}
+	payload := freeD.FreeDPosition{
+		ID:    1,
+		Pan:   180,
+		Tilt:  90,
+		Roll:  -180,
+		PosX:  131069,
+		PosY:  131070,
+		PosZ:  131071,
+		Zoom:  66051,
+		Focus: 263430,
+	}
+
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: payload})
+		if err != nil {
+			b.Fatalf("freed.encode processing failed: %s", err)
+		}
+	}
+}

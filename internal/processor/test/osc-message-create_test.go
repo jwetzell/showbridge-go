@@ -400,3 +400,32 @@ func TestBadOSCMessageCreate(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkOSCMessageCreate(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["osc.message.create"]
+	if !ok {
+		b.Fatalf("osc.message.create processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "osc.message.create",
+		Params: map[string]any{
+			"address": "/hello",
+			"args":    []any{"{{.Payload}}"},
+			"types":   "i",
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("osc.message.create failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: count})
+		if err != nil {
+			b.Fatalf("osc.message.create processing failed: %s", err)
+		}
+		count++
+	}
+}

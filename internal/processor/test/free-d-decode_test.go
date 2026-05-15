@@ -102,3 +102,17 @@ func TestBadFreeDDecode(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkFreeDDecode(b *testing.B) {
+	processorInstance := processor.FreeDDecode{}
+	payload := []byte{0xd1, 0x01, 0x5a, 0x00, 0x00, 0x2d, 0x00, 0x00, 0xa6, 0x00, 0x00, 0x7f, 0xff, 0x40, 0x7f, 0xff, 0x80, 0x7f, 0xff,
+		0xc0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x00, 0x00, 50,
+	}
+
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: payload})
+		if err != nil {
+			b.Fatalf("freed.encode processing failed: %s", err)
+		}
+	}
+}

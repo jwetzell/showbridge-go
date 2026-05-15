@@ -124,3 +124,29 @@ func TestBadFilterChange(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkFilterChange(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["filter.change"]
+	if !ok {
+		b.Fatalf("filter.change processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type:   "filter.change",
+		Params: nil,
+	})
+
+	if err != nil {
+		b.Fatalf("filter.change failed to create processor: %s", err)
+	}
+	modules := map[string]common.Module{}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: count, Modules: modules})
+		if err != nil {
+			b.Fatalf("filter.change processing failed: %s", err)
+		}
+		count++
+	}
+}

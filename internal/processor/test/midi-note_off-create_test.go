@@ -158,3 +158,32 @@ func TestBadMIDINoteOffCretea(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkMIDINoteOffCreate(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["midi.note_off.create"]
+	if !ok {
+		b.Fatalf("midi.note_off.create processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "midi.note_off.create",
+		Params: map[string]any{
+			"channel":  "1",
+			"note":     "60",
+			"velocity": "100",
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("midi.note_off.create failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: count})
+		if err != nil {
+			b.Fatalf("midi.note_off.create processing failed: %s", err)
+		}
+		count++
+	}
+}

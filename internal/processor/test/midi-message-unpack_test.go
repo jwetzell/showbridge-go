@@ -150,3 +150,15 @@ func TestBadMIDIMessageUnpack(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkMIDIMessageUnpack(b *testing.B) {
+	processorInstance := processor.MIDIMessageUnpack{}
+	payload := midi.NoteOn(1, 60, 127)
+
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: payload})
+		if err != nil {
+			b.Fatalf("midi.message.unpack processing failed: %s", err)
+		}
+	}
+}

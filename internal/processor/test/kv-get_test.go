@@ -58,21 +58,10 @@ func TestGoodKvGet(t *testing.T) {
 		expected any
 	}{
 		{
-			name: "basic value",
+			name: "basic key",
 			params: map[string]any{
 				"module": "test",
 				"key":    "test",
-				"value":  "hello",
-			},
-			payload:  "hello",
-			expected: "test",
-		},
-		{
-			name: "template value",
-			params: map[string]any{
-				"module": "test",
-				"key":    "test",
-				"value":  "{{.Payload}}",
 			},
 			payload:  "hello",
 			expected: "test",
@@ -230,5 +219,34 @@ func TestBadKvGet(t *testing.T) {
 				t.Fatalf("kv.get got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
+	}
+}
+
+func BenchmarkKvGet(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["kv.get"]
+	if !ok {
+		b.Fatalf("kv.get processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "kv.get",
+		Params: map[string]any{
+			"module": "test",
+			"key":    "test",
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("kv.get failed to create processor: %s", err)
+	}
+	modules := map[string]common.Module{
+		"test": test.NewTestKVModule("test"),
+	}
+
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: nil, Modules: modules})
+		if err != nil {
+			b.Fatalf("kv.get processing failed: %s", err)
+		}
 	}
 }

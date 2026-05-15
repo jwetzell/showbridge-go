@@ -91,3 +91,15 @@ func TestBadMIDIMessageDecode(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkMIDIMessageDecode(b *testing.B) {
+	processorInstance := processor.MIDIMessageDecode{}
+	payload := []byte{0x90, 0x40, 0x7F}
+
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: payload})
+		if err != nil {
+			b.Fatalf("midi.message.decode processing failed: %s", err)
+		}
+	}
+}

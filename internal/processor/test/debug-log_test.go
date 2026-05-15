@@ -118,3 +118,29 @@ func TestBadDebugLog(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkDebugLog(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["debug.log"]
+	if !ok {
+		b.Fatalf("debug.log processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type:   "debug.log",
+		Params: nil,
+	})
+
+	if err != nil {
+		b.Fatalf("debug.log failed to create processor: %s", err)
+	}
+	modules := map[string]common.Module{}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: count, Modules: modules})
+		if err != nil {
+			b.Fatalf("debug.log processing failed: %s", err)
+		}
+		count++
+	}
+}

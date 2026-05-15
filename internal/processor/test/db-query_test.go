@@ -301,3 +301,32 @@ func TestBadDbQuery(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkDbQuery(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["db.query"]
+	if !ok {
+		b.Fatalf("db.query processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "db.query",
+		Params: map[string]any{
+			"module": "test",
+			"query":  "SELECT * FROM test;",
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("db.query failed to create processor: %s", err)
+	}
+	modules := map[string]common.Module{
+		"test": test.NewTestDBModule("test"),
+	}
+
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: nil, Modules: modules})
+		if err != nil {
+			b.Fatalf("db.query processing failed: %s", err)
+		}
+	}
+}

@@ -157,3 +157,31 @@ func TestBadHTTPResponseCreate(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkHTTPResponseCreate(b *testing.B) {
+	registration, ok := processor.ProcessorRegistry["http.response.create"]
+	if !ok {
+		b.Fatalf("http.response.create processor not registered")
+	}
+
+	processorInstance, err := registration.New(config.ProcessorConfig{
+		Type: "http.response.create",
+		Params: map[string]any{
+			"status":       200,
+			"bodyTemplate": "Hello, {{.Payload}}!",
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("http.response.create failed to create processor: %s", err)
+	}
+
+	count := 0
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: count})
+		if err != nil {
+			b.Fatalf("http.response.create processing failed: %s", err)
+		}
+		count++
+	}
+}

@@ -89,3 +89,15 @@ func TestBadMIDIMessageEncode(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkMIDIMessageEncode(b *testing.B) {
+	processorInstance := processor.MIDIMessageEncode{}
+	payload := midi.NoteOn(1, 60, 127)
+
+	for b.Loop() {
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: payload})
+		if err != nil {
+			b.Fatalf("midi.message.encode processing failed: %s", err)
+		}
+	}
+}
