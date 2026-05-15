@@ -16,28 +16,31 @@ type KVGet struct {
 	ModuleId string
 	Key      string
 	logger   *slog.Logger
+	module   common.KeyValueModule
 }
 
 func (kvg *KVGet) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
-	if wrappedPayload.Modules == nil {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("kv.get wrapped payload has no modules")
+	if kvg.module == nil {
+		if wrappedPayload.Modules == nil {
+			wrappedPayload.End = true
+			return wrappedPayload, errors.New("kv.get wrapped payload has no modules")
+		}
+
+		module, ok := wrappedPayload.Modules[kvg.ModuleId]
+		if !ok {
+			wrappedPayload.End = true
+			return wrappedPayload, fmt.Errorf("kv.get unable to find module with id: %s", kvg.ModuleId)
+		}
+
+		kvModule, ok := module.(common.KeyValueModule)
+		if !ok {
+			wrappedPayload.End = true
+			return wrappedPayload, fmt.Errorf("kv.get module with id %s is not a KeyValueModule", kvg.ModuleId)
+		}
+		kvg.module = kvModule
 	}
 
-	module, ok := wrappedPayload.Modules[kvg.ModuleId]
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("kv.get unable to find module with id: %s", kvg.ModuleId)
-	}
-
-	kvModule, ok := module.(common.KeyValueModule)
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("kv.get module with id %s is not a KeyValueModule", kvg.ModuleId)
-	}
-	// TODO(jwetzell): cache the module reference after the first run
-
-	value, err := kvModule.Get(kvg.Key)
+	value, err := kvg.module.Get(kvg.Key)
 	if err != nil {
 		wrappedPayload.End = true
 		return wrappedPayload, fmt.Errorf("kv.get error getting key: %w", err)

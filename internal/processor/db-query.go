@@ -17,28 +17,31 @@ type DbQuery struct {
 	ModuleId string
 	Query    *template.Template
 	logger   *slog.Logger
+	module   common.DatabaseModule
 }
 
 func (dq *DbQuery) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
-	if wrappedPayload.Modules == nil {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("db.query wrapped payload has no modules")
+	if dq.module == nil {
+		if wrappedPayload.Modules == nil {
+			wrappedPayload.End = true
+			return wrappedPayload, errors.New("db.query wrapped payload has no modules")
+		}
+
+		module, ok := wrappedPayload.Modules[dq.ModuleId]
+		if !ok {
+			wrappedPayload.End = true
+			return wrappedPayload, fmt.Errorf("db.query unable to find module with id: %s", dq.ModuleId)
+		}
+
+		dbModule, ok := module.(common.DatabaseModule)
+		if !ok {
+			wrappedPayload.End = true
+			return wrappedPayload, fmt.Errorf("db.query module with id %s is not a DatabaseModule", dq.ModuleId)
+		}
+		dq.module = dbModule
 	}
 
-	module, ok := wrappedPayload.Modules[dq.ModuleId]
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("db.query unable to find module with id: %s", dq.ModuleId)
-	}
-
-	dbModule, ok := module.(common.DatabaseModule)
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("db.query module with id %s is not a DatabaseModule", dq.ModuleId)
-	}
-	// TODO(jwetzell): cache the module reference after the first run
-
-	db := dbModule.Database()
+	db := dq.module.Database()
 	if db == nil {
 		wrappedPayload.End = true
 		return wrappedPayload, fmt.Errorf("db.query module with id %s returned nil database", dq.ModuleId)

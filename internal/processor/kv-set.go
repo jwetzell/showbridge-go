@@ -19,27 +19,29 @@ type KVSet struct {
 	Key      string
 	Value    *template.Template
 	logger   *slog.Logger
+	module   common.KeyValueModule
 }
 
 func (kvs *KVSet) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	if kvs.module == nil {
+		if wrappedPayload.Modules == nil {
+			wrappedPayload.End = true
+			return wrappedPayload, errors.New("kv.set wrapped payload has no modules")
+		}
 
-	if wrappedPayload.Modules == nil {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("kv.set wrapped payload has no modules")
-	}
+		module, ok := wrappedPayload.Modules[kvs.ModuleId]
+		if !ok {
+			wrappedPayload.End = true
+			return wrappedPayload, fmt.Errorf("kv.set unable to find module with id: %s", kvs.ModuleId)
+		}
 
-	module, ok := wrappedPayload.Modules[kvs.ModuleId]
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("kv.set unable to find module with id: %s", kvs.ModuleId)
+		kvModule, ok := module.(common.KeyValueModule)
+		if !ok {
+			wrappedPayload.End = true
+			return wrappedPayload, fmt.Errorf("kv.set module with id %s is not a KeyValueModule", kvs.ModuleId)
+		}
+		kvs.module = kvModule
 	}
-
-	kvModule, ok := module.(common.KeyValueModule)
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("kv.set module with id %s is not a KeyValueModule", kvs.ModuleId)
-	}
-	// TODO(jwetzell): cache the module reference after the first run
 
 	var valueBuffer bytes.Buffer
 	err := kvs.Value.Execute(&valueBuffer, wrappedPayload)
@@ -49,7 +51,7 @@ func (kvs *KVSet) Process(ctx context.Context, wrappedPayload common.WrappedPayl
 		return wrappedPayload, err
 	}
 
-	err = kvModule.Set(kvs.Key, valueBuffer.String())
+	err = kvs.module.Set(kvs.Key, valueBuffer.String())
 	if err != nil {
 		wrappedPayload.End = true
 		return wrappedPayload, fmt.Errorf("kv.set error setting key: %w", err)
