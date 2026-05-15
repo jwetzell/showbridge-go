@@ -11,7 +11,7 @@ require (
 	github.com/google/jsonschema-go v0.4.3
 	github.com/gorilla/websocket v1.5.3
 	github.com/jwetzell/artnet-go v0.2.1
-	github.com/jwetzell/free-d-go v0.1.0
+	github.com/jwetzell/free-d-go v0.1.1
 	github.com/jwetzell/osc-go v0.3.0
 	github.com/jwetzell/psn-go v0.3.0
 	github.com/nats-io/nats-server/v2 v2.14.0
