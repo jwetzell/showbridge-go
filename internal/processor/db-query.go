@@ -36,6 +36,7 @@ func (dq *DbQuery) Process(ctx context.Context, wrappedPayload common.WrappedPay
 		wrappedPayload.End = true
 		return wrappedPayload, fmt.Errorf("db.query module with id %s is not a DatabaseModule", dq.ModuleId)
 	}
+	// TODO(jwetzell): cache the module reference after the first run
 
 	db := dbModule.Database()
 	if db == nil {
@@ -65,6 +66,7 @@ func (dq *DbQuery) Process(ctx context.Context, wrappedPayload common.WrappedPay
 		return wrappedPayload, fmt.Errorf("db.query error getting columns: %w", err)
 	}
 
+	// TODO(jwetzell): optimize this
 	results := make([]map[string]any, 0)
 
 	for rows.Next() {

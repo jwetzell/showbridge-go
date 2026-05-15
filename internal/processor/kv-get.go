@@ -35,6 +35,7 @@ func (kvg *KVGet) Process(ctx context.Context, wrappedPayload common.WrappedPayl
 		wrappedPayload.End = true
 		return wrappedPayload, fmt.Errorf("kv.get module with id %s is not a KeyValueModule", kvg.ModuleId)
 	}
+	// TODO(jwetzell): cache the module reference after the first run
 
 	value, err := kvModule.Get(kvg.Key)
 	if err != nil {

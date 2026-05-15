@@ -39,6 +39,7 @@ func (kvs *KVSet) Process(ctx context.Context, wrappedPayload common.WrappedPayl
 		wrappedPayload.End = true
 		return wrappedPayload, fmt.Errorf("kv.set module with id %s is not a KeyValueModule", kvs.ModuleId)
 	}
+	// TODO(jwetzell): cache the module reference after the first run
 
 	var valueBuffer bytes.Buffer
 	err := kvs.Value.Execute(&valueBuffer, wrappedPayload)
