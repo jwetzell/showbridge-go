@@ -81,11 +81,19 @@ func GetAnyAsByte(value any) (byte, bool) {
 }
 
 func GetAnyAsByteSlice(value any) ([]byte, bool) {
+	// already a []byte
+	byteSlice, ok := value.([]byte)
+	if ok {
+		return byteSlice, true
+	}
+
+	// check for a slice
 	v := reflect.ValueOf(value)
 	if v.Kind() != reflect.Slice {
 		return nil, false
 	}
 
+	// try to convert each element to a byte
 	result := make([]byte, v.Len())
 	for i := 0; i < v.Len(); i++ {
 		elem := v.Index(i).Interface()
@@ -99,6 +107,14 @@ func GetAnyAsByteSlice(value any) ([]byte, bool) {
 }
 
 func GetAnyAsIntSlice(value any) ([]int, bool) {
+
+	// already a []byte
+	intSlice, ok := value.([]int)
+	if ok {
+		return intSlice, true
+	}
+
+	// check for a slice
 	v := reflect.ValueOf(value)
 	if v.Kind() != reflect.Slice {
 		return nil, false
