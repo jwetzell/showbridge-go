@@ -34,6 +34,11 @@ func (mpcc *MIDIProgramChangeCreate) Process(ctx context.Context, wrappedPayload
 
 	channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
 
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
 	var programBuffer bytes.Buffer
 	err = mpcc.Program.Execute(&programBuffer, templateData)
 
@@ -43,6 +48,11 @@ func (mpcc *MIDIProgramChangeCreate) Process(ctx context.Context, wrappedPayload
 	}
 
 	programValue, err := strconv.ParseUint(programBuffer.String(), 10, 8)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
 
 	payloadMessage := midi.ProgramChange(uint8(channelValue), uint8(programValue))
 	wrappedPayload.Payload = payloadMessage

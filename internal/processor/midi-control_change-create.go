@@ -35,6 +35,11 @@ func (mccc *MIDIControlChangeCreate) Process(ctx context.Context, wrappedPayload
 
 	channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
 
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
 	var controlBuffer bytes.Buffer
 	err = mccc.Control.Execute(&controlBuffer, templateData)
 
@@ -45,6 +50,11 @@ func (mccc *MIDIControlChangeCreate) Process(ctx context.Context, wrappedPayload
 
 	controlValue, err := strconv.ParseUint(controlBuffer.String(), 10, 8)
 
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
 	var valueBuffer bytes.Buffer
 	err = mccc.Value.Execute(&valueBuffer, templateData)
 
@@ -54,6 +64,11 @@ func (mccc *MIDIControlChangeCreate) Process(ctx context.Context, wrappedPayload
 	}
 
 	valueValue, err := strconv.ParseUint(valueBuffer.String(), 10, 8)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
 
 	payloadMessage := midi.ControlChange(uint8(channelValue), uint8(controlValue), uint8(valueValue))
 	wrappedPayload.Payload = payloadMessage

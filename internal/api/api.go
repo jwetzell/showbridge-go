@@ -58,7 +58,10 @@ func (as *ApiServer) Start(config config.ApiConfig) {
 	}
 
 	go func() {
-		as.server.ListenAndServe()
+		err := as.server.ListenAndServe()
+		if err != nil && err != http.ErrServerClosed {
+			as.logger.Error("server error", "error", err)
+		}
 		as.shutdown()
 	}()
 }
@@ -148,7 +151,7 @@ func (as *ApiServer) handleConfigHTTP(w http.ResponseWriter, req *http.Request) 
 			http.Error(w, "Bad request", http.StatusBadRequest)
 			return
 		}
-		err, moduleErrors, routeErrors := as.configurableRouter.UpdateConfig(newConfig, true)
+		moduleErrors, routeErrors, err := as.configurableRouter.UpdateConfig(newConfig, true)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusConflict)
 			return

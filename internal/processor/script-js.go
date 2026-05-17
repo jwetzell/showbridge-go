@@ -32,9 +32,13 @@ func (sj *ScriptJS) Process(ctx context.Context, wrappedPayload common.WrappedPa
 		}
 	}
 
-	sj.vm.SetProperty(sj.vm.GlobalObject(), sj.payloadAtom, wrappedPayload.Payload)
+	err := sj.vm.SetProperty(sj.vm.GlobalObject(), sj.payloadAtom, wrappedPayload.Payload)
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
 
-	_, err := sj.vm.Eval(sj.Program, quickjs.EvalGlobal)
+	_, err = sj.vm.Eval(sj.Program, quickjs.EvalGlobal)
 
 	if err != nil {
 		wrappedPayload.End = true

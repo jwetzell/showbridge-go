@@ -209,6 +209,13 @@ func TestBadScriptJS(t *testing.T) {
 				Params: test.params,
 			})
 
+			if err != nil {
+				if test.errorString != err.Error() {
+					t.Fatalf("script.js got error '%s', expected '%s'", err.Error(), test.errorString)
+				}
+				return
+			}
+
 			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
 			if err == nil {

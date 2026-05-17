@@ -127,6 +127,9 @@ func readConfig(configPath string) (config.Config, error) {
 	}
 
 	validatedConfigBytes, err := json.Marshal(yamlMap)
+	if err != nil {
+		return config.Config{}, err
+	}
 
 	err = json.Unmarshal(validatedConfigBytes, &cfg)
 	if err != nil {

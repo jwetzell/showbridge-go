@@ -35,6 +35,11 @@ func (mnoc *MIDINoteOnCreate) Process(ctx context.Context, wrappedPayload common
 
 	channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
 
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
 	var noteBuffer bytes.Buffer
 	err = mnoc.Note.Execute(&noteBuffer, templateData)
 
@@ -45,6 +50,11 @@ func (mnoc *MIDINoteOnCreate) Process(ctx context.Context, wrappedPayload common
 
 	noteValue, err := strconv.ParseUint(noteBuffer.String(), 10, 8)
 
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
 	var velocityBuffer bytes.Buffer
 	err = mnoc.Velocity.Execute(&velocityBuffer, templateData)
 
@@ -54,6 +64,11 @@ func (mnoc *MIDINoteOnCreate) Process(ctx context.Context, wrappedPayload common
 	}
 
 	velocityValue, err := strconv.ParseUint(velocityBuffer.String(), 10, 8)
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
 	payloadMessage := midi.NoteOn(uint8(channelValue), uint8(noteValue), uint8(velocityValue))
 	wrappedPayload.Payload = payloadMessage
 	return wrappedPayload, nil
