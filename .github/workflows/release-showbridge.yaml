@@ -136,10 +136,6 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version-file: "go.mod"
-      - name: setup zig
-        uses: mlugg/setup-zig@v2
-        with:
-          version: 0.16.0
       - name: build
         run: |
           CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" ./cmd/showbridge
@@ -166,10 +162,6 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version-file: "go.mod"
-      - name: setup zig
-        uses: mlugg/setup-zig@v2
-        with:
-          version: 0.16.0
       - name: build
         run: |
           CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" ./cmd/showbridge
