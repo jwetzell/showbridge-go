@@ -125,6 +125,9 @@ func (sc *SerialClient) Start(ctx context.Context, router common.RouteIO) error 
 		if err != nil {
 			if sc.ctx.Err() != nil {
 				sc.logger.Debug("done")
+				if sc.port != nil {
+					sc.port.Close()
+				}
 				return nil
 			}
 			sc.logger.Error("port setup error", "port", sc.Port, "error", err.Error())
@@ -136,6 +139,9 @@ func (sc *SerialClient) Start(ctx context.Context, router common.RouteIO) error 
 		select {
 		case <-sc.ctx.Done():
 			sc.logger.Debug("done")
+			if sc.port != nil {
+				sc.port.Close()
+			}
 			return nil
 		default:
 		READ:
