@@ -96,7 +96,7 @@ func (sc *SerialClient) SetupPort() error {
 
 	port, err := serial.Open(sc.Port, sc.Mode)
 	if err != nil {
-		return fmt.Errorf("serial.client can't open input port: %s", sc.Port)
+		return err
 	}
 
 	sc.port = port
@@ -127,7 +127,7 @@ func (sc *SerialClient) Start(ctx context.Context, router common.RouteIO) error 
 				sc.logger.Debug("done")
 				return nil
 			}
-			sc.logger.Error("port setup error", "error", err.Error())
+			sc.logger.Error("port setup error", "port", sc.Port, "error", err.Error())
 			time.Sleep(time.Second * 2)
 			continue
 		}
