@@ -32,7 +32,7 @@ jobs:
         run: echo "SHOWBRIDGE_VERSION=${SHOWBRIDGE_VERSION#v}" >> $GITHUB_ENV
       - name: build
         run: |
-          go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" ./cmd/showbridge
+          CGO_ENABLED=1 go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" ./cmd/showbridge
           tar -czf showbridge_${SHOWBRIDGE_VERSION}_linux-amd64.tar.gz showbridge
       - name: upload linux artifacts
         uses: actions/upload-artifact@v7
@@ -63,7 +63,7 @@ jobs:
         run: echo "SHOWBRIDGE_VERSION=${SHOWBRIDGE_VERSION#v}" >> $GITHUB_ENV
       - name: build
         run: |
-          go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" ./cmd/showbridge
+          CGO_ENABLED=1 go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" ./cmd/showbridge
           tar -czf showbridge_${SHOWBRIDGE_VERSION}_linux-arm64.tar.gz showbridge
       - name: upload linux artifacts
         uses: actions/upload-artifact@v7
