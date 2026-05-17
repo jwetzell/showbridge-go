@@ -25,9 +25,10 @@ func (sf *SlipFramer) Decode(data []byte) [][]byte {
 		}
 
 		if escapeNext {
-			if packetByte == ESC_END {
+			switch packetByte {
+			case ESC_END:
 				sf.buffer = append(sf.buffer, END)
-			} else if packetByte == ESC_ESC {
+			case ESC_ESC:
 				sf.buffer = append(sf.buffer, ESC)
 			}
 			escapeNext = false

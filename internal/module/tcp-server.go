@@ -236,7 +236,7 @@ func (ts *TCPServer) Output(ctx context.Context, payload any) error {
 	for _, connection := range ts.connections {
 		_, err := connection.Write(payloadBytes)
 		if err != nil {
-			errorString.WriteString(fmt.Sprintf("%s\n", err.Error()))
+			fmt.Fprintf(&errorString, "%s\n", err.Error())
 		}
 	}
 	ts.connectionsMu.Unlock()

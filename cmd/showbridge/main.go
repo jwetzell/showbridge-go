@@ -159,7 +159,7 @@ func run(ctx context.Context, c *cli.Command) error {
 		return errors.New("config path cannot be empty")
 	}
 
-	logLevel := slog.LevelInfo
+	var logLevel slog.Level
 
 	logLevelFromFlag := c.String("log-level")
 
