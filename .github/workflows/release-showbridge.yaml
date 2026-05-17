@@ -25,6 +25,8 @@ jobs:
         uses: mlugg/setup-zig@v2
         with:
           version: 0.16.0
+      - name: install alsa lib
+        run: sudo apt-get install -y libasound2-dev
       - name: setup env variables
         run: |
           echo "SHOWBRIDGE_VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
