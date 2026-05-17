@@ -263,7 +263,7 @@ func (app *showbridgeApp) handleChannels() {
 				app.routerMutex.Unlock()
 				continue
 			}
-			err, moduleErrors, routeErrors := app.router.UpdateConfig(config, false)
+			moduleErrors, routeErrors, err := app.router.UpdateConfig(config, false)
 			if err != nil {
 				app.logger.Error("failed to update router config", "error", err)
 				app.routerMutex.Unlock()

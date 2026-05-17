@@ -15,9 +15,9 @@ func (r *Router) GetRunningConfig() config.Config {
 	return r.runningConfig
 }
 
-func (r *Router) UpdateConfig(newConfig config.Config, triggerChangeChan bool) (error, []config.ModuleError, []config.RouteError) {
+func (r *Router) UpdateConfig(newConfig config.Config, triggerChangeChan bool) ([]config.ModuleError, []config.RouteError, error) {
 	if !r.runningConfigMu.TryLock() {
-		return errors.New("config update in progress"), nil, nil
+		return nil, nil, errors.New("config update in progress")
 	}
 	defer r.runningConfigMu.Unlock()
 	oldConfig := r.runningConfig
@@ -81,5 +81,5 @@ func (r *Router) UpdateConfig(newConfig config.Config, triggerChangeChan bool) (
 		r.ConfigChange <- newConfig
 	}
 
-	return nil, moduleErrors, routeErrors
+	return moduleErrors, routeErrors, nil
 }

@@ -7,6 +7,6 @@ type Config struct {
 }
 
 type Configurable interface {
-	UpdateConfig(newConfig Config, triggerChangeChannel bool) (error, []ModuleError, []RouteError)
+	UpdateConfig(newConfig Config, triggerChangeChannel bool) ([]ModuleError, []RouteError, error)
 	GetRunningConfig() Config
 }
