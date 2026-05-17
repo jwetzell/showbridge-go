@@ -79,6 +79,9 @@ func (t *DbSqlite) Stop() {
 	}
 }
 
-func (t *DbSqlite) Database() *sql.DB {
-	return t.db
+func (t *DbSqlite) Database() (*sql.DB, error) {
+	if t.db == nil {
+		return nil, fmt.Errorf("database not initialized")
+	}
+	return t.db, nil
 }

@@ -79,11 +79,14 @@ func (m *TestDBModule) Start(ctx context.Context, router common.RouteIO) error {
 	return nil
 }
 
-func (m *TestDBModule) Database() *sql.DB {
+func (m *TestDBModule) Database() (*sql.DB, error) {
 	if m.db == nil {
-		db, _ := sql.Open("sqlite", ":memory:")
+		db, err := sql.Open("sqlite", ":memory:")
+		if err != nil {
+			return nil, err
+		}
 
-		db.Exec(`
+		_, err = db.Exec(`
 		CREATE TABLE test (
 			id INTEGER PRIMARY KEY,
 			value TEXT
@@ -91,9 +94,12 @@ func (m *TestDBModule) Database() *sql.DB {
 		INSERT INTO test (id, value) VALUES (1, 'test-1'), (2, 'test-2');
 		
 		`)
+		if err != nil {
+			return nil, err
+		}
 		m.db = db
 	}
-	return m.db
+	return m.db, nil
 }
 
 func (m *TestDBModule) Stop() {}

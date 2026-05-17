@@ -22,5 +22,5 @@ type KeyValueModule interface {
 }
 
 type DatabaseModule interface {
-	Database() *sql.DB
+	Database() (*sql.DB, error)
 }
