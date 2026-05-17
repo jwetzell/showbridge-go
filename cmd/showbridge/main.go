@@ -145,7 +145,7 @@ func writeConfig(configPath string, newConfig config.Config) error {
 		return err
 	}
 
-	err = os.WriteFile(configPath, configBytes, 0644)
+	err = os.WriteFile(configPath, configBytes, 0600)
 	if err != nil {
 		return err
 	}
