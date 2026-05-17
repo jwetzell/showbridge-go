@@ -43,8 +43,13 @@ func init() {
 					Title: "Baud Rate",
 					Type:  "integer",
 				},
+				"framing": {
+					Title: "Framing Method",
+					Type:  "string",
+					Enum:  []any{"LF", "CR", "CRLF", "SLIP", "RAW"},
+				},
 			},
-			Required:             []string{"port", "baudRate"},
+			Required:             []string{"port", "baudRate", "framing"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(config config.ModuleConfig) (common.Module, error) {
