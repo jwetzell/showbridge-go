@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -163,8 +164,9 @@ func (hs *HTTPServer) Start(ctx context.Context, router common.RouteIO) error {
 	hs.cancel = cancel
 
 	httpServer := &http.Server{
-		Addr:    fmt.Sprintf(":%d", hs.Port),
-		Handler: hs,
+		Addr:              fmt.Sprintf(":%d", hs.Port),
+		ReadHeaderTimeout: 5 * time.Second,
+		Handler:           hs,
 	}
 
 	go func() {

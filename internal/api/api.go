@@ -53,8 +53,9 @@ func (as *ApiServer) Start(config config.ApiConfig) {
 	as.serverMu.Lock()
 	defer as.serverMu.Unlock()
 	as.server = &http.Server{
-		Addr:    fmt.Sprintf(":%d", as.config.Port),
-		Handler: mux,
+		Addr:              fmt.Sprintf(":%d", as.config.Port),
+		ReadHeaderTimeout: 5 * time.Second,
+		Handler:           mux,
 	}
 
 	go func() {
