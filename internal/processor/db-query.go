@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"text/template"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
@@ -116,6 +117,23 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "db.query",
 		Title: "Query Database",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"module": {
+					Title:       "Module ID",
+					Type:        "string",
+					Description: "ID of the database module to query",
+				},
+				"query": {
+					Title:       "Query",
+					Type:        "string",
+					Description: "SQL query to execute",
+				},
+			},
+			Required:             []string{"module", "query"},
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
+		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 
 			params := config.Params
