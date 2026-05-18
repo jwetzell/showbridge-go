@@ -9,6 +9,8 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
+// TODO(jwetzell): maybe make a more useful logging processor
+
 type DebugLog struct {
 	config config.ProcessorConfig
 	logger *slog.Logger
