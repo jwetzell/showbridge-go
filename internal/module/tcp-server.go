@@ -158,7 +158,6 @@ ClientRead:
 							break
 						}
 					}
-					ts.logger.Debug("stream ended", "remoteAddr", client.RemoteAddr().String())
 					ts.connectionsMu.Unlock()
 				}
 				return
@@ -213,7 +212,6 @@ AcceptLoop:
 		} else {
 			ts.wg.Go(func() {
 				ts.handleClient(conn)
-				ts.logger.Debug("connection handler done", "remoteAddr", conn.RemoteAddr().String())
 			})
 		}
 	}

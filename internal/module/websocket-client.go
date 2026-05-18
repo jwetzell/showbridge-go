@@ -112,8 +112,12 @@ func (wc *WebSocketClient) readLoop() {
 		messageType, message, err := wc.conn.ReadMessage()
 		if err != nil {
 			if opErr, ok := err.(*net.OpError); ok {
-				//NOTE(jwetzell) we hit deadline
+				// NOTE(jwetzell) we hit deadline
 				if opErr.Timeout() {
+					continue
+				}
+				// NOTE(jwetzell) connection was closed
+				if errors.Is(opErr, net.ErrClosed) {
 					continue
 				}
 			}
@@ -134,7 +138,6 @@ func (wc *WebSocketClient) readLoop() {
 			continue
 		}
 	}
-	wc.logger.Debug("exiting read loop")
 }
 
 func (wc *WebSocketClient) outputBytes(ctx context.Context, payload []byte) error {
