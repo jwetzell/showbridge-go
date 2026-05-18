@@ -27,6 +27,8 @@ type SipDTMFResponse struct {
 	Digits   string
 }
 
+var validDTMFRegex = regexp.MustCompile(`^[0-9*#A-Da-d]+$`)
+
 func (srdc *SipResponseDTMFCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
 	templateData := wrappedPayload
@@ -103,7 +105,7 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			return &SipResponseDTMFCreate{config: config, Digits: digitsTemplate, PreWait: int(preWaitNum), PostWait: int(postWaitNum), validDTMF: regexp.MustCompile(`^[0-9*#A-Da-d]+$`)}, nil
+			return &SipResponseDTMFCreate{config: config, Digits: digitsTemplate, PreWait: int(preWaitNum), PostWait: int(postWaitNum), validDTMF: validDTMFRegex}, nil
 		},
 	})
 }
