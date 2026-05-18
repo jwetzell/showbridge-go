@@ -1,0 +1,85 @@
+api:
+  enabled: true
+  port: 8080
+modules:
+  - id: sqlite
+    type: db.sqlite
+    params:
+      dsn: ":memory:"
+  - id: httpin
+    type: http.server
+    params:
+      port: 3000
+  - id: tcpout
+    type: net.tcp.client
+    params:
+      host: "localhost"
+      port: 9000
+      framing: "RAW"
+  - id: tcpin
+    type: net.tcp.server
+    params:
+      port: 9000
+      framing: "RAW"
+  - id: ticker
+    type: time.interval
+    params:
+      duration: 1000
+  - id: udpout
+    type: net.udp.client
+    params:
+      host: "localhost"
+      port: 9001
+  - id: udpin
+    type: net.udp.server
+    params:
+      port: 9001
+  - id: wsecho
+    type: websocket.client
+    params:
+      url: "wss://echo.websocket.org"
+routes:
+  - input: ticker
+    processors:
+      - type: string.create
+        params:
+          template: "hello"
+      - type: router.output
+        params:
+          module: wsecho
+      - type: string.encode
+      - type: router.output
+        params:
+          module: tcpout
+      - type: router.output
+        params:
+          module: udpout
+  - input: ticker
+    processors:
+      - type: http.request.do
+        params:
+          url: "http://localhost:3000/echo"
+          method: "GET"
+      - type: debug.log
+  - input: tcpin
+    processors:
+      - type: string.decode
+      - type: debug.log
+  - input: httpin
+    processors:
+      - type: debug.log
+  - input: udpin
+    processors:
+      - type: string.decode
+      - type: debug.log
+  - input: wsecho
+    processors:
+      - type: debug.log
+  - input: ticker
+    processors:
+      - type: db.query
+        params:
+          module: "sqlite"
+          query: "SELECT 1;"
+      - type: debug.log
+  
