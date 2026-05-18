@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 	"sync"
+	"sync/atomic"
 
 	"github.com/jwetzell/showbridge-go/internal/api"
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -170,17 +171,19 @@ func (r *Router) Start(ctx context.Context) {
 	r.contextCancel = cancel
 	r.startModules()
 	r.apiServer.Start(r.GetRunningConfig().Api)
-	<-r.Context.Done()
-	r.logger.Debug("shutting down api server")
-	r.apiServer.Stop()
-	r.logger.Debug("waiting for modules to exit")
-	r.moduleWait.Wait()
-	r.logger.Info("done")
 }
 
 func (r *Router) Stop() {
 	r.logger.Info("stopping")
+	r.logger.Debug("shutting down api server")
+	r.apiServer.Stop()
+	r.logger.Debug("stopping modules")
+	r.stopModules()
+	r.logger.Debug("waiting for modules to exit")
+	r.moduleWait.Wait()
+	r.logger.Debug("canceling router context")
 	r.contextCancel()
+	r.logger.Info("done")
 }
 
 func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) (bool, []common.RouteIOError) {
@@ -190,7 +193,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 	spanCtx, span := otel.Tracer("router").Start(ctx, "input", trace.WithAttributes(attribute.String("source.id", sourceId)))
 	defer span.End()
 	var routeIOErrors []common.RouteIOError
-	routeFound := false
+	var routeFound atomic.Bool
 
 	r.broadcastEvent(common.Event{
 		Type: "input",
@@ -209,7 +212,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 		if routeInstance.Input() == sourceId {
 			routeWaitGroup.Go(func() {
 
-				routeFound = true
+				routeFound.Store(true)
 
 				routeCtx, routeSpan := otel.Tracer("router").Start(spanCtx, "route", trace.WithAttributes(attribute.Int("route.index", routeIndex), attribute.String("route.input", routeInstance.Input())))
 				_, err := routeInstance.ProcessPayload(routeCtx, common.WrappedPayload{
@@ -248,7 +251,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 		}
 	}
 	routeWaitGroup.Wait()
-	return routeFound, routeIOErrors
+	return routeFound.Load(), routeIOErrors
 }
 
 func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload any) error {
@@ -301,12 +304,21 @@ func (r *Router) HandleOutput(ctx context.Context, destinationId string, payload
 }
 
 func (r *Router) startModules() {
-
 	for moduleId := range r.ModuleInstances {
 		// TODO(jwetzell): handle module run errors
 		err := r.startModule(r.Context, moduleId)
 		if err != nil {
 			r.logger.Error("error starting module", "moduleId", moduleId, "error", err)
+		}
+	}
+}
+
+func (r *Router) stopModules() {
+	for moduleId := range r.ModuleInstances {
+		// TODO(jwetzell): handle module stop errors?
+		err := r.stopModule(moduleId)
+		if err != nil {
+			r.logger.Error("error stopping module", "moduleId", moduleId, "error", err)
 		}
 	}
 }

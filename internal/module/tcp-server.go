@@ -25,12 +25,13 @@ type TCPServer struct {
 	Framer        framer.Framer
 	ctx           context.Context
 	router        common.RouteIO
-	quit          chan any
 	wg            sync.WaitGroup
 	connections   []*net.TCPConn
 	connectionsMu sync.RWMutex
 	logger        *slog.Logger
 	cancel        context.CancelFunc
+	listener      *net.TCPListener
+	listenerMu    sync.Mutex
 }
 
 func init() {
@@ -91,7 +92,7 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			return &TCPServer{Framer: framer, Addr: addr, config: moduleConfig, quit: make(chan any), logger: CreateLogger(moduleConfig)}, nil
+			return &TCPServer{Framer: framer, Addr: addr, config: moduleConfig, logger: CreateLogger(moduleConfig)}, nil
 		},
 	})
 }
@@ -108,14 +109,14 @@ func (ts *TCPServer) handleClient(client *net.TCPConn) {
 	ts.connectionsMu.Lock()
 	ts.connections = append(ts.connections, client)
 	ts.connectionsMu.Unlock()
-	ts.logger.Debug("net.tcp.server connection accepted", "remoteAddr", client.RemoteAddr().String())
+	ts.logger.Debug("connection accepted", "remoteAddr", client.RemoteAddr().String())
 	defer client.Close()
 
 	buffer := make([]byte, 1024)
 ClientRead:
-	for {
+	for ts.ctx.Err() == nil {
 		select {
-		case <-ts.quit:
+		case <-ts.ctx.Done():
 			client.Close()
 			ts.connectionsMu.Lock()
 			for i := 0; i < len(ts.connections); i++ {
@@ -194,21 +195,17 @@ func (ts *TCPServer) Start(ctx context.Context, router common.RouteIO) error {
 	if err != nil {
 		return err
 	}
+	ts.listenerMu.Lock()
+	ts.listener = listener
+	ts.listenerMu.Unlock()
 	ts.wg.Add(1)
 
-	go func() {
-		<-ts.ctx.Done()
-		close(ts.quit)
-		listener.Close()
-		ts.logger.Debug("done")
-	}()
-
 AcceptLoop:
-	for {
+	for ts.ctx.Err() == nil {
 		conn, err := listener.AcceptTCP()
 		if err != nil {
 			select {
-			case <-ts.quit:
+			case <-ts.ctx.Done():
 				break AcceptLoop
 			default:
 				ts.logger.Debug("problem with listener", "error", err)
@@ -216,11 +213,11 @@ AcceptLoop:
 		} else {
 			ts.wg.Go(func() {
 				ts.handleClient(conn)
+				ts.logger.Debug("connection handler done", "remoteAddr", conn.RemoteAddr().String())
 			})
 		}
 	}
 	ts.wg.Done()
-	ts.wg.Wait()
 	return nil
 }
 
@@ -248,6 +245,15 @@ func (ts *TCPServer) Output(ctx context.Context, payload any) error {
 }
 
 func (ts *TCPServer) Stop() {
-	ts.cancel()
+	if ts.cancel != nil {
+		ts.cancel()
+	}
+	ts.listenerMu.Lock()
+	defer ts.listenerMu.Unlock()
+	if ts.listener != nil {
+		ts.listener.Close()
+		ts.listener = nil
+	}
 	ts.wg.Wait()
+	ts.logger.Debug("done")
 }

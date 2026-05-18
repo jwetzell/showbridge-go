@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+	"sync"
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
@@ -23,6 +24,7 @@ type TCPClient struct {
 	Addr   *net.TCPAddr
 	logger *slog.Logger
 	cancel context.CancelFunc
+	connMu sync.Mutex
 }
 
 func init() {
@@ -98,20 +100,10 @@ func (tc *TCPClient) Start(ctx context.Context, router common.RouteIO) error {
 	tc.ctx = moduleContext
 	tc.cancel = cancel
 
-	// TODO(jwetzell): shutdown with router.Context properly
-	go func() {
-		<-tc.ctx.Done()
-		tc.logger.Debug("done")
-		if tc.conn != nil {
-			tc.conn.Close()
-		}
-	}()
-
-	for {
+	for tc.ctx.Err() == nil {
 		err := tc.SetupConn()
 		if err != nil {
 			if tc.ctx.Err() != nil {
-				tc.logger.Debug("done")
 				return nil
 			}
 			tc.logger.Error("connection error", "error", err.Error())
@@ -122,14 +114,12 @@ func (tc *TCPClient) Start(ctx context.Context, router common.RouteIO) error {
 		buffer := make([]byte, 1024)
 		select {
 		case <-tc.ctx.Done():
-			tc.logger.Debug("done")
 			return nil
 		default:
 		READ:
 			for {
 				select {
 				case <-tc.ctx.Done():
-					tc.logger.Debug("done")
 					return nil
 				default:
 					byteCount, err := tc.conn.Read(buffer)
@@ -155,21 +145,22 @@ func (tc *TCPClient) Start(ctx context.Context, router common.RouteIO) error {
 			}
 		}
 	}
+	return nil
 }
 
 func (tc *TCPClient) SetupConn() error {
+	tc.connMu.Lock()
+	defer tc.connMu.Unlock()
 	client, err := net.DialTCP("tcp", nil, tc.Addr)
 	tc.conn = client
 	return err
 }
 
 func (tc *TCPClient) Output(ctx context.Context, payload any) error {
-	// NOTE(jwetzell): not sure how this would occur but
+	tc.connMu.Lock()
+	defer tc.connMu.Unlock()
 	if tc.conn == nil {
-		err := tc.SetupConn()
-		if err != nil {
-			return err
-		}
+		return errors.New("net.tcp.client client is not setup")
 	}
 	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 	if !ok {
@@ -180,5 +171,15 @@ func (tc *TCPClient) Output(ctx context.Context, payload any) error {
 }
 
 func (tc *TCPClient) Stop() {
-	tc.cancel()
+	if tc.cancel != nil {
+		tc.cancel()
+	}
+	tc.connMu.Lock()
+	defer tc.connMu.Unlock()
+	if tc.conn != nil {
+		tc.conn.Close()
+		tc.conn = nil
+	}
+	tc.logger.Debug("done")
+
 }

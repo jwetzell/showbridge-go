@@ -66,12 +66,9 @@ func (t *TimeTimer) Start(ctx context.Context, router common.RouteIO) error {
 	t.cancel = cancel
 
 	t.timer = time.NewTimer(time.Millisecond * time.Duration(t.Duration))
-	defer t.timer.Stop()
 	for {
 		select {
 		case <-t.ctx.Done():
-			t.timer.Stop()
-			t.logger.Debug("done")
 			return nil
 		case time := <-t.timer.C:
 			if t.router != nil {
@@ -82,5 +79,12 @@ func (t *TimeTimer) Start(ctx context.Context, router common.RouteIO) error {
 }
 
 func (t *TimeTimer) Stop() {
-	t.cancel()
+	if t.cancel != nil {
+		t.cancel()
+	}
+	if t.timer != nil {
+		t.timer.Stop()
+		t.timer = nil
+	}
+	t.logger.Debug("done")
 }

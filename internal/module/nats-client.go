@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"sync"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -13,14 +14,17 @@ import (
 )
 
 type NATSClient struct {
-	config  config.ModuleConfig
-	ctx     context.Context
-	router  common.RouteIO
-	URL     string
-	Subject string
-	client  *nats.Conn
-	logger  *slog.Logger
-	cancel  context.CancelFunc
+	config   config.ModuleConfig
+	ctx      context.Context
+	router   common.RouteIO
+	URL      string
+	Subject  string
+	client   *nats.Conn
+	logger   *slog.Logger
+	cancel   context.CancelFunc
+	sub      *nats.Subscription
+	subMu    sync.Mutex
+	clientMu sync.Mutex
 }
 
 func init() {
@@ -81,10 +85,9 @@ func (nc *NATSClient) Start(ctx context.Context, router common.RouteIO) error {
 		return err
 	}
 
+	nc.clientMu.Lock()
 	nc.client = client
-
-	defer client.Drain()
-	defer client.Close()
+	nc.clientMu.Unlock()
 
 	sub, err := nc.client.Subscribe(nc.Subject, func(msg *nats.Msg) {
 		if nc.router != nil {
@@ -95,11 +98,11 @@ func (nc *NATSClient) Start(ctx context.Context, router common.RouteIO) error {
 	if err != nil {
 		return err
 	}
-
-	defer sub.Unsubscribe()
+	nc.subMu.Lock()
+	nc.sub = sub
+	nc.subMu.Unlock()
 
 	<-nc.ctx.Done()
-	nc.logger.Debug("done")
 	return nil
 }
 
@@ -110,6 +113,9 @@ func (nc *NATSClient) Output(ctx context.Context, payload any) error {
 	if !ok {
 		return errors.New("nats.client is only able to output NATSMessage")
 	}
+
+	nc.clientMu.Lock()
+	defer nc.clientMu.Unlock()
 
 	if nc.client == nil {
 		return errors.New("nats.client client is not setup")
@@ -125,5 +131,23 @@ func (nc *NATSClient) Output(ctx context.Context, payload any) error {
 }
 
 func (nc *NATSClient) Stop() {
-	nc.cancel()
+	if nc.cancel != nil {
+		nc.cancel()
+	}
+	nc.subMu.Lock()
+	defer nc.subMu.Unlock()
+	if nc.sub != nil {
+		nc.sub.Unsubscribe()
+		nc.sub = nil
+	}
+
+	nc.clientMu.Lock()
+	defer nc.clientMu.Unlock()
+	if nc.client != nil {
+		nc.client.Drain()
+		// TODO(jwetzell): setup closed callback to get when client is fully closed
+		nc.client.Close()
+		nc.client = nil
+	}
+	nc.logger.Debug("done")
 }

@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net"
 	"net/url"
+	"sync"
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
@@ -22,6 +24,7 @@ type WebSocketClient struct {
 	router common.RouteIO
 	logger *slog.Logger
 	cancel context.CancelFunc
+	connMu sync.Mutex
 }
 
 func init() {
@@ -69,6 +72,8 @@ func (wc *WebSocketClient) Type() string {
 }
 
 func (wc *WebSocketClient) SetupConn() error {
+	wc.connMu.Lock()
+	defer wc.connMu.Unlock()
 	conn, _, err := websocket.DefaultDialer.Dial(wc.URL.String(), nil)
 	wc.conn = conn
 	return err
@@ -87,17 +92,13 @@ func (wc *WebSocketClient) Start(ctx context.Context, router common.RouteIO) err
 			wc.logger.Error("connection error", "error", err)
 		} else {
 			// NOTE(jwetzell): enter read loop until an error occurs
+			wc.logger.Debug("websocket connection established entering read loop")
 			wc.readLoop()
 		}
 		// NOTE(jwetzell): if connection is lost or read error wait before trying again
 		time.Sleep(2 * time.Second)
 	}
-
 	<-wc.ctx.Done()
-	wc.logger.Debug("done")
-	if wc.conn != nil {
-		wc.conn.Close()
-	}
 	return nil
 }
 
@@ -107,10 +108,16 @@ func (wc *WebSocketClient) readLoop() {
 			wc.logger.Error("websocket connection is not established")
 			return
 		}
-
+		wc.conn.SetReadDeadline(time.Now().Add(5 * time.Second))
 		messageType, message, err := wc.conn.ReadMessage()
 		if err != nil {
-			wc.logger.Error("read error", "error", err)
+			if opErr, ok := err.(*net.OpError); ok {
+				//NOTE(jwetzell) we hit deadline
+				if opErr.Timeout() {
+					continue
+				}
+			}
+			wc.logger.Error("websocket read error", "error", err)
 			return
 		}
 		if wc.router != nil {
@@ -127,6 +134,7 @@ func (wc *WebSocketClient) readLoop() {
 			continue
 		}
 	}
+	wc.logger.Debug("exiting read loop")
 }
 
 func (wc *WebSocketClient) outputBytes(ctx context.Context, payload []byte) error {
@@ -154,7 +162,8 @@ func (wc *WebSocketClient) outputString(ctx context.Context, payload string) err
 }
 
 func (wc *WebSocketClient) Output(ctx context.Context, payload any) error {
-
+	wc.connMu.Lock()
+	defer wc.connMu.Unlock()
 	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 	if ok {
 		return wc.outputBytes(ctx, payloadBytes)
@@ -169,5 +178,14 @@ func (wc *WebSocketClient) Output(ctx context.Context, payload any) error {
 }
 
 func (wc *WebSocketClient) Stop() {
-	wc.cancel()
+	if wc.cancel != nil {
+		wc.cancel()
+	}
+	wc.connMu.Lock()
+	defer wc.connMu.Unlock()
+	if wc.conn != nil {
+		wc.conn.Close()
+		wc.conn = nil
+	}
+	wc.logger.Debug("done")
 }

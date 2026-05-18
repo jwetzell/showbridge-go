@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log/slog"
+	"sync"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -20,6 +21,8 @@ type DbSqlite struct {
 	router common.RouteIO
 	db     *sql.DB
 	logger *slog.Logger
+	dbMu   sync.Mutex
+	cancel context.CancelFunc
 }
 
 func init() {
@@ -61,25 +64,38 @@ func (t *DbSqlite) Type() string {
 func (t *DbSqlite) Start(ctx context.Context, router common.RouteIO) error {
 	t.logger.Debug("running")
 	t.router = router
-	t.ctx = ctx
+	moduleContext, cancel := context.WithCancel(ctx)
+	t.ctx = moduleContext
+	t.cancel = cancel
 
 	db, err := sql.Open("sqlite", t.Dsn)
 	if err != nil {
 		return fmt.Errorf("db.sqlite error opening database: %w", err)
 	}
+	t.dbMu.Lock()
 	t.db = db
-	defer t.db.Close()
-	<-ctx.Done()
+	t.dbMu.Unlock()
+	<-t.ctx.Done()
 	return nil
 }
 
 func (t *DbSqlite) Stop() {
+	if t.cancel != nil {
+		t.cancel()
+	}
+	t.dbMu.Lock()
+	defer t.dbMu.Unlock()
 	if t.db != nil {
 		t.db.Close()
+		t.db = nil
 	}
+	t.logger.Debug("done")
 }
 
+// TODO(jwetzell): get a database module layout that doesn't require handing the DB over
 func (t *DbSqlite) Database() (*sql.DB, error) {
+	t.dbMu.Lock()
+	defer t.dbMu.Unlock()
 	if t.db == nil {
 		return nil, fmt.Errorf("database not initialized")
 	}

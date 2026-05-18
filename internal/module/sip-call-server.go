@@ -29,9 +29,10 @@ type SIPCallServer struct {
 	Port      int
 	Transport string
 	UserAgent string
-	dg        *diago.Diago
 	logger    *slog.Logger
 	cancel    context.CancelFunc
+	ua        *sipgo.UserAgent
+	uaMu      sync.Mutex
 }
 
 type SIPCallMessage struct {
@@ -145,7 +146,9 @@ func (scs *SIPCallServer) Start(ctx context.Context, router common.RouteIO) erro
 		sipgo.WithUserAgentTransportLayerOptions(sip.WithTransportLayerLogger(diagoLogger)),
 		sipgo.WithUserAgentTransactionLayerOptions(sip.WithTransactionLayerLogger(diagoLogger)),
 	)
-	defer ua.Close()
+	scs.uaMu.Lock()
+	scs.ua = ua
+	scs.uaMu.Unlock()
 
 	sip.SetDefaultLogger(diagoLogger)
 	media.SetDefaultLogger(diagoLogger)
@@ -157,16 +160,14 @@ func (scs *SIPCallServer) Start(ctx context.Context, router common.RouteIO) erro
 		},
 	))
 
-	go func() {
-		dg.Serve(scs.ctx, func(inDialog *diago.DialogServerSession) {
-			scs.HandleCall(inDialog)
-		})
-	}()
-
-	scs.dg = dg
+	err := dg.Serve(scs.ctx, func(inDialog *diago.DialogServerSession) {
+		scs.HandleCall(inDialog)
+	})
+	if err != nil {
+		scs.logger.Error("diago serve error", "error", err)
+	}
 
 	<-scs.ctx.Done()
-	scs.logger.Debug("done")
 	return nil
 }
 
@@ -247,5 +248,13 @@ func (scs *SIPCallServer) Output(ctx context.Context, payload any) error {
 }
 
 func (scs *SIPCallServer) Stop() {
-	scs.cancel()
+	if scs.cancel != nil {
+		scs.cancel()
+	}
+	scs.uaMu.Lock()
+	defer scs.uaMu.Unlock()
+	if scs.ua != nil {
+		scs.ua.Close()
+	}
+	scs.logger.Debug("done")
 }

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
@@ -16,12 +17,14 @@ import (
 )
 
 type HTTPServer struct {
-	config config.ModuleConfig
-	Port   uint16
-	ctx    context.Context
-	router common.RouteIO
-	logger *slog.Logger
-	cancel context.CancelFunc
+	config   config.ModuleConfig
+	Port     uint16
+	ctx      context.Context
+	router   common.RouteIO
+	logger   *slog.Logger
+	cancel   context.CancelFunc
+	server   *http.Server
+	serverMu sync.Mutex
 }
 
 type ResponseIOError struct {
@@ -169,10 +172,9 @@ func (hs *HTTPServer) Start(ctx context.Context, router common.RouteIO) error {
 		Handler:           hs,
 	}
 
-	go func() {
-		<-hs.ctx.Done()
-		httpServer.Close()
-	}()
+	hs.serverMu.Lock()
+	hs.server = httpServer
+	hs.serverMu.Unlock()
 
 	err := httpServer.ListenAndServe()
 	// TODO(jwetzell): handle server closed error differently
@@ -183,7 +185,6 @@ func (hs *HTTPServer) Start(ctx context.Context, router common.RouteIO) error {
 	}
 
 	<-hs.ctx.Done()
-	hs.logger.Debug("done")
 	return nil
 }
 
@@ -210,5 +211,17 @@ func (hs *HTTPServer) Output(ctx context.Context, payload any) error {
 }
 
 func (hs *HTTPServer) Stop() {
-	hs.cancel()
+	if hs.cancel != nil {
+		hs.cancel()
+	}
+	hs.serverMu.Lock()
+	defer hs.serverMu.Unlock()
+	if hs.server != nil {
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
+		hs.server.Shutdown(shutdownCtx)
+		shutdownCancel()
+		<-shutdownCtx.Done()
+		hs.server = nil
+	}
+	hs.logger.Debug("done")
 }

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"sync"
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
@@ -26,6 +27,7 @@ type SerialClient struct {
 	port   serial.Port
 	logger *slog.Logger
 	cancel context.CancelFunc
+	portMu sync.Mutex
 }
 
 func init() {
@@ -93,7 +95,8 @@ func (sc *SerialClient) Type() string {
 }
 
 func (sc *SerialClient) SetupPort() error {
-
+	sc.portMu.Lock()
+	defer sc.portMu.Unlock()
 	port, err := serial.Open(sc.Port, sc.Mode)
 	if err != nil {
 		return err
@@ -111,23 +114,10 @@ func (sc *SerialClient) Start(ctx context.Context, router common.RouteIO) error 
 	sc.ctx = moduleContext
 	sc.cancel = cancel
 
-	// TODO(jwetzell): shutdown with router.Context properly
-	go func() {
-		<-sc.ctx.Done()
-		sc.logger.Debug("done")
-		if sc.port != nil {
-			sc.port.Close()
-		}
-	}()
-
-	for {
+	for sc.ctx.Err() == nil {
 		err := sc.SetupPort()
 		if err != nil {
 			if sc.ctx.Err() != nil {
-				sc.logger.Debug("done")
-				if sc.port != nil {
-					sc.port.Close()
-				}
 				return nil
 			}
 			sc.logger.Error("port setup error", "port", sc.Port, "error", err.Error())
@@ -138,17 +128,12 @@ func (sc *SerialClient) Start(ctx context.Context, router common.RouteIO) error 
 		buffer := make([]byte, 1024)
 		select {
 		case <-sc.ctx.Done():
-			sc.logger.Debug("done")
-			if sc.port != nil {
-				sc.port.Close()
-			}
 			return nil
 		default:
 		READ:
-			for {
+			for sc.ctx.Err() == nil {
 				select {
 				case <-sc.ctx.Done():
-					sc.logger.Debug("done")
 					return nil
 				default:
 					byteCount, err := sc.port.Read(buffer)
@@ -174,6 +159,7 @@ func (sc *SerialClient) Start(ctx context.Context, router common.RouteIO) error 
 			}
 		}
 	}
+	return nil
 }
 
 func (sc *SerialClient) Output(ctx context.Context, payload any) error {
@@ -189,5 +175,14 @@ func (sc *SerialClient) Output(ctx context.Context, payload any) error {
 }
 
 func (sc *SerialClient) Stop() {
-	sc.cancel()
+	if sc.cancel != nil {
+		sc.cancel()
+	}
+	sc.portMu.Lock()
+	defer sc.portMu.Unlock()
+	if sc.port != nil {
+		sc.port.Close()
+		sc.port = nil
+	}
+	sc.logger.Debug("done")
 }

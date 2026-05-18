@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+	"sync"
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
@@ -16,14 +17,15 @@ import (
 )
 
 type NATSServer struct {
-	config config.ModuleConfig
-	ctx    context.Context
-	Ip     string
-	Port   int
-	router common.RouteIO
-	server *server.Server
-	logger *slog.Logger
-	cancel context.CancelFunc
+	config   config.ModuleConfig
+	ctx      context.Context
+	Ip       string
+	Port     int
+	router   common.RouteIO
+	server   *server.Server
+	logger   *slog.Logger
+	cancel   context.CancelFunc
+	serverMu sync.Mutex
 }
 
 func init() {
@@ -103,9 +105,10 @@ func (ns *NATSServer) Start(ctx context.Context, router common.RouteIO) error {
 		return err
 	}
 
+	ns.serverMu.Lock()
 	ns.server = natsServer
+	defer ns.serverMu.Unlock()
 	natsServer.Start()
-	defer natsServer.Shutdown()
 
 	if !natsServer.ReadyForConnections(5 * time.Second) {
 		return errors.New("nats.server failed to start")
@@ -114,13 +117,17 @@ func (ns *NATSServer) Start(ctx context.Context, router common.RouteIO) error {
 
 	<-ns.ctx.Done()
 
-	ns.logger.Debug("done")
 	return nil
 }
 
 func (ns *NATSServer) Stop() {
-	ns.cancel()
+	if ns.cancel != nil {
+		ns.cancel()
+	}
+	ns.serverMu.Lock()
+	defer ns.serverMu.Unlock()
 	if ns.server != nil {
 		ns.server.Shutdown()
 	}
+	ns.logger.Debug("done")
 }
