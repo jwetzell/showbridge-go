@@ -66,12 +66,10 @@ func (i *TimeInterval) Start(ctx context.Context, router common.RouteIO) error {
 
 	ticker := time.NewTicker(time.Millisecond * time.Duration(i.Duration))
 	i.ticker = ticker
-	defer ticker.Stop()
 
 	for {
 		select {
 		case <-i.ctx.Done():
-			i.logger.Debug("done")
 			return nil
 		case <-ticker.C:
 			if i.router != nil {
@@ -79,9 +77,15 @@ func (i *TimeInterval) Start(ctx context.Context, router common.RouteIO) error {
 			}
 		}
 	}
-
 }
 
 func (i *TimeInterval) Stop() {
-	i.cancel()
+	if i.cancel != nil {
+		i.cancel()
+	}
+	if i.ticker != nil {
+		i.ticker.Stop()
+		i.ticker = nil
+	}
+	i.logger.Debug("done")
 }

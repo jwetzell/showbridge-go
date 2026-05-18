@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+	"sync"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -21,6 +22,7 @@ type UDPClient struct {
 	router common.RouteIO
 	logger *slog.Logger
 	cancel context.CancelFunc
+	connMu sync.Mutex
 }
 
 func init() {
@@ -74,6 +76,8 @@ func (uc *UDPClient) Type() string {
 }
 
 func (uc *UDPClient) SetupConn() error {
+	uc.connMu.Lock()
+	defer uc.connMu.Unlock()
 	client, err := net.DialUDP("udp", nil, uc.Addr)
 	uc.conn = client
 	return err
@@ -92,15 +96,12 @@ func (uc *UDPClient) Start(ctx context.Context, router common.RouteIO) error {
 	}
 
 	<-uc.ctx.Done()
-	uc.logger.Debug("done")
-	if uc.conn != nil {
-		uc.conn.Close()
-	}
 	return nil
 }
 
 func (uc *UDPClient) Output(ctx context.Context, payload any) error {
-
+	uc.connMu.Lock()
+	defer uc.connMu.Unlock()
 	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 	if !ok {
 		return errors.New("net.udp.client is only able to output bytes")
@@ -118,5 +119,15 @@ func (uc *UDPClient) Output(ctx context.Context, payload any) error {
 }
 
 func (uc *UDPClient) Stop() {
-	uc.cancel()
+	if uc.cancel != nil {
+		uc.cancel()
+	}
+	uc.connMu.Lock()
+	defer uc.connMu.Unlock()
+	if uc.conn != nil {
+		uc.conn.Close()
+		uc.conn = nil
+	}
+
+	uc.logger.Debug("done")
 }

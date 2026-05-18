@@ -33,6 +33,8 @@ type SIPDTMFServer struct {
 	Separator string
 	logger    *slog.Logger
 	cancel    context.CancelFunc
+	ua        *sipgo.UserAgent
+	uaMu      sync.Mutex
 }
 
 type SIPDTMFMessage struct {
@@ -164,7 +166,10 @@ func (sds *SIPDTMFServer) Start(ctx context.Context, router common.RouteIO) erro
 		sipgo.WithUserAgentTransportLayerOptions(sip.WithTransportLayerLogger(diagoLogger)),
 		sipgo.WithUserAgentTransactionLayerOptions(sip.WithTransactionLayerLogger(diagoLogger)),
 	)
-	defer ua.Close()
+
+	sds.uaMu.Lock()
+	sds.ua = ua
+	sds.uaMu.Unlock()
 
 	sip.SetDefaultLogger(diagoLogger)
 	media.SetDefaultLogger(diagoLogger)
@@ -185,7 +190,6 @@ func (sds *SIPDTMFServer) Start(ctx context.Context, router common.RouteIO) erro
 	}
 
 	<-sds.ctx.Done()
-	sds.logger.Debug("done")
 	return nil
 }
 
@@ -281,5 +285,13 @@ func (sds *SIPDTMFServer) Output(ctx context.Context, payload any) error {
 }
 
 func (sds *SIPDTMFServer) Stop() {
-	sds.cancel()
+	if sds.cancel != nil {
+		sds.cancel()
+	}
+	sds.uaMu.Lock()
+	defer sds.uaMu.Unlock()
+	if sds.ua != nil {
+		sds.ua.Close()
+	}
+	sds.logger.Debug("done")
 }

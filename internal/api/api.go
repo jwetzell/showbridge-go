@@ -20,7 +20,6 @@ type ApiServer struct {
 	config             config.ApiConfig
 	serverMu           sync.Mutex
 	server             *http.Server
-	shutdown           context.CancelFunc
 	logger             *slog.Logger
 	configurableRouter config.Configurable
 	eventRouter        common.EventRouter
@@ -63,7 +62,6 @@ func (as *ApiServer) Start(config config.ApiConfig) {
 		if err != nil && err != http.ErrServerClosed {
 			as.logger.Error("server error", "error", err)
 		}
-		as.shutdown()
 	}()
 }
 
@@ -71,16 +69,18 @@ func (as *ApiServer) Stop() {
 	if as.server == nil {
 		return
 	}
-	as.logger.Debug("stopping")
 	as.serverMu.Lock()
 	defer as.serverMu.Unlock()
 	if as.server != nil {
 		apiShutdownCtx, apiShutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
-		as.shutdown = apiShutdownCancel
-		as.server.Shutdown(apiShutdownCtx)
-		<-apiShutdownCtx.Done()
+		defer apiShutdownCancel()
+		err := as.server.Shutdown(apiShutdownCtx)
+		if err != nil {
+			as.logger.Error("error shutting down server", "error", err)
+		}
 		as.server = nil
 	}
+	as.logger.Debug("done")
 }
 
 func (as *ApiServer) handleHealthHTTP(w http.ResponseWriter, req *http.Request) {

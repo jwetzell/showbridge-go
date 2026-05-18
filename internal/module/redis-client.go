@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"sync"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -13,14 +14,15 @@ import (
 )
 
 type RedisClient struct {
-	config config.ModuleConfig
-	ctx    context.Context
-	router common.RouteIO
-	Host   string
-	Port   uint16
-	client *redis.Client
-	logger *slog.Logger
-	cancel context.CancelFunc
+	config   config.ModuleConfig
+	ctx      context.Context
+	router   common.RouteIO
+	Host     string
+	Port     uint16
+	client   *redis.Client
+	logger   *slog.Logger
+	cancel   context.CancelFunc
+	clientMu sync.Mutex
 }
 
 func init() {
@@ -87,17 +89,25 @@ func (rc *RedisClient) Start(ctx context.Context, router common.RouteIO) error {
 		DB:       0,
 	})
 
+	rc.clientMu.Lock()
 	rc.client = client
-
-	defer client.Close()
+	rc.clientMu.Unlock()
 
 	<-rc.ctx.Done()
-	rc.logger.Debug("done")
 	return nil
 }
 
 func (rc *RedisClient) Stop() {
-	rc.cancel()
+	if rc.cancel != nil {
+		rc.cancel()
+	}
+	rc.clientMu.Lock()
+	defer rc.clientMu.Unlock()
+	if rc.client != nil {
+		rc.client.Close()
+		rc.client = nil
+	}
+	rc.logger.Debug("done")
 }
 
 func (rc *RedisClient) Get(key string) (any, error) {

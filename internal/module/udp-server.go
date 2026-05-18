@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+	"sync"
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
@@ -22,6 +23,8 @@ type UDPServer struct {
 	router     common.RouteIO
 	logger     *slog.Logger
 	cancel     context.CancelFunc
+	listener   *net.UDPConn
+	listenerMu sync.Mutex
 }
 
 func init() {
@@ -106,15 +109,13 @@ func (us *UDPServer) Start(ctx context.Context, router common.RouteIO) error {
 	if err != nil {
 		return err
 	}
-
-	defer listener.Close()
+	us.listenerMu.Lock()
+	us.listener = listener
 
 	buffer := make([]byte, us.BufferSize)
-	for {
+	for us.ctx.Err() == nil {
 		select {
 		case <-us.ctx.Done():
-			// TODO(jwetzell): cleanup?
-			us.logger.Debug("done")
 			return nil
 		default:
 			listener.SetDeadline(time.Now().Add(time.Millisecond * 200))
@@ -135,7 +136,8 @@ func (us *UDPServer) Start(ctx context.Context, router common.RouteIO) error {
 			}
 		}
 	}
-
+	us.listenerMu.Unlock()
+	return nil
 }
 
 func (us *UDPServer) Output(ctx context.Context, payload any) error {
@@ -143,5 +145,14 @@ func (us *UDPServer) Output(ctx context.Context, payload any) error {
 }
 
 func (us *UDPServer) Stop() {
-	us.cancel()
+	if us.cancel != nil {
+		us.cancel()
+	}
+	us.listenerMu.Lock()
+	defer us.listenerMu.Unlock()
+	if us.listener != nil {
+		us.listener.Close()
+		us.listener = nil
+	}
+	us.logger.Debug("done")
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"sync"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/google/jsonschema-go/jsonschema"
@@ -22,6 +23,7 @@ type MQTTClient struct {
 	client   mqtt.Client
 	logger   *slog.Logger
 	cancel   context.CancelFunc
+	clientMu sync.Mutex
 }
 
 func init() {
@@ -100,8 +102,8 @@ func (mc *MQTTClient) Start(ctx context.Context, router common.RouteIO) error {
 		token.Wait()
 	}
 
+	mc.clientMu.Lock()
 	mc.client = mqtt.NewClient(opts)
-	defer mc.client.Disconnect(250)
 
 	token := mc.client.Connect()
 
@@ -110,9 +112,9 @@ func (mc *MQTTClient) Start(ctx context.Context, router common.RouteIO) error {
 	if err != nil {
 		return err
 	}
+	mc.clientMu.Unlock()
 
 	<-mc.ctx.Done()
-	mc.logger.Debug("done")
 	return nil
 }
 
@@ -139,5 +141,14 @@ func (mc *MQTTClient) Output(ctx context.Context, payload any) error {
 }
 
 func (mc *MQTTClient) Stop() {
-	mc.cancel()
+	if mc.cancel != nil {
+		mc.cancel()
+	}
+	mc.clientMu.Lock()
+	defer mc.clientMu.Unlock()
+	if mc.client != nil {
+		mc.client.Disconnect(250)
+		mc.client = nil
+	}
+	mc.logger.Debug("done")
 }

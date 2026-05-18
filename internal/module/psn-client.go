@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"net"
+	"sync"
 	"time"
 
 	"github.com/jwetzell/psn-go"
@@ -19,6 +20,7 @@ type PSNClient struct {
 	decoder *psn.Decoder
 	logger  *slog.Logger
 	cancel  context.CancelFunc
+	connMu  sync.Mutex
 }
 
 func init() {
@@ -55,21 +57,22 @@ func (pc *PSNClient) Start(ctx context.Context, router common.RouteIO) error {
 	if err != nil {
 		return err
 	}
-	defer client.Close()
 
+	pc.connMu.Lock()
 	pc.conn = client
+	pc.connMu.Unlock()
 
 	buffer := make([]byte, 2048)
 	for {
 		select {
 		case <-pc.ctx.Done():
-			// TODO(jwetzell): cleanup?
-			pc.logger.Debug("done")
 			return nil
 		default:
+			pc.connMu.Lock()
 			pc.conn.SetDeadline(time.Now().Add(time.Millisecond * 200))
 
 			numBytes, _, err := pc.conn.ReadFromUDP(buffer)
+			pc.connMu.Unlock()
 			if err != nil {
 				//NOTE(jwetzell) we hit deadline
 				if opErr, ok := err.(*net.OpError); ok && opErr.Timeout() {
@@ -99,5 +102,14 @@ func (pc *PSNClient) Start(ctx context.Context, router common.RouteIO) error {
 }
 
 func (pc *PSNClient) Stop() {
-	pc.cancel()
+	if pc.cancel != nil {
+		pc.cancel()
+	}
+	pc.connMu.Lock()
+	defer pc.connMu.Unlock()
+	if pc.conn != nil {
+		pc.conn.Close()
+		pc.conn = nil
+	}
+	pc.logger.Debug("done")
 }

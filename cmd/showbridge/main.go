@@ -90,12 +90,11 @@ func main() {
 }
 
 type showbridgeApp struct {
-	ctx          context.Context
-	configPath   string
-	logger       *slog.Logger
-	router       *showbridge.Router
-	routerRunner *sync.WaitGroup
-	routerMutex  sync.Mutex
+	ctx         context.Context
+	configPath  string
+	logger      *slog.Logger
+	router      *showbridge.Router
+	routerMutex sync.Mutex
 }
 
 func readConfig(configPath string) (config.Config, error) {
@@ -211,10 +210,9 @@ func run(ctx context.Context, c *cli.Command) error {
 	}
 
 	showbridgeApp := &showbridgeApp{
-		ctx:          ctx,
-		configPath:   configPath,
-		logger:       slog.Default().With("component", "cmd"),
-		routerRunner: &sync.WaitGroup{},
+		ctx:        ctx,
+		configPath: configPath,
+		logger:     slog.Default().With("component", "cmd"),
 	}
 
 	config, err := readConfig(showbridgeApp.configPath)
@@ -236,9 +234,7 @@ func run(ctx context.Context, c *cli.Command) error {
 	showbridgeApp.routerMutex.Lock()
 	showbridgeApp.router = router
 
-	showbridgeApp.routerRunner.Go(func() {
-		router.Start(context.Background())
-	})
+	router.Start(context.Background())
 	showbridgeApp.routerMutex.Unlock()
 
 	go showbridgeApp.handleChannels()
@@ -246,8 +242,6 @@ func run(ctx context.Context, c *cli.Command) error {
 	<-showbridgeApp.ctx.Done()
 	showbridgeApp.logger.Debug("shutting down router")
 	showbridgeApp.router.Stop()
-	showbridgeApp.logger.Debug("waiting for router to exit")
-	showbridgeApp.routerRunner.Wait()
 	return nil
 }
 

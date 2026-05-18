@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"sync"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -16,13 +17,14 @@ import (
 )
 
 type MIDIOutput struct {
-	config   config.ModuleConfig
-	ctx      context.Context
-	router   common.RouteIO
-	Port     string
-	SendFunc func(midi.Message) error
-	logger   *slog.Logger
-	cancel   context.CancelFunc
+	config     config.ModuleConfig
+	ctx        context.Context
+	router     common.RouteIO
+	Port       string
+	sendFunc   func(midi.Message) error
+	logger     *slog.Logger
+	cancel     context.CancelFunc
+	sendFuncMu sync.Mutex
 }
 
 func init() {
@@ -63,7 +65,6 @@ func (mo *MIDIOutput) Type() string {
 
 func (mo *MIDIOutput) Start(ctx context.Context, router common.RouteIO) error {
 	mo.logger.Debug("running")
-	defer midi.CloseDriver()
 	mo.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	mo.ctx = moduleContext
@@ -80,15 +81,18 @@ func (mo *MIDIOutput) Start(ctx context.Context, router common.RouteIO) error {
 		return err
 	}
 
-	mo.SendFunc = send
+	mo.sendFuncMu.Lock()
+	mo.sendFunc = send
+	mo.sendFuncMu.Unlock()
 
 	<-mo.ctx.Done()
-	mo.logger.Debug("done")
 	return nil
 }
 
 func (mo *MIDIOutput) Output(ctx context.Context, payload any) error {
-	if mo.SendFunc == nil {
+	mo.sendFuncMu.Lock()
+	defer mo.sendFuncMu.Unlock()
+	if mo.sendFunc == nil {
 		return errors.New("midi.output output is not setup")
 	}
 
@@ -98,9 +102,13 @@ func (mo *MIDIOutput) Output(ctx context.Context, payload any) error {
 		return errors.New("midi.output can only output midi.Message")
 	}
 
-	return mo.SendFunc(payloadMessage)
+	return mo.sendFunc(payloadMessage)
 }
 
 func (mo *MIDIOutput) Stop() {
-	mo.cancel()
+	if mo.cancel != nil {
+		mo.cancel()
+	}
+	midi.CloseDriver()
+	mo.logger.Debug("done")
 }

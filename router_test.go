@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log/slog"
 	"reflect"
-	"sync"
 	"testing"
 	"time"
 
@@ -54,7 +53,9 @@ func (mcm *MockCounterModule) Type() string {
 }
 
 func (mcm *MockCounterModule) Stop() {
-	mcm.cancel()
+	if mcm.cancel != nil {
+		mcm.cancel()
+	}
 }
 
 func init() {
@@ -222,12 +223,7 @@ func TestRouterInputUnknownDestinationModule(t *testing.T) {
 		t.Fatalf("router should not have returned any route errors: %v", routeErrors)
 	}
 
-	routerRunner := sync.WaitGroup{}
-
-	routerRunner.Go(func() {
-		router.Start(t.Context())
-		fmt.Println("router stopped")
-	})
+	router.Start(t.Context())
 
 	time.Sleep(time.Second * 1)
 
@@ -281,12 +277,7 @@ func TestRouterInputNoMatchingRoute(t *testing.T) {
 		t.Fatalf("router should not have returned any route errors: %v", routeErrors)
 	}
 
-	routerRunner := sync.WaitGroup{}
-
-	routerRunner.Go(func() {
-		router.Start(t.Context())
-		fmt.Println("router stopped")
-	})
+	router.Start(t.Context())
 
 	time.Sleep(time.Second * 1)
 
@@ -332,12 +323,7 @@ func TestRouterInputSingleRoute(t *testing.T) {
 		t.Fatalf("router should not have returned any route errors: %v", routeErrors)
 	}
 
-	routerRunner := sync.WaitGroup{}
-
-	routerRunner.Go(func() {
-		router.Start(t.Context())
-		fmt.Println("router stopped")
-	})
+	router.Start(t.Context())
 
 	time.Sleep(time.Second * 1)
 
@@ -425,11 +411,7 @@ func TestRouterInputMultipleRoutes(t *testing.T) {
 		t.Fatalf("router should not have returned any route errors: %v", routeErrors)
 	}
 
-	routerRunner := sync.WaitGroup{}
-
-	routerRunner.Go(func() {
-		router.Start(t.Context())
-	})
+	router.Start(t.Context())
 	time.Sleep(time.Second * 1)
 
 	defer router.Stop()
@@ -510,11 +492,7 @@ func TestRouterInputMultipleModules(t *testing.T) {
 		t.Fatalf("router should not have returned any route errors: %v", routeErrors)
 	}
 
-	routerRunner := sync.WaitGroup{}
-
-	routerRunner.Go(func() {
-		router.Start(t.Context())
-	})
+	router.Start(t.Context())
 
 	time.Sleep(time.Second * 1)
 
