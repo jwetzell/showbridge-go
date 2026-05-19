@@ -22,5 +22,5 @@ type KeyValueModule interface {
 }
 
 type DatabaseModule interface {
-	Database() (*sql.DB, error)
+	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
 }

@@ -79,7 +79,7 @@ func (m *TestDBModule) Start(ctx context.Context, router common.RouteIO) error {
 	return nil
 }
 
-func (m *TestDBModule) Database() (*sql.DB, error) {
+func (m *TestDBModule) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
 	if m.db == nil {
 		db, err := sql.Open("sqlite", ":memory:")
 		if err != nil {
@@ -99,7 +99,7 @@ func (m *TestDBModule) Database() (*sql.DB, error) {
 		}
 		m.db = db
 	}
-	return m.db, nil
+	return m.db.QueryContext(ctx, query, args...)
 }
 
 func (m *TestDBModule) Stop() {}

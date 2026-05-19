@@ -42,19 +42,8 @@ func (dq *DbQuery) Process(ctx context.Context, wrappedPayload common.WrappedPay
 		dq.module = dbModule
 	}
 
-	db, err := dq.module.Database()
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("db.query error getting database from module: %w", err)
-	}
-
-	if db == nil {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("db.query module with id %s returned nil database", dq.ModuleId)
-	}
-
 	var queryBuffer bytes.Buffer
-	err = dq.Query.Execute(&queryBuffer, wrappedPayload)
+	err := dq.Query.Execute(&queryBuffer, wrappedPayload)
 
 	if err != nil {
 		wrappedPayload.End = true
@@ -62,7 +51,7 @@ func (dq *DbQuery) Process(ctx context.Context, wrappedPayload common.WrappedPay
 	}
 
 	// support proper parameterized queries
-	rows, err := db.QueryContext(ctx, queryBuffer.String())
+	rows, err := dq.module.QueryContext(ctx, queryBuffer.String())
 	if err != nil {
 		wrappedPayload.End = true
 		return wrappedPayload, fmt.Errorf("db.query error executing query: %w", err)
