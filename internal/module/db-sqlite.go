@@ -53,51 +53,50 @@ func init() {
 	})
 }
 
-func (t *DbSqlite) Id() string {
-	return t.config.Id
+func (dbs *DbSqlite) Id() string {
+	return dbs.config.Id
 }
 
-func (t *DbSqlite) Type() string {
-	return t.config.Type
+func (dbs *DbSqlite) Type() string {
+	return dbs.config.Type
 }
 
-func (t *DbSqlite) Start(ctx context.Context, router common.RouteIO) error {
-	t.logger.Debug("running")
-	t.router = router
+func (dbs *DbSqlite) Start(ctx context.Context, router common.RouteIO) error {
+	dbs.logger.Debug("running")
+	dbs.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
-	t.ctx = moduleContext
-	t.cancel = cancel
+	dbs.ctx = moduleContext
+	dbs.cancel = cancel
 
-	db, err := sql.Open("sqlite", t.Dsn)
+	db, err := sql.Open("sqlite", dbs.Dsn)
 	if err != nil {
 		return fmt.Errorf("db.sqlite error opening database: %w", err)
 	}
-	t.dbMu.Lock()
-	t.db = db
-	t.dbMu.Unlock()
-	<-t.ctx.Done()
+	dbs.dbMu.Lock()
+	dbs.db = db
+	dbs.dbMu.Unlock()
+	<-dbs.ctx.Done()
 	return nil
 }
 
-func (t *DbSqlite) Stop() {
-	if t.cancel != nil {
-		t.cancel()
+func (dbs *DbSqlite) Stop() {
+	if dbs.cancel != nil {
+		dbs.cancel()
 	}
-	t.dbMu.Lock()
-	defer t.dbMu.Unlock()
-	if t.db != nil {
-		t.db.Close()
-		t.db = nil
+	dbs.dbMu.Lock()
+	defer dbs.dbMu.Unlock()
+	if dbs.db != nil {
+		dbs.db.Close()
+		dbs.db = nil
 	}
-	t.logger.Debug("done")
+	dbs.logger.Debug("done")
 }
 
-// TODO(jwetzell): get a database module layout that doesn't require handing the DB over
-func (t *DbSqlite) Database() (*sql.DB, error) {
-	t.dbMu.Lock()
-	defer t.dbMu.Unlock()
-	if t.db == nil {
+func (dbs *DbSqlite) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
+	dbs.dbMu.Lock()
+	defer dbs.dbMu.Unlock()
+	if dbs.db == nil {
 		return nil, fmt.Errorf("database not initialized")
 	}
-	return t.db, nil
+	return dbs.db.QueryContext(ctx, query, args...)
 }
