@@ -19,7 +19,7 @@ require (
 	github.com/redis/go-redis/v9 v9.19.0
 	github.com/urfave/cli/v3 v3.9.0
 	gitlab.com/gomidi/midi/v2 v2.3.23
-	go.bug.st/serial v1.6.4
+	go.bug.st/serial v1.7.0
 	modernc.org/quickjs v0.18.1
 	modernc.org/sqlite v1.50.1
 	sigs.k8s.io/yaml v1.6.0
@@ -28,7 +28,6 @@ require (
 require (
 	github.com/antithesishq/antithesis-sdk-go v0.7.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/creack/goselect v0.1.3 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/dylibso/observe-sdk/go v0.0.0-20240828172851-9145d8ad07e1 // indirect
 	github.com/emiago/dtls/v3 v3.0.0-20260122183559-8b8d23e359c0 // indirect
