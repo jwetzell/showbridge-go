@@ -29,9 +29,7 @@ type HTTPServer struct {
 
 type ResponseIOError struct {
 	Index        int     `json:"index"`
-	OutputError  *string `json:"outputError"`
 	ProcessError *string `json:"processError"`
-	InputError   *string `json:"inputError"`
 }
 
 type IOResponseData struct {
@@ -116,19 +114,9 @@ func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							Index: responseIOError.Index,
 						}
 
-						if responseIOError.InputError != nil {
-							errorMsg := responseIOError.InputError.Error()
-							errorToAdd.InputError = &errorMsg
-						}
-
 						if responseIOError.ProcessError != nil {
 							errorMsg := responseIOError.ProcessError.Error()
 							errorToAdd.ProcessError = &errorMsg
-						}
-
-						if responseIOError.OutputError != nil {
-							errorMsg := responseIOError.OutputError.Error()
-							errorToAdd.OutputError = &errorMsg
 						}
 
 						response.IOErrors = append(response.IOErrors, errorToAdd)

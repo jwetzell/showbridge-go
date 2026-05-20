@@ -32,10 +32,6 @@ func (mr *MockRouter) HandleInput(ctx context.Context, sourceId string, payload 
 	return false, []common.RouteIOError{}
 }
 
-func (mr *MockRouter) HandleOutput(ctx context.Context, destinationId string, payload any) error {
-	return nil
-}
-
 func TestGoodRouteHandleInput(t *testing.T) {
 	routeConfig := config.RouteConfig{
 		Input: "input",
@@ -101,7 +97,7 @@ func TestRouteHandleInputWithProcessorError(t *testing.T) {
 		Payload: inputData,
 	})
 	if err == nil {
-		t.Fatalf("route HandleOutput did not return error for bad processor")
+		t.Fatalf("route did not return error for bad processor")
 	}
 }
 
@@ -162,7 +158,7 @@ func TestRouteHandleNilPayloadFromProcessor(t *testing.T) {
 		Payload: "test",
 	})
 	if err != nil {
-		t.Fatalf("route HandleOutput returned error for nil payload: %v", err)
+		t.Fatalf("route returned error for nil payload: %v", err)
 	}
 }
 
