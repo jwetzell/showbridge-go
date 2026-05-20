@@ -43,7 +43,9 @@ func GetModulesSchema() *jsonschema.Schema {
 		}
 		if mod.ParamsSchema != nil {
 			moduleSchema.Properties["params"] = mod.ParamsSchema
-			moduleSchema.Required = append(moduleSchema.Required, "params")
+			if len(mod.ParamsSchema.Required) > 0 {
+				moduleSchema.Required = append(moduleSchema.Required, "params")
+			}
 		}
 		moduleDefinitionSchemas = append(moduleDefinitionSchemas, moduleSchema)
 	}

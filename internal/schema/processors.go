@@ -39,7 +39,9 @@ func GetProcessorsSchema() *jsonschema.Schema {
 		}
 		if proc.ParamsSchema != nil {
 			processorSchema.Properties["params"] = proc.ParamsSchema
-			processorSchema.Required = append(processorSchema.Required, "params")
+			if len(proc.ParamsSchema.Required) > 0 {
+				processorSchema.Required = append(processorSchema.Required, "params")
+			}
 		}
 		processorDefinitionSchemas = append(processorDefinitionSchemas, processorSchema)
 	}
