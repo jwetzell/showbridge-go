@@ -113,7 +113,6 @@ func (ns *NATSServer) Start(ctx context.Context, router common.RouteIO) error {
 	if !natsServer.ReadyForConnections(5 * time.Second) {
 		return errors.New("nats.server failed to start")
 	}
-	ns.logger.Info("NATS server started", "client_url", natsServer.ClientURL())
 
 	<-ns.ctx.Done()
 

@@ -2,6 +2,7 @@ package module_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
@@ -32,6 +33,52 @@ func TestTCPServerFromRegistry(t *testing.T) {
 
 	if moduleInstance.Type() != "net.tcp.server" {
 		t.Fatalf("net.tcp.server module has wrong type: %s", moduleInstance.Type())
+	}
+}
+
+func TestGoodTCPServer(t *testing.T) {
+
+	testCases := []struct {
+		name   string
+		params map[string]any
+	}{
+		{
+			name: "minimal config",
+			params: map[string]any{
+				"port":    8000,
+				"framing": "LF",
+			},
+		},
+	}
+
+	for _, test := range testCases {
+		t.Run(test.name, func(t *testing.T) {
+
+			registration, ok := module.ModuleRegistry["net.tcp.server"]
+			if !ok {
+				t.Fatalf("net.tcp.server module not registered")
+			}
+
+			moduleInstance, err := registration.New(config.ModuleConfig{
+				Id:     "test",
+				Type:   "net.tcp.server",
+				Params: test.params,
+			})
+
+			if err != nil {
+				t.Fatalf("net.tcp.server failed to create module: %s", err)
+			}
+			// TODO(jwetzell) this is kind of hacky
+			go func() {
+				time.Sleep(1 * time.Second)
+				moduleInstance.Stop()
+			}()
+			err = moduleInstance.Start(t.Context(), nil)
+
+			if err != nil {
+				t.Fatalf("net.tcp.server failed to start: %s", err)
+			}
+		})
 	}
 }
 

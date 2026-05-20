@@ -243,16 +243,6 @@ func TestBadDbQuery(t *testing.T) {
 			errorString:           "db.query unable to find module with id: test",
 		},
 		{
-			name:    "module not found in context",
-			payload: test.TestStruct{Data: "hello"},
-			params: map[string]any{
-				"module": "test",
-				"query":  "select * from test;",
-			},
-			wrappedPayloadModules: map[string]common.Module{},
-			errorString:           "db.query unable to find module with id: test",
-		},
-		{
 			name:    "module not a DatabseModule",
 			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{

@@ -2,6 +2,7 @@ package module_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
@@ -33,6 +34,53 @@ func TestUDPClientFromRegistry(t *testing.T) {
 
 	if moduleInstance.Type() != "net.udp.client" {
 		t.Fatalf("net.udp.client module has wrong type: %s", moduleInstance.Type())
+	}
+}
+
+func TestGoodUDPClient(t *testing.T) {
+
+	testCases := []struct {
+		name   string
+		params map[string]any
+	}{
+		{
+			name: "minimal config",
+			params: map[string]any{
+				"host": "localhost",
+				"port": 8000,
+			},
+		},
+	}
+
+	for _, test := range testCases {
+		t.Run(test.name, func(t *testing.T) {
+
+			registration, ok := module.ModuleRegistry["net.udp.client"]
+			if !ok {
+				t.Fatalf("net.udp.client module not registered")
+			}
+
+			moduleInstance, err := registration.New(config.ModuleConfig{
+				Id:     "test",
+				Type:   "net.udp.client",
+				Params: test.params,
+			})
+
+			if err != nil {
+				t.Fatalf("net.udp.client failed to create module: %s", err)
+			}
+			// TODO(jwetzell) this is kind of hacky
+			go func() {
+				time.Sleep(1 * time.Second)
+				moduleInstance.Stop()
+			}()
+
+			err = moduleInstance.Start(t.Context(), nil)
+
+			if err != nil {
+				t.Fatalf("net.udp.client failed to start: %s", err)
+			}
+		})
 	}
 }
 

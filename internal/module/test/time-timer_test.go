@@ -2,6 +2,7 @@ package module_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
@@ -31,6 +32,51 @@ func TestTimeTimerFromRegistry(t *testing.T) {
 
 	if moduleInstance.Type() != "time.timer" {
 		t.Fatalf("time.timer module has wrong type: %s", moduleInstance.Type())
+	}
+}
+
+func TestGoodTimeTimer(t *testing.T) {
+
+	testCases := []struct {
+		name   string
+		params map[string]any
+	}{
+		{
+			name: "minimal config",
+			params: map[string]any{
+				"duration": 2000,
+			},
+		},
+	}
+
+	for _, test := range testCases {
+		t.Run(test.name, func(t *testing.T) {
+
+			registration, ok := module.ModuleRegistry["time.timer"]
+			if !ok {
+				t.Fatalf("time.timer module not registered")
+			}
+
+			moduleInstance, err := registration.New(config.ModuleConfig{
+				Id:     "test",
+				Type:   "time.timer",
+				Params: test.params,
+			})
+
+			if err != nil {
+				t.Fatalf("time.timer failed to create module: %s", err)
+			}
+			// TODO(jwetzell) this is kind of hacky
+			go func() {
+				time.Sleep(1 * time.Second)
+				moduleInstance.Stop()
+			}()
+			err = moduleInstance.Start(t.Context(), nil)
+
+			if err != nil {
+				t.Fatalf("time.timer failed to start: %s", err)
+			}
+		})
 	}
 }
 
