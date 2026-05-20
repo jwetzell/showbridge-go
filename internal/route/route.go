@@ -7,10 +7,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
-	"go.opentelemetry.io/otel/trace"
 )
 
 type Route struct {
@@ -44,31 +40,17 @@ func (r *Route) Input() string {
 }
 
 func (r *Route) ProcessPayload(ctx context.Context, wrappedPayload common.WrappedPayload) (any, error) {
-	tracer := otel.Tracer("route")
-	processCtx, processSpan := tracer.Start(ctx, "ProcessPayload", trace.WithAttributes(attribute.String("payload.type", fmt.Sprintf("%T", wrappedPayload.Payload))))
-	defer processSpan.End()
-	for processorIndex, processor := range r.processors {
-		processorCtx, processorSpan := otel.Tracer("processor").Start(processCtx, "process", trace.WithAttributes(attribute.Int("processor.index", processorIndex), attribute.String("processor.type", processor.Type())))
-		processedPayload, err := processor.Process(processorCtx, wrappedPayload)
+	for _, processor := range r.processors {
+		processedPayload, err := processor.Process(ctx, wrappedPayload)
 		if err != nil {
-			processorSpan.SetStatus(codes.Error, "route processor error")
-			processorSpan.RecordError(err)
-			processorSpan.End()
-			processSpan.SetStatus(codes.Error, "route processing error")
-			processSpan.RecordError(err)
 			return nil, err
 		}
-		processorSpan.SetStatus(codes.Ok, "processor successful")
 		//NOTE(jwetzell) payload has been marked as an end
 		if processedPayload.End {
-			processSpan.SetStatus(codes.Ok, "route processing terminated early due to processor signal")
-			processorSpan.End()
 			return processedPayload.Payload, nil
 		}
 		wrappedPayload = processedPayload
-		processorSpan.End()
 	}
-	processSpan.SetStatus(codes.Ok, "route processing successful")
 
 	return wrappedPayload.Payload, nil
 }

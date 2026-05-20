@@ -12,10 +12,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
 	"github.com/jwetzell/showbridge-go/internal/route"
-
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 )
 
 // TODO(jwetzell): can/should this be split into different "components"?
@@ -189,8 +185,6 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 	r.runningConfigMu.RLock()
 	defer r.runningConfigMu.RUnlock()
 
-	spanCtx, span := otel.Tracer("router").Start(ctx, "input", trace.WithAttributes(attribute.String("source.id", sourceId)))
-	defer span.End()
 	var routeIOErrors []common.RouteIOError
 	var routeFound atomic.Bool
 
@@ -213,8 +207,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 
 				routeFound.Store(true)
 
-				routeCtx, routeSpan := otel.Tracer("router").Start(spanCtx, "route", trace.WithAttributes(attribute.Int("route.index", routeIndex), attribute.String("route.input", routeInstance.Input())))
-				_, err := routeInstance.ProcessPayload(routeCtx, common.WrappedPayload{
+				_, err := routeInstance.ProcessPayload(ctx, common.WrappedPayload{
 					Payload: payload,
 					Source:  sourceId,
 					Modules: r.ModuleInstances,
@@ -245,7 +238,6 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 						"index": routeIndex,
 					},
 				})
-				routeSpan.End()
 			})
 		}
 	}
