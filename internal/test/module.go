@@ -26,6 +26,35 @@ func (m *TestModule) Id() string {
 	return "test"
 }
 
+func NewTestOutputModule(id string) *TestOutputModule {
+	return &TestOutputModule{
+		id: id,
+	}
+}
+
+type TestOutputModule struct {
+	id string
+}
+
+func (m *TestOutputModule) Start(ctx context.Context, router common.RouteIO) error {
+	<-ctx.Done()
+	return nil
+}
+
+func (m *TestOutputModule) Output(ctx context.Context, payload any) error {
+	return nil
+}
+
+func (m *TestOutputModule) Stop() {}
+
+func (m *TestOutputModule) Type() string {
+	return "test.output"
+}
+
+func (m *TestOutputModule) Id() string {
+	return m.id
+}
+
 func NewTestKVModule(id string) *TestKVModule {
 	return &TestKVModule{
 		id: id,
@@ -63,6 +92,7 @@ func (m *TestKVModule) Set(key string, value any) error {
 	m.kvData[key] = value
 	return nil
 }
+
 func NewTestDBModule(id string) *TestDBModule {
 	return &TestDBModule{
 		id: id,
