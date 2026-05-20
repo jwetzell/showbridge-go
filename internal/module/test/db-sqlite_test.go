@@ -47,6 +47,12 @@ func TestGoodDbSqlite(t *testing.T) {
 				"dsn": ":memory:",
 			},
 		},
+		{
+			name: "file db",
+			params: map[string]any{
+				"dsn": "test.db",
+			},
+		},
 	}
 
 	for _, test := range testCases {
