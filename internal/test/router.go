@@ -13,10 +13,6 @@ func (r *TestRouter) HandleInput(ctx context.Context, sourceId string, payload a
 	return false, nil
 }
 
-func (r *TestRouter) HandleOutput(ctx context.Context, destinationId string, payload any) error {
-	return nil
-}
-
 func GetNewTestRouter() *TestRouter {
 	return &TestRouter{}
 }
