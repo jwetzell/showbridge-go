@@ -203,7 +203,7 @@ func TestRouterInputUnknownDestinationModule(t *testing.T) {
 				Input: "mock",
 				Processors: []config.ProcessorConfig{
 					{
-						Type: "router.output",
+						Type: "module.output",
 						Params: config.Params{
 							"module": "test",
 						},
@@ -239,7 +239,7 @@ func TestRouterInputUnknownDestinationModule(t *testing.T) {
 		t.Fatalf("router should have returned exactly 1 routing error, got: %d", len(routingErrors))
 	}
 
-	if routingErrors[0].ProcessError.Error() != "router.output failed to send output: no module found for destination id" {
+	if routingErrors[0].ProcessError.Error() != "module.output unable to find module with id: test" {
 		t.Fatalf("routing output error did not match expected, got: %s", routingErrors[0].ProcessError.Error())
 	}
 }
@@ -257,7 +257,7 @@ func TestRouterInputNoMatchingRoute(t *testing.T) {
 				Input: "test",
 				Processors: []config.ProcessorConfig{
 					{
-						Type: "router.output",
+						Type: "module.output",
 						Params: config.Params{
 							"module": "mock",
 						},
@@ -303,7 +303,7 @@ func TestRouterInputSingleRoute(t *testing.T) {
 				Input: "mock",
 				Processors: []config.ProcessorConfig{
 					{
-						Type: "router.output",
+						Type: "module.output",
 						Params: config.Params{
 							"module": "mock",
 						},
@@ -369,7 +369,7 @@ func TestRouterInputMultipleRoutes(t *testing.T) {
 				Input: "mock",
 				Processors: []config.ProcessorConfig{
 					{
-						Type: "router.output",
+						Type: "module.output",
 						Params: config.Params{
 							"module": "mock",
 						},
@@ -380,7 +380,7 @@ func TestRouterInputMultipleRoutes(t *testing.T) {
 				Input: "mock",
 				Processors: []config.ProcessorConfig{
 					{
-						Type: "router.output",
+						Type: "module.output",
 						Params: config.Params{
 							"module": "mock",
 						},
@@ -391,7 +391,7 @@ func TestRouterInputMultipleRoutes(t *testing.T) {
 				Input: "mock",
 				Processors: []config.ProcessorConfig{
 					{
-						Type: "router.output",
+						Type: "module.output",
 						Params: config.Params{
 							"module": "mock",
 						},
@@ -461,7 +461,7 @@ func TestRouterInputMultipleModules(t *testing.T) {
 				Input: "mock1",
 				Processors: []config.ProcessorConfig{
 					{
-						Type: "router.output",
+						Type: "module.output",
 						Params: config.Params{
 							"module": "mock1",
 						},
@@ -472,7 +472,7 @@ func TestRouterInputMultipleModules(t *testing.T) {
 				Input: "mock2",
 				Processors: []config.ProcessorConfig{
 					{
-						Type: "router.output",
+						Type: "module.output",
 						Params: config.Params{
 							"module": "mock2",
 						},

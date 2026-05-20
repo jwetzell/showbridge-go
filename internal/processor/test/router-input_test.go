@@ -10,25 +10,25 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
-func TestRouterOutputFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["router.output"]
+func TestRouterInputFromRegistry(t *testing.T) {
+	registration, ok := processor.ProcessorRegistry["router.input"]
 	if !ok {
-		t.Fatalf("router.output processor not registered")
+		t.Fatalf("router.input processor not registered")
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
-		Type: "router.output",
+		Type: "router.input",
 		Params: config.Params{
-			"module": "test",
+			"source": "test",
 		},
 	})
 
 	if err != nil {
-		t.Fatalf("failed to create router.output processor: %s", err)
+		t.Fatalf("failed to create router.input processor: %s", err)
 	}
 
-	if processorInstance.Type() != "router.output" {
-		t.Fatalf("router.output processor has wrong type: %s", processorInstance.Type())
+	if processorInstance.Type() != "router.input" {
+		t.Fatalf("router.input processor has wrong type: %s", processorInstance.Type())
 	}
 
 	payload := "test"
@@ -39,15 +39,15 @@ func TestRouterOutputFromRegistry(t *testing.T) {
 		Payload: payload,
 	})
 	if err != nil {
-		t.Fatalf("router.output processing failed: %s", err)
+		t.Fatalf("router.input processing failed: %s", err)
 	}
 
 	if got.Payload != expected {
-		t.Fatalf("router.output got %+v, expected %+v", got, expected)
+		t.Fatalf("router.input got %+v, expected %+v", got, expected)
 	}
 }
 
-func TestGoodRouterOutput(t *testing.T) {
+func TestGoodRouterInput(t *testing.T) {
 
 	testCases := []struct {
 		name     string
@@ -59,33 +59,33 @@ func TestGoodRouterOutput(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["router.output"]
+			registration, ok := processor.ProcessorRegistry["router.input"]
 			if !ok {
-				t.Fatalf("router.output processor not registered")
+				t.Fatalf("router.input processor not registered")
 			}
 
 			processorInstance, err := registration.New(config.ProcessorConfig{
-				Type:   "router.output",
+				Type:   "router.input",
 				Params: testCase.params,
 			})
 
 			if err != nil {
-				t.Fatalf("router.output failed to create processor: %s", err)
+				t.Fatalf("router.input failed to create processor: %s", err)
 			}
 
 			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: testCase.payload})
 			if err != nil {
-				t.Fatalf("router.output processing failed: %s", err)
+				t.Fatalf("router.input processing failed: %s", err)
 			}
 
 			if !reflect.DeepEqual(got.Payload, testCase.expected) {
-				t.Fatalf("router.output got %+v (%T), expected %+v (%T)", got.Payload, got.Payload, testCase.expected, testCase.expected)
+				t.Fatalf("router.input got %+v (%T), expected %+v (%T)", got.Payload, got.Payload, testCase.expected, testCase.expected)
 			}
 		})
 	}
 }
 
-func TestBadRouterOutput(t *testing.T) {
+func TestBadRouterInput(t *testing.T) {
 	testCases := []struct {
 		name        string
 		params      map[string]any
@@ -94,49 +94,48 @@ func TestBadRouterOutput(t *testing.T) {
 		errorString string
 	}{
 		{
-			name:        "no module param",
+			name:        "no source param",
 			params:      map[string]any{},
 			payload:     "test",
 			router:      test.GetNewTestRouter(),
-			errorString: "router.output module error: not found",
+			errorString: "router.input source error: not found",
 		},
 		{
-			name: "non-string module",
+			name: "non-string source",
 			params: map[string]any{
-				"module": 123,
+				"source": 123,
 			},
-			payload: "test",
-			router:  test.GetNewTestRouter(),
-
-			errorString: "router.output module error: not a string",
+			payload:     "test",
+			router:      test.GetNewTestRouter(),
+			errorString: "router.input source error: not a string",
 		},
 		{
 			name: "router not found in context",
 			params: map[string]any{
-				"module": "test",
+				"source": "test",
 			},
 			payload:     "test",
 			router:      nil,
-			errorString: "router.output no router found",
+			errorString: "router.input no router found",
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["router.output"]
+			registration, ok := processor.ProcessorRegistry["router.input"]
 			if !ok {
-				t.Fatalf("router.output processor not registered")
+				t.Fatalf("router.input processor not registered")
 			}
 
 			processorInstance, err := registration.New(config.ProcessorConfig{
-				Type:   "router.output",
+				Type:   "router.input",
 				Params: testCase.params,
 			})
 
 			if err != nil {
 				if testCase.errorString != err.Error() {
-					t.Fatalf("router.output got error '%s', expected '%s'", err.Error(), testCase.errorString)
+					t.Fatalf("router.input got error '%s', expected '%s'", err.Error(), testCase.errorString)
 				}
 				return
 			}
@@ -144,11 +143,11 @@ func TestBadRouterOutput(t *testing.T) {
 			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Router: testCase.router, Payload: testCase.payload})
 
 			if err == nil {
-				t.Fatalf("router.output expected to fail but succeeded, got: %v", got)
+				t.Fatalf("router.input expected to fail but succeeded, got: %v", got)
 			}
 
 			if err.Error() != testCase.errorString {
-				t.Fatalf("router.output got error '%s', expected '%s'", err.Error(), testCase.errorString)
+				t.Fatalf("router.input got error '%s', expected '%s'", err.Error(), testCase.errorString)
 			}
 		})
 	}

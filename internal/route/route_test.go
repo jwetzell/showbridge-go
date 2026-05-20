@@ -8,6 +8,7 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/route"
+	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
 func TestRouteCreate(t *testing.T) {
@@ -41,7 +42,7 @@ func TestGoodRouteHandleInput(t *testing.T) {
 		Processors: []config.ProcessorConfig{
 			{Type: "string.encode"},
 			{
-				Type: "router.output",
+				Type: "module.output",
 				Params: config.Params{
 					"module": "output",
 				},
@@ -57,6 +58,7 @@ func TestGoodRouteHandleInput(t *testing.T) {
 	inputData := "test input data"
 	payload, err := testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
 		Router:  &MockRouter{},
+		Modules: map[string]common.Module{"output": &test.TestOutputModule{}},
 		Payload: inputData,
 	})
 	if err != nil {
@@ -79,7 +81,7 @@ func TestRouteHandleInputWithProcessorError(t *testing.T) {
 		Processors: []config.ProcessorConfig{
 			{Type: "string.create", Params: map[string]any{"template": "{{.invalid}}}"}},
 			{
-				Type: "router.output",
+				Type: "module.output",
 				Params: config.Params{
 					"module": "output",
 				},
@@ -95,6 +97,7 @@ func TestRouteHandleInputWithProcessorError(t *testing.T) {
 	inputData := "test input data"
 	_, err = testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
 		Router:  &MockRouter{},
+		Modules: map[string]common.Module{"output": &test.TestOutputModule{}},
 		Payload: inputData,
 	})
 	if err == nil {
@@ -107,7 +110,7 @@ func TestRouteHandleNilPayload(t *testing.T) {
 		Input: "input",
 		Processors: []config.ProcessorConfig{
 			{
-				Type: "router.output",
+				Type: "module.output",
 				Params: config.Params{
 					"module": "output",
 				},
@@ -123,6 +126,7 @@ func TestRouteHandleNilPayload(t *testing.T) {
 
 	payload, err := testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
 		Router:  &MockRouter{},
+		Modules: map[string]common.Module{"output": &test.TestOutputModule{}},
 		Payload: nil,
 	})
 	if err != nil {
@@ -139,7 +143,7 @@ func TestRouteHandleNilPayloadFromProcessor(t *testing.T) {
 		Processors: []config.ProcessorConfig{
 			{Type: "script.js", Params: map[string]any{"program": "payload = undefined"}},
 			{
-				Type: "router.output",
+				Type: "module.output",
 				Params: config.Params{
 					"module": "output",
 				},
@@ -154,6 +158,7 @@ func TestRouteHandleNilPayloadFromProcessor(t *testing.T) {
 
 	_, err = testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
 		Router:  &MockRouter{},
+		Modules: map[string]common.Module{"output": &test.TestOutputModule{}},
 		Payload: "test",
 	})
 	if err != nil {
