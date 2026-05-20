@@ -20,7 +20,7 @@ require (
 	github.com/urfave/cli/v3 v3.9.0
 	gitlab.com/gomidi/midi/v2 v2.3.23
 	go.bug.st/serial v1.7.0
-	modernc.org/quickjs v0.18.1
+	modernc.org/quickjs v0.18.2
 	modernc.org/sqlite v1.50.1
 	sigs.k8s.io/yaml v1.6.0
 )
@@ -63,7 +63,6 @@ require (
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.51.0 // indirect
-	golang.org/x/mod v0.35.0 // indirect
 	golang.org/x/net v0.54.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.44.0 // indirect
@@ -72,7 +71,7 @@ require (
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/hraban/opus.v2 v2.0.0-20230925203106-0188a62cb302 // indirect
 	modernc.org/libc v1.72.3 // indirect
-	modernc.org/libquickjs v0.12.7 // indirect
+	modernc.org/libquickjs v0.12.8 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 )
