@@ -24,3 +24,7 @@ type KeyValueModule interface {
 type DatabaseModule interface {
 	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
 }
+
+type PubSubModule interface {
+	Publish(ctx context.Context, topic string, payload any) error
+}

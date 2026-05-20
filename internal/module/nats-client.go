@@ -9,7 +9,6 @@ import (
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/config"
-	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/nats-io/nats.go"
 )
 
@@ -106,12 +105,16 @@ func (nc *NATSClient) Start(ctx context.Context, router common.RouteIO) error {
 	return nil
 }
 
-func (nc *NATSClient) Output(ctx context.Context, payload any) error {
+func (nc *NATSClient) Publish(ctx context.Context, topic string, payload any) error {
 
-	payloadMessage, ok := common.GetAnyAs[processor.NATSMessage](payload)
+	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 
 	if !ok {
-		return errors.New("nats.client is only able to output NATSMessage")
+		payloadString, ok := common.GetAnyAs[string](payload)
+		if !ok {
+			return errors.New("nats.client is only able to publish bytes or string")
+		}
+		payloadBytes = []byte(payloadString)
 	}
 
 	nc.clientMu.Lock()
@@ -125,7 +128,7 @@ func (nc *NATSClient) Output(ctx context.Context, payload any) error {
 		return errors.New("nats.client is not connected")
 	}
 
-	err := nc.client.Publish(payloadMessage.Subject, payloadMessage.Payload)
+	err := nc.client.Publish(topic, payloadBytes)
 
 	return err
 }
