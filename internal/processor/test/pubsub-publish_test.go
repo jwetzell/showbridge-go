@@ -208,7 +208,7 @@ func TestBadPubSubPublish(t *testing.T) {
 				"topic":  "test",
 			},
 			wrappedPayloadModules: map[string]common.Module{
-				"test": test.NewTestKVModule("test"),
+				"test": test.NewTestKVModule("test", nil),
 			},
 			errorString: "pubsub.publish module with id test is not an OutputModule",
 		},

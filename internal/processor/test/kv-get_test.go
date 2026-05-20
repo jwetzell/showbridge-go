@@ -36,7 +36,9 @@ func TestKvGetFromRegistry(t *testing.T) {
 
 	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
 		Modules: map[string]common.Module{
-			"test": test.NewTestKVModule("test"),
+			"test": test.NewTestKVModule("test", map[string]any{
+				"test": "test",
+			}),
 		},
 		Payload: payload,
 	})
@@ -52,19 +54,23 @@ func TestKvGetFromRegistry(t *testing.T) {
 func TestGoodKvGet(t *testing.T) {
 
 	testCases := []struct {
-		name     string
-		params   map[string]any
-		payload  any
-		expected any
+		name         string
+		presetValues map[string]any
+		params       map[string]any
+		payload      any
+		expected     any
 	}{
 		{
 			name: "basic key",
+			presetValues: map[string]any{
+				"test": "hello",
+			},
 			params: map[string]any{
 				"module": "test",
 				"key":    "test",
 			},
 			payload:  "hello",
-			expected: "test",
+			expected: "hello",
 		},
 	}
 	for _, testCase := range testCases {
@@ -85,7 +91,7 @@ func TestGoodKvGet(t *testing.T) {
 
 			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
 				Modules: map[string]common.Module{
-					"test": test.NewTestKVModule("test"),
+					"test": test.NewTestKVModule("test", testCase.presetValues),
 				},
 				Payload: testCase.payload,
 			})
@@ -116,7 +122,7 @@ func TestBadKvGet(t *testing.T) {
 				"key": "test",
 			},
 			wrappedPayloadModules: map[string]common.Module{
-				"test": test.NewTestKVModule("test"),
+				"test": test.NewTestKVModule("test", nil),
 			},
 			errorString: "kv.get module error: not found",
 		},
@@ -128,7 +134,7 @@ func TestBadKvGet(t *testing.T) {
 				"key":    "test",
 			},
 			wrappedPayloadModules: map[string]common.Module{
-				"test": test.NewTestKVModule("test"),
+				"test": test.NewTestKVModule("test", nil),
 			},
 			errorString: "kv.get module error: not a string",
 		},
@@ -139,7 +145,7 @@ func TestBadKvGet(t *testing.T) {
 				"module": "test",
 			},
 			wrappedPayloadModules: map[string]common.Module{
-				"test": test.NewTestKVModule("test"),
+				"test": test.NewTestKVModule("test", nil),
 			},
 			errorString: "kv.get key error: not found",
 		},
@@ -151,7 +157,7 @@ func TestBadKvGet(t *testing.T) {
 				"key":    1,
 			},
 			wrappedPayloadModules: map[string]common.Module{
-				"test": test.NewTestKVModule("test"),
+				"test": test.NewTestKVModule("test", nil),
 			},
 			errorString: "kv.get key error: not a string",
 		},
@@ -240,7 +246,9 @@ func BenchmarkKvGet(b *testing.B) {
 		b.Fatalf("kv.get failed to create processor: %s", err)
 	}
 	modules := map[string]common.Module{
-		"test": test.NewTestKVModule("test"),
+		"test": test.NewTestKVModule("test", map[string]any{
+			"test": "test",
+		}),
 	}
 
 	for b.Loop() {

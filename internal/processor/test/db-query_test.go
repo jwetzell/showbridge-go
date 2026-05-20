@@ -250,7 +250,7 @@ func TestBadDbQuery(t *testing.T) {
 				"query":  "select * from test;",
 			},
 			wrappedPayloadModules: map[string]common.Module{
-				"test": test.NewTestKVModule("test"),
+				"test": test.NewTestKVModule("test", nil),
 			},
 			errorString: "db.query module with id test is not a DatabaseModule",
 		},

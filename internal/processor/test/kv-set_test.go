@@ -301,7 +301,7 @@ func BenchmarkKvSet(b *testing.B) {
 		b.Fatalf("kv.set failed to create processor: %s", err)
 	}
 	modules := map[string]common.Module{
-		"test": test.NewTestKVModule("test"),
+		"test": test.NewTestKVModule("test", nil),
 	}
 
 	count := 0

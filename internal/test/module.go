@@ -62,9 +62,10 @@ func (m *TestOutputModule) Id() string {
 	return m.id
 }
 
-func NewTestKVModule(id string) *TestKVModule {
+func NewTestKVModule(id string, presetValues map[string]any) *TestKVModule {
 	return &TestKVModule{
-		id: id,
+		id:     id,
+		kvData: presetValues,
 	}
 }
 
@@ -89,7 +90,14 @@ func (m *TestKVModule) Id() string {
 }
 
 func (m *TestKVModule) Get(key string) (any, error) {
-	return key, nil
+	if m.kvData == nil {
+		return nil, nil
+	}
+	value, ok := m.kvData[key]
+	if !ok {
+		return nil, nil
+	}
+	return value, nil
 }
 
 func (m *TestKVModule) Set(key string, value any) error {
