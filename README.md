@@ -40,7 +40,6 @@ GLOBAL OPTIONS:
    --config string      path to config file (default: "./config.yaml") [$SHOWBRIDGE_CONFIG]
    --log-level string   set log level (default: "info") [$SHOWBRIDGE_LOG_LEVEL]
    --log-format string  log format to use (default: "text") [$SHOWBRIDGE_LOG_FORMAT]
-   --trace              enable OpenTelemetry tracing [$SHOWBRIDGE_TRACE]
    --help, -h           show help
    --version, -v        print the version
 ```

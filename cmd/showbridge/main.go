@@ -16,11 +16,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/schema"
 	"github.com/urfave/cli/v3"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
-	"go.opentelemetry.io/otel/sdk/resource"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.40.0"
 	"sigs.k8s.io/yaml"
 )
 
@@ -66,12 +61,6 @@ func main() {
 					return nil
 				},
 				Sources: cli.EnvVars("SHOWBRIDGE_LOG_FORMAT"),
-			},
-			&cli.BoolFlag{
-				Name:    "trace",
-				Value:   false,
-				Usage:   "enable OpenTelemetry tracing",
-				Sources: cli.EnvVars("SHOWBRIDGE_TRACE"),
 			},
 		},
 		Action: run,
@@ -196,19 +185,6 @@ func run(ctx context.Context, c *cli.Command) error {
 
 	slog.SetDefault(slog.New(logHandler))
 
-	if c.Bool("trace") {
-		exporter, err := otlptracehttp.New(ctx)
-		if err != nil {
-			return fmt.Errorf("failed to create trace exporter: %w", err)
-		}
-
-		tracerProvider := newTracerProvider(exporter)
-		otel.SetTracerProvider(tracerProvider)
-		defer tracerProvider.Shutdown(ctx)
-
-		otel.SetTracerProvider(tracerProvider)
-	}
-
 	showbridgeApp := &showbridgeApp{
 		ctx:        ctx,
 		configPath: configPath,
@@ -288,24 +264,4 @@ func (app *showbridgeApp) logConfigErrors(moduleErrors []config.ModuleError, rou
 	for _, routeError := range routeErrors {
 		app.logger.Error("problem initializing route", "index", routeError.Index, "error", routeError.Error)
 	}
-}
-
-func newTracerProvider(exp sdktrace.SpanExporter) *sdktrace.TracerProvider {
-	r, err := resource.Merge(
-		resource.Default(),
-		resource.NewWithAttributes(
-			semconv.SchemaURL,
-			semconv.ServiceName("showbridge"),
-			semconv.ServiceVersion(version),
-		),
-	)
-
-	if err != nil {
-		panic(err)
-	}
-
-	return sdktrace.NewTracerProvider(
-		sdktrace.WithBatcher(exp),
-		sdktrace.WithResource(r),
-	)
 }
