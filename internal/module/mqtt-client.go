@@ -2,6 +2,7 @@ package module
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -20,6 +21,8 @@ type MQTTClient struct {
 	Broker   string
 	ClientID string
 	Topic    string
+	QoS      byte
+	Retained bool
 	client   mqtt.Client
 	logger   *slog.Logger
 	cancel   context.CancelFunc
@@ -45,12 +48,24 @@ func init() {
 					Title: "Client ID",
 					Type:  "string",
 				},
+				"qos": {
+					Title:   "QoS",
+					Type:    "integer",
+					Minimum: jsonschema.Ptr[float64](0),
+					Maximum: jsonschema.Ptr[float64](2),
+					Default: json.RawMessage(`0`),
+				},
+				"retained": {
+					Title:   "Retained",
+					Type:    "boolean",
+					Default: json.RawMessage(`false`),
+				},
 			},
 			Required:             []string{"broker", "topic", "clientId"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ModuleConfig) (common.Module, error) {
-			params := config.Params
+		New: func(moduleConfig config.ModuleConfig) (common.Module, error) {
+			params := moduleConfig.Params
 			brokerString, err := params.GetString("broker")
 
 			if err != nil {
@@ -69,7 +84,27 @@ func init() {
 				return nil, fmt.Errorf("mqtt.client clientId error: %w", err)
 			}
 
-			return &MQTTClient{config: config, Broker: brokerString, Topic: topicString, ClientID: clientIdString, logger: CreateLogger(config)}, nil
+			qosString, err := params.GetInt("qos")
+
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					qosString = 0
+				} else {
+					return nil, fmt.Errorf("mqtt.client qos error: %w", err)
+				}
+			}
+
+			retainedBool, err := params.GetBool("retained")
+
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					retainedBool = false
+				} else {
+					return nil, fmt.Errorf("mqtt.client retained error: %w", err)
+				}
+			}
+
+			return &MQTTClient{config: moduleConfig, Broker: brokerString, Topic: topicString, ClientID: clientIdString, QoS: byte(qosString), Retained: retainedBool, logger: CreateLogger(moduleConfig)}, nil
 		},
 	})
 }
@@ -118,11 +153,15 @@ func (mc *MQTTClient) Start(ctx context.Context, router common.RouteIO) error {
 	return nil
 }
 
-func (mc *MQTTClient) Output(ctx context.Context, payload any) error {
-	payloadMessage, ok := common.GetAnyAs[mqtt.Message](payload)
+func (mc *MQTTClient) Publish(ctx context.Context, topic string, payload any) error {
+	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 
 	if !ok {
-		return errors.New("mqtt.client is only able to output a MQTTMessage")
+		payloadString, ok := common.GetAnyAs[string](payload)
+		if !ok {
+			return errors.New("mqtt.client is only able to publish bytes or string")
+		}
+		payloadBytes = []byte(payloadString)
 	}
 
 	if mc.client == nil {
@@ -133,7 +172,7 @@ func (mc *MQTTClient) Output(ctx context.Context, payload any) error {
 		return errors.New("mqtt.client is not connected")
 	}
 
-	token := mc.client.Publish(payloadMessage.Topic(), payloadMessage.Qos(), payloadMessage.Retained(), payloadMessage.Payload())
+	token := mc.client.Publish(topic, mc.QoS, mc.Retained, payloadBytes)
 
 	token.Wait()
 

@@ -36,7 +36,7 @@ func TestGoodHTTPRequestDo(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		expected processor.NATSMessage
+		expected any
 		params   map[string]any
 		payload  any
 	}{}

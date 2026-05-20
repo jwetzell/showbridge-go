@@ -111,3 +111,32 @@ func (m *TestDBModule) Type() string {
 func (m *TestDBModule) Id() string {
 	return m.id
 }
+
+func NewTestPubSubModule(id string) *TestPubSubModule {
+	return &TestPubSubModule{
+		id: id,
+	}
+}
+
+type TestPubSubModule struct {
+	id string
+}
+
+func (m *TestPubSubModule) Start(ctx context.Context, router common.RouteIO) error {
+	<-ctx.Done()
+	return nil
+}
+
+func (m *TestPubSubModule) Publish(ctx context.Context, topic string, payload any) error {
+	return nil
+}
+
+func (m *TestPubSubModule) Stop() {}
+
+func (m *TestPubSubModule) Type() string {
+	return "test.pubsub"
+}
+
+func (m *TestPubSubModule) Id() string {
+	return m.id
+}
