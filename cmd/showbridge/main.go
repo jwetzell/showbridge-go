@@ -204,9 +204,6 @@ func run(ctx context.Context, c *cli.Command) error {
 		return fmt.Errorf("errors initializing modules or routes")
 	}
 
-	if err != nil {
-		return fmt.Errorf("failed to initialize router: %w", err)
-	}
 	showbridgeApp.routerMutex.Lock()
 	showbridgeApp.router = router
 
