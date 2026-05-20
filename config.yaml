@@ -18,6 +18,6 @@ routes:
         params:
           address: "{{.Payload.URL.Path}}"
       - type: osc.message.encode
-      - type: router.output
+      - type: module.output
         params:
           module: udp

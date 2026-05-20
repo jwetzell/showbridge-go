@@ -58,14 +58,14 @@ routes:
       - type: string.create
         params:
           template: "hello"
-      - type: router.output
+      - type: module.output
         params:
           module: wsecho
       - type: string.encode
-      - type: router.output
+      - type: module.output
         params:
           module: tcpout
-      - type: router.output
+      - type: module.output
         params:
           module: udpout
   - input: ticker
@@ -105,7 +105,7 @@ routes:
         params:
           subject: "test"
           payload: "hello"
-      - type: router.output
+      - type: module.output
         params:
           module: natsout
   
