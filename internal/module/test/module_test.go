@@ -19,7 +19,7 @@ func TestModuleBadRegistrationNoType(t *testing.T) {
 	module.RegisterModule(module.ModuleRegistration{
 		Type: "",
 		New: func(config config.ModuleConfig) (common.Module, error) {
-			return &test.TestModule{}, nil
+			return test.NewTestModule("test"), nil
 		},
 	})
 }
@@ -47,14 +47,14 @@ func TestModuleBadRegistrationExistingType(t *testing.T) {
 	module.RegisterModule(module.ModuleRegistration{
 		Type: "module.test",
 		New: func(config config.ModuleConfig) (common.Module, error) {
-			return &test.TestModule{}, nil
+			return test.NewTestModule("test"), nil
 		},
 	})
 
 	module.RegisterModule(module.ModuleRegistration{
 		Type: "module.test",
 		New: func(config config.ModuleConfig) (common.Module, error) {
-			return &test.TestModule{}, nil
+			return test.NewTestModule("test"), nil
 		},
 	})
 }

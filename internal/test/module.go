@@ -8,7 +8,14 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+func NewTestModule(id string) *TestModule {
+	return &TestModule{
+		id: id,
+	}
+}
+
 type TestModule struct {
+	id string
 }
 
 func (m *TestModule) Start(ctx context.Context, router common.RouteIO) error {

@@ -98,7 +98,7 @@ func TestBadModuleOutput(t *testing.T) {
 			name:        "no module param",
 			params:      map[string]any{},
 			payload:     "test",
-			modules:     map[string]common.Module{"test": &test.TestModule{}},
+			modules:     map[string]common.Module{"test": test.NewTestModule("test")},
 			errorString: "module.output module error: not found",
 		},
 		{
@@ -107,7 +107,7 @@ func TestBadModuleOutput(t *testing.T) {
 				"module": 123,
 			},
 			payload:     "test",
-			modules:     map[string]common.Module{"test": &test.TestModule{}},
+			modules:     map[string]common.Module{"test": test.NewTestModule("test")},
 			errorString: "module.output module error: not a string",
 		},
 		{
