@@ -101,11 +101,10 @@ routes:
       - type: debug.log
   - input: ticker
     processors:
-      - type: nats.message.create
+      - type: string.create
         params:
-          subject: "test"
-          payload: "hello"
-      - type: module.output
+          template: "{{.Payload}}"
+      - type: pubsub.publish
         params:
           module: natsout
-  
+          topic: "test"
