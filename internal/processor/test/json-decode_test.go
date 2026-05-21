@@ -142,7 +142,7 @@ func BenchmarkJsonDecode(b *testing.B) {
 
 	count := 0
 	for b.Loop() {
-		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: []byte(fmt.Sprintf("{\"key\":%d}", count))})
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: fmt.Appendf(nil, "{\"key\":%d}", count)})
 		if err != nil {
 			b.Fatalf("json.decode processing failed: %s", err)
 		}

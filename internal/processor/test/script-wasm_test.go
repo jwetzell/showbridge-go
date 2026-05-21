@@ -209,7 +209,7 @@ func BenchmarkScriptWASM(b *testing.B) {
 
 	count := 0
 	for b.Loop() {
-		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: []byte(fmt.Sprintf("%d", count))})
+		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: fmt.Appendf(nil, "%d", count)})
 		if err != nil {
 			b.Fatalf("script.wasm processing failed: %s", err)
 		}
