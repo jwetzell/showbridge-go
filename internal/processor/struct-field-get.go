@@ -16,7 +16,7 @@ type StructFieldGet struct {
 	Name   string
 }
 
-func (sf *StructFieldGet) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (sfg *StructFieldGet) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	s := reflect.ValueOf(payload)
 
@@ -29,18 +29,18 @@ func (sf *StructFieldGet) Process(ctx context.Context, wrappedPayload common.Wra
 		}
 	}
 
-	field := s.FieldByName(sf.Name)
+	field := s.FieldByName(sfg.Name)
 	if !field.IsValid() {
 		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("struct.field.get field '%s' does not exist", sf.Name)
+		return wrappedPayload, fmt.Errorf("struct.field.get field '%s' does not exist", sfg.Name)
 	}
 
 	wrappedPayload.Payload = field.Interface()
 	return wrappedPayload, nil
 }
 
-func (sf *StructFieldGet) Type() string {
-	return sf.config.Type
+func (sfg *StructFieldGet) Type() string {
+	return sfg.config.Type
 }
 
 func init() {

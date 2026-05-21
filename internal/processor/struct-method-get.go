@@ -16,7 +16,7 @@ type StructMethodGet struct {
 	Name   string
 }
 
-func (sm *StructMethodGet) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (smg *StructMethodGet) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	s := reflect.ValueOf(payload)
 
@@ -29,10 +29,10 @@ func (sm *StructMethodGet) Process(ctx context.Context, wrappedPayload common.Wr
 		}
 	}
 
-	method := s.MethodByName(sm.Name)
+	method := s.MethodByName(smg.Name)
 	if !method.IsValid() {
 		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("struct.method.get method '%s' does not exist", sm.Name)
+		return wrappedPayload, fmt.Errorf("struct.method.get method '%s' does not exist", smg.Name)
 	}
 
 	value := method.Call(nil)
@@ -58,8 +58,8 @@ func (sm *StructMethodGet) Process(ctx context.Context, wrappedPayload common.Wr
 	return wrappedPayload, nil
 }
 
-func (sm *StructMethodGet) Type() string {
-	return sm.config.Type
+func (smg *StructMethodGet) Type() string {
+	return smg.config.Type
 }
 
 func init() {

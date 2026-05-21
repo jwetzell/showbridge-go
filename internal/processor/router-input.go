@@ -17,7 +17,7 @@ type RouterInput struct {
 	logger   *slog.Logger
 }
 
-func (ro *RouterInput) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (ri *RouterInput) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
 	payload := wrappedPayload.Payload
 	if wrappedPayload.InputHandler == nil {
@@ -25,7 +25,7 @@ func (ro *RouterInput) Process(ctx context.Context, wrappedPayload common.Wrappe
 		return wrappedPayload, errors.New("router.input no input handler found")
 	}
 
-	_, err := wrappedPayload.InputHandler(ctx, ro.SourceId, payload)
+	_, err := wrappedPayload.InputHandler(ctx, ri.SourceId, payload)
 
 	if err != nil {
 		wrappedPayload.End = true
@@ -37,8 +37,8 @@ func (ro *RouterInput) Process(ctx context.Context, wrappedPayload common.Wrappe
 	return wrappedPayload, nil
 }
 
-func (ro *RouterInput) Type() string {
-	return ro.config.Type
+func (ri *RouterInput) Type() string {
+	return ri.config.Type
 }
 
 func init() {

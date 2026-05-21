@@ -18,29 +18,29 @@ type ModuleOutput struct {
 	module   common.OutputModule
 }
 
-func (ro *ModuleOutput) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (mo *ModuleOutput) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
-	if ro.module == nil {
+	if mo.module == nil {
 		if wrappedPayload.Modules == nil {
 			wrappedPayload.End = true
 			return wrappedPayload, errors.New("module.output wrapped payload has no modules")
 		}
 
-		module, ok := wrappedPayload.Modules[ro.ModuleId]
+		module, ok := wrappedPayload.Modules[mo.ModuleId]
 		if !ok {
 			wrappedPayload.End = true
-			return wrappedPayload, fmt.Errorf("module.output unable to find module with id: %s", ro.ModuleId)
+			return wrappedPayload, fmt.Errorf("module.output unable to find module with id: %s", mo.ModuleId)
 		}
 
 		outputModule, ok := module.(common.OutputModule)
 		if !ok {
 			wrappedPayload.End = true
-			return wrappedPayload, fmt.Errorf("module.output module with id %s is not an OutputModule", ro.ModuleId)
+			return wrappedPayload, fmt.Errorf("module.output module with id %s is not an OutputModule", mo.ModuleId)
 		}
-		ro.module = outputModule
+		mo.module = outputModule
 	}
 
-	err := ro.module.Output(ctx, wrappedPayload.Payload)
+	err := mo.module.Output(ctx, wrappedPayload.Payload)
 
 	if err != nil {
 		wrappedPayload.End = true
@@ -50,8 +50,8 @@ func (ro *ModuleOutput) Process(ctx context.Context, wrappedPayload common.Wrapp
 	return wrappedPayload, nil
 }
 
-func (ro *ModuleOutput) Type() string {
-	return ro.config.Type
+func (mo *ModuleOutput) Type() string {
+	return mo.config.Type
 }
 
 func init() {
