@@ -15,14 +15,14 @@ import (
 )
 
 type UDPMulticast struct {
-	config config.ModuleConfig
-	conn   *net.UDPConn
-	ctx    context.Context
-	router common.RouteIO
-	Addr   *net.UDPAddr
-	logger *slog.Logger
-	cancel context.CancelFunc
-	connMu sync.Mutex
+	config       config.ModuleConfig
+	conn         *net.UDPConn
+	ctx          context.Context
+	inputHandler common.InputHandler
+	Addr         *net.UDPAddr
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	connMu       sync.Mutex
 }
 
 func init() {
@@ -75,9 +75,9 @@ func (um *UDPMulticast) Type() string {
 	return um.config.Type
 }
 
-func (um *UDPMulticast) Start(ctx context.Context, router common.RouteIO) error {
+func (um *UDPMulticast) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	um.logger.Debug("running")
-	um.router = router
+	um.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	um.ctx = moduleContext
 	um.cancel = cancel
@@ -114,10 +114,10 @@ func (um *UDPMulticast) Start(ctx context.Context, router common.RouteIO) error 
 			if numBytes > 0 {
 				message := buffer[:numBytes]
 
-				if um.router != nil {
-					um.router.HandleInput(um.ctx, um.Id(), message)
+				if um.inputHandler != nil {
+					um.inputHandler(um.ctx, um.Id(), message)
 				} else {
-					um.logger.Error("input received but no router is configured")
+					um.logger.Error("input received but no input handler is configured")
 				}
 			}
 		}

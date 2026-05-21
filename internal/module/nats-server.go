@@ -17,15 +17,15 @@ import (
 )
 
 type NATSServer struct {
-	config   config.ModuleConfig
-	ctx      context.Context
-	Ip       string
-	Port     int
-	router   common.RouteIO
-	server   *server.Server
-	logger   *slog.Logger
-	cancel   context.CancelFunc
-	serverMu sync.Mutex
+	config       config.ModuleConfig
+	ctx          context.Context
+	Ip           string
+	Port         int
+	inputHandler common.InputHandler
+	server       *server.Server
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	serverMu     sync.Mutex
 }
 
 func init() {
@@ -88,9 +88,9 @@ func (ns *NATSServer) Type() string {
 	return ns.config.Type
 }
 
-func (ns *NATSServer) Start(ctx context.Context, router common.RouteIO) error {
+func (ns *NATSServer) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	ns.logger.Debug("running")
-	ns.router = router
+	ns.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	ns.ctx = moduleContext
 	ns.cancel = cancel

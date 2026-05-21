@@ -12,13 +12,13 @@ import (
 )
 
 type TimeInterval struct {
-	config   config.ModuleConfig
-	Duration uint32
-	ctx      context.Context
-	router   common.RouteIO
-	ticker   *time.Ticker
-	logger   *slog.Logger
-	cancel   context.CancelFunc
+	config       config.ModuleConfig
+	Duration     uint32
+	ctx          context.Context
+	inputHandler common.InputHandler
+	ticker       *time.Ticker
+	logger       *slog.Logger
+	cancel       context.CancelFunc
 }
 
 func init() {
@@ -57,9 +57,9 @@ func (i *TimeInterval) Type() string {
 	return i.config.Type
 }
 
-func (i *TimeInterval) Start(ctx context.Context, router common.RouteIO) error {
+func (i *TimeInterval) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	i.logger.Debug("running")
-	i.router = router
+	i.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	i.ctx = moduleContext
 	i.cancel = cancel
@@ -72,8 +72,8 @@ func (i *TimeInterval) Start(ctx context.Context, router common.RouteIO) error {
 		case <-i.ctx.Done():
 			return nil
 		case <-ticker.C:
-			if i.router != nil {
-				i.router.HandleInput(i.ctx, i.Id(), time.Now())
+			if i.inputHandler != nil {
+				i.inputHandler(i.ctx, i.Id(), time.Now())
 			}
 		}
 	}

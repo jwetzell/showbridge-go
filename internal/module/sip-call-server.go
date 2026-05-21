@@ -22,17 +22,17 @@ import (
 )
 
 type SIPCallServer struct {
-	config    config.ModuleConfig
-	ctx       context.Context
-	router    common.RouteIO
-	IP        string
-	Port      int
-	Transport string
-	UserAgent string
-	logger    *slog.Logger
-	cancel    context.CancelFunc
-	ua        *sipgo.UserAgent
-	uaMu      sync.Mutex
+	config       config.ModuleConfig
+	ctx          context.Context
+	inputHandler common.InputHandler
+	IP           string
+	Port         int
+	Transport    string
+	UserAgent    string
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	ua           *sipgo.UserAgent
+	uaMu         sync.Mutex
 }
 
 type SIPCallMessage struct {
@@ -132,9 +132,9 @@ func (scs *SIPCallServer) Type() string {
 	return scs.config.Type
 }
 
-func (scs *SIPCallServer) Start(ctx context.Context, router common.RouteIO) error {
+func (scs *SIPCallServer) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	scs.logger.Debug("running")
-	scs.router = router
+	scs.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	scs.ctx = moduleContext
 	scs.cancel = cancel
@@ -179,9 +179,11 @@ func (scs *SIPCallServer) HandleCall(inDialog *diago.DialogServerSession) {
 	dialogContext := context.WithValue(scs.ctx, sipCallContextKey("call"), &SIPCall{
 		inDialog: inDialog,
 	})
-	scs.router.HandleInput(dialogContext, scs.Id(), SIPCallMessage{
-		To: inDialog.ToUser(),
-	})
+	if scs.inputHandler != nil {
+		scs.inputHandler(dialogContext, scs.Id(), SIPCallMessage{
+			To: inDialog.ToUser(),
+		})
+	}
 }
 
 func (scs *SIPCallServer) Output(ctx context.Context, payload any) error {

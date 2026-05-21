@@ -14,15 +14,15 @@ import (
 )
 
 type UDPClient struct {
-	config config.ModuleConfig
-	Addr   *net.UDPAddr
-	Port   uint16
-	conn   *net.UDPConn
-	ctx    context.Context
-	router common.RouteIO
-	logger *slog.Logger
-	cancel context.CancelFunc
-	connMu sync.Mutex
+	config       config.ModuleConfig
+	Addr         *net.UDPAddr
+	Port         uint16
+	conn         *net.UDPConn
+	ctx          context.Context
+	inputHandler common.InputHandler
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	connMu       sync.Mutex
 }
 
 func init() {
@@ -83,9 +83,9 @@ func (uc *UDPClient) SetupConn() error {
 	return err
 }
 
-func (uc *UDPClient) Start(ctx context.Context, router common.RouteIO) error {
+func (uc *UDPClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	uc.logger.Debug("running")
-	uc.router = router
+	uc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	uc.ctx = moduleContext
 	uc.cancel = cancel

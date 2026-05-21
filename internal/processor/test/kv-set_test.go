@@ -113,7 +113,7 @@ func TestBadKvSet(t *testing.T) {
 			name:    "no module param",
 			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
-				"key":   "test",
+				"key": "test",
 			},
 			wrappedPayloadModules: map[string]common.Module{
 				"test": &test.TestKVModule{},

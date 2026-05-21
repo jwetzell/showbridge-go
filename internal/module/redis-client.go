@@ -14,15 +14,15 @@ import (
 )
 
 type RedisClient struct {
-	config   config.ModuleConfig
-	ctx      context.Context
-	router   common.RouteIO
-	Host     string
-	Port     uint16
-	client   *redis.Client
-	logger   *slog.Logger
-	cancel   context.CancelFunc
-	clientMu sync.Mutex
+	config       config.ModuleConfig
+	ctx          context.Context
+	inputHandler common.InputHandler
+	Host         string
+	Port         uint16
+	client       *redis.Client
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	clientMu     sync.Mutex
 }
 
 func init() {
@@ -75,10 +75,10 @@ func (rc *RedisClient) Printf(ctx context.Context, format string, v ...any) {
 	rc.logger.Debug(msg)
 }
 
-func (rc *RedisClient) Start(ctx context.Context, router common.RouteIO) error {
+func (rc *RedisClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	redis.SetLogger(rc)
 	rc.logger.Debug("running")
-	rc.router = router
+	rc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	rc.ctx = moduleContext
 	rc.cancel = cancel

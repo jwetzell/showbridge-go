@@ -70,7 +70,7 @@ func (r *Router) startModule(ctx context.Context, moduleId string) error {
 		return errors.New("module id not found")
 	}
 	r.moduleWait.Go(func() {
-		err := moduleInstance.Start(ctx, r)
+		err := moduleInstance.Start(ctx, r.HandleInput)
 		if err != nil {
 			// TODO(jwetzell): propagate module run errors better
 			r.logger.Error("error encountered running module", "moduleId", moduleId, "error", err)
@@ -211,7 +211,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 					Payload: payload,
 					Source:  sourceId,
 					Modules: r.ModuleInstances,
-					Router:  r,
+					InputHandler:  r.HandleInput,
 					End:     false,
 				})
 				if err != nil {

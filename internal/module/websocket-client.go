@@ -17,14 +17,14 @@ import (
 )
 
 type WebSocketClient struct {
-	config config.ModuleConfig
-	URL    url.URL
-	ctx    context.Context
-	conn   *websocket.Conn
-	router common.RouteIO
-	logger *slog.Logger
-	cancel context.CancelFunc
-	connMu sync.Mutex
+	config       config.ModuleConfig
+	URL          url.URL
+	ctx          context.Context
+	conn         *websocket.Conn
+	inputHandler common.InputHandler
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	connMu       sync.Mutex
 }
 
 func init() {
@@ -79,9 +79,9 @@ func (wc *WebSocketClient) SetupConn() error {
 	return err
 }
 
-func (wc *WebSocketClient) Start(ctx context.Context, router common.RouteIO) error {
+func (wc *WebSocketClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	wc.logger.Debug("running")
-	wc.router = router
+	wc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	wc.ctx = moduleContext
 	wc.cancel = cancel
@@ -124,17 +124,17 @@ func (wc *WebSocketClient) readLoop() {
 			wc.logger.Error("websocket read error", "error", err)
 			return
 		}
-		if wc.router != nil {
+		if wc.inputHandler != nil {
 			switch messageType {
 			case websocket.TextMessage:
-				wc.router.HandleInput(wc.ctx, wc.Id(), string(message))
+				wc.inputHandler(wc.ctx, wc.Id(), string(message))
 			case websocket.BinaryMessage:
-				wc.router.HandleInput(wc.ctx, wc.Id(), message)
+				wc.inputHandler(wc.ctx, wc.Id(), message)
 			default:
 				wc.logger.Warn("unsupported message type received", "messageType", messageType)
 			}
 		} else {
-			wc.logger.Error("input received but no router is configured")
+			wc.logger.Error("input received but no input handler is configured")
 			continue
 		}
 	}

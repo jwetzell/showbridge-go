@@ -16,15 +16,15 @@ import (
 )
 
 type TCPClient struct {
-	config config.ModuleConfig
-	framer framer.Framer
-	conn   *net.TCPConn
-	ctx    context.Context
-	router common.RouteIO
-	Addr   *net.TCPAddr
-	logger *slog.Logger
-	cancel context.CancelFunc
-	connMu sync.Mutex
+	config       config.ModuleConfig
+	framer       framer.Framer
+	conn         *net.TCPConn
+	ctx          context.Context
+	inputHandler common.InputHandler
+	Addr         *net.TCPAddr
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	connMu       sync.Mutex
 }
 
 func init() {
@@ -93,9 +93,9 @@ func (tc *TCPClient) Type() string {
 	return tc.config.Type
 }
 
-func (tc *TCPClient) Start(ctx context.Context, router common.RouteIO) error {
+func (tc *TCPClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	tc.logger.Debug("running")
-	tc.router = router
+	tc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	tc.ctx = moduleContext
 	tc.cancel = cancel
@@ -133,10 +133,10 @@ func (tc *TCPClient) Start(ctx context.Context, router common.RouteIO) error {
 						if byteCount > 0 {
 							messages := tc.framer.Decode(buffer[0:byteCount])
 							for _, message := range messages {
-								if tc.router != nil {
-									tc.router.HandleInput(tc.ctx, tc.Id(), message)
+								if tc.inputHandler != nil {
+									tc.inputHandler(tc.ctx, tc.Id(), message)
 								} else {
-									tc.logger.Error("input received but no router is configured")
+									tc.logger.Error("input received but no input handler is configured")
 								}
 							}
 						}

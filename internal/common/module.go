@@ -8,7 +8,7 @@ import (
 type Module interface {
 	Id() string
 	Type() string
-	Start(context.Context, RouteIO) error
+	Start(context.Context, InputHandler) error
 	Stop()
 }
 

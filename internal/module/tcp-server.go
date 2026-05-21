@@ -24,7 +24,7 @@ type TCPServer struct {
 	Addr          *net.TCPAddr
 	Framer        framer.Framer
 	ctx           context.Context
-	router        common.RouteIO
+	inputHandler  common.InputHandler
 	wg            sync.WaitGroup
 	connections   []*net.TCPConn
 	connectionsMu sync.RWMutex
@@ -166,15 +166,10 @@ ClientRead:
 				if byteCount > 0 {
 					messages := ts.Framer.Decode(buffer[0:byteCount])
 					for _, message := range messages {
-						if ts.router != nil {
-							_, ok := client.RemoteAddr().(*net.TCPAddr)
-							if ok {
-								ts.router.HandleInput(ts.ctx, ts.Id(), message)
-							} else {
-								ts.router.HandleInput(ts.ctx, ts.Id(), message)
-							}
+						if ts.inputHandler != nil {
+							ts.inputHandler(ts.ctx, ts.Id(), message)
 						} else {
-							ts.logger.Error("input received but no router is configured")
+							ts.logger.Error("input received but no input handler is configured")
 						}
 					}
 				}
@@ -183,9 +178,9 @@ ClientRead:
 	}
 }
 
-func (ts *TCPServer) Start(ctx context.Context, router common.RouteIO) error {
+func (ts *TCPServer) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	ts.logger.Debug("running")
-	ts.router = router
+	ts.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	ts.ctx = moduleContext
 	ts.cancel = cancel

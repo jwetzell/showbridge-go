@@ -18,16 +18,16 @@ import (
 )
 
 type SerialClient struct {
-	config config.ModuleConfig
-	ctx    context.Context
-	router common.RouteIO
-	Port   string
-	Framer framer.Framer
-	Mode   *serial.Mode
-	port   serial.Port
-	logger *slog.Logger
-	cancel context.CancelFunc
-	portMu sync.Mutex
+	config       config.ModuleConfig
+	ctx          context.Context
+	inputHandler common.InputHandler
+	Port         string
+	Framer       framer.Framer
+	Mode         *serial.Mode
+	port         serial.Port
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	portMu       sync.Mutex
 }
 
 func init() {
@@ -107,9 +107,9 @@ func (sc *SerialClient) SetupPort() error {
 	return nil
 }
 
-func (sc *SerialClient) Start(ctx context.Context, router common.RouteIO) error {
+func (sc *SerialClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	sc.logger.Debug("running")
-	sc.router = router
+	sc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	sc.ctx = moduleContext
 	sc.cancel = cancel
@@ -147,8 +147,8 @@ func (sc *SerialClient) Start(ctx context.Context, router common.RouteIO) error 
 						if byteCount > 0 {
 							messages := sc.Framer.Decode(buffer[0:byteCount])
 							for _, message := range messages {
-								if sc.router != nil {
-									sc.router.HandleInput(sc.ctx, sc.Id(), message)
+								if sc.inputHandler != nil {
+									sc.inputHandler(sc.ctx, sc.Id(), message)
 								} else {
 									sc.logger.Error("input received but no router is configured")
 								}

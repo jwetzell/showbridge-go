@@ -15,13 +15,13 @@ import (
 )
 
 type MIDIInput struct {
-	config config.ModuleConfig
-	ctx    context.Context
-	router common.RouteIO
-	Port   string
-	logger *slog.Logger
-	cancel context.CancelFunc
-	stop   func()
+	config       config.ModuleConfig
+	ctx          context.Context
+	inputHandler common.InputHandler
+	Port         string
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	stop         func()
 }
 
 func init() {
@@ -59,9 +59,9 @@ func (mi *MIDIInput) Type() string {
 	return mi.config.Type
 }
 
-func (mi *MIDIInput) Start(ctx context.Context, router common.RouteIO) error {
+func (mi *MIDIInput) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	mi.logger.Debug("running")
-	mi.router = router
+	mi.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	mi.ctx = moduleContext
 	mi.cancel = cancel
@@ -72,8 +72,8 @@ func (mi *MIDIInput) Start(ctx context.Context, router common.RouteIO) error {
 	}
 
 	stop, err := midi.ListenTo(in, func(msg midi.Message, timestampms int32) {
-		if mi.router != nil {
-			mi.router.HandleInput(mi.ctx, mi.Id(), msg)
+		if mi.inputHandler != nil {
+			mi.inputHandler(mi.ctx, mi.Id(), msg)
 		}
 	}, midi.UseSysEx())
 

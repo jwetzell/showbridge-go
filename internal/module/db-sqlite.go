@@ -15,14 +15,14 @@ import (
 )
 
 type DbSqlite struct {
-	config config.ModuleConfig
-	Dsn    string
-	ctx    context.Context
-	router common.RouteIO
-	db     *sql.DB
-	logger *slog.Logger
-	dbMu   sync.Mutex
-	cancel context.CancelFunc
+	config       config.ModuleConfig
+	Dsn          string
+	ctx          context.Context
+	inputHandler common.InputHandler
+	db           *sql.DB
+	logger       *slog.Logger
+	dbMu         sync.Mutex
+	cancel       context.CancelFunc
 }
 
 func init() {
@@ -61,9 +61,9 @@ func (dbs *DbSqlite) Type() string {
 	return dbs.config.Type
 }
 
-func (dbs *DbSqlite) Start(ctx context.Context, router common.RouteIO) error {
+func (dbs *DbSqlite) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	dbs.logger.Debug("running")
-	dbs.router = router
+	dbs.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	dbs.ctx = moduleContext
 	dbs.cancel = cancel

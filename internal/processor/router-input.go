@@ -20,12 +20,12 @@ type RouterInput struct {
 func (ro *RouterInput) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
 	payload := wrappedPayload.Payload
-	if wrappedPayload.Router == nil {
+	if wrappedPayload.InputHandler == nil {
 		wrappedPayload.End = true
-		return wrappedPayload, errors.New("router.input no router found")
+		return wrappedPayload, errors.New("router.input no input handler found")
 	}
 
-	_, err := wrappedPayload.Router.HandleInput(ctx, ro.SourceId, payload)
+	_, err := wrappedPayload.InputHandler(ctx, ro.SourceId, payload)
 
 	if err != nil {
 		wrappedPayload.End = true

@@ -17,14 +17,14 @@ import (
 )
 
 type MIDIOutput struct {
-	config     config.ModuleConfig
-	ctx        context.Context
-	router     common.RouteIO
-	Port       string
-	sendFunc   func(midi.Message) error
-	logger     *slog.Logger
-	cancel     context.CancelFunc
-	sendFuncMu sync.Mutex
+	config       config.ModuleConfig
+	ctx          context.Context
+	inputHandler common.InputHandler
+	Port         string
+	sendFunc     func(midi.Message) error
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	sendFuncMu   sync.Mutex
 }
 
 func init() {
@@ -63,9 +63,9 @@ func (mo *MIDIOutput) Type() string {
 	return mo.config.Type
 }
 
-func (mo *MIDIOutput) Start(ctx context.Context, router common.RouteIO) error {
+func (mo *MIDIOutput) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	mo.logger.Debug("running")
-	mo.router = router
+	mo.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	mo.ctx = moduleContext
 	mo.cancel = cancel

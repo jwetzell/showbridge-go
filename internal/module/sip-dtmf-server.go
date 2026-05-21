@@ -23,18 +23,18 @@ import (
 )
 
 type SIPDTMFServer struct {
-	config    config.ModuleConfig
-	ctx       context.Context
-	router    common.RouteIO
-	IP        string
-	Port      int
-	Transport string
-	UserAgent string
-	Separator string
-	logger    *slog.Logger
-	cancel    context.CancelFunc
-	ua        *sipgo.UserAgent
-	uaMu      sync.Mutex
+	config       config.ModuleConfig
+	ctx          context.Context
+	inputHandler common.InputHandler
+	IP           string
+	Port         int
+	Transport    string
+	UserAgent    string
+	Separator    string
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	ua           *sipgo.UserAgent
+	uaMu         sync.Mutex
 }
 
 type SIPDTMFMessage struct {
@@ -152,9 +152,9 @@ func (sds *SIPDTMFServer) Type() string {
 	return sds.config.Type
 }
 
-func (sds *SIPDTMFServer) Start(ctx context.Context, router common.RouteIO) error {
+func (sds *SIPDTMFServer) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	sds.logger.Debug("running")
-	sds.router = router
+	sds.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	sds.ctx = moduleContext
 	sds.cancel = cancel
@@ -203,11 +203,11 @@ func (sds *SIPDTMFServer) HandleCall(inDialog *diago.DialogServerSession) error 
 
 	return reader.Listen(func(dtmf rune) error {
 		if dtmf == rune(sds.Separator[0]) {
-			if sds.router != nil {
+			if sds.inputHandler != nil {
 				dialogContext := context.WithValue(sds.ctx, sipCallContextKey("call"), &SIPDTMFCall{
 					inDialog: inDialog,
 				})
-				sds.router.HandleInput(dialogContext, sds.Id(), SIPDTMFMessage{
+				sds.inputHandler(dialogContext, sds.Id(), SIPDTMFMessage{
 					To:     inDialog.ToUser(),
 					Digits: userString,
 				})

@@ -18,7 +18,7 @@ type TestModule struct {
 	id string
 }
 
-func (m *TestModule) Start(ctx context.Context, router common.RouteIO) error {
+func (m *TestModule) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	<-ctx.Done()
 	return nil
 }
@@ -43,7 +43,7 @@ type TestOutputModule struct {
 	id string
 }
 
-func (m *TestOutputModule) Start(ctx context.Context, router common.RouteIO) error {
+func (m *TestOutputModule) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	<-ctx.Done()
 	return nil
 }
@@ -74,7 +74,7 @@ type TestKVModule struct {
 	kvData map[string]any
 }
 
-func (m *TestKVModule) Start(ctx context.Context, router common.RouteIO) error {
+func (m *TestKVModule) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	<-ctx.Done()
 	return nil
 }
@@ -119,7 +119,7 @@ type TestDBModule struct {
 	db *sql.DB
 }
 
-func (m *TestDBModule) Start(ctx context.Context, router common.RouteIO) error {
+func (m *TestDBModule) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	<-ctx.Done()
 	return nil
 }
@@ -167,7 +167,7 @@ type TestPubSubModule struct {
 	id string
 }
 
-func (m *TestPubSubModule) Start(ctx context.Context, router common.RouteIO) error {
+func (m *TestPubSubModule) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	<-ctx.Done()
 	return nil
 }

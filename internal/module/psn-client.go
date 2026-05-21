@@ -13,14 +13,14 @@ import (
 )
 
 type PSNClient struct {
-	config  config.ModuleConfig
-	conn    *net.UDPConn
-	ctx     context.Context
-	router  common.RouteIO
-	decoder *psn.Decoder
-	logger  *slog.Logger
-	cancel  context.CancelFunc
-	connMu  sync.Mutex
+	config       config.ModuleConfig
+	conn         *net.UDPConn
+	ctx          context.Context
+	inputHandler common.InputHandler
+	decoder      *psn.Decoder
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	connMu       sync.Mutex
 }
 
 func init() {
@@ -41,9 +41,9 @@ func (pc *PSNClient) Type() string {
 	return pc.config.Type
 }
 
-func (pc *PSNClient) Start(ctx context.Context, router common.RouteIO) error {
+func (pc *PSNClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	pc.logger.Debug("running")
-	pc.router = router
+	pc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	pc.ctx = moduleContext
 	pc.cancel = cancel
@@ -88,13 +88,13 @@ func (pc *PSNClient) Start(ctx context.Context, router common.RouteIO) error {
 					pc.logger.Error("problem decoding psn traffic", "error", err)
 				}
 
-				if pc.router != nil {
+				if pc.inputHandler != nil {
 					// TODO(jwetzell): better input handling
 					for _, tracker := range pc.decoder.Trackers {
-						pc.router.HandleInput(pc.ctx, pc.Id(), tracker)
+						pc.inputHandler(pc.ctx, pc.Id(), tracker)
 					}
 				} else {
-					pc.logger.Error("has no router")
+					pc.logger.Error("has no input handler")
 				}
 			}
 		}

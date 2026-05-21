@@ -12,13 +12,13 @@ import (
 )
 
 type TimeTimer struct {
-	config   config.ModuleConfig
-	Duration uint32
-	ctx      context.Context
-	router   common.RouteIO
-	timer    *time.Timer
-	logger   *slog.Logger
-	cancel   context.CancelFunc
+	config       config.ModuleConfig
+	Duration     uint32
+	ctx          context.Context
+	inputHandler common.InputHandler
+	timer        *time.Timer
+	logger       *slog.Logger
+	cancel       context.CancelFunc
 }
 
 func init() {
@@ -58,9 +58,9 @@ func (t *TimeTimer) Type() string {
 	return t.config.Type
 }
 
-func (t *TimeTimer) Start(ctx context.Context, router common.RouteIO) error {
+func (t *TimeTimer) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	t.logger.Debug("running")
-	t.router = router
+	t.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	t.ctx = moduleContext
 	t.cancel = cancel
@@ -71,8 +71,8 @@ func (t *TimeTimer) Start(ctx context.Context, router common.RouteIO) error {
 		case <-t.ctx.Done():
 			return nil
 		case time := <-t.timer.C:
-			if t.router != nil {
-				t.router.HandleInput(t.ctx, t.Id(), time)
+			if t.inputHandler != nil {
+				t.inputHandler(t.ctx, t.Id(), time)
 			}
 		}
 	}

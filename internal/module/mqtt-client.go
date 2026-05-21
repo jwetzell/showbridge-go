@@ -15,18 +15,18 @@ import (
 )
 
 type MQTTClient struct {
-	config   config.ModuleConfig
-	ctx      context.Context
-	router   common.RouteIO
-	Broker   string
-	ClientID string
-	Topic    string
-	QoS      byte
-	Retained bool
-	client   mqtt.Client
-	logger   *slog.Logger
-	cancel   context.CancelFunc
-	clientMu sync.Mutex
+	config       config.ModuleConfig
+	ctx          context.Context
+	inputHandler common.InputHandler
+	Broker       string
+	ClientID     string
+	Topic        string
+	QoS          byte
+	Retained     bool
+	client       mqtt.Client
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	clientMu     sync.Mutex
 }
 
 func init() {
@@ -117,9 +117,9 @@ func (mc *MQTTClient) Type() string {
 	return mc.config.Type
 }
 
-func (mc *MQTTClient) Start(ctx context.Context, router common.RouteIO) error {
+func (mc *MQTTClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	mc.logger.Debug("running")
-	mc.router = router
+	mc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	mc.ctx = moduleContext
 	mc.cancel = cancel
@@ -132,7 +132,9 @@ func (mc *MQTTClient) Start(ctx context.Context, router common.RouteIO) error {
 
 	opts.OnConnect = func(c mqtt.Client) {
 		token := mc.client.Subscribe(mc.Topic, 1, func(c mqtt.Client, m mqtt.Message) {
-			mc.router.HandleInput(mc.ctx, mc.Id(), m)
+			if mc.inputHandler != nil {
+				mc.inputHandler(mc.ctx, mc.Id(), m)
+			}
 		})
 		token.Wait()
 	}

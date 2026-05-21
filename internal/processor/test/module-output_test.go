@@ -34,8 +34,10 @@ func TestModuleOutputFromRegistry(t *testing.T) {
 	payload := "test"
 	expected := "test"
 
+	router := test.GetNewTestRouter()
+
 	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
-		Router:  test.GetNewTestRouter(),
+		InputHandler:  router.HandleInput,
 		Modules: map[string]common.Module{"test": &test.TestOutputModule{}},
 		Payload: payload,
 	})

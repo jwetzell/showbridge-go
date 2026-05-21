@@ -52,8 +52,9 @@ func TestGoodRouteHandleInput(t *testing.T) {
 	}
 
 	inputData := "test input data"
+	testRouter := test.GetNewTestRouter()
 	payload, err := testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
-		Router:  &MockRouter{},
+		InputHandler:  testRouter.HandleInput,
 		Modules: map[string]common.Module{"output": &test.TestOutputModule{}},
 		Payload: inputData,
 	})
@@ -91,8 +92,9 @@ func TestRouteHandleInputWithProcessorError(t *testing.T) {
 	}
 
 	inputData := "test input data"
+	testRouter := test.GetNewTestRouter()
 	_, err = testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
-		Router:  &MockRouter{},
+		InputHandler:  testRouter.HandleInput,
 		Modules: map[string]common.Module{"output": &test.TestOutputModule{}},
 		Payload: inputData,
 	})
@@ -120,8 +122,9 @@ func TestRouteHandleNilPayload(t *testing.T) {
 		return
 	}
 
+	testRouter := test.GetNewTestRouter()
 	payload, err := testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
-		Router:  &MockRouter{},
+		InputHandler:  testRouter.HandleInput,
 		Modules: map[string]common.Module{"output": &test.TestOutputModule{}},
 		Payload: nil,
 	})
@@ -152,8 +155,9 @@ func TestRouteHandleNilPayloadFromProcessor(t *testing.T) {
 		t.Fatalf("route failed to create: %v", err)
 	}
 
+	testRouter := test.GetNewTestRouter()
 	_, err = testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
-		Router:  &MockRouter{},
+		InputHandler:  testRouter.HandleInput,
 		Modules: map[string]common.Module{"output": &test.TestOutputModule{}},
 		Payload: "test",
 	})
