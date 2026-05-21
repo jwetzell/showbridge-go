@@ -21,7 +21,6 @@ func TestKvSetFromRegistry(t *testing.T) {
 		Params: map[string]any{
 			"module": "test",
 			"key":    "test",
-			"value":  "hello",
 		},
 	})
 	if err != nil {
@@ -32,8 +31,8 @@ func TestKvSetFromRegistry(t *testing.T) {
 		t.Fatalf("kv.set processor has wrong type: %s", processorInstance.Type())
 	}
 
-	payload := ""
-	expected := ""
+	payload := "test"
+	expected := "test"
 
 	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
 		Modules: map[string]common.Module{
@@ -63,10 +62,9 @@ func TestGoodKvSet(t *testing.T) {
 			params: map[string]any{
 				"module": "test",
 				"key":    "test",
-				"value":  "hello",
 			},
-			payload:  "",
-			expected: "",
+			payload:  "test",
+			expected: "test",
 		},
 	}
 	for _, testCase := range testCases {
@@ -116,7 +114,6 @@ func TestBadKvSet(t *testing.T) {
 			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"key":   "test",
-				"value": "test",
 			},
 			wrappedPayloadModules: map[string]common.Module{
 				"test": &test.TestKVModule{},
@@ -129,7 +126,6 @@ func TestBadKvSet(t *testing.T) {
 			params: map[string]any{
 				"module": 1,
 				"key":    "test",
-				"value":  "test",
 			},
 			wrappedPayloadModules: map[string]common.Module{
 				"test": &test.TestKVModule{},
@@ -141,7 +137,6 @@ func TestBadKvSet(t *testing.T) {
 			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
-				"value":  "test",
 			},
 			wrappedPayloadModules: map[string]common.Module{
 				"test": &test.TestKVModule{},
@@ -154,7 +149,6 @@ func TestBadKvSet(t *testing.T) {
 			params: map[string]any{
 				"module": "test",
 				"key":    1,
-				"value":  "test",
 			},
 			wrappedPayloadModules: map[string]common.Module{
 				"test": &test.TestKVModule{},
@@ -162,66 +156,14 @@ func TestBadKvSet(t *testing.T) {
 			errorString: "kv.set key error: not a string",
 		},
 		{
-			name:    "no value param",
-			payload: test.TestStruct{Data: "hello"},
-			params: map[string]any{
-				"module": "test",
-				"key":    "test",
-			},
-			wrappedPayloadModules: map[string]common.Module{
-				"test": &test.TestKVModule{},
-			},
-			errorString: "kv.set value error: not found",
-		},
-		{
-			name:    "non string value",
-			payload: test.TestStruct{Data: "hello"},
-			params: map[string]any{
-				"module": "test",
-				"key":    "test",
-				"value":  1,
-			},
-			wrappedPayloadModules: map[string]common.Module{
-				"test": &test.TestKVModule{},
-			},
-			errorString: "kv.set value error: not a string",
-		},
-		{
 			name:    "no modules in context",
 			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"key":    "test",
-				"value":  "hello",
 			},
 			wrappedPayloadModules: nil,
 			errorString:           "kv.set wrapped payload has no modules",
-		},
-		{
-			name:    "value template syntax error",
-			payload: test.TestStruct{Data: "hello"},
-			params: map[string]any{
-				"module": "test",
-				"key":    "test",
-				"value":  "{{",
-			},
-			wrappedPayloadModules: map[string]common.Module{
-				"test": &test.TestKVModule{},
-			},
-			errorString: "template: template:1: unclosed action",
-		},
-		{
-			name:    "value template execution error",
-			payload: test.TestStruct{Data: "hello"},
-			params: map[string]any{
-				"module": "test",
-				"key":    "test",
-				"value":  "{{.Data}}",
-			},
-			wrappedPayloadModules: map[string]common.Module{
-				"test": &test.TestKVModule{},
-			},
-			errorString: "template: template:1:2: executing \"template\" at <.Data>: can't evaluate field Data in type common.WrappedPayload",
 		},
 		{
 			name:    "module not found in context",
@@ -229,7 +171,6 @@ func TestBadKvSet(t *testing.T) {
 			params: map[string]any{
 				"module": "test",
 				"key":    "test",
-				"value":  "hello",
 			},
 			wrappedPayloadModules: map[string]common.Module{},
 			errorString:           "kv.set unable to find module with id: test",
@@ -240,7 +181,6 @@ func TestBadKvSet(t *testing.T) {
 			params: map[string]any{
 				"module": "test",
 				"key":    "test",
-				"value":  "hello",
 			},
 			wrappedPayloadModules: map[string]common.Module{
 				"test": test.NewTestDBModule("test"),
@@ -293,7 +233,6 @@ func BenchmarkKvSet(b *testing.B) {
 		Params: map[string]any{
 			"module": "test",
 			"key":    "test",
-			"value":  "{{.Payload}}",
 		},
 	})
 
