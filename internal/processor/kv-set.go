@@ -1,11 +1,9 @@
 package processor
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
-	"html/template"
 	"log/slog"
 
 	"github.com/google/jsonschema-go/jsonschema"
@@ -17,7 +15,6 @@ type KVSet struct {
 	config   config.ProcessorConfig
 	ModuleId string
 	Key      string
-	Value    *template.Template
 	logger   *slog.Logger
 	module   common.KeyValueModule
 }
@@ -43,15 +40,7 @@ func (kvs *KVSet) Process(ctx context.Context, wrappedPayload common.WrappedPayl
 		kvs.module = kvModule
 	}
 
-	var valueBuffer bytes.Buffer
-	err := kvs.Value.Execute(&valueBuffer, wrappedPayload)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	err = kvs.module.Set(kvs.Key, valueBuffer.String())
+	err := kvs.module.Set(kvs.Key, wrappedPayload.Payload)
 	if err != nil {
 		wrappedPayload.End = true
 		return wrappedPayload, fmt.Errorf("kv.set error setting key: %w", err)
@@ -79,12 +68,8 @@ func init() {
 					Title: "Key",
 					Type:  "string",
 				},
-				"value": {
-					Title: "Value",
-					Type:  "string",
-				},
 			},
-			Required:             []string{"module", "key", "value"},
+			Required:             []string{"module", "key"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
@@ -101,17 +86,7 @@ func init() {
 				return nil, fmt.Errorf("kv.set key error: %w", err)
 			}
 
-			valueString, err := params.GetString("value")
-			if err != nil {
-				return nil, fmt.Errorf("kv.set value error: %w", err)
-			}
-			valueTemplate, err := template.New("template").Parse(valueString)
-
-			if err != nil {
-				return nil, err
-			}
-
-			return &KVSet{config: config, ModuleId: moduleIdString, Key: keyString, Value: valueTemplate, logger: slog.Default().With("component", "processor", "type", config.Type)}, nil
+			return &KVSet{config: config, ModuleId: moduleIdString, Key: keyString, logger: slog.Default().With("component", "processor", "type", config.Type)}, nil
 		},
 	})
 }
