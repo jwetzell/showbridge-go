@@ -16,17 +16,6 @@ import (
 	_ "gitlab.com/gomidi/midi/v2/drivers/rtmididrv"
 )
 
-type MIDIOutput struct {
-	config       config.ModuleConfig
-	ctx          context.Context
-	inputHandler common.InputHandler
-	Port         string
-	sendFunc     func(midi.Message) error
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	sendFuncMu   sync.Mutex
-}
-
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type:  "midi.output",
@@ -53,6 +42,17 @@ func init() {
 			return &MIDIOutput{config: config, Port: portString, logger: CreateLogger(config)}, nil
 		},
 	})
+}
+
+type MIDIOutput struct {
+	config       config.ModuleConfig
+	ctx          context.Context
+	inputHandler common.InputHandler
+	Port         string
+	sendFunc     func(midi.Message) error
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	sendFuncMu   sync.Mutex
 }
 
 func (mo *MIDIOutput) Id() string {

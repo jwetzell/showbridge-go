@@ -11,16 +11,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type TimeTimer struct {
-	config       config.ModuleConfig
-	Duration     uint32
-	ctx          context.Context
-	inputHandler common.InputHandler
-	timer        *time.Timer
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-}
-
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type:  "time.timer",
@@ -48,6 +38,16 @@ func init() {
 			return &TimeTimer{Duration: uint32(durationNum), config: config, logger: CreateLogger(config)}, nil
 		},
 	})
+}
+
+type TimeTimer struct {
+	config       config.ModuleConfig
+	Duration     uint32
+	ctx          context.Context
+	inputHandler common.InputHandler
+	timer        *time.Timer
+	logger       *slog.Logger
+	cancel       context.CancelFunc
 }
 
 func (t *TimeTimer) Id() string {

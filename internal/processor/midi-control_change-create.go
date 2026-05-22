@@ -15,70 +15,6 @@ import (
 	"gitlab.com/gomidi/midi/v2"
 )
 
-type MIDIControlChangeCreate struct {
-	config  config.ProcessorConfig
-	Channel *template.Template
-	Control *template.Template
-	Value   *template.Template
-}
-
-func (mccc *MIDIControlChangeCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
-	templateData := wrappedPayload
-
-	var channelBuffer bytes.Buffer
-	err := mccc.Channel.Execute(&channelBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	var controlBuffer bytes.Buffer
-	err = mccc.Control.Execute(&controlBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	controlValue, err := strconv.ParseUint(controlBuffer.String(), 10, 8)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	var valueBuffer bytes.Buffer
-	err = mccc.Value.Execute(&valueBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	valueValue, err := strconv.ParseUint(valueBuffer.String(), 10, 8)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	payloadMessage := midi.ControlChange(uint8(channelValue), uint8(controlValue), uint8(valueValue))
-	wrappedPayload.Payload = payloadMessage
-	return wrappedPayload, nil
-}
-
-func (mccc *MIDIControlChangeCreate) Type() string {
-	return mccc.config.Type
-}
-
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "midi.control_change.create",
@@ -146,4 +82,68 @@ func init() {
 			}, nil
 		},
 	})
+}
+
+type MIDIControlChangeCreate struct {
+	config  config.ProcessorConfig
+	Channel *template.Template
+	Control *template.Template
+	Value   *template.Template
+}
+
+func (mccc *MIDIControlChangeCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	templateData := wrappedPayload
+
+	var channelBuffer bytes.Buffer
+	err := mccc.Channel.Execute(&channelBuffer, templateData)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	var controlBuffer bytes.Buffer
+	err = mccc.Control.Execute(&controlBuffer, templateData)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	controlValue, err := strconv.ParseUint(controlBuffer.String(), 10, 8)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	var valueBuffer bytes.Buffer
+	err = mccc.Value.Execute(&valueBuffer, templateData)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	valueValue, err := strconv.ParseUint(valueBuffer.String(), 10, 8)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	payloadMessage := midi.ControlChange(uint8(channelValue), uint8(controlValue), uint8(valueValue))
+	wrappedPayload.Payload = payloadMessage
+	return wrappedPayload, nil
+}
+
+func (mccc *MIDIControlChangeCreate) Type() string {
+	return mccc.config.Type
 }

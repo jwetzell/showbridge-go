@@ -10,31 +10,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type IntScale struct {
-	OutMin int
-	OutMax int
-	InMin  int
-	InMax  int
-	config config.ProcessorConfig
-}
-
-func (is *IntScale) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
-	payloadInt, ok := common.GetAnyAs[int](payload)
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("int.scale can only process an int")
-	}
-
-	payloadInt = (payloadInt-is.InMin)*(is.OutMax-is.OutMin)/(is.InMax-is.InMin) + is.OutMin
-	wrappedPayload.Payload = payloadInt
-	return wrappedPayload, nil
-}
-
-func (is *IntScale) Type() string {
-	return is.config.Type
-}
-
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "int.scale",
@@ -96,4 +71,29 @@ func init() {
 			return &IntScale{config: config, InMin: inMinInt, InMax: inMaxInt, OutMin: outMinInt, OutMax: outMaxInt}, nil
 		},
 	})
+}
+
+type IntScale struct {
+	OutMin int
+	OutMax int
+	InMin  int
+	InMax  int
+	config config.ProcessorConfig
+}
+
+func (is *IntScale) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
+	payloadInt, ok := common.GetAnyAs[int](payload)
+	if !ok {
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("int.scale can only process an int")
+	}
+
+	payloadInt = (payloadInt-is.InMin)*(is.OutMax-is.OutMin)/(is.InMax-is.InMin) + is.OutMin
+	wrappedPayload.Payload = payloadInt
+	return wrappedPayload, nil
+}
+
+func (is *IntScale) Type() string {
+	return is.config.Type
 }

@@ -12,20 +12,6 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
-type NATSClient struct {
-	config       config.ModuleConfig
-	ctx          context.Context
-	inputHandler common.InputHandler
-	URL          string
-	Subject      string
-	client       *nats.Conn
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	sub          *nats.Subscription
-	subMu        sync.Mutex
-	clientMu     sync.Mutex
-}
-
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type:  "nats.client",
@@ -61,6 +47,20 @@ func init() {
 			return &NATSClient{config: config, URL: urlString, Subject: subjectString, logger: CreateLogger(config)}, nil
 		},
 	})
+}
+
+type NATSClient struct {
+	config       config.ModuleConfig
+	ctx          context.Context
+	inputHandler common.InputHandler
+	URL          string
+	Subject      string
+	client       *nats.Conn
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	sub          *nats.Subscription
+	subMu        sync.Mutex
+	clientMu     sync.Mutex
 }
 
 func (nc *NATSClient) Id() string {

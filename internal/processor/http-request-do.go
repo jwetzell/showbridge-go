@@ -14,6 +14,53 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "http.request.do",
+		Title: "Do HTTP Request",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"method": {
+					Title: "HTTP Method",
+					Type:  "string",
+					Enum:  []any{"GET", "POST", "PUT", "PATCH", "DELETE"},
+				},
+				"url": {
+					Title: "URL",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"method", "url"},
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
+		},
+		New: func(config config.ProcessorConfig) (Processor, error) {
+			params := config.Params
+
+			methodString, err := params.GetString("method")
+			if err != nil {
+				return nil, fmt.Errorf("http.request.do method error: %w", err)
+			}
+
+			urlString, err := params.GetString("url")
+			if err != nil {
+				return nil, fmt.Errorf("http.request.do url error: %w", err)
+			}
+
+			urlTemplate, err := template.New("url").Parse(urlString)
+
+			if err != nil {
+				return nil, err
+			}
+			client := &http.Client{
+				Timeout: 10 * time.Second,
+			}
+
+			return &HTTPRequestDo{config: config, URL: urlTemplate, Method: methodString, client: client}, nil
+		},
+	})
+}
+
 type HTTPRequestDo struct {
 	config config.ProcessorConfig
 	client *http.Client
@@ -67,51 +114,4 @@ func (hrd *HTTPRequestDo) Process(ctx context.Context, wrappedPayload common.Wra
 
 func (hrd *HTTPRequestDo) Type() string {
 	return hrd.config.Type
-}
-
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "http.request.do",
-		Title: "Do HTTP Request",
-		ParamsSchema: &jsonschema.Schema{
-			Type: "object",
-			Properties: map[string]*jsonschema.Schema{
-				"method": {
-					Title: "HTTP Method",
-					Type:  "string",
-					Enum:  []any{"GET", "POST", "PUT", "PATCH", "DELETE"},
-				},
-				"url": {
-					Title: "URL",
-					Type:  "string",
-				},
-			},
-			Required:             []string{"method", "url"},
-			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
-		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
-
-			methodString, err := params.GetString("method")
-			if err != nil {
-				return nil, fmt.Errorf("http.request.do method error: %w", err)
-			}
-
-			urlString, err := params.GetString("url")
-			if err != nil {
-				return nil, fmt.Errorf("http.request.do url error: %w", err)
-			}
-
-			urlTemplate, err := template.New("url").Parse(urlString)
-
-			if err != nil {
-				return nil, err
-			}
-			client := &http.Client{
-				Timeout: 10 * time.Second,
-			}
-
-			return &HTTPRequestDo{config: config, URL: urlTemplate, Method: methodString, client: client}, nil
-		},
-	})
 }

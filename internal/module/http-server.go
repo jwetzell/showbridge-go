@@ -16,6 +16,34 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
+func init() {
+	RegisterModule(ModuleRegistration{
+		Type:  "http.server",
+		Title: "HTTP Server",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"port": {
+					Title:   "Port",
+					Type:    "integer",
+					Minimum: jsonschema.Ptr[float64](1024),
+					Maximum: jsonschema.Ptr[float64](65535),
+				},
+			},
+			Required:             []string{"port"},
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
+		},
+		New: func(config config.ModuleConfig) (common.Module, error) {
+			params := config.Params
+			portNum, err := params.GetInt("port")
+			if err != nil {
+				return nil, fmt.Errorf("http.server port error: %w", err)
+			}
+			return &HTTPServer{Port: uint16(portNum), config: config, logger: CreateLogger(config)}, nil
+		},
+	})
+}
+
 type HTTPServer struct {
 	config       config.ModuleConfig
 	Port         uint16
@@ -53,34 +81,6 @@ func (hsrw *HTTPServerResponseWriter) WriteHeader(status int) {
 func (hsrw *HTTPServerResponseWriter) Write(data []byte) (int, error) {
 	hsrw.done = true
 	return hsrw.ResponseWriter.Write(data)
-}
-
-func init() {
-	RegisterModule(ModuleRegistration{
-		Type:  "http.server",
-		Title: "HTTP Server",
-		ParamsSchema: &jsonschema.Schema{
-			Type: "object",
-			Properties: map[string]*jsonschema.Schema{
-				"port": {
-					Title:   "Port",
-					Type:    "integer",
-					Minimum: jsonschema.Ptr[float64](1024),
-					Maximum: jsonschema.Ptr[float64](65535),
-				},
-			},
-			Required:             []string{"port"},
-			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
-		},
-		New: func(config config.ModuleConfig) (common.Module, error) {
-			params := config.Params
-			portNum, err := params.GetInt("port")
-			if err != nil {
-				return nil, fmt.Errorf("http.server port error: %w", err)
-			}
-			return &HTTPServer{Port: uint16(portNum), config: config, logger: CreateLogger(config)}, nil
-		},
-	})
 }
 
 func (hs *HTTPServer) Id() string {

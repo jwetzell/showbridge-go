@@ -17,19 +17,6 @@ import (
 	"go.bug.st/serial"
 )
 
-type SerialClient struct {
-	config       config.ModuleConfig
-	ctx          context.Context
-	inputHandler common.InputHandler
-	Port         string
-	Framer       framer.Framer
-	Mode         *serial.Mode
-	port         serial.Port
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	portMu       sync.Mutex
-}
-
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type:  "serial.client",
@@ -84,6 +71,19 @@ func init() {
 			return &SerialClient{config: config, Port: portString, Framer: framer, Mode: &mode, logger: CreateLogger(config)}, nil
 		},
 	})
+}
+
+type SerialClient struct {
+	config       config.ModuleConfig
+	ctx          context.Context
+	inputHandler common.InputHandler
+	Port         string
+	Framer       framer.Framer
+	Mode         *serial.Mode
+	port         serial.Port
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	portMu       sync.Mutex
 }
 
 func (sc *SerialClient) Id() string {

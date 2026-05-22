@@ -15,18 +15,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/framer"
 )
 
-type TCPClient struct {
-	config       config.ModuleConfig
-	framer       framer.Framer
-	conn         *net.TCPConn
-	ctx          context.Context
-	inputHandler common.InputHandler
-	Addr         *net.TCPAddr
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	connMu       sync.Mutex
-}
-
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type:  "net.tcp.client",
@@ -83,6 +71,18 @@ func init() {
 			return &TCPClient{framer: framer, Addr: addr, config: config, logger: CreateLogger(config)}, nil
 		},
 	})
+}
+
+type TCPClient struct {
+	config       config.ModuleConfig
+	framer       framer.Framer
+	conn         *net.TCPConn
+	ctx          context.Context
+	inputHandler common.InputHandler
+	Addr         *net.TCPAddr
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	connMu       sync.Mutex
 }
 
 func (tc *TCPClient) Id() string {

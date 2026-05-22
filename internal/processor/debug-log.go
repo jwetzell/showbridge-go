@@ -9,13 +9,22 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-// TODO(jwetzell): maybe make a more useful logging processor
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "debug.log",
+		Title: "Debug Log",
+		New: func(config config.ProcessorConfig) (Processor, error) {
+			return &DebugLog{config: config, logger: slog.Default().With("component", "processor", "type", config.Type)}, nil
+		},
+	})
+}
 
 type DebugLog struct {
 	config config.ProcessorConfig
 	logger *slog.Logger
 }
 
+// TODO(jwetzell): maybe make a more useful logging processor
 func (dl *DebugLog) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadString := fmt.Sprintf("%+v", payload)
@@ -28,12 +37,3 @@ func (dl *DebugLog) Type() string {
 	return dl.config.Type
 }
 
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "debug.log",
-		Title: "Debug Log",
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			return &DebugLog{config: config, logger: slog.Default().With("component", "processor", "type", config.Type)}, nil
-		},
-	})
-}

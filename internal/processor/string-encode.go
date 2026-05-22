@@ -8,6 +8,16 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "string.encode",
+		Title: "Encode String",
+		New: func(config config.ProcessorConfig) (Processor, error) {
+			return &StringEncode{config: config}, nil
+		},
+	})
+}
+
 type StringEncode struct {
 	config config.ProcessorConfig
 }
@@ -28,14 +38,4 @@ func (se *StringEncode) Process(ctx context.Context, wrappedPayload common.Wrapp
 
 func (se *StringEncode) Type() string {
 	return se.config.Type
-}
-
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "string.encode",
-		Title: "Encode String",
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			return &StringEncode{config: config}, nil
-		},
-	})
 }

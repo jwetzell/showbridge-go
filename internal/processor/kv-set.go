@@ -11,6 +11,44 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "kv.set",
+		Title: "Set Key",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"module": {
+					Title: "Module ID",
+					Type:  "string",
+				},
+				"key": {
+					Title: "Key",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"module", "key"},
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
+		},
+		New: func(config config.ProcessorConfig) (Processor, error) {
+
+			params := config.Params
+
+			moduleIdString, err := params.GetString("module")
+			if err != nil {
+				return nil, fmt.Errorf("kv.set module error: %w", err)
+			}
+
+			keyString, err := params.GetString("key")
+			if err != nil {
+				return nil, fmt.Errorf("kv.set key error: %w", err)
+			}
+
+			return &KVSet{config: config, ModuleId: moduleIdString, Key: keyString, logger: slog.Default().With("component", "processor", "type", config.Type)}, nil
+		},
+	})
+}
+
 type KVSet struct {
 	config   config.ProcessorConfig
 	ModuleId string
@@ -51,42 +89,4 @@ func (kvs *KVSet) Process(ctx context.Context, wrappedPayload common.WrappedPayl
 
 func (kvs *KVSet) Type() string {
 	return kvs.config.Type
-}
-
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "kv.set",
-		Title: "Set Key",
-		ParamsSchema: &jsonschema.Schema{
-			Type: "object",
-			Properties: map[string]*jsonschema.Schema{
-				"module": {
-					Title: "Module ID",
-					Type:  "string",
-				},
-				"key": {
-					Title: "Key",
-					Type:  "string",
-				},
-			},
-			Required:             []string{"module", "key"},
-			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
-		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-
-			params := config.Params
-
-			moduleIdString, err := params.GetString("module")
-			if err != nil {
-				return nil, fmt.Errorf("kv.set module error: %w", err)
-			}
-
-			keyString, err := params.GetString("key")
-			if err != nil {
-				return nil, fmt.Errorf("kv.set key error: %w", err)
-			}
-
-			return &KVSet{config: config, ModuleId: moduleIdString, Key: keyString, logger: slog.Default().With("component", "processor", "type", config.Type)}, nil
-		},
-	})
 }

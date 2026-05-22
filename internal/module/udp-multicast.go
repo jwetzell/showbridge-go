@@ -14,17 +14,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type UDPMulticast struct {
-	config       config.ModuleConfig
-	conn         *net.UDPConn
-	ctx          context.Context
-	inputHandler common.InputHandler
-	Addr         *net.UDPAddr
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	connMu       sync.Mutex
-}
-
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type:  "net.udp.multicast",
@@ -65,6 +54,17 @@ func init() {
 			return &UDPMulticast{config: moduleConfig, Addr: addr, logger: CreateLogger(moduleConfig)}, nil
 		},
 	})
+}
+
+type UDPMulticast struct {
+	config       config.ModuleConfig
+	conn         *net.UDPConn
+	ctx          context.Context
+	inputHandler common.InputHandler
+	Addr         *net.UDPAddr
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	connMu       sync.Mutex
 }
 
 func (um *UDPMulticast) Id() string {

@@ -15,18 +15,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type UDPServer struct {
-	Addr         *net.UDPAddr
-	BufferSize   int
-	config       config.ModuleConfig
-	ctx          context.Context
-	inputHandler common.InputHandler
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	listener     *net.UDPConn
-	listenerMu   sync.Mutex
-}
-
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type:  "net.udp.server",
@@ -88,6 +76,18 @@ func init() {
 			return &UDPServer{Addr: addr, BufferSize: bufferSizeNum, config: moduleConfig, logger: CreateLogger(moduleConfig)}, nil
 		},
 	})
+}
+
+type UDPServer struct {
+	Addr         *net.UDPAddr
+	BufferSize   int
+	config       config.ModuleConfig
+	ctx          context.Context
+	inputHandler common.InputHandler
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	listener     *net.UDPConn
+	listenerMu   sync.Mutex
 }
 
 func (us *UDPServer) Id() string {

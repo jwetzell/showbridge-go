@@ -11,6 +11,39 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "filter.expr",
+		Title: "Filter by Expr expression",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"expression": {
+					Title: "Expression",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"expression"},
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
+		},
+		New: func(config config.ProcessorConfig) (Processor, error) {
+			params := config.Params
+
+			expressionString, err := params.GetString("expression")
+			if err != nil {
+				return nil, fmt.Errorf("filter.expr expression error: %w", err)
+			}
+
+			program, err := expr.Compile(expressionString)
+			if err != nil {
+				return nil, err
+			}
+
+			return &FilterExpr{config: config, Program: program}, nil
+		},
+	})
+}
+
 // NOTE(jwetzell): see language definition https://expr-lang.org/docs/language-definition
 type FilterExpr struct {
 	config  config.ProcessorConfig
@@ -44,37 +77,4 @@ func (fe *FilterExpr) Process(ctx context.Context, wrappedPayload common.Wrapped
 
 func (fe *FilterExpr) Type() string {
 	return fe.config.Type
-}
-
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "filter.expr",
-		Title: "Filter by Expr expression",
-		ParamsSchema: &jsonschema.Schema{
-			Type: "object",
-			Properties: map[string]*jsonschema.Schema{
-				"expression": {
-					Title: "Expression",
-					Type:  "string",
-				},
-			},
-			Required:             []string{"expression"},
-			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
-		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
-
-			expressionString, err := params.GetString("expression")
-			if err != nil {
-				return nil, fmt.Errorf("filter.expr expression error: %w", err)
-			}
-
-			program, err := expr.Compile(expressionString)
-			if err != nil {
-				return nil, err
-			}
-
-			return &FilterExpr{config: config, Program: program}, nil
-		},
-	})
 }

@@ -11,6 +11,33 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "struct.field.get",
+		Title: "Get Struct Field",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"name": {
+					Title: "Field Name",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"name"},
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
+		},
+		New: func(config config.ProcessorConfig) (Processor, error) {
+			params := config.Params
+			nameString, err := params.GetString("name")
+			if err != nil {
+				return nil, fmt.Errorf("struct.field.get name error: %w", err)
+			}
+
+			return &StructFieldGet{config: config, Name: nameString}, nil
+		},
+	})
+}
+
 type StructFieldGet struct {
 	config config.ProcessorConfig
 	Name   string
@@ -41,31 +68,4 @@ func (sfg *StructFieldGet) Process(ctx context.Context, wrappedPayload common.Wr
 
 func (sfg *StructFieldGet) Type() string {
 	return sfg.config.Type
-}
-
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "struct.field.get",
-		Title: "Get Struct Field",
-		ParamsSchema: &jsonschema.Schema{
-			Type: "object",
-			Properties: map[string]*jsonschema.Schema{
-				"name": {
-					Title: "Field Name",
-					Type:  "string",
-				},
-			},
-			Required:             []string{"name"},
-			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
-		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
-			nameString, err := params.GetString("name")
-			if err != nil {
-				return nil, fmt.Errorf("struct.field.get name error: %w", err)
-			}
-
-			return &StructFieldGet{config: config, Name: nameString}, nil
-		},
-	})
 }

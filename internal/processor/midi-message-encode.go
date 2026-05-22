@@ -11,6 +11,16 @@ import (
 	"gitlab.com/gomidi/midi/v2"
 )
 
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "midi.message.encode",
+		Title: "Encode MIDI Message",
+		New: func(config config.ProcessorConfig) (Processor, error) {
+			return &MIDIMessageEncode{config: config}, nil
+		},
+	})
+}
+
 type MIDIMessageEncode struct {
 	config config.ProcessorConfig
 }
@@ -30,14 +40,4 @@ func (mme *MIDIMessageEncode) Process(ctx context.Context, wrappedPayload common
 
 func (mme *MIDIMessageEncode) Type() string {
 	return mme.config.Type
-}
-
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "midi.message.encode",
-		Title: "Encode MIDI Message",
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			return &MIDIMessageEncode{config: config}, nil
-		},
-	})
 }

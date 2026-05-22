@@ -12,6 +12,16 @@ import (
 	"gitlab.com/gomidi/midi/v2"
 )
 
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "midi.message.unpack",
+		Title: "Unpack MIDI Message",
+		New: func(config config.ProcessorConfig) (Processor, error) {
+			return &MIDIMessageUnpack{config: config}, nil
+		},
+	})
+}
+
 type MIDIMessageUnpack struct {
 	config config.ProcessorConfig
 }
@@ -88,14 +98,4 @@ func (mmu *MIDIMessageUnpack) Process(ctx context.Context, wrappedPayload common
 
 func (mmu *MIDIMessageUnpack) Type() string {
 	return mmu.config.Type
-}
-
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "midi.message.unpack",
-		Title: "Unpack MIDI Message",
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			return &MIDIMessageUnpack{config: config}, nil
-		},
-	})
 }

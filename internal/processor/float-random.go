@@ -12,32 +12,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type FloatRandom struct {
-	BitSize int
-	Min     float64
-	Max     float64
-	config  config.ProcessorConfig
-}
-
-func (fr *FloatRandom) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
-	if fr.BitSize == 32 {
-		payloadFloat := rand.Float32()*(float32(fr.Max)-float32(fr.Min)) + float32(fr.Min)
-		wrappedPayload.Payload = payloadFloat
-		return wrappedPayload, nil
-	}
-	if fr.BitSize == 64 {
-		payloadFloat := rand.Float64()*(fr.Max-fr.Min) + fr.Min
-		wrappedPayload.Payload = payloadFloat
-		return wrappedPayload, nil
-	}
-	wrappedPayload.End = true
-	return wrappedPayload, errors.New("float.random bitSize error: must be 32 or 64")
-}
-
-func (fr *FloatRandom) Type() string {
-	return fr.config.Type
-}
-
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "float.random",
@@ -96,4 +70,30 @@ func init() {
 			return &FloatRandom{config: processorConfig, Min: minFloat, Max: maxFloat, BitSize: bitSizeInt}, nil
 		},
 	})
+}
+
+type FloatRandom struct {
+	BitSize int
+	Min     float64
+	Max     float64
+	config  config.ProcessorConfig
+}
+
+func (fr *FloatRandom) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	if fr.BitSize == 32 {
+		payloadFloat := rand.Float32()*(float32(fr.Max)-float32(fr.Min)) + float32(fr.Min)
+		wrappedPayload.Payload = payloadFloat
+		return wrappedPayload, nil
+	}
+	if fr.BitSize == 64 {
+		payloadFloat := rand.Float64()*(fr.Max-fr.Min) + fr.Min
+		wrappedPayload.Payload = payloadFloat
+		return wrappedPayload, nil
+	}
+	wrappedPayload.End = true
+	return wrappedPayload, errors.New("float.random bitSize error: must be 32 or 64")
+}
+
+func (fr *FloatRandom) Type() string {
+	return fr.config.Type
 }

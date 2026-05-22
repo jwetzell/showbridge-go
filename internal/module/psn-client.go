@@ -12,6 +12,16 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
+func init() {
+	RegisterModule(ModuleRegistration{
+		Type:  "psn.client",
+		Title: "PosiStageNet Client",
+		New: func(config config.ModuleConfig) (common.Module, error) {
+			return &PSNClient{config: config, decoder: psn.NewDecoder(), logger: CreateLogger(config)}, nil
+		},
+	})
+}
+
 type PSNClient struct {
 	config       config.ModuleConfig
 	conn         *net.UDPConn
@@ -21,16 +31,6 @@ type PSNClient struct {
 	logger       *slog.Logger
 	cancel       context.CancelFunc
 	connMu       sync.Mutex
-}
-
-func init() {
-	RegisterModule(ModuleRegistration{
-		Type:  "psn.client",
-		Title: "PosiStageNet Client",
-		New: func(config config.ModuleConfig) (common.Module, error) {
-			return &PSNClient{config: config, decoder: psn.NewDecoder(), logger: CreateLogger(config)}, nil
-		},
-	})
 }
 
 func (pc *PSNClient) Id() string {

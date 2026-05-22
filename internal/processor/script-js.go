@@ -10,6 +10,50 @@ import (
 	"modernc.org/quickjs"
 )
 
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "script.js",
+		Title: "Run JavaScript",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"program": {
+					Title: "Program",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"program"},
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
+		},
+		New: func(config config.ProcessorConfig) (Processor, error) {
+			params := config.Params
+
+			programString, err := params.GetString("program")
+			if err != nil {
+				return nil, fmt.Errorf("script.js program error: %w", err)
+			}
+
+			vm, err := quickjs.NewVM()
+
+			if err != nil {
+				return nil, err
+			}
+
+			payloadAtom, err := vm.NewAtom("payload")
+			if err != nil {
+				return nil, err
+			}
+
+			senderAtom, err := vm.NewAtom("sender")
+			if err != nil {
+				return nil, err
+			}
+
+			return &ScriptJS{config: config, Program: programString, vm: vm, payloadAtom: payloadAtom, senderAtom: senderAtom}, nil
+		},
+	})
+}
+
 type ScriptJS struct {
 	config      config.ProcessorConfig
 	vm          *quickjs.VM
@@ -92,48 +136,4 @@ func (sj *ScriptJS) Process(ctx context.Context, wrappedPayload common.WrappedPa
 
 func (sj *ScriptJS) Type() string {
 	return sj.config.Type
-}
-
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "script.js",
-		Title: "Run JavaScript",
-		ParamsSchema: &jsonschema.Schema{
-			Type: "object",
-			Properties: map[string]*jsonschema.Schema{
-				"program": {
-					Title: "Program",
-					Type:  "string",
-				},
-			},
-			Required:             []string{"program"},
-			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
-		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
-
-			programString, err := params.GetString("program")
-			if err != nil {
-				return nil, fmt.Errorf("script.js program error: %w", err)
-			}
-
-			vm, err := quickjs.NewVM()
-
-			if err != nil {
-				return nil, err
-			}
-
-			payloadAtom, err := vm.NewAtom("payload")
-			if err != nil {
-				return nil, err
-			}
-
-			senderAtom, err := vm.NewAtom("sender")
-			if err != nil {
-				return nil, err
-			}
-
-			return &ScriptJS{config: config, Program: programString, vm: vm, payloadAtom: payloadAtom, senderAtom: senderAtom}, nil
-		},
-	})
 }

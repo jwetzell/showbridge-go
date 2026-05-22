@@ -22,31 +22,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-type SIPDTMFServer struct {
-	config       config.ModuleConfig
-	ctx          context.Context
-	inputHandler common.InputHandler
-	IP           string
-	Port         int
-	Transport    string
-	UserAgent    string
-	Separator    string
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	ua           *sipgo.UserAgent
-	uaMu         sync.Mutex
-}
-
-type SIPDTMFMessage struct {
-	To     string
-	Digits string
-}
-
-type SIPDTMFCall struct {
-	inDialog *diago.DialogServerSession
-	lock     sync.Mutex
-}
-
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type:  "sip.dtmf.server",
@@ -142,6 +117,31 @@ func init() {
 			return &SIPDTMFServer{config: moduleConfig, IP: ipString, Port: int(portNum), Transport: transportString, UserAgent: userAgentString, Separator: separatorString, logger: CreateLogger(moduleConfig)}, nil
 		},
 	})
+}
+
+type SIPDTMFServer struct {
+	config       config.ModuleConfig
+	ctx          context.Context
+	inputHandler common.InputHandler
+	IP           string
+	Port         int
+	Transport    string
+	UserAgent    string
+	Separator    string
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	ua           *sipgo.UserAgent
+	uaMu         sync.Mutex
+}
+
+type SIPDTMFMessage struct {
+	To     string
+	Digits string
+}
+
+type SIPDTMFCall struct {
+	inDialog *diago.DialogServerSession
+	lock     sync.Mutex
 }
 
 func (sds *SIPDTMFServer) Id() string {

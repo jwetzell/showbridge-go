@@ -11,38 +11,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type HTTPResponseCreate struct {
-	Status   int
-	BodyTmpl *template.Template
-	config   config.ProcessorConfig
-}
-
-type HTTPResponse struct {
-	Status int
-	Body   []byte
-}
-
-func (hrc *HTTPResponseCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
-	templateData := wrappedPayload
-
-	var bodyBuffer bytes.Buffer
-	err := hrc.BodyTmpl.Execute(&bodyBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-	wrappedPayload.Payload = HTTPResponse{
-		Status: hrc.Status,
-		Body:   bodyBuffer.Bytes(),
-	}
-	return wrappedPayload, nil
-}
-
-func (hrc *HTTPResponseCreate) Type() string {
-	return hrc.config.Type
-}
-
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "http.response.create",
@@ -85,4 +53,36 @@ func init() {
 			return &HTTPResponseCreate{config: config, Status: int(statusNum), BodyTmpl: bodyTemplate}, nil
 		},
 	})
+}
+
+type HTTPResponseCreate struct {
+	Status   int
+	BodyTmpl *template.Template
+	config   config.ProcessorConfig
+}
+
+type HTTPResponse struct {
+	Status int
+	Body   []byte
+}
+
+func (hrc *HTTPResponseCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	templateData := wrappedPayload
+
+	var bodyBuffer bytes.Buffer
+	err := hrc.BodyTmpl.Execute(&bodyBuffer, templateData)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+	wrappedPayload.Payload = HTTPResponse{
+		Status: hrc.Status,
+		Body:   bodyBuffer.Bytes(),
+	}
+	return wrappedPayload, nil
+}
+
+func (hrc *HTTPResponseCreate) Type() string {
+	return hrc.config.Type
 }

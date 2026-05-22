@@ -10,20 +10,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type TimeSleep struct {
-	config   config.ProcessorConfig
-	Duration time.Duration
-}
-
-func (ts *TimeSleep) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
-	time.Sleep(ts.Duration)
-	return wrappedPayload, nil
-}
-
-func (ts *TimeSleep) Type() string {
-	return ts.config.Type
-}
-
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "time.sleep",
@@ -51,4 +37,18 @@ func init() {
 			return &TimeSleep{config: config, Duration: time.Millisecond * time.Duration(durationNum)}, nil
 		},
 	})
+}
+
+type TimeSleep struct {
+	config   config.ProcessorConfig
+	Duration time.Duration
+}
+
+func (ts *TimeSleep) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	time.Sleep(ts.Duration)
+	return wrappedPayload, nil
+}
+
+func (ts *TimeSleep) Type() string {
+	return ts.config.Type
 }

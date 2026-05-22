@@ -10,6 +10,16 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "osc.message.decode",
+		Title: "Decode OSC Message",
+		New: func(config config.ProcessorConfig) (Processor, error) {
+			return &OSCMessageDecode{config: config}, nil
+		},
+	})
+}
+
 type OSCMessageDecode struct {
 	config config.ProcessorConfig
 }
@@ -44,14 +54,4 @@ func (omd *OSCMessageDecode) Process(ctx context.Context, wrappedPayload common.
 
 func (omd *OSCMessageDecode) Type() string {
 	return omd.config.Type
-}
-
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "osc.message.decode",
-		Title: "Decode OSC Message",
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			return &OSCMessageDecode{config: config}, nil
-		},
-	})
 }

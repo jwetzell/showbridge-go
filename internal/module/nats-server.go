@@ -16,18 +16,6 @@ import (
 	"github.com/nats-io/nats-server/v2/server"
 )
 
-type NATSServer struct {
-	config       config.ModuleConfig
-	ctx          context.Context
-	Ip           string
-	Port         int
-	inputHandler common.InputHandler
-	server       *server.Server
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	serverMu     sync.Mutex
-}
-
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type:  "nats.server",
@@ -78,6 +66,18 @@ func init() {
 			return &NATSServer{config: moduleConfig, logger: CreateLogger(moduleConfig), Ip: ipString, Port: portNum}, nil
 		},
 	})
+}
+
+type NATSServer struct {
+	config       config.ModuleConfig
+	ctx          context.Context
+	Ip           string
+	Port         int
+	inputHandler common.InputHandler
+	server       *server.Server
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	serverMu     sync.Mutex
 }
 
 func (ns *NATSServer) Id() string {

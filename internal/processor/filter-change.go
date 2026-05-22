@@ -8,6 +8,16 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "filter.change",
+		Title: "Filter On Change",
+		New: func(config config.ProcessorConfig) (Processor, error) {
+			return &FilterChange{config: config}, nil
+		},
+	})
+}
+
 type FilterChange struct {
 	config   config.ProcessorConfig
 	previous any
@@ -27,14 +37,4 @@ func (fc *FilterChange) Process(ctx context.Context, wrappedPayload common.Wrapp
 
 func (fc *FilterChange) Type() string {
 	return fc.config.Type
-}
-
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "filter.change",
-		Title: "Filter On Change",
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			return &FilterChange{config: config}, nil
-		},
-	})
 }

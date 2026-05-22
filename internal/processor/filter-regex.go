@@ -11,33 +11,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type FilterRegex struct {
-	config  config.ProcessorConfig
-	Pattern *regexp.Regexp
-}
-
-func (fr *FilterRegex) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
-	payloadString, ok := common.GetAnyAs[string](payload)
-
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("filter.regex processor only accepts a string")
-	}
-
-	if !fr.Pattern.MatchString(payloadString) {
-		wrappedPayload.End = true
-		return wrappedPayload, nil
-	}
-
-	wrappedPayload.Payload = payloadString
-	return wrappedPayload, nil
-}
-
-func (fr *FilterRegex) Type() string {
-	return fr.config.Type
-}
-
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "filter.regex",
@@ -70,4 +43,31 @@ func init() {
 			return &FilterRegex{config: config, Pattern: patternRegexp}, nil
 		},
 	})
+}
+
+type FilterRegex struct {
+	config  config.ProcessorConfig
+	Pattern *regexp.Regexp
+}
+
+func (fr *FilterRegex) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
+	payloadString, ok := common.GetAnyAs[string](payload)
+
+	if !ok {
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("filter.regex processor only accepts a string")
+	}
+
+	if !fr.Pattern.MatchString(payloadString) {
+		wrappedPayload.End = true
+		return wrappedPayload, nil
+	}
+
+	wrappedPayload.Payload = payloadString
+	return wrappedPayload, nil
+}
+
+func (fr *FilterRegex) Type() string {
+	return fr.config.Type
 }

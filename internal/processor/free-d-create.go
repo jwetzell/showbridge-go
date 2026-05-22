@@ -13,6 +13,181 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "freed.create",
+		Title: "Create FreeD",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"id": {
+					Title: "Camera ID",
+					Type:  "string",
+				},
+				"pan": {
+					Title: "Pan",
+					Type:  "string",
+				},
+				"tilt": {
+					Title: "Tilt",
+					Type:  "string",
+				},
+				"roll": {
+					Title: "Roll",
+					Type:  "string",
+				},
+				"posX": {
+					Title: "Position X",
+					Type:  "string",
+				},
+				"posY": {
+					Title: "Position Y",
+					Type:  "string",
+				},
+				"posZ": {
+					Title: "Position Z",
+					Type:  "string",
+				},
+				"zoom": {
+					Title: "Zoom",
+					Type:  "string",
+				},
+				"focus": {
+					Title: "Focus",
+					Type:  "string",
+				},
+			},
+			Required: []string{
+				"id",
+				"pan",
+				"tilt",
+				"roll",
+				"posX",
+				"posY",
+				"posZ",
+				"zoom",
+				"focus",
+			},
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
+		},
+		New: func(config config.ProcessorConfig) (Processor, error) {
+
+			// TODO(jwetzell): make some params optional
+			params := config.Params
+			idString, err := params.GetString("id")
+			if err != nil {
+				return nil, fmt.Errorf("freed.create id error: %w", err)
+			}
+
+			idTemplate, err := template.New("id").Parse(idString)
+
+			if err != nil {
+				return nil, err
+			}
+
+			panString, err := params.GetString("pan")
+			if err != nil {
+				return nil, fmt.Errorf("freed.create pan error: %w", err)
+			}
+
+			panTemplate, err := template.New("pan").Parse(panString)
+
+			if err != nil {
+				return nil, err
+			}
+
+			tiltString, err := params.GetString("tilt")
+			if err != nil {
+				return nil, fmt.Errorf("freed.create tilt error: %w", err)
+			}
+
+			tiltTemplate, err := template.New("tilt").Parse(tiltString)
+
+			if err != nil {
+				return nil, err
+			}
+
+			rollString, err := params.GetString("roll")
+			if err != nil {
+				return nil, fmt.Errorf("freed.create roll error: %w", err)
+			}
+
+			rollTemplate, err := template.New("roll").Parse(rollString)
+
+			if err != nil {
+				return nil, err
+			}
+
+			posXString, err := params.GetString("posX")
+			if err != nil {
+				return nil, fmt.Errorf("freed.create posX error: %w", err)
+			}
+
+			posXTemplate, err := template.New("posX").Parse(posXString)
+
+			if err != nil {
+				return nil, err
+			}
+
+			posYString, err := params.GetString("posY")
+			if err != nil {
+				return nil, fmt.Errorf("freed.create posY error: %w", err)
+			}
+
+			posYTemplate, err := template.New("posY").Parse(posYString)
+
+			if err != nil {
+				return nil, err
+			}
+
+			posZString, err := params.GetString("posZ")
+			if err != nil {
+				return nil, fmt.Errorf("freed.create posZ error: %w", err)
+			}
+
+			posZTemplate, err := template.New("posZ").Parse(posZString)
+
+			if err != nil {
+				return nil, err
+			}
+
+			zoomString, err := params.GetString("zoom")
+			if err != nil {
+				return nil, fmt.Errorf("freed.create zoom error: %w", err)
+			}
+
+			zoomTemplate, err := template.New("zoom").Parse(zoomString)
+
+			if err != nil {
+				return nil, err
+			}
+
+			focusString, err := params.GetString("focus")
+			if err != nil {
+				return nil, fmt.Errorf("freed.create focus error: %w", err)
+			}
+
+			focusTemplate, err := template.New("focus").Parse(focusString)
+			if err != nil {
+				return nil, err
+			}
+
+			return &FreeDCreate{
+				config: config,
+				Id:     idTemplate,
+				Pan:    panTemplate,
+				Tilt:   tiltTemplate,
+				Roll:   rollTemplate,
+				PosX:   posXTemplate,
+				PosY:   posYTemplate,
+				PosZ:   posZTemplate,
+				Zoom:   zoomTemplate,
+				Focus:  focusTemplate,
+			}, nil
+		},
+	})
+}
+
 type FreeDCreate struct {
 	config config.ProcessorConfig
 	Id     *template.Template
@@ -202,179 +377,4 @@ func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload common.Wrappe
 
 func (fc *FreeDCreate) Type() string {
 	return fc.config.Type
-}
-
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "freed.create",
-		Title: "Create FreeD",
-		ParamsSchema: &jsonschema.Schema{
-			Type: "object",
-			Properties: map[string]*jsonschema.Schema{
-				"id": {
-					Title: "Camera ID",
-					Type:  "string",
-				},
-				"pan": {
-					Title: "Pan",
-					Type:  "string",
-				},
-				"tilt": {
-					Title: "Tilt",
-					Type:  "string",
-				},
-				"roll": {
-					Title: "Roll",
-					Type:  "string",
-				},
-				"posX": {
-					Title: "Position X",
-					Type:  "string",
-				},
-				"posY": {
-					Title: "Position Y",
-					Type:  "string",
-				},
-				"posZ": {
-					Title: "Position Z",
-					Type:  "string",
-				},
-				"zoom": {
-					Title: "Zoom",
-					Type:  "string",
-				},
-				"focus": {
-					Title: "Focus",
-					Type:  "string",
-				},
-			},
-			Required: []string{
-				"id",
-				"pan",
-				"tilt",
-				"roll",
-				"posX",
-				"posY",
-				"posZ",
-				"zoom",
-				"focus",
-			},
-			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
-		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-
-			// TODO(jwetzell): make some params optional
-			params := config.Params
-			idString, err := params.GetString("id")
-			if err != nil {
-				return nil, fmt.Errorf("freed.create id error: %w", err)
-			}
-
-			idTemplate, err := template.New("id").Parse(idString)
-
-			if err != nil {
-				return nil, err
-			}
-
-			panString, err := params.GetString("pan")
-			if err != nil {
-				return nil, fmt.Errorf("freed.create pan error: %w", err)
-			}
-
-			panTemplate, err := template.New("pan").Parse(panString)
-
-			if err != nil {
-				return nil, err
-			}
-
-			tiltString, err := params.GetString("tilt")
-			if err != nil {
-				return nil, fmt.Errorf("freed.create tilt error: %w", err)
-			}
-
-			tiltTemplate, err := template.New("tilt").Parse(tiltString)
-
-			if err != nil {
-				return nil, err
-			}
-
-			rollString, err := params.GetString("roll")
-			if err != nil {
-				return nil, fmt.Errorf("freed.create roll error: %w", err)
-			}
-
-			rollTemplate, err := template.New("roll").Parse(rollString)
-
-			if err != nil {
-				return nil, err
-			}
-
-			posXString, err := params.GetString("posX")
-			if err != nil {
-				return nil, fmt.Errorf("freed.create posX error: %w", err)
-			}
-
-			posXTemplate, err := template.New("posX").Parse(posXString)
-
-			if err != nil {
-				return nil, err
-			}
-
-			posYString, err := params.GetString("posY")
-			if err != nil {
-				return nil, fmt.Errorf("freed.create posY error: %w", err)
-			}
-
-			posYTemplate, err := template.New("posY").Parse(posYString)
-
-			if err != nil {
-				return nil, err
-			}
-
-			posZString, err := params.GetString("posZ")
-			if err != nil {
-				return nil, fmt.Errorf("freed.create posZ error: %w", err)
-			}
-
-			posZTemplate, err := template.New("posZ").Parse(posZString)
-
-			if err != nil {
-				return nil, err
-			}
-
-			zoomString, err := params.GetString("zoom")
-			if err != nil {
-				return nil, fmt.Errorf("freed.create zoom error: %w", err)
-			}
-
-			zoomTemplate, err := template.New("zoom").Parse(zoomString)
-
-			if err != nil {
-				return nil, err
-			}
-
-			focusString, err := params.GetString("focus")
-			if err != nil {
-				return nil, fmt.Errorf("freed.create focus error: %w", err)
-			}
-
-			focusTemplate, err := template.New("focus").Parse(focusString)
-			if err != nil {
-				return nil, err
-			}
-
-			return &FreeDCreate{
-				config: config,
-				Id:     idTemplate,
-				Pan:    panTemplate,
-				Tilt:   tiltTemplate,
-				Roll:   rollTemplate,
-				PosX:   posXTemplate,
-				PosY:   posYTemplate,
-				PosZ:   posZTemplate,
-				Zoom:   zoomTemplate,
-				Focus:  focusTemplate,
-			}, nil
-		},
-	})
 }

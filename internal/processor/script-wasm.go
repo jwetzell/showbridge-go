@@ -12,37 +12,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type ScriptWASM struct {
-	config   config.ProcessorConfig
-	Program  *extism.Plugin
-	Function string
-}
-
-func (sw *ScriptWASM) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
-
-	payload := wrappedPayload.Payload
-	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
-
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("script.wasm can only process a byte array")
-	}
-
-	_, output, err := sw.Program.Call(sw.Function, payloadBytes)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-	wrappedPayload.Payload = output
-
-	return wrappedPayload, nil
-}
-
-func (sw *ScriptWASM) Type() string {
-	return sw.config.Type
-}
-
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "script.wasm",
@@ -119,4 +88,35 @@ func init() {
 			return &ScriptWASM{config: processorConfig, Program: programInstance, Function: functionString}, nil
 		},
 	})
+}
+
+type ScriptWASM struct {
+	config   config.ProcessorConfig
+	Program  *extism.Plugin
+	Function string
+}
+
+func (sw *ScriptWASM) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+
+	payload := wrappedPayload.Payload
+	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
+
+	if !ok {
+		wrappedPayload.End = true
+		return wrappedPayload, fmt.Errorf("script.wasm can only process a byte array")
+	}
+
+	_, output, err := sw.Program.Call(sw.Function, payloadBytes)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+	wrappedPayload.Payload = output
+
+	return wrappedPayload, nil
+}
+
+func (sw *ScriptWASM) Type() string {
+	return sw.config.Type
 }

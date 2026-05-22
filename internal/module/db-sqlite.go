@@ -14,17 +14,6 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-type DbSqlite struct {
-	config       config.ModuleConfig
-	Dsn          string
-	ctx          context.Context
-	inputHandler common.InputHandler
-	db           *sql.DB
-	logger       *slog.Logger
-	dbMu         sync.Mutex
-	cancel       context.CancelFunc
-}
-
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type:  "db.sqlite",
@@ -51,6 +40,17 @@ func init() {
 			return &DbSqlite{Dsn: dsnString, config: config, logger: CreateLogger(config)}, nil
 		},
 	})
+}
+
+type DbSqlite struct {
+	config       config.ModuleConfig
+	Dsn          string
+	ctx          context.Context
+	inputHandler common.InputHandler
+	db           *sql.DB
+	logger       *slog.Logger
+	dbMu         sync.Mutex
+	cancel       context.CancelFunc
 }
 
 func (dbs *DbSqlite) Id() string {

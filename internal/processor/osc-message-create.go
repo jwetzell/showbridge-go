@@ -15,76 +15,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type OSCMessageCreate struct {
-	config  config.ProcessorConfig
-	Address *template.Template
-	Args    []*template.Template
-	Types   string
-}
-
-func (omc *OSCMessageCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
-
-	templateData := wrappedPayload
-
-	var addressBuffer bytes.Buffer
-	err := omc.Address.Execute(&addressBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	addressString := addressBuffer.String()
-
-	if len(addressString) == 0 {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("osc.message.create address must not be empty")
-	}
-
-	if addressString[0] != '/' {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("osc.message.create address must start with '/'")
-	}
-
-	payloadMessage := &osc.OSCMessage{
-		Address: addressString,
-	}
-
-	args := []osc.OSCArg{}
-
-	for argIndex, argTemplate := range omc.Args {
-		var argBuffer bytes.Buffer
-		err := argTemplate.Execute(&argBuffer, templateData)
-
-		if err != nil {
-			wrappedPayload.End = true
-			return wrappedPayload, err
-		}
-
-		argString := argBuffer.String()
-
-		typedArg, err := argToTypedArg(argString, omc.Types[argIndex])
-
-		if err != nil {
-			wrappedPayload.End = true
-			return wrappedPayload, err
-		}
-
-		args = append(args, typedArg)
-	}
-
-	if len(args) > 0 {
-		payloadMessage.Args = args
-	}
-
-	wrappedPayload.Payload = payloadMessage
-	return wrappedPayload, nil
-}
-
-func (omc *OSCMessageCreate) Type() string {
-	return omc.config.Type
-}
-
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "osc.message.create",
@@ -156,6 +86,76 @@ func init() {
 			return &OSCMessageCreate{config: processorConfig, Address: addressTemplate, Args: argTemplates, Types: typesString}, nil
 		},
 	})
+}
+
+type OSCMessageCreate struct {
+	config  config.ProcessorConfig
+	Address *template.Template
+	Args    []*template.Template
+	Types   string
+}
+
+func (omc *OSCMessageCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+
+	templateData := wrappedPayload
+
+	var addressBuffer bytes.Buffer
+	err := omc.Address.Execute(&addressBuffer, templateData)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	addressString := addressBuffer.String()
+
+	if len(addressString) == 0 {
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("osc.message.create address must not be empty")
+	}
+
+	if addressString[0] != '/' {
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("osc.message.create address must start with '/'")
+	}
+
+	payloadMessage := &osc.OSCMessage{
+		Address: addressString,
+	}
+
+	args := []osc.OSCArg{}
+
+	for argIndex, argTemplate := range omc.Args {
+		var argBuffer bytes.Buffer
+		err := argTemplate.Execute(&argBuffer, templateData)
+
+		if err != nil {
+			wrappedPayload.End = true
+			return wrappedPayload, err
+		}
+
+		argString := argBuffer.String()
+
+		typedArg, err := argToTypedArg(argString, omc.Types[argIndex])
+
+		if err != nil {
+			wrappedPayload.End = true
+			return wrappedPayload, err
+		}
+
+		args = append(args, typedArg)
+	}
+
+	if len(args) > 0 {
+		payloadMessage.Args = args
+	}
+
+	wrappedPayload.Payload = payloadMessage
+	return wrappedPayload, nil
+}
+
+func (omc *OSCMessageCreate) Type() string {
+	return omc.config.Type
 }
 
 func argToTypedArg(rawArg string, oscType byte) (osc.OSCArg, error) {

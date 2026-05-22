@@ -11,6 +11,37 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "module.output",
+		Title: "Module Output",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"module": {
+					Title:       "Module ID",
+					Type:        "string",
+					Description: "ID of module to send output to",
+				},
+			},
+			Required:             []string{"module"},
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
+		},
+		New: func(config config.ProcessorConfig) (Processor, error) {
+
+			params := config.Params
+
+			moduleId, err := params.GetString("module")
+
+			if err != nil {
+				return nil, fmt.Errorf("module.output module error: %w", err)
+			}
+
+			return &ModuleOutput{config: config, ModuleId: moduleId, logger: slog.Default().With("component", "processor", "type", config.Type)}, nil
+		},
+	})
+}
+
 type ModuleOutput struct {
 	config   config.ProcessorConfig
 	ModuleId string
@@ -52,35 +83,4 @@ func (mo *ModuleOutput) Process(ctx context.Context, wrappedPayload common.Wrapp
 
 func (mo *ModuleOutput) Type() string {
 	return mo.config.Type
-}
-
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "module.output",
-		Title: "Module Output",
-		ParamsSchema: &jsonschema.Schema{
-			Type: "object",
-			Properties: map[string]*jsonschema.Schema{
-				"module": {
-					Title:       "Module ID",
-					Type:        "string",
-					Description: "ID of module to send output to",
-				},
-			},
-			Required:             []string{"module"},
-			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
-		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-
-			params := config.Params
-
-			moduleId, err := params.GetString("module")
-
-			if err != nil {
-				return nil, fmt.Errorf("module.output module error: %w", err)
-			}
-
-			return &ModuleOutput{config: config, ModuleId: moduleId, logger: slog.Default().With("component", "processor", "type", config.Type)}, nil
-		},
-	})
 }

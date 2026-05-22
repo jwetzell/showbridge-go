@@ -11,36 +11,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type RouterInput struct {
-	config   config.ProcessorConfig
-	SourceId string
-	logger   *slog.Logger
-}
-
-func (ri *RouterInput) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
-
-	payload := wrappedPayload.Payload
-	if wrappedPayload.InputHandler == nil {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("router.input no input handler found")
-	}
-
-	_, err := wrappedPayload.InputHandler(ctx, ri.SourceId, payload)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("router.input failed to send input")
-	}
-
-	wrappedPayload.Payload = payload
-
-	return wrappedPayload, nil
-}
-
-func (ri *RouterInput) Type() string {
-	return ri.config.Type
-}
-
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "router.input",
@@ -70,4 +40,34 @@ func init() {
 			return &RouterInput{config: config, SourceId: sourceId, logger: slog.Default().With("component", "processor", "type", config.Type)}, nil
 		},
 	})
+}
+
+type RouterInput struct {
+	config   config.ProcessorConfig
+	SourceId string
+	logger   *slog.Logger
+}
+
+func (ri *RouterInput) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+
+	payload := wrappedPayload.Payload
+	if wrappedPayload.InputHandler == nil {
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("router.input no input handler found")
+	}
+
+	_, err := wrappedPayload.InputHandler(ctx, ri.SourceId, payload)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("router.input failed to send input")
+	}
+
+	wrappedPayload.Payload = payload
+
+	return wrappedPayload, nil
+}
+
+func (ri *RouterInput) Type() string {
+	return ri.config.Type
 }

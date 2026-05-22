@@ -17,24 +17,6 @@ type ScriptExpr struct {
 	Program *vm.Program
 }
 
-func (se *ScriptExpr) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
-
-	exprEnv := wrappedPayload
-
-	output, err := expr.Run(se.Program, exprEnv)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	wrappedPayload.Payload = output
-	return wrappedPayload, nil
-}
-
-func (se *ScriptExpr) Type() string {
-	return se.config.Type
-}
-
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "script.expr",
@@ -66,4 +48,22 @@ func init() {
 			return &ScriptExpr{config: config, Program: program}, nil
 		},
 	})
+}
+
+func (se *ScriptExpr) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+
+	exprEnv := wrappedPayload
+
+	output, err := expr.Run(se.Program, exprEnv)
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	wrappedPayload.Payload = output
+	return wrappedPayload, nil
+}
+
+func (se *ScriptExpr) Type() string {
+	return se.config.Type
 }

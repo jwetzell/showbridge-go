@@ -19,21 +19,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/framer"
 )
 
-type TCPServer struct {
-	config        config.ModuleConfig
-	Addr          *net.TCPAddr
-	Framer        framer.Framer
-	ctx           context.Context
-	inputHandler  common.InputHandler
-	wg            sync.WaitGroup
-	connections   []*net.TCPConn
-	connectionsMu sync.RWMutex
-	logger        *slog.Logger
-	cancel        context.CancelFunc
-	listener      *net.TCPListener
-	listenerMu    sync.Mutex
-}
-
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type:  "net.tcp.server",
@@ -95,6 +80,21 @@ func init() {
 			return &TCPServer{Framer: framer, Addr: addr, config: moduleConfig, logger: CreateLogger(moduleConfig)}, nil
 		},
 	})
+}
+
+type TCPServer struct {
+	config        config.ModuleConfig
+	Addr          *net.TCPAddr
+	Framer        framer.Framer
+	ctx           context.Context
+	inputHandler  common.InputHandler
+	wg            sync.WaitGroup
+	connections   []*net.TCPConn
+	connectionsMu sync.RWMutex
+	logger        *slog.Logger
+	cancel        context.CancelFunc
+	listener      *net.TCPListener
+	listenerMu    sync.Mutex
 }
 
 func (ts *TCPServer) Id() string {

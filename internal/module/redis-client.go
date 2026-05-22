@@ -13,18 +13,6 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type RedisClient struct {
-	config       config.ModuleConfig
-	ctx          context.Context
-	inputHandler common.InputHandler
-	Host         string
-	Port         uint16
-	client       *redis.Client
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	clientMu     sync.Mutex
-}
-
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type:  "redis.client",
@@ -60,6 +48,18 @@ func init() {
 			return &RedisClient{config: config, Host: hostString, Port: uint16(portInt), logger: CreateLogger(config)}, nil
 		},
 	})
+}
+
+type RedisClient struct {
+	config       config.ModuleConfig
+	ctx          context.Context
+	inputHandler common.InputHandler
+	Host         string
+	Port         uint16
+	client       *redis.Client
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	clientMu     sync.Mutex
 }
 
 func (rc *RedisClient) Id() string {

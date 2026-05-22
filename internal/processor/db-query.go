@@ -13,6 +13,51 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "db.query",
+		Title: "Query Database",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"module": {
+					Title:       "Module ID",
+					Type:        "string",
+					Description: "ID of the database module to query",
+				},
+				"query": {
+					Title:       "Query",
+					Type:        "string",
+					Description: "SQL query to execute",
+				},
+			},
+			Required:             []string{"module", "query"},
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
+		},
+		New: func(config config.ProcessorConfig) (Processor, error) {
+
+			params := config.Params
+
+			moduleIdString, err := params.GetString("module")
+			if err != nil {
+				return nil, fmt.Errorf("db.query module error: %w", err)
+			}
+
+			queryString, err := params.GetString("query")
+			if err != nil {
+				return nil, fmt.Errorf("db.query query error: %w", err)
+			}
+
+			queryTemplate, err := template.New("query").Parse(queryString)
+
+			if err != nil {
+				return nil, err
+			}
+			return &DbQuery{config: config, ModuleId: moduleIdString, Query: queryTemplate, logger: slog.Default().With("component", "processor", "type", config.Type)}, nil
+		},
+	})
+}
+
 type DbQuery struct {
 	config   config.ProcessorConfig
 	ModuleId string
@@ -100,49 +145,4 @@ func (dq *DbQuery) Process(ctx context.Context, wrappedPayload common.WrappedPay
 
 func (dq *DbQuery) Type() string {
 	return dq.config.Type
-}
-
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "db.query",
-		Title: "Query Database",
-		ParamsSchema: &jsonschema.Schema{
-			Type: "object",
-			Properties: map[string]*jsonschema.Schema{
-				"module": {
-					Title:       "Module ID",
-					Type:        "string",
-					Description: "ID of the database module to query",
-				},
-				"query": {
-					Title:       "Query",
-					Type:        "string",
-					Description: "SQL query to execute",
-				},
-			},
-			Required:             []string{"module", "query"},
-			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
-		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-
-			params := config.Params
-
-			moduleIdString, err := params.GetString("module")
-			if err != nil {
-				return nil, fmt.Errorf("db.query module error: %w", err)
-			}
-
-			queryString, err := params.GetString("query")
-			if err != nil {
-				return nil, fmt.Errorf("db.query query error: %w", err)
-			}
-
-			queryTemplate, err := template.New("query").Parse(queryString)
-
-			if err != nil {
-				return nil, err
-			}
-			return &DbQuery{config: config, ModuleId: moduleIdString, Query: queryTemplate, logger: slog.Default().With("component", "processor", "type", config.Type)}, nil
-		},
-	})
 }

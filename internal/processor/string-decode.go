@@ -8,6 +8,16 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "string.decode",
+		Title: "Decode String",
+		New: func(config config.ProcessorConfig) (Processor, error) {
+			return &StringDecode{config: config}, nil
+		},
+	})
+}
+
 type StringDecode struct {
 	config config.ProcessorConfig
 }
@@ -29,14 +39,4 @@ func (sd *StringDecode) Process(ctx context.Context, wrappedPayload common.Wrapp
 
 func (sd *StringDecode) Type() string {
 	return sd.config.Type
-}
-
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "string.decode",
-		Title: "Decode String",
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			return &StringDecode{config: config}, nil
-		},
-	})
 }

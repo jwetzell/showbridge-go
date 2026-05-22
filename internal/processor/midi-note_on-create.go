@@ -15,69 +15,6 @@ import (
 	"gitlab.com/gomidi/midi/v2"
 )
 
-type MIDINoteOnCreate struct {
-	config   config.ProcessorConfig
-	Channel  *template.Template
-	Note     *template.Template
-	Velocity *template.Template
-}
-
-func (mnoc *MIDINoteOnCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
-	templateData := wrappedPayload
-
-	var channelBuffer bytes.Buffer
-	err := mnoc.Channel.Execute(&channelBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	var noteBuffer bytes.Buffer
-	err = mnoc.Note.Execute(&noteBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	noteValue, err := strconv.ParseUint(noteBuffer.String(), 10, 8)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	var velocityBuffer bytes.Buffer
-	err = mnoc.Velocity.Execute(&velocityBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	velocityValue, err := strconv.ParseUint(velocityBuffer.String(), 10, 8)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	payloadMessage := midi.NoteOn(uint8(channelValue), uint8(noteValue), uint8(velocityValue))
-	wrappedPayload.Payload = payloadMessage
-	return wrappedPayload, nil
-}
-
-func (mnoc *MIDINoteOnCreate) Type() string {
-	return mnoc.config.Type
-}
-
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "midi.note_on.create",
@@ -144,4 +81,67 @@ func init() {
 			}, nil
 		},
 	})
+}
+
+type MIDINoteOnCreate struct {
+	config   config.ProcessorConfig
+	Channel  *template.Template
+	Note     *template.Template
+	Velocity *template.Template
+}
+
+func (mnoc *MIDINoteOnCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	templateData := wrappedPayload
+
+	var channelBuffer bytes.Buffer
+	err := mnoc.Channel.Execute(&channelBuffer, templateData)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	var noteBuffer bytes.Buffer
+	err = mnoc.Note.Execute(&noteBuffer, templateData)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	noteValue, err := strconv.ParseUint(noteBuffer.String(), 10, 8)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	var velocityBuffer bytes.Buffer
+	err = mnoc.Velocity.Execute(&velocityBuffer, templateData)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	velocityValue, err := strconv.ParseUint(velocityBuffer.String(), 10, 8)
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	payloadMessage := midi.NoteOn(uint8(channelValue), uint8(noteValue), uint8(velocityValue))
+	wrappedPayload.Payload = payloadMessage
+	return wrappedPayload, nil
+}
+
+func (mnoc *MIDINoteOnCreate) Type() string {
+	return mnoc.config.Type
 }

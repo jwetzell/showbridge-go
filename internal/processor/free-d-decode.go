@@ -9,10 +9,20 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "freed.decode",
+		Title: "Decode FreeD",
+		New: func(config config.ProcessorConfig) (Processor, error) {
+			return &FreeDDecode{config: config}, nil
+		},
+	})
+}
+
 type FreeDDecode struct {
 	config config.ProcessorConfig
 }
-
+	
 func (fd *FreeDDecode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
@@ -33,14 +43,4 @@ func (fd *FreeDDecode) Process(ctx context.Context, wrappedPayload common.Wrappe
 
 func (fd *FreeDDecode) Type() string {
 	return fd.config.Type
-}
-
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "freed.decode",
-		Title: "Decode FreeD",
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			return &FreeDDecode{config: config}, nil
-		},
-	})
 }

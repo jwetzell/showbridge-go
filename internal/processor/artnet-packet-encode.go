@@ -9,6 +9,16 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "artnet.packet.encode",
+		Title: "Encode ArtNet Packet",
+		New: func(config config.ProcessorConfig) (Processor, error) {
+			return &ArtNetPacketEncode{config: config}, nil
+		},
+	})
+}
+
 type ArtNetPacketEncode struct {
 	config config.ProcessorConfig
 }
@@ -35,14 +45,4 @@ func (ape *ArtNetPacketEncode) Process(ctx context.Context, wrappedPayload commo
 
 func (ape *ArtNetPacketEncode) Type() string {
 	return ape.config.Type
-}
-
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "artnet.packet.encode",
-		Title: "Encode ArtNet Packet",
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			return &ArtNetPacketEncode{config: config}, nil
-		},
-	})
 }

@@ -21,31 +21,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-type SIPCallServer struct {
-	config       config.ModuleConfig
-	ctx          context.Context
-	inputHandler common.InputHandler
-	IP           string
-	Port         int
-	Transport    string
-	UserAgent    string
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	ua           *sipgo.UserAgent
-	uaMu         sync.Mutex
-}
-
-type SIPCallMessage struct {
-	To string
-}
-
-type SIPCall struct {
-	inDialog *diago.DialogServerSession
-	lock     sync.Mutex
-}
-
-type sipCallContextKey string
-
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type:  "sip.call.server",
@@ -123,6 +98,31 @@ func init() {
 		},
 	})
 }
+
+type SIPCallServer struct {
+	config       config.ModuleConfig
+	ctx          context.Context
+	inputHandler common.InputHandler
+	IP           string
+	Port         int
+	Transport    string
+	UserAgent    string
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	ua           *sipgo.UserAgent
+	uaMu         sync.Mutex
+}
+
+type SIPCallMessage struct {
+	To string
+}
+
+type SIPCall struct {
+	inDialog *diago.DialogServerSession
+	lock     sync.Mutex
+}
+
+type sipCallContextKey string
 
 func (scs *SIPCallServer) Id() string {
 	return scs.config.Id

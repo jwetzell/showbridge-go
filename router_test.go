@@ -14,6 +14,15 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/module"
 )
 
+func init() {
+	module.RegisterModule(module.ModuleRegistration{
+		Type: "mock.counter",
+		New: func(config config.ModuleConfig) (common.Module, error) {
+			return &MockCounterModule{config: config, logger: slog.Default()}, nil
+		},
+	})
+}
+
 type MockCounterModule struct {
 	config       config.ModuleConfig
 	ctx          context.Context
@@ -56,15 +65,6 @@ func (mcm *MockCounterModule) Stop() {
 	if mcm.cancel != nil {
 		mcm.cancel()
 	}
-}
-
-func init() {
-	module.RegisterModule(module.ModuleRegistration{
-		Type: "mock.counter",
-		New: func(config config.ModuleConfig) (common.Module, error) {
-			return &MockCounterModule{config: config, logger: slog.Default()}, nil
-		},
-	})
 }
 
 func TestNewRouter(t *testing.T) {

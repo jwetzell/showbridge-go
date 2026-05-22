@@ -14,6 +14,16 @@ type OSCMessageEncode struct {
 	config config.ProcessorConfig
 }
 
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "osc.message.encode",
+		Title: "Encode OSC Message",
+		New: func(config config.ProcessorConfig) (Processor, error) {
+			return &OSCMessageEncode{config: config}, nil
+		},
+	})
+}
+
 func (ome *OSCMessageEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadMessage, ok := common.GetAnyAs[*osc.OSCMessage](payload)
@@ -34,14 +44,4 @@ func (ome *OSCMessageEncode) Process(ctx context.Context, wrappedPayload common.
 
 func (ome *OSCMessageEncode) Type() string {
 	return ome.config.Type
-}
-
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "osc.message.encode",
-		Title: "Encode OSC Message",
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			return &OSCMessageEncode{config: config}, nil
-		},
-	})
 }

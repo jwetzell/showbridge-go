@@ -11,6 +11,33 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "struct.method.get",
+		Title: "Get Struct Method",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"name": {
+					Title: "Method Name",
+					Type:  "string",
+				},
+			},
+			Required:             []string{"name"},
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
+		},
+		New: func(config config.ProcessorConfig) (Processor, error) {
+			params := config.Params
+			nameString, err := params.GetString("name")
+			if err != nil {
+				return nil, fmt.Errorf("struct.method.get name error: %w", err)
+			}
+
+			return &StructMethodGet{config: config, Name: nameString}, nil
+		},
+	})
+}
+
 type StructMethodGet struct {
 	config config.ProcessorConfig
 	Name   string
@@ -60,31 +87,4 @@ func (smg *StructMethodGet) Process(ctx context.Context, wrappedPayload common.W
 
 func (smg *StructMethodGet) Type() string {
 	return smg.config.Type
-}
-
-func init() {
-	RegisterProcessor(ProcessorRegistration{
-		Type:  "struct.method.get",
-		Title: "Get Struct Method",
-		ParamsSchema: &jsonschema.Schema{
-			Type: "object",
-			Properties: map[string]*jsonschema.Schema{
-				"name": {
-					Title: "Method Name",
-					Type:  "string",
-				},
-			},
-			Required:             []string{"name"},
-			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
-		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
-			nameString, err := params.GetString("name")
-			if err != nil {
-				return nil, fmt.Errorf("struct.method.get name error: %w", err)
-			}
-
-			return &StructMethodGet{config: config, Name: nameString}, nil
-		},
-	})
 }

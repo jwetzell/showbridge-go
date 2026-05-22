@@ -11,22 +11,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type IntRandom struct {
-	Min    int
-	Max    int
-	config config.ProcessorConfig
-}
-
-func (ir *IntRandom) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
-	payloadInt := rand.IntN(ir.Max-ir.Min+1) + ir.Min
-	wrappedPayload.Payload = payloadInt
-	return wrappedPayload, nil
-}
-
-func (ir *IntRandom) Type() string {
-	return ir.config.Type
-}
-
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "int.random",
@@ -66,4 +50,20 @@ func init() {
 			return &IntRandom{config: config, Min: int(minInt), Max: int(maxInt)}, nil
 		},
 	})
+}
+
+type IntRandom struct {
+	Min    int
+	Max    int
+	config config.ProcessorConfig
+}
+
+func (ir *IntRandom) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	payloadInt := rand.IntN(ir.Max-ir.Min+1) + ir.Min
+	wrappedPayload.Payload = payloadInt
+	return wrappedPayload, nil
+}
+
+func (ir *IntRandom) Type() string {
+	return ir.config.Type
 }

@@ -15,54 +15,6 @@ import (
 	"gitlab.com/gomidi/midi/v2"
 )
 
-type MIDIProgramChangeCreate struct {
-	config  config.ProcessorConfig
-	Channel *template.Template
-	Program *template.Template
-}
-
-func (mpcc *MIDIProgramChangeCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
-	templateData := wrappedPayload
-
-	var channelBuffer bytes.Buffer
-	err := mpcc.Channel.Execute(&channelBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	var programBuffer bytes.Buffer
-	err = mpcc.Program.Execute(&programBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	programValue, err := strconv.ParseUint(programBuffer.String(), 10, 8)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	payloadMessage := midi.ProgramChange(uint8(channelValue), uint8(programValue))
-	wrappedPayload.Payload = payloadMessage
-	return wrappedPayload, nil
-}
-
-func (mpcc *MIDIProgramChangeCreate) Type() string {
-	return mpcc.config.Type
-}
-
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "midi.program_change.create",
@@ -113,4 +65,52 @@ func init() {
 			}, nil
 		},
 	})
+}
+
+type MIDIProgramChangeCreate struct {
+	config  config.ProcessorConfig
+	Channel *template.Template
+	Program *template.Template
+}
+
+func (mpcc *MIDIProgramChangeCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	templateData := wrappedPayload
+
+	var channelBuffer bytes.Buffer
+	err := mpcc.Channel.Execute(&channelBuffer, templateData)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	var programBuffer bytes.Buffer
+	err = mpcc.Program.Execute(&programBuffer, templateData)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	programValue, err := strconv.ParseUint(programBuffer.String(), 10, 8)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	payloadMessage := midi.ProgramChange(uint8(channelValue), uint8(programValue))
+	wrappedPayload.Payload = payloadMessage
+	return wrappedPayload, nil
+}
+
+func (mpcc *MIDIProgramChangeCreate) Type() string {
+	return mpcc.config.Type
 }

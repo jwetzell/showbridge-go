@@ -11,31 +11,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type StringCreate struct {
-	config   config.ProcessorConfig
-	Template *template.Template
-}
-
-func (sc *StringCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
-	templateData := wrappedPayload
-
-	var templateBuffer bytes.Buffer
-	err := sc.Template.Execute(&templateBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	wrappedPayload.Payload = templateBuffer.String()
-
-	return wrappedPayload, nil
-}
-
-func (sc *StringCreate) Type() string {
-	return sc.config.Type
-}
-
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "string.create",
@@ -66,4 +41,29 @@ func init() {
 			return &StringCreate{config: config, Template: templateTemplate}, nil
 		},
 	})
+}
+
+type StringCreate struct {
+	config   config.ProcessorConfig
+	Template *template.Template
+}
+
+func (sc *StringCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+	templateData := wrappedPayload
+
+	var templateBuffer bytes.Buffer
+	err := sc.Template.Execute(&templateBuffer, templateData)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	wrappedPayload.Payload = templateBuffer.String()
+
+	return wrappedPayload, nil
+}
+
+func (sc *StringCreate) Type() string {
+	return sc.config.Type
 }

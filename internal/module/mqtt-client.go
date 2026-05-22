@@ -14,21 +14,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type MQTTClient struct {
-	config       config.ModuleConfig
-	ctx          context.Context
-	inputHandler common.InputHandler
-	Broker       string
-	ClientID     string
-	Topic        string
-	QoS          byte
-	Retained     bool
-	client       mqtt.Client
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	clientMu     sync.Mutex
-}
-
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type:  "mqtt.client",
@@ -107,6 +92,21 @@ func init() {
 			return &MQTTClient{config: moduleConfig, Broker: brokerString, Topic: topicString, ClientID: clientIdString, QoS: byte(qosString), Retained: retainedBool, logger: CreateLogger(moduleConfig)}, nil
 		},
 	})
+}
+
+type MQTTClient struct {
+	config       config.ModuleConfig
+	ctx          context.Context
+	inputHandler common.InputHandler
+	Broker       string
+	ClientID     string
+	Topic        string
+	QoS          byte
+	Retained     bool
+	client       mqtt.Client
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	clientMu     sync.Mutex
 }
 
 func (mc *MQTTClient) Id() string {

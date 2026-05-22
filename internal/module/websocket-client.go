@@ -16,17 +16,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
-type WebSocketClient struct {
-	config       config.ModuleConfig
-	URL          url.URL
-	ctx          context.Context
-	conn         *websocket.Conn
-	inputHandler common.InputHandler
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	connMu       sync.Mutex
-}
-
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type:  "websocket.client",
@@ -61,6 +50,17 @@ func init() {
 			return &WebSocketClient{URL: *parsedURL, config: config, logger: CreateLogger(config)}, nil
 		},
 	})
+}
+
+type WebSocketClient struct {
+	config       config.ModuleConfig
+	URL          url.URL
+	ctx          context.Context
+	conn         *websocket.Conn
+	inputHandler common.InputHandler
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	connMu       sync.Mutex
 }
 
 func (wc *WebSocketClient) Id() string {
