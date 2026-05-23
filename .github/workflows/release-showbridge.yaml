@@ -211,7 +211,8 @@ jobs:
           files: showbridge_*.tar.gz
   docker:
     runs-on: ubuntu-latest
-    needs: linux_amd64
+    needs: setup_release
+    if: github.ref_type == 'tag' && github.event_name != 'workflow_dispatch'
     steps:
       - name: Check out repository
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
@@ -237,7 +238,6 @@ jobs:
 
       - name: Build and push
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
-        if: github.ref_type == 'tag'
         with:
           push: true
           context: ./
