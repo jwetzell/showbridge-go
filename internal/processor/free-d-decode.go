@@ -21,6 +21,7 @@ func init() {
 
 type FreeDDecode struct {
 	config config.ProcessorConfig
+	buf [29]byte
 }
 	
 func (fd *FreeDDecode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
@@ -32,7 +33,14 @@ func (fd *FreeDDecode) Process(ctx context.Context, wrappedPayload common.Wrappe
 		return wrappedPayload, errors.New("freed.decode processor only accepts a []byte")
 	}
 
-	payloadMessage, err := freeD.Decode(payloadBytes)
+	if len(payloadBytes) != 29 {
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("freeD packet must be exactly 29 bytes")
+	}
+
+	copy(fd.buf[:], payloadBytes)
+
+	payloadMessage, err := freeD.Decode(fd.buf)
 	if err != nil {
 		wrappedPayload.End = true
 		return wrappedPayload, err

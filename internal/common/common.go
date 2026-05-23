@@ -89,7 +89,7 @@ func GetAnyAsByteSlice(value any) ([]byte, bool) {
 
 	// check for a slice
 	v := reflect.ValueOf(value)
-	if v.Kind() != reflect.Slice {
+	if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
 		return nil, false
 	}
 
@@ -108,7 +108,7 @@ func GetAnyAsByteSlice(value any) ([]byte, bool) {
 
 func GetAnyAsIntSlice(value any) ([]int, bool) {
 
-	// already a []byte
+	// already a []int
 	intSlice, ok := value.([]int)
 	if ok {
 		return intSlice, true
@@ -116,7 +116,7 @@ func GetAnyAsIntSlice(value any) ([]int, bool) {
 
 	// check for a slice
 	v := reflect.ValueOf(value)
-	if v.Kind() != reflect.Slice {
+	if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
 		return nil, false
 	}
 
