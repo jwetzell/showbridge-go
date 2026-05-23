@@ -85,6 +85,11 @@ jobs:
           go-version-file: "go.mod"
       - name: install alsa lib
         run: sudo apt-get install -y libasound2-dev
+      - name: get webui artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: showbridge-webui
+          path: internal/api/webui/
       - name: build
         run: |
           CGO_ENABLED=1 go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" ./cmd/showbridge
@@ -119,9 +124,14 @@ jobs:
           go-version-file: "go.mod"
       - name: install alsa lib
         run: sudo apt-get install -y libasound2-dev
+      - name: get webui artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: showbridge-webui
+          path: internal/api/webui/
       - name: build
         run: |
-          CGO_ENABLED=1 go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" ./cmd/showbridge
+          CGO_ENABLED=1 go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" -tags=showbridge_webui ./cmd/showbridge
           tar -czf showbridge_${SHOWBRIDGE_VERSION}_linux-arm64.tar.gz showbridge
       - name: upload linux artifacts
         uses: actions/upload-artifact@v7
@@ -155,13 +165,18 @@ jobs:
         uses: mlugg/setup-zig@v2
         with:
           version: 0.16.0
+      - name: get webui artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: showbridge-webui
+          path: internal/api/webui/
       - name: build amd64
         run: |
-          CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="zig cc -target x86_64-windows-gnu" CXX="zig c++ -target x86_64-windows-gnu" go build -o showbridge.exe -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" ./cmd/showbridge
+          CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="zig cc -target x86_64-windows-gnu" CXX="zig c++ -target x86_64-windows-gnu" go build -o showbridge.exe -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" -tags=showbridge_webui ./cmd/showbridge
           zip showbridge_${SHOWBRIDGE_VERSION}_windows-amd64.zip showbridge.exe
       - name: build arm64
         run: |
-          CGO_ENABLED=1 GOOS=windows GOARCH=arm64 CC="zig cc -target aarch64-windows-gnu" CXX="zig c++ -target aarch64-windows-gnu" go build -o showbridge.exe -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" ./cmd/showbridge
+          CGO_ENABLED=1 GOOS=windows GOARCH=arm64 CC="zig cc -target aarch64-windows-gnu" CXX="zig c++ -target aarch64-windows-gnu" go build -o showbridge.exe -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" -tags=showbridge_webui ./cmd/showbridge
           zip showbridge_${SHOWBRIDGE_VERSION}_windows-arm64.zip showbridge.exe
       - name: upload windows artifacts
         uses: actions/upload-artifact@v7
@@ -191,9 +206,14 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version-file: "go.mod"
+      - name: get webui artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: showbridge-webui
+          path: internal/api/webui/
       - name: build
         run: |
-          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" ./cmd/showbridge
+          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" -tags=showbridge_webui ./cmd/showbridge
           tar -czf showbridge_${SHOWBRIDGE_VERSION}_macOS-arm64.tar.gz showbridge
       - name: upload macos artifacts
         uses: actions/upload-artifact@v7
