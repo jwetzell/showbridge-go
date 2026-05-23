@@ -37,6 +37,37 @@ jobs:
         with:
           draft: true
           generate_release_notes: true
+  build_webui:
+    runs-on: ubuntu-latest
+    needs: setup_release
+    env:
+      SHOWBRIDGE_VERSION: ${{ needs.setup_release.outputs.version }}
+      SHORT_COMMIT: ${{ needs.setup_release.outputs.short_commit }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: jwetzell/showbridge-webui
+          ref: main
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+          cache-dependency-path: "package-lock.json"
+
+      - name: Install Node.js dependencies
+        run: npm ci
+
+      - run: npm run build -- --base-href=/ui/
+
+      - name: upload webui artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: showbridge-webui
+          path: dist/webui/
+
   linux_amd64:
     runs-on: ubuntu-24.04
     needs: setup_release
@@ -179,7 +210,7 @@ jobs:
           files: showbridge_*.tar.gz
   macos_amd64:
     runs-on: macos-26-intel
-    needs: setup_release
+    needs: [setup_release, build_webui]
     env:
       SHOWBRIDGE_VERSION: ${{ needs.setup_release.outputs.version }}
       SHORT_COMMIT: ${{ needs.setup_release.outputs.short_commit }}
@@ -192,9 +223,14 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version-file: "go.mod"
+      - name: get webui artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: showbridge-webui
+          path: internal/api/webui/
       - name: build
         run: |
-          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" ./cmd/showbridge
+          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" -tags=showbridge_webui ./cmd/showbridge
           tar -czf showbridge_${SHOWBRIDGE_VERSION}_macOS-amd64.tar.gz showbridge
       - name: upload macos artifacts
         uses: actions/upload-artifact@v7
