@@ -48,6 +48,8 @@ func (as *ApiServer) Start(config config.ApiConfig) {
 	mux.HandleFunc("/schema/routes.schema.json", handleRoutesSchema)
 	mux.HandleFunc("/schema/modules.schema.json", handleModulesSchema)
 	mux.HandleFunc("/schema/processors.schema.json", handleProcessorsSchema)
+	mux.HandleFunc("/ui", handleWebUI)
+	mux.HandleFunc("/ui/", handleWebUI)
 
 	as.serverMu.Lock()
 	defer as.serverMu.Unlock()
