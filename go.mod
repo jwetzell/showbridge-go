@@ -10,7 +10,7 @@ require (
 	github.com/extism/go-sdk v1.7.1
 	github.com/google/jsonschema-go v0.4.3
 	github.com/gorilla/websocket v1.5.3
-	github.com/jwetzell/artnet-go v0.2.2
+	github.com/jwetzell/artnet-go v0.2.3
 	github.com/jwetzell/free-d-go v0.2.0
 	github.com/jwetzell/osc-go v0.3.0
 	github.com/jwetzell/psn-go v0.3.0
