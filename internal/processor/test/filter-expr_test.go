@@ -10,7 +10,7 @@ import (
 )
 
 func TestFilterExprFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["filter.expr"]
+	registration, ok := processor.GetProcessorRegistration("filter.expr")
 	if !ok {
 		t.Fatalf("filter.expr processor not registered")
 	}
@@ -71,7 +71,7 @@ func TestGoodFilterExpr(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["filter.expr"]
+			registration, ok := processor.GetProcessorRegistration("filter.expr")
 			if !ok {
 				t.Fatalf("filter.expr processor not registered")
 			}
@@ -144,7 +144,7 @@ func TestBadFilterExpr(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["filter.expr"]
+			registration, ok := processor.GetProcessorRegistration("filter.expr")
 			if !ok {
 				t.Fatalf("filter.expr processor not registered")
 			}
@@ -173,7 +173,7 @@ func TestBadFilterExpr(t *testing.T) {
 }
 
 func BenchmarkFilterExpr(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["filter.expr"]
+	registration, ok := processor.GetProcessorRegistration("filter.expr")
 	if !ok {
 		b.Fatalf("filter.expr processor not registered")
 	}

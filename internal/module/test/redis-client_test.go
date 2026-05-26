@@ -8,7 +8,7 @@ import (
 )
 
 func TestRedisClientFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["redis.client"]
+	registration, ok := module.GetModuleRegistration("redis.client")
 	if !ok {
 		t.Fatalf("redis.client module not registered")
 	}
@@ -76,7 +76,7 @@ func TestBadRedisClient(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["redis.client"]
+			registration, ok := module.GetModuleRegistration("redis.client")
 			if !ok {
 				t.Fatalf("redis.client module not registered")
 			}

@@ -11,7 +11,7 @@ import (
 )
 
 func TestMIDINoteOffCreteaFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["midi.note_off.create"]
+	registration, ok := processor.GetProcessorRegistration("midi.note_off.create")
 	if !ok {
 		t.Fatalf("midi.note_off.create processor not registered")
 	}
@@ -56,7 +56,7 @@ func TestGoodMIDINoteOffCretea(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["midi.note_off.create"]
+			registration, ok := processor.GetProcessorRegistration("midi.note_off.create")
 			if !ok {
 				t.Fatalf("midi.note_off.create processor not registered")
 			}
@@ -129,7 +129,7 @@ func TestBadMIDINoteOffCretea(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["midi.note_off.create"]
+			registration, ok := processor.GetProcessorRegistration("midi.note_off.create")
 			if !ok {
 				t.Fatalf("midi.note_off.create processor not registered")
 			}
@@ -160,7 +160,7 @@ func TestBadMIDINoteOffCretea(t *testing.T) {
 }
 
 func BenchmarkMIDINoteOffCreate(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["midi.note_off.create"]
+	registration, ok := processor.GetProcessorRegistration("midi.note_off.create")
 	if !ok {
 		b.Fatalf("midi.note_off.create processor not registered")
 	}

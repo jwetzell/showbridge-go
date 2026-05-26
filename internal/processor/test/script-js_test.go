@@ -10,7 +10,7 @@ import (
 )
 
 func TestScriptJSFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["script.js"]
+	registration, ok := processor.GetProcessorRegistration("script.js")
 	if !ok {
 		t.Fatalf("script.js processor not registered")
 	}
@@ -45,7 +45,7 @@ func TestScriptJSFromRegistry(t *testing.T) {
 }
 
 func TestScriptJSNoProgram(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["script.js"]
+	registration, ok := processor.GetProcessorRegistration("script.js")
 	if !ok {
 		t.Fatalf("script.js processor not registered")
 	}
@@ -61,7 +61,7 @@ func TestScriptJSNoProgram(t *testing.T) {
 }
 
 func TestScriptJSBadConfigWrongProgramType(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["script.js"]
+	registration, ok := processor.GetProcessorRegistration("script.js")
 	if !ok {
 		t.Fatalf("script.js processor not registered")
 	}
@@ -151,7 +151,7 @@ func TestGoodScriptJS(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["script.js"]
+			registration, ok := processor.GetProcessorRegistration("script.js")
 			if !ok {
 				t.Fatalf("script.js processor not registered")
 			}
@@ -199,7 +199,7 @@ func TestBadScriptJS(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["script.js"]
+			registration, ok := processor.GetProcessorRegistration("script.js")
 			if !ok {
 				t.Fatalf("script.js processor not registered")
 			}
@@ -230,7 +230,7 @@ func TestBadScriptJS(t *testing.T) {
 }
 
 func BenchmarkScriptJS(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["script.js"]
+	registration, ok := processor.GetProcessorRegistration("script.js")
 	if !ok {
 		b.Fatalf("script.js processor not registered")
 	}

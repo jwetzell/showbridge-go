@@ -11,7 +11,7 @@ import (
 )
 
 func TestFreeDEncodeFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["freed.encode"]
+	registration, ok := processor.GetProcessorRegistration("freed.encode")
 	if !ok {
 		t.Fatalf("freed.encode processor not registered")
 	}

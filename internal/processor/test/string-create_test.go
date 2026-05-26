@@ -10,7 +10,7 @@ import (
 )
 
 func TestStringCreateFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["string.create"]
+	registration, ok := processor.GetProcessorRegistration("string.create")
 	if !ok {
 		t.Fatalf("string.create processor not registered")
 	}
@@ -84,7 +84,7 @@ func TestGoodStringCreate(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["string.create"]
+			registration, ok := processor.GetProcessorRegistration("string.create")
 			if !ok {
 				t.Fatalf("string.create processor not registered")
 			}
@@ -157,7 +157,7 @@ func TestBadStringCreate(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["string.create"]
+			registration, ok := processor.GetProcessorRegistration("string.create")
 			if !ok {
 				t.Fatalf("string.create processor not registered")
 			}
@@ -188,7 +188,7 @@ func TestBadStringCreate(t *testing.T) {
 }
 
 func BenchmarkStringCreate(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["string.create"]
+	registration, ok := processor.GetProcessorRegistration("string.create")
 	if !ok {
 		b.Fatalf("string.create processor not registered")
 	}

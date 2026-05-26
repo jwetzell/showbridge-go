@@ -30,15 +30,36 @@ func RegisterModule(mod ModuleRegistration) {
 	moduleRegistryMu.Lock()
 	defer moduleRegistryMu.Unlock()
 
-	if _, ok := ModuleRegistry[string(mod.Type)]; ok {
+	if _, ok := moduleRegistry[string(mod.Type)]; ok {
 		panic(fmt.Sprintf("module already registered: %s", mod.Type))
 	}
-	ModuleRegistry[string(mod.Type)] = mod
+	moduleRegistry[string(mod.Type)] = mod
+}
+
+type ModuleRegistry map[string]ModuleRegistration
+
+func GetModuleRegistration(moduleType string) (ModuleRegistration, bool) {
+	moduleRegistryMu.RLock()
+	defer moduleRegistryMu.RUnlock()
+
+	mod, ok := moduleRegistry[moduleType]
+	return mod, ok
+}
+
+func GetModuleRegistrations() []ModuleRegistration {
+	moduleRegistryMu.RLock()
+	defer moduleRegistryMu.RUnlock()
+
+	registrations := make([]ModuleRegistration, 0, len(moduleRegistry))
+	for _, mod := range moduleRegistry {
+		registrations = append(registrations, mod)
+	}
+	return registrations
 }
 
 var (
 	moduleRegistryMu sync.RWMutex
-	ModuleRegistry   = make(map[string]ModuleRegistration)
+	moduleRegistry   = make(ModuleRegistry)
 )
 
 func CreateLogger(config config.ModuleConfig) *slog.Logger {

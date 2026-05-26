@@ -11,7 +11,7 @@ import (
 )
 
 func TestStringSplitFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["string.split"]
+	registration, ok := processor.GetProcessorRegistration("string.split")
 	if !ok {
 		t.Fatalf("string.split processor not registered")
 	}
@@ -66,7 +66,7 @@ func TestGoodStringSplit(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["string.split"]
+			registration, ok := processor.GetProcessorRegistration("string.split")
 			if !ok {
 				t.Fatalf("string.split processor not registered")
 			}
@@ -126,7 +126,7 @@ func TestBadStringSplit(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["string.split"]
+			registration, ok := processor.GetProcessorRegistration("string.split")
 			if !ok {
 				t.Fatalf("string.split processor not registered")
 			}
@@ -156,7 +156,7 @@ func TestBadStringSplit(t *testing.T) {
 }
 
 func BenchmarkStringSplit(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["string.split"]
+	registration, ok := processor.GetProcessorRegistration("string.split")
 	if !ok {
 		b.Fatalf("string.split processor not registered")
 	}

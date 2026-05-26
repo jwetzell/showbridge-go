@@ -8,7 +8,7 @@ import (
 )
 
 func TestMQTTClientFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["mqtt.client"]
+	registration, ok := module.GetModuleRegistration("mqtt.client")
 	if !ok {
 		t.Fatalf("mqtt.client module not registered")
 	}
@@ -98,7 +98,7 @@ func TestBadMQTTClient(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["mqtt.client"]
+			registration, ok := module.GetModuleRegistration("mqtt.client")
 			if !ok {
 				t.Fatalf("mqtt.client module not registered")
 			}

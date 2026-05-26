@@ -8,7 +8,7 @@ import (
 )
 
 func TestMIDIInputFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["midi.input"]
+	registration, ok := module.GetModuleRegistration("midi.input")
 	if !ok {
 		t.Fatalf("midi.input module not registered")
 	}
@@ -55,7 +55,7 @@ func TestBadMIDIInput(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["midi.input"]
+			registration, ok := module.GetModuleRegistration("midi.input")
 			if !ok {
 				t.Fatalf("midi.input module not registered")
 			}

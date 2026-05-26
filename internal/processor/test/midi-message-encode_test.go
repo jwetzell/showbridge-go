@@ -11,7 +11,7 @@ import (
 )
 
 func TestMIDIMessageEncodeFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["midi.message.encode"]
+	registration, ok := processor.GetProcessorRegistration("midi.message.encode")
 	if !ok {
 		t.Fatalf("midi.message.encode processor not registered")
 	}

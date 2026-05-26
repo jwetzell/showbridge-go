@@ -9,7 +9,7 @@ import (
 )
 
 func TestScriptExprFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["script.expr"]
+	registration, ok := processor.GetProcessorRegistration("script.expr")
 	if !ok {
 		t.Fatalf("script.expr processor not registered")
 	}
@@ -62,7 +62,7 @@ func TestGoodScriptExpr(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["script.expr"]
+			registration, ok := processor.GetProcessorRegistration("script.expr")
 			if !ok {
 				t.Fatalf("script.expr processor not registered")
 			}
@@ -117,7 +117,7 @@ func TestBadScriptExpr(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["script.expr"]
+			registration, ok := processor.GetProcessorRegistration("script.expr")
 			if !ok {
 				t.Fatalf("script.expr processor not registered")
 			}
@@ -148,7 +148,7 @@ func TestBadScriptExpr(t *testing.T) {
 }
 
 func BenchmarkScriptExpr(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["script.expr"]
+	registration, ok := processor.GetProcessorRegistration("script.expr")
 	if !ok {
 		b.Fatalf("script.expr processor not registered")
 	}

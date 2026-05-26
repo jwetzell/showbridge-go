@@ -9,7 +9,7 @@ import (
 )
 
 func TestTimeTimerFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["time.timer"]
+	registration, ok := module.GetModuleRegistration("time.timer")
 	if !ok {
 		t.Fatalf("time.timer module not registered")
 	}
@@ -52,7 +52,7 @@ func TestGoodTimeTimer(t *testing.T) {
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["time.timer"]
+			registration, ok := module.GetModuleRegistration("time.timer")
 			if !ok {
 				t.Fatalf("time.timer module not registered")
 			}
@@ -103,7 +103,7 @@ func TestBadTimeTimer(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["time.timer"]
+			registration, ok := module.GetModuleRegistration("time.timer")
 			if !ok {
 				t.Fatalf("time.timer module not registered")
 			}

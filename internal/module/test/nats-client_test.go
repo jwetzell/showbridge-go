@@ -8,7 +8,7 @@ import (
 )
 
 func TestNATSClientFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["nats.client"]
+	registration, ok := module.GetModuleRegistration("nats.client")
 	if !ok {
 		t.Fatalf("nats.client module not registered")
 	}
@@ -76,7 +76,7 @@ func TestBadNATSClient(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["nats.client"]
+			registration, ok := module.GetModuleRegistration("nats.client")
 			if !ok {
 				t.Fatalf("nats.client module not registered")
 			}

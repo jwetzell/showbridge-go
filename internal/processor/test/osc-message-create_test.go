@@ -11,7 +11,7 @@ import (
 )
 
 func TestOSCMessageCreateFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["osc.message.create"]
+	registration, ok := processor.GetProcessorRegistration("osc.message.create")
 	if !ok {
 		t.Fatalf("osc.message.create processor not registered")
 	}
@@ -146,7 +146,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["osc.message.create"]
+			registration, ok := processor.GetProcessorRegistration("osc.message.create")
 			if !ok {
 				t.Fatalf("osc.message.create processor not registered")
 			}
@@ -371,7 +371,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["osc.message.create"]
+			registration, ok := processor.GetProcessorRegistration("osc.message.create")
 			if !ok {
 				t.Fatalf("osc.message.create processor not registered")
 			}
@@ -402,7 +402,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 }
 
 func BenchmarkOSCMessageCreate(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["osc.message.create"]
+	registration, ok := processor.GetProcessorRegistration("osc.message.create")
 	if !ok {
 		b.Fatalf("osc.message.create processor not registered")
 	}

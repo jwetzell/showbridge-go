@@ -11,7 +11,7 @@ import (
 )
 
 func TestFreeDCreateFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["freed.create"]
+	registration, ok := processor.GetProcessorRegistration("freed.create")
 	if !ok {
 		t.Fatalf("freed.create processor not registered")
 	}
@@ -89,7 +89,7 @@ func TestGoodFreeDCreate(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["freed.create"]
+			registration, ok := processor.GetProcessorRegistration("freed.create")
 			if !ok {
 				t.Fatalf("freed.create processor not registered")
 			}
@@ -848,7 +848,7 @@ func TestBadFreeDCreate(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["freed.create"]
+			registration, ok := processor.GetProcessorRegistration("freed.create")
 			if !ok {
 				t.Fatalf("freed.create processor not registered")
 			}
@@ -879,7 +879,7 @@ func TestBadFreeDCreate(t *testing.T) {
 }
 
 func BenchmarkFreeDCreate(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["freed.create"]
+	registration, ok := processor.GetProcessorRegistration("freed.create")
 	if !ok {
 		b.Fatalf("freed.create processor not registered")
 	}

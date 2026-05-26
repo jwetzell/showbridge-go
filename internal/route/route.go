@@ -19,7 +19,7 @@ func NewRoute(config config.RouteConfig) (*Route, error) {
 
 	if len(config.Processors) > 0 {
 		for _, processorDecl := range config.Processors {
-			processorInfo, ok := processor.ProcessorRegistry[processorDecl.Type]
+			processorInfo, ok := processor.GetProcessorRegistration(processorDecl.Type)
 			if !ok {
 				return nil, fmt.Errorf("problem loading processor registration for processor type: %s", processorDecl.Type)
 			}

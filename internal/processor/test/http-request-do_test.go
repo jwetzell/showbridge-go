@@ -10,7 +10,7 @@ import (
 )
 
 func TestHTTPRequestCreateFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["http.request.do"]
+	registration, ok := processor.GetProcessorRegistration("http.request.do")
 	if !ok {
 		t.Fatalf("http.request.do processor not registered")
 	}
@@ -44,7 +44,7 @@ func TestGoodHTTPRequestDo(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["http.request.do"]
+			registration, ok := processor.GetProcessorRegistration("http.request.do")
 			if !ok {
 				t.Fatalf("http.request.do processor not registered")
 			}
@@ -132,7 +132,7 @@ func TestBadHTTPRequestDo(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["http.request.do"]
+			registration, ok := processor.GetProcessorRegistration("http.request.do")
 			if !ok {
 				t.Fatalf("http.request.do processor not registered")
 			}

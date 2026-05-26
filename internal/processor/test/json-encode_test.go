@@ -12,7 +12,7 @@ import (
 )
 
 func TestJsonEncodeFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["json.encode"]
+	registration, ok := processor.GetProcessorRegistration("json.encode")
 	if !ok {
 		t.Fatalf("json.encode processor not registered")
 	}
@@ -116,7 +116,7 @@ func TestBadJsonEncode(t *testing.T) {
 }
 
 func BenchmarkJsonEncode(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["json.encode"]
+	registration, ok := processor.GetProcessorRegistration("json.encode")
 	if !ok {
 		b.Fatalf("json.encode processor not registered")
 	}

@@ -11,7 +11,7 @@ import (
 )
 
 func TestKvSetFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["kv.set"]
+	registration, ok := processor.GetProcessorRegistration("kv.set")
 	if !ok {
 		t.Fatalf("kv.set processor not registered")
 	}
@@ -69,7 +69,7 @@ func TestGoodKvSet(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["kv.set"]
+			registration, ok := processor.GetProcessorRegistration("kv.set")
 			if !ok {
 				t.Fatalf("kv.set processor not registered")
 			}
@@ -192,7 +192,7 @@ func TestBadKvSet(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["kv.set"]
+			registration, ok := processor.GetProcessorRegistration("kv.set")
 			if !ok {
 				t.Fatalf("kv.set processor not registered")
 			}
@@ -223,7 +223,7 @@ func TestBadKvSet(t *testing.T) {
 }
 
 func BenchmarkKvSet(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["kv.set"]
+	registration, ok := processor.GetProcessorRegistration("kv.set")
 	if !ok {
 		b.Fatalf("kv.set processor not registered")
 	}

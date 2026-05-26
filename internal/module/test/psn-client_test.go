@@ -8,7 +8,7 @@ import (
 )
 
 func TestPSNClientFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["psn.client"]
+	registration, ok := module.GetModuleRegistration("psn.client")
 	if !ok {
 		t.Fatalf("psn.client module not registered")
 	}
@@ -41,7 +41,7 @@ func TestBadPSNClient(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["psn.client"]
+			registration, ok := module.GetModuleRegistration("psn.client")
 			if !ok {
 				t.Fatalf("psn.client module not registered")
 			}

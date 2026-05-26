@@ -9,7 +9,7 @@ import (
 )
 
 func TestHTTPServerFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["http.server"]
+	registration, ok := module.GetModuleRegistration("http.server")
 	if !ok {
 		t.Fatalf("http.server module not registered")
 	}
@@ -52,7 +52,7 @@ func TestGoodHTTPServer(t *testing.T) {
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["http.server"]
+			registration, ok := module.GetModuleRegistration("http.server")
 			if !ok {
 				t.Fatalf("http.server module not registered")
 			}
@@ -102,7 +102,7 @@ func TestBadHTTPServer(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["http.server"]
+			registration, ok := module.GetModuleRegistration("http.server")
 			if !ok {
 				t.Fatalf("http.server module not registered")
 			}

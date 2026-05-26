@@ -9,7 +9,7 @@ import (
 )
 
 func TestIntScaleFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["int.scale"]
+	registration, ok := processor.GetProcessorRegistration("int.scale")
 	if !ok {
 		t.Fatalf("int.scale processor not registered")
 	}
@@ -55,7 +55,7 @@ func TestGoodIntScale(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["int.scale"]
+			registration, ok := processor.GetProcessorRegistration("int.scale")
 			if !ok {
 				t.Fatalf("int.scale processor not registered")
 			}
@@ -140,7 +140,7 @@ func TestBadIntScale(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["int.scale"]
+			registration, ok := processor.GetProcessorRegistration("int.scale")
 			if !ok {
 				t.Fatalf("int.scale processor not registered")
 			}
@@ -171,7 +171,7 @@ func TestBadIntScale(t *testing.T) {
 }
 
 func BenchmarkIntScale(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["int.scale"]
+	registration, ok := processor.GetProcessorRegistration("int.scale")
 	if !ok {
 		b.Fatalf("int.scale processor not registered")
 	}

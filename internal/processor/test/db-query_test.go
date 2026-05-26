@@ -12,7 +12,7 @@ import (
 )
 
 func TestDbQueryFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["db.query"]
+	registration, ok := processor.GetProcessorRegistration("db.query")
 	if !ok {
 		t.Fatalf("db.query processor not registered")
 	}
@@ -100,7 +100,7 @@ func TestGoodDbQuery(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["db.query"]
+			registration, ok := processor.GetProcessorRegistration("db.query")
 			if !ok {
 				t.Fatalf("db.query processor not registered")
 			}
@@ -243,7 +243,7 @@ func TestBadDbQuery(t *testing.T) {
 			errorString:           "db.query unable to find module with id: test",
 		},
 		{
-			name:    "module not a DatabseModule",
+			name:    "module not a DatabaseModule",
 			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
@@ -259,7 +259,7 @@ func TestBadDbQuery(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["db.query"]
+			registration, ok := processor.GetProcessorRegistration("db.query")
 			if !ok {
 				t.Fatalf("db.query processor not registered")
 			}
@@ -293,7 +293,7 @@ func TestBadDbQuery(t *testing.T) {
 }
 
 func BenchmarkDbQuery(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["db.query"]
+	registration, ok := processor.GetProcessorRegistration("db.query")
 	if !ok {
 		b.Fatalf("db.query processor not registered")
 	}

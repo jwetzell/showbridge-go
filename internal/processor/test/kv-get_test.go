@@ -11,7 +11,7 @@ import (
 )
 
 func TestKvGetFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["kv.get"]
+	registration, ok := processor.GetProcessorRegistration("kv.get")
 	if !ok {
 		t.Fatalf("kv.get processor not registered")
 	}
@@ -75,7 +75,7 @@ func TestGoodKvGet(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["kv.get"]
+			registration, ok := processor.GetProcessorRegistration("kv.get")
 			if !ok {
 				t.Fatalf("kv.get processor not registered")
 			}
@@ -198,7 +198,7 @@ func TestBadKvGet(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["kv.get"]
+			registration, ok := processor.GetProcessorRegistration("kv.get")
 			if !ok {
 				t.Fatalf("kv.get processor not registered")
 			}
@@ -229,7 +229,7 @@ func TestBadKvGet(t *testing.T) {
 }
 
 func BenchmarkKvGet(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["kv.get"]
+	registration, ok := processor.GetProcessorRegistration("kv.get")
 	if !ok {
 		b.Fatalf("kv.get processor not registered")
 	}

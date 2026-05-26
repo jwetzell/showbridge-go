@@ -11,7 +11,7 @@ import (
 )
 
 func TestStringEncodeFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["string.encode"]
+	registration, ok := processor.GetProcessorRegistration("string.encode")
 	if !ok {
 		t.Fatalf("string.encode processor not registered")
 	}
@@ -107,7 +107,7 @@ func TestBadStringEncode(t *testing.T) {
 }
 
 func BenchmarkStringEncode(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["string.encode"]
+	registration, ok := processor.GetProcessorRegistration("string.encode")
 	if !ok {
 		b.Fatalf("string.encode processor not registered")
 	}

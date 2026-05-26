@@ -8,7 +8,7 @@ import (
 )
 
 func TestSIPDTMFServerFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["sip.dtmf.server"]
+	registration, ok := module.GetModuleRegistration("sip.dtmf.server")
 	if !ok {
 		t.Fatalf("sip.dtmf.server module not registered")
 	}
@@ -89,7 +89,7 @@ func TestBadSIPDTMFServer(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["sip.dtmf.server"]
+			registration, ok := module.GetModuleRegistration("sip.dtmf.server")
 			if !ok {
 				t.Fatalf("sip.dtmf.server module not registered")
 			}

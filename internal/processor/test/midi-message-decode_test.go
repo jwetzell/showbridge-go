@@ -11,7 +11,7 @@ import (
 )
 
 func TestMIDIMessageDecodeFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["midi.message.decode"]
+	registration, ok := processor.GetProcessorRegistration("midi.message.decode")
 	if !ok {
 		t.Fatalf("midi.message.decode processor not registered")
 	}

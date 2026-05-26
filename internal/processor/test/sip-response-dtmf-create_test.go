@@ -10,7 +10,7 @@ import (
 )
 
 func TestSipResponseDTMFCreateFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["sip.response.dtmf.create"]
+	registration, ok := processor.GetProcessorRegistration("sip.response.dtmf.create")
 	if !ok {
 		t.Fatalf("sip.response.dtmf.create processor not registered")
 	}
@@ -74,7 +74,7 @@ func TestGoodSipResponseDTMFCreate(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["sip.response.dtmf.create"]
+			registration, ok := processor.GetProcessorRegistration("sip.response.dtmf.create")
 			if !ok {
 				t.Fatalf("sip.response.dtmf.create processor not registered")
 			}
@@ -191,7 +191,7 @@ func TestBadSipResponseDTMFCreate(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["sip.response.dtmf.create"]
+			registration, ok := processor.GetProcessorRegistration("sip.response.dtmf.create")
 			if !ok {
 				t.Fatalf("sip.response.dtmf.create processor not registered")
 			}
@@ -222,7 +222,7 @@ func TestBadSipResponseDTMFCreate(t *testing.T) {
 }
 
 func BenchmarkSipResponseDTMFCreate(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["sip.response.dtmf.create"]
+	registration, ok := processor.GetProcessorRegistration("sip.response.dtmf.create")
 	if !ok {
 		b.Fatalf("sip.response.dtmf.create processor not registered")
 	}

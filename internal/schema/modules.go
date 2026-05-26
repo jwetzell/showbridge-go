@@ -19,7 +19,7 @@ func GetModulesSchema() *jsonschema.Schema {
 	}
 
 	moduleDefinitionSchemas := []*jsonschema.Schema{}
-	for _, mod := range module.ModuleRegistry {
+	for _, mod := range module.GetModuleRegistrations() {
 		moduleSchema := &jsonschema.Schema{
 			ID:   mod.Type,
 			Type: "object",

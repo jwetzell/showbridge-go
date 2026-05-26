@@ -10,7 +10,7 @@ import (
 )
 
 func TestIntParseFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["int.parse"]
+	registration, ok := processor.GetProcessorRegistration("int.parse")
 	if !ok {
 		t.Fatalf("int.parse processor not registered")
 	}
@@ -84,7 +84,7 @@ func TestGoodIntParse(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["int.parse"]
+			registration, ok := processor.GetProcessorRegistration("int.parse")
 			if !ok {
 				t.Fatalf("int.parse processor not registered")
 			}
@@ -170,7 +170,7 @@ func TestBadIntParse(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["int.parse"]
+			registration, ok := processor.GetProcessorRegistration("int.parse")
 			if !ok {
 				t.Fatalf("int.parse processor not registered")
 			}
@@ -201,7 +201,7 @@ func TestBadIntParse(t *testing.T) {
 }
 
 func BenchmarkIntParse(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["int.parse"]
+	registration, ok := processor.GetProcessorRegistration("int.parse")
 	if !ok {
 		b.Fatalf("int.parse processor not registered")
 	}

@@ -10,7 +10,7 @@ import (
 )
 
 func TestFilterRateFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["filter.rate"]
+	registration, ok := processor.GetProcessorRegistration("filter.rate")
 	if !ok {
 		t.Fatalf("filter.rate processor not registered")
 	}
@@ -40,7 +40,7 @@ func TestGoodFilterRate(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["filter.rate"]
+			registration, ok := processor.GetProcessorRegistration("filter.rate")
 			if !ok {
 				t.Fatalf("filter.rate processor not registered")
 			}
@@ -87,7 +87,7 @@ func TestBadFilterRate(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["filter.rate"]
+			registration, ok := processor.GetProcessorRegistration("filter.rate")
 			if !ok {
 				t.Fatalf("filter.rate processor not registered")
 			}

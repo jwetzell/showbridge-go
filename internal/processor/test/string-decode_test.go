@@ -10,7 +10,7 @@ import (
 )
 
 func TestStringDecodeFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["string.decode"]
+	registration, ok := processor.GetProcessorRegistration("string.decode")
 	if !ok {
 		t.Fatalf("string.decode processor not registered")
 	}
@@ -101,7 +101,7 @@ func TestBadStringDecode(t *testing.T) {
 }
 
 func BenchmarkStringDecode(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["string.decode"]
+	registration, ok := processor.GetProcessorRegistration("string.decode")
 	if !ok {
 		b.Fatalf("string.decode processor not registered")
 	}

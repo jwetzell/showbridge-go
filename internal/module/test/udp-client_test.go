@@ -9,7 +9,7 @@ import (
 )
 
 func TestUDPClientFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["net.udp.client"]
+	registration, ok := module.GetModuleRegistration("net.udp.client")
 	if !ok {
 		t.Fatalf("udp.client module not registered")
 	}
@@ -55,7 +55,7 @@ func TestGoodUDPClient(t *testing.T) {
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["net.udp.client"]
+			registration, ok := module.GetModuleRegistration("net.udp.client")
 			if !ok {
 				t.Fatalf("net.udp.client module not registered")
 			}
@@ -125,7 +125,7 @@ func TestBadUDPClient(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["net.udp.client"]
+			registration, ok := module.GetModuleRegistration("net.udp.client")
 			if !ok {
 				t.Fatalf("net.udp.client module not registered")
 			}

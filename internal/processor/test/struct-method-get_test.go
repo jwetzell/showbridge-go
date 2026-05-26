@@ -11,7 +11,7 @@ import (
 )
 
 func TestStructMethodGetFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["struct.method.get"]
+	registration, ok := processor.GetProcessorRegistration("struct.method.get")
 	if !ok {
 		t.Fatalf("struct.method.get processor not registered")
 	}
@@ -118,7 +118,7 @@ func TestGoodStructMethodGet(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["struct.method.get"]
+			registration, ok := processor.GetProcessorRegistration("struct.method.get")
 			if !ok {
 				t.Fatalf("struct.method.get processor not registered")
 			}
@@ -187,7 +187,7 @@ func TestBadStructMethodGet(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["struct.method.get"]
+			registration, ok := processor.GetProcessorRegistration("struct.method.get")
 			if !ok {
 				t.Fatalf("struct.method.get processor not registered")
 			}
@@ -218,7 +218,7 @@ func TestBadStructMethodGet(t *testing.T) {
 }
 
 func BenchmarkStructMethodGet(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["struct.method.get"]
+	registration, ok := processor.GetProcessorRegistration("struct.method.get")
 	if !ok {
 		b.Fatalf("struct.method.get processor not registered")
 	}

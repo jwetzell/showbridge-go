@@ -1,23 +1,23 @@
 package framer
 
-type RawFramer struct{}
+type rawFramer struct{}
 
-func NewRawFramer() *RawFramer {
-	return &RawFramer{}
+func newRawFramer() *rawFramer {
+	return &rawFramer{}
 }
 
-func (rf *RawFramer) Decode(data []byte) [][]byte {
+func (rf *rawFramer) Decode(data []byte) [][]byte {
 	return [][]byte{data}
 }
 
-func (rf *RawFramer) Encode(data []byte) []byte {
+func (rf *rawFramer) Encode(data []byte) []byte {
 	return data
 }
 
-func (rf *RawFramer) Clear() {
+func (rf *rawFramer) Clear() {
 	// NOTE(jwetzell): no internal state to clear
 }
 
-func (rf *RawFramer) Buffer() []byte {
+func (rf *rawFramer) Buffer() []byte {
 	return []byte{}
 }

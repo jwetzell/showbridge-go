@@ -10,7 +10,7 @@ import (
 )
 
 func TestSipResponseAudioCreateFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["sip.response.audio.create"]
+	registration, ok := processor.GetProcessorRegistration("sip.response.audio.create")
 	if !ok {
 		t.Fatalf("sip.response.audio.create processor not registered")
 	}
@@ -76,7 +76,7 @@ func TestGoodSipResponseAudioCreate(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["sip.response.audio.create"]
+			registration, ok := processor.GetProcessorRegistration("sip.response.audio.create")
 			if !ok {
 				t.Fatalf("sip.response.audio.create processor not registered")
 			}
@@ -183,7 +183,7 @@ func TestBadSipResponseAudioCreate(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["sip.response.audio.create"]
+			registration, ok := processor.GetProcessorRegistration("sip.response.audio.create")
 			if !ok {
 				t.Fatalf("sip.response.audio.create processor not registered")
 			}
@@ -214,7 +214,7 @@ func TestBadSipResponseAudioCreate(t *testing.T) {
 }
 
 func BenchmarkSipResponseAudioCreate(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["sip.response.audio.create"]
+	registration, ok := processor.GetProcessorRegistration("sip.response.audio.create")
 	if !ok {
 		b.Fatalf("sip.response.audio.create processor not registered")
 	}

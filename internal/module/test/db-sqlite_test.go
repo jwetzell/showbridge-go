@@ -9,7 +9,7 @@ import (
 )
 
 func TestDbSqliteFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["db.sqlite"]
+	registration, ok := module.GetModuleRegistration("db.sqlite")
 	if !ok {
 		t.Fatalf("db.sqlite module not registered")
 	}
@@ -58,7 +58,7 @@ func TestGoodDbSqlite(t *testing.T) {
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["db.sqlite"]
+			registration, ok := module.GetModuleRegistration("db.sqlite")
 			if !ok {
 				t.Fatalf("db.sqlite module not registered")
 			}
@@ -107,7 +107,7 @@ func TestBadDbSqlite(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["db.sqlite"]
+			registration, ok := module.GetModuleRegistration("db.sqlite")
 			if !ok {
 				t.Fatalf("db.sqlite module not registered")
 			}

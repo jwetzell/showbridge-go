@@ -19,7 +19,7 @@ func GetProcessorsSchema() *jsonschema.Schema {
 	}
 
 	processorDefinitionSchemas := []*jsonschema.Schema{}
-	for _, proc := range processor.ProcessorRegistry {
+	for _, proc := range processor.GetProcessorRegistrations() {
 		processorSchema := &jsonschema.Schema{
 			ID:   proc.Type,
 			Type: "object",

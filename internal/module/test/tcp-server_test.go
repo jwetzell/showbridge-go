@@ -9,7 +9,7 @@ import (
 )
 
 func TestTCPServerFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["net.tcp.server"]
+	registration, ok := module.GetModuleRegistration("net.tcp.server")
 	if !ok {
 		t.Fatalf("net.tcp.server module not registered")
 	}
@@ -54,7 +54,7 @@ func TestGoodTCPServer(t *testing.T) {
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["net.tcp.server"]
+			registration, ok := module.GetModuleRegistration("net.tcp.server")
 			if !ok {
 				t.Fatalf("net.tcp.server module not registered")
 			}
@@ -149,7 +149,7 @@ func TestBadTCPServer(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["net.tcp.server"]
+			registration, ok := module.GetModuleRegistration("net.tcp.server")
 			if !ok {
 				t.Fatalf("net.tcp.server module not registered")
 			}

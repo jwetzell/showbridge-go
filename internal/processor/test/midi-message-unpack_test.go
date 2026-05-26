@@ -11,7 +11,7 @@ import (
 )
 
 func TestMIDIMessageUnpackFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["midi.message.unpack"]
+	registration, ok := processor.GetProcessorRegistration("midi.message.unpack")
 	if !ok {
 		t.Fatalf("midi.message.unpack processor not registered")
 	}
@@ -121,7 +121,7 @@ func TestBadMIDIMessageUnpack(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["midi.message.unpack"]
+			registration, ok := processor.GetProcessorRegistration("midi.message.unpack")
 			if !ok {
 				t.Fatalf("midi.message.unpack processor not registered")
 			}

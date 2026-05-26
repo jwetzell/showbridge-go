@@ -36,7 +36,7 @@ func (r *Router) addModule(moduleDecl config.ModuleConfig) error {
 	if moduleDecl.Id == "" {
 		return errors.New("module id cannot be empty")
 	}
-	moduleInfo, ok := module.ModuleRegistry[moduleDecl.Type]
+	moduleRegistration, ok := module.GetModuleRegistration(moduleDecl.Type)
 	if !ok {
 		return errors.New("module type not defined")
 	}
@@ -46,7 +46,7 @@ func (r *Router) addModule(moduleDecl config.ModuleConfig) error {
 		return errors.New("module id already exists")
 	}
 
-	moduleInstance, err := moduleInfo.New(moduleDecl)
+	moduleInstance, err := moduleRegistration.New(moduleDecl)
 	if err != nil {
 		return err
 	}
@@ -208,11 +208,11 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 				routeFound.Store(true)
 
 				_, err := routeInstance.ProcessPayload(ctx, common.WrappedPayload{
-					Payload: payload,
-					Source:  sourceId,
-					Modules: r.ModuleInstances,
-					InputHandler:  r.HandleInput,
-					End:     false,
+					Payload:      payload,
+					Source:       sourceId,
+					Modules:      r.ModuleInstances,
+					InputHandler: r.HandleInput,
+					End:          false,
 				})
 				if err != nil {
 					if routeIOErrors == nil {

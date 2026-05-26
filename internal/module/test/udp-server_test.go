@@ -9,7 +9,7 @@ import (
 )
 
 func TestUDPServerFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["net.udp.server"]
+	registration, ok := module.GetModuleRegistration("net.udp.server")
 	if !ok {
 		t.Fatalf("net.udp.server module not registered")
 	}
@@ -52,7 +52,7 @@ func TestGoodUDPServer(t *testing.T) {
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["net.udp.server"]
+			registration, ok := module.GetModuleRegistration("net.udp.server")
 			if !ok {
 				t.Fatalf("net.udp.server module not registered")
 			}
@@ -128,7 +128,7 @@ func TestBadUDPServer(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["net.udp.server"]
+			registration, ok := module.GetModuleRegistration("net.udp.server")
 			if !ok {
 				t.Fatalf("net.udp.server module not registered")
 			}

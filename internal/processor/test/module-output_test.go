@@ -11,7 +11,7 @@ import (
 )
 
 func TestModuleOutputFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["module.output"]
+	registration, ok := processor.GetProcessorRegistration("module.output")
 	if !ok {
 		t.Fatalf("module.output processor not registered")
 	}
@@ -37,9 +37,9 @@ func TestModuleOutputFromRegistry(t *testing.T) {
 	router := test.GetNewTestRouter()
 
 	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
-		InputHandler:  router.HandleInput,
-		Modules: map[string]common.Module{"test": &test.TestOutputModule{}},
-		Payload: payload,
+		InputHandler: router.HandleInput,
+		Modules:      map[string]common.Module{"test": &test.TestOutputModule{}},
+		Payload:      payload,
 	})
 	if err != nil {
 		t.Fatalf("module.output processing failed: %s", err)
@@ -62,7 +62,7 @@ func TestGoodModuleOutput(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["module.output"]
+			registration, ok := processor.GetProcessorRegistration("module.output")
 			if !ok {
 				t.Fatalf("module.output processor not registered")
 			}
@@ -126,7 +126,7 @@ func TestBadModuleOutput(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["module.output"]
+			registration, ok := processor.GetProcessorRegistration("module.output")
 			if !ok {
 				t.Fatalf("module.output processor not registered")
 			}

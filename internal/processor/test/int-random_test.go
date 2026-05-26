@@ -9,7 +9,7 @@ import (
 )
 
 func TestIntRandomFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["int.random"]
+	registration, ok := processor.GetProcessorRegistration("int.random")
 	if !ok {
 		t.Fatalf("int.random processor not registered")
 	}
@@ -32,7 +32,7 @@ func TestIntRandomFromRegistry(t *testing.T) {
 }
 
 func TestIntRandomGoodConfig(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["int.random"]
+	registration, ok := processor.GetProcessorRegistration("int.random")
 	if !ok {
 		t.Fatalf("int.random processor not registered")
 	}
@@ -84,7 +84,7 @@ func TestGoodIntRandom(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["int.random"]
+			registration, ok := processor.GetProcessorRegistration("int.random")
 			if !ok {
 				t.Fatalf("int.random processor not registered")
 			}
@@ -166,7 +166,7 @@ func TestBadIntRandom(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["int.random"]
+			registration, ok := processor.GetProcessorRegistration("int.random")
 			if !ok {
 				t.Fatalf("int.random processor not registered")
 			}
@@ -197,7 +197,7 @@ func TestBadIntRandom(t *testing.T) {
 }
 
 func BenchmarkIntRandom(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["int.random"]
+	registration, ok := processor.GetProcessorRegistration("int.random")
 	if !ok {
 		b.Fatalf("int.random processor not registered")
 	}

@@ -1,14 +1,14 @@
 package framer
 
-type SlipFramer struct {
+type slipFramer struct {
 	buffer []byte
 }
 
-func NewSlipFramer() *SlipFramer {
-	return &SlipFramer{buffer: []byte{}}
+func newSlipFramer() *slipFramer {
+	return &slipFramer{buffer: []byte{}}
 }
 
-func (sf *SlipFramer) Decode(data []byte) [][]byte {
+func (sf *slipFramer) Decode(data []byte) [][]byte {
 	messages := [][]byte{}
 
 	END := byte(0xc0)
@@ -49,7 +49,7 @@ func (sf *SlipFramer) Decode(data []byte) [][]byte {
 	return messages
 }
 
-func (sf *SlipFramer) Encode(data []byte) []byte {
+func (sf *slipFramer) Encode(data []byte) []byte {
 	END := byte(0xc0)
 	ESC := byte(0xdb)
 	ESC_END := byte(0xdc)
@@ -72,10 +72,10 @@ func (sf *SlipFramer) Encode(data []byte) []byte {
 	return encodedBytes
 }
 
-func (sf *SlipFramer) Clear() {
+func (sf *slipFramer) Clear() {
 	sf.buffer = []byte{}
 }
 
-func (sf *SlipFramer) Buffer() []byte {
+func (sf *slipFramer) Buffer() []byte {
 	return sf.buffer
 }

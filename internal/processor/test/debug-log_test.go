@@ -10,7 +10,7 @@ import (
 )
 
 func TestDebugLogFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["debug.log"]
+	registration, ok := processor.GetProcessorRegistration("debug.log")
 	if !ok {
 		t.Fatalf("debug.log processor not registered")
 	}
@@ -52,7 +52,7 @@ func TestGoodDebugLog(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["debug.log"]
+			registration, ok := processor.GetProcessorRegistration("debug.log")
 			if !ok {
 				t.Fatalf("debug.log processor not registered")
 			}
@@ -89,7 +89,7 @@ func TestBadDebugLog(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["debug.log"]
+			registration, ok := processor.GetProcessorRegistration("debug.log")
 			if !ok {
 				t.Fatalf("debug.log processor not registered")
 			}
@@ -120,7 +120,7 @@ func TestBadDebugLog(t *testing.T) {
 }
 
 func BenchmarkDebugLog(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["debug.log"]
+	registration, ok := processor.GetProcessorRegistration("debug.log")
 	if !ok {
 		b.Fatalf("debug.log processor not registered")
 	}

@@ -12,7 +12,7 @@ import (
 )
 
 func TestPubSubPublishFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["pubsub.publish"]
+	registration, ok := processor.GetProcessorRegistration("pubsub.publish")
 	if !ok {
 		t.Fatalf("pubsub.publish processor not registered")
 	}
@@ -70,7 +70,7 @@ func TestGoodPubSubPublish(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["pubsub.publish"]
+			registration, ok := processor.GetProcessorRegistration("pubsub.publish")
 			if !ok {
 				t.Fatalf("pubsub.publish processor not registered")
 			}
@@ -217,7 +217,7 @@ func TestBadPubSubPublish(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["pubsub.publish"]
+			registration, ok := processor.GetProcessorRegistration("pubsub.publish")
 			if !ok {
 				t.Fatalf("pubsub.publish processor not registered")
 			}

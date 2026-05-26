@@ -10,7 +10,7 @@ import (
 )
 
 func TestFilterRegexFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["filter.regex"]
+	registration, ok := processor.GetProcessorRegistration("filter.regex")
 	if !ok {
 		t.Fatalf("filter.regex processor not registered")
 	}
@@ -77,7 +77,7 @@ func TestGoodFilterRegex(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["filter.regex"]
+			registration, ok := processor.GetProcessorRegistration("filter.regex")
 			if !ok {
 				t.Fatalf("filter.regex processor not registered")
 			}
@@ -145,7 +145,7 @@ func TestBadFilterRegex(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["filter.regex"]
+			registration, ok := processor.GetProcessorRegistration("filter.regex")
 			if !ok {
 				t.Fatalf("filter.regex processor not registered")
 			}
@@ -176,7 +176,7 @@ func TestBadFilterRegex(t *testing.T) {
 }
 
 func BenchmarkFilterRegex(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["filter.regex"]
+	registration, ok := processor.GetProcessorRegistration("filter.regex")
 	if !ok {
 		b.Fatalf("filter.regex processor not registered")
 	}

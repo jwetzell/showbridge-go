@@ -8,7 +8,7 @@ import (
 )
 
 func TestSerialClientFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["serial.client"]
+	registration, ok := module.GetModuleRegistration("serial.client")
 	if !ok {
 		t.Fatalf("serial.client module not registered")
 	}
@@ -85,7 +85,7 @@ func TestBadSerialClient(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["serial.client"]
+			registration, ok := module.GetModuleRegistration("serial.client")
 			if !ok {
 				t.Fatalf("serial.client module not registered")
 			}

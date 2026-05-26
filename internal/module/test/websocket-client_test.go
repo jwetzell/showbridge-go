@@ -8,7 +8,7 @@ import (
 )
 
 func TestWebSocketClientFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["websocket.client"]
+	registration, ok := module.GetModuleRegistration("websocket.client")
 	if !ok {
 		t.Fatalf("websocket.client module not registered")
 	}
@@ -64,7 +64,7 @@ func TestBadWebSocketClient(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["websocket.client"]
+			registration, ok := module.GetModuleRegistration("websocket.client")
 			if !ok {
 				t.Fatalf("websocket.client module not registered")
 			}

@@ -10,15 +10,15 @@ type Framer interface {
 func GetFramer(framingType string) Framer {
 	switch framingType {
 	case "CR":
-		return NewByteSeparatorFramer([]byte{'\r'})
+		return newByteSeparatorFramer([]byte{'\r'})
 	case "LF":
-		return NewByteSeparatorFramer([]byte{'\n'})
+		return newByteSeparatorFramer([]byte{'\n'})
 	case "CRLF":
-		return NewByteSeparatorFramer([]byte{'\r', '\n'})
+		return newByteSeparatorFramer([]byte{'\r', '\n'})
 	case "SLIP":
-		return NewSlipFramer()
+		return newSlipFramer()
 	case "RAW":
-		return NewRawFramer()
+		return newRawFramer()
 	default:
 		return nil
 	}

@@ -8,7 +8,7 @@ import (
 )
 
 func TestUDPMulticastFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["net.udp.multicast"]
+	registration, ok := module.GetModuleRegistration("net.udp.multicast")
 	if !ok {
 		t.Fatalf("udp.multicast module not registered")
 	}
@@ -84,7 +84,7 @@ func TestBadUDPMulticast(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["net.udp.multicast"]
+			registration, ok := module.GetModuleRegistration("net.udp.multicast")
 			if !ok {
 				t.Fatalf("net.udp.multicast module not registered")
 			}

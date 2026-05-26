@@ -8,7 +8,7 @@ import (
 )
 
 func TestMIDIOutputFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["midi.output"]
+	registration, ok := module.GetModuleRegistration("midi.output")
 	if !ok {
 		t.Fatalf("midi.output module not registered")
 	}
@@ -55,7 +55,7 @@ func TestBadMIDIOutput(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["midi.output"]
+			registration, ok := module.GetModuleRegistration("midi.output")
 			if !ok {
 				t.Fatalf("midi.output module not registered")
 			}

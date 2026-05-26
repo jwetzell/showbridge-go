@@ -9,7 +9,7 @@ import (
 )
 
 func TestNATSServerFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["nats.server"]
+	registration, ok := module.GetModuleRegistration("nats.server")
 	if !ok {
 		t.Fatalf("nats.server module not registered")
 	}
@@ -53,7 +53,7 @@ func TestGoodNATSServer(t *testing.T) {
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["nats.server"]
+			registration, ok := module.GetModuleRegistration("nats.server")
 			if !ok {
 				t.Fatalf("nats.server module not registered")
 			}
@@ -100,7 +100,7 @@ func TestBadNATSServer(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["nats.server"]
+			registration, ok := module.GetModuleRegistration("nats.server")
 			if !ok {
 				t.Fatalf("nats.server module not registered")
 			}

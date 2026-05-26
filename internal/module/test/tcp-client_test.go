@@ -8,7 +8,7 @@ import (
 )
 
 func TestTCPClientFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["net.tcp.client"]
+	registration, ok := module.GetModuleRegistration("net.tcp.client")
 	if !ok {
 		t.Fatalf("net.tcp.client module not registered")
 	}
@@ -77,7 +77,7 @@ func TestBadTCPClient(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["net.tcp.client"]
+			registration, ok := module.GetModuleRegistration("net.tcp.client")
 			if !ok {
 				t.Fatalf("net.tcp.client module not registered")
 			}

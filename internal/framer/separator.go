@@ -4,16 +4,16 @@ import (
 	"bytes"
 )
 
-type ByteSeparatorFramer struct {
+type byteSeparatorFramer struct {
 	buffer    []byte
 	separator []byte
 }
 
-func NewByteSeparatorFramer(separator []byte) *ByteSeparatorFramer {
-	return &ByteSeparatorFramer{separator: separator, buffer: []byte{}}
+func newByteSeparatorFramer(separator []byte) *byteSeparatorFramer {
+	return &byteSeparatorFramer{separator: separator, buffer: []byte{}}
 }
 
-func (bsf *ByteSeparatorFramer) Decode(data []byte) [][]byte {
+func (bsf *byteSeparatorFramer) Decode(data []byte) [][]byte {
 	messages := [][]byte{}
 
 	bsf.buffer = append(bsf.buffer, data...)
@@ -28,14 +28,14 @@ func (bsf *ByteSeparatorFramer) Decode(data []byte) [][]byte {
 	return messages
 }
 
-func (bsf *ByteSeparatorFramer) Encode(data []byte) []byte {
+func (bsf *byteSeparatorFramer) Encode(data []byte) []byte {
 	return append(data, bsf.separator...)
 }
 
-func (bsf *ByteSeparatorFramer) Clear() {
+func (bsf *byteSeparatorFramer) Clear() {
 	bsf.buffer = []byte{}
 }
 
-func (bsf *ByteSeparatorFramer) Buffer() []byte {
+func (bsf *byteSeparatorFramer) Buffer() []byte {
 	return bsf.buffer
 }

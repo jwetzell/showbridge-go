@@ -9,7 +9,7 @@ import (
 )
 
 func TestFloatRandomFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["float.random"]
+	registration, ok := processor.GetProcessorRegistration("float.random")
 	if !ok {
 		t.Fatalf("float.random processor not registered")
 	}
@@ -57,7 +57,7 @@ func TestGoodFloatRandom(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["float.random"]
+			registration, ok := processor.GetProcessorRegistration("float.random")
 			if !ok {
 				t.Fatalf("float.random processor not registered")
 			}
@@ -155,7 +155,7 @@ func TestBadFloatRandom(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["float.random"]
+			registration, ok := processor.GetProcessorRegistration("float.random")
 			if !ok {
 				t.Fatalf("float.random processor not registered")
 			}
@@ -186,7 +186,7 @@ func TestBadFloatRandom(t *testing.T) {
 }
 
 func BenchmarkFloatRandom(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["float.random"]
+	registration, ok := processor.GetProcessorRegistration("float.random")
 	if !ok {
 		b.Fatalf("float.random processor not registered")
 	}

@@ -9,7 +9,7 @@ import (
 )
 
 func TestTimeSleepFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["time.sleep"]
+	registration, ok := processor.GetProcessorRegistration("time.sleep")
 	if !ok {
 		t.Fatalf("time.sleep processor not registered")
 	}
@@ -45,7 +45,7 @@ func TestGoodTimeSleep(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["time.sleep"]
+			registration, ok := processor.GetProcessorRegistration("time.sleep")
 			if !ok {
 				t.Fatalf("time.sleep processor not registered")
 			}
@@ -97,7 +97,7 @@ func TestBadTimeSleep(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["time.sleep"]
+			registration, ok := processor.GetProcessorRegistration("time.sleep")
 			if !ok {
 				t.Fatalf("time.sleep processor not registered")
 			}

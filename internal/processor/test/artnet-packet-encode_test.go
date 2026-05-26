@@ -11,7 +11,7 @@ import (
 )
 
 func TestArtnetPacketEncodeFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["artnet.packet.encode"]
+	registration, ok := processor.GetProcessorRegistration("artnet.packet.encode")
 	if !ok {
 		t.Fatalf("artnet.packet.encode processor not registered")
 	}

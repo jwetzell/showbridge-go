@@ -35,13 +35,33 @@ func RegisterProcessor(processor ProcessorRegistration) {
 	processorRegistryMu.Lock()
 	defer processorRegistryMu.Unlock()
 
-	if _, ok := ProcessorRegistry[string(processor.Type)]; ok {
+	if _, ok := processorRegistry[string(processor.Type)]; ok {
 		panic(fmt.Sprintf("processor already registered: %s", processor.Type))
 	}
-	ProcessorRegistry[string(processor.Type)] = processor
+	processorRegistry[string(processor.Type)] = processor
+}
+
+type ProcessorRegistry map[string]ProcessorRegistration
+
+func GetProcessorRegistration(processorType string) (ProcessorRegistration, bool) {
+	processorRegistryMu.RLock()
+	defer processorRegistryMu.RUnlock()
+	processor, ok := processorRegistry[processorType]
+	return processor, ok
+}
+
+func GetProcessorRegistrations() []ProcessorRegistration {
+	processorRegistryMu.RLock()
+	defer processorRegistryMu.RUnlock()
+
+	registrations := make([]ProcessorRegistration, 0, len(processorRegistry))
+	for _, processor := range processorRegistry {
+		registrations = append(registrations, processor)
+	}
+	return registrations
 }
 
 var (
 	processorRegistryMu sync.RWMutex
-	ProcessorRegistry   = make(map[string]ProcessorRegistration)
+	processorRegistry   = make(map[string]ProcessorRegistration)
 )

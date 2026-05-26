@@ -8,7 +8,7 @@ import (
 )
 
 func TestSIPCallServerFromRegistry(t *testing.T) {
-	registration, ok := module.ModuleRegistry["sip.call.server"]
+	registration, ok := module.GetModuleRegistration("sip.call.server")
 	if !ok {
 		t.Fatalf("sip.call.server module not registered")
 	}
@@ -70,7 +70,7 @@ func TestBadSIPCallServer(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.ModuleRegistry["sip.call.server"]
+			registration, ok := module.GetModuleRegistration("sip.call.server")
 			if !ok {
 				t.Fatalf("sip.call.server module not registered")
 			}

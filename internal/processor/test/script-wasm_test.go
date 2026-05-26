@@ -11,7 +11,7 @@ import (
 )
 
 func TestScriptWASMFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["script.wasm"]
+	registration, ok := processor.GetProcessorRegistration("script.wasm")
 	if !ok {
 		t.Fatalf("script.wasm processor not registered")
 	}
@@ -60,7 +60,7 @@ func TestGoodScriptWASM(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["script.wasm"]
+			registration, ok := processor.GetProcessorRegistration("script.wasm")
 			if !ok {
 				t.Fatalf("script.wasm processor not registered")
 			}
@@ -160,7 +160,7 @@ func TestBadScriptWASM(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["script.wasm"]
+			registration, ok := processor.GetProcessorRegistration("script.wasm")
 			if !ok {
 				t.Fatalf("script.wasm processor not registered")
 			}
@@ -191,7 +191,7 @@ func TestBadScriptWASM(t *testing.T) {
 }
 
 func BenchmarkScriptWASM(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["script.wasm"]
+	registration, ok := processor.GetProcessorRegistration("script.wasm")
 	if !ok {
 		b.Fatalf("script.wasm processor not registered")
 	}

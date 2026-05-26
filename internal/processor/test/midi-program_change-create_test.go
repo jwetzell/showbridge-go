@@ -11,7 +11,7 @@ import (
 )
 
 func TestMIDIProgramChangeCreateFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["midi.program_change.create"]
+	registration, ok := processor.GetProcessorRegistration("midi.program_change.create")
 	if !ok {
 		t.Fatalf("midi.program_change.create processor not registered")
 	}
@@ -55,7 +55,7 @@ func TestGoodMIDIProgramChangeCreate(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["midi.program_change.create"]
+			registration, ok := processor.GetProcessorRegistration("midi.program_change.create")
 			if !ok {
 				t.Fatalf("midi.program_change.create processor not registered")
 			}
@@ -116,7 +116,7 @@ func TestBadMIDIProgramChangeCreate(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["midi.program_change.create"]
+			registration, ok := processor.GetProcessorRegistration("midi.program_change.create")
 			if !ok {
 				t.Fatalf("midi.program_change.create processor not registered")
 			}
@@ -147,7 +147,7 @@ func TestBadMIDIProgramChangeCreate(t *testing.T) {
 }
 
 func BenchmarkMIDIProgramChangeCreate(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["midi.program_change.create"]
+	registration, ok := processor.GetProcessorRegistration("midi.program_change.create")
 	if !ok {
 		b.Fatalf("midi.program_change.create processor not registered")
 	}

@@ -11,7 +11,7 @@ import (
 )
 
 func TestOSCMessageEncodeFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["osc.message.encode"]
+	registration, ok := processor.GetProcessorRegistration("osc.message.encode")
 	if !ok {
 		t.Fatalf("osc.message.encode processor not registered")
 	}

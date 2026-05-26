@@ -10,7 +10,7 @@ import (
 )
 
 func TestFloatParseFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["float.parse"]
+	registration, ok := processor.GetProcessorRegistration("float.parse")
 	if !ok {
 		t.Fatalf("float.parse processor not registered")
 	}
@@ -63,7 +63,7 @@ func TestGoodFloatParse(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["float.parse"]
+			registration, ok := processor.GetProcessorRegistration("float.parse")
 			if !ok {
 				t.Fatalf("float.parse processor not registered")
 			}
@@ -136,7 +136,7 @@ func TestBadFloatParse(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			registration, ok := processor.ProcessorRegistry["float.parse"]
+			registration, ok := processor.GetProcessorRegistration("float.parse")
 			if !ok {
 				t.Fatalf("float.parse processor not registered")
 			}
@@ -167,7 +167,7 @@ func TestBadFloatParse(t *testing.T) {
 }
 
 func BenchmarkFloatParse(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["float.parse"]
+	registration, ok := processor.GetProcessorRegistration("float.parse")
 	if !ok {
 		b.Fatalf("float.parse processor not registered")
 	}

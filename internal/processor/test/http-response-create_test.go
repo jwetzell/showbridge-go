@@ -10,7 +10,7 @@ import (
 )
 
 func TestHTTPResponseCreateFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["http.response.create"]
+	registration, ok := processor.GetProcessorRegistration("http.response.create")
 	if !ok {
 		t.Fatalf("http.response.create processor not registered")
 	}
@@ -54,7 +54,7 @@ func TestGoodHTTPResponseCreate(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["http.response.create"]
+			registration, ok := processor.GetProcessorRegistration("http.response.create")
 			if !ok {
 				t.Fatalf("http.response.create processor not registered")
 			}
@@ -128,7 +128,7 @@ func TestBadHTTPResponseCreate(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["http.response.create"]
+			registration, ok := processor.GetProcessorRegistration("http.response.create")
 			if !ok {
 				t.Fatalf("http.response.create processor not registered")
 			}
@@ -159,7 +159,7 @@ func TestBadHTTPResponseCreate(t *testing.T) {
 }
 
 func BenchmarkHTTPResponseCreate(b *testing.B) {
-	registration, ok := processor.ProcessorRegistry["http.response.create"]
+	registration, ok := processor.GetProcessorRegistration("http.response.create")
 	if !ok {
 		b.Fatalf("http.response.create processor not registered")
 	}

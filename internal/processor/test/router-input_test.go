@@ -11,7 +11,7 @@ import (
 )
 
 func TestRouterInputFromRegistry(t *testing.T) {
-	registration, ok := processor.ProcessorRegistry["router.input"]
+	registration, ok := processor.GetProcessorRegistration("router.input")
 	if !ok {
 		t.Fatalf("router.input processor not registered")
 	}
@@ -35,8 +35,8 @@ func TestRouterInputFromRegistry(t *testing.T) {
 	expected := "test"
 
 	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
-		InputHandler:  test.GetNewTestRouter().HandleInput,
-		Payload: payload,
+		InputHandler: test.GetNewTestRouter().HandleInput,
+		Payload:      payload,
 	})
 	if err != nil {
 		t.Fatalf("router.input processing failed: %s", err)
@@ -59,7 +59,7 @@ func TestGoodRouterInput(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["router.input"]
+			registration, ok := processor.GetProcessorRegistration("router.input")
 			if !ok {
 				t.Fatalf("router.input processor not registered")
 			}
@@ -95,36 +95,36 @@ func TestBadRouterInput(t *testing.T) {
 		errorString  string
 	}{
 		{
-			name:        "no source param",
-			params:      map[string]any{},
-			payload:     "test",
-			inputHandler:      router.HandleInput,
-			errorString: "router.input source error: not found",
+			name:         "no source param",
+			params:       map[string]any{},
+			payload:      "test",
+			inputHandler: router.HandleInput,
+			errorString:  "router.input source error: not found",
 		},
 		{
 			name: "non-string source",
 			params: map[string]any{
 				"source": 123,
 			},
-			payload:     "test",
-			inputHandler:      router.HandleInput,
-			errorString: "router.input source error: not a string",
+			payload:      "test",
+			inputHandler: router.HandleInput,
+			errorString:  "router.input source error: not a string",
 		},
 		{
 			name: "router not found in context",
 			params: map[string]any{
 				"source": "test",
 			},
-			payload:     "test",
-			inputHandler:      nil,
-			errorString: "router.input no input handler found",
+			payload:      "test",
+			inputHandler: nil,
+			errorString:  "router.input no input handler found",
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 
-			registration, ok := processor.ProcessorRegistry["router.input"]
+			registration, ok := processor.GetProcessorRegistration("router.input")
 			if !ok {
 				t.Fatalf("router.input processor not registered")
 			}
