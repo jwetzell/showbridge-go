@@ -40,12 +40,12 @@ func (r *Route) Input() string {
 }
 
 func (r *Route) ProcessPayload(ctx context.Context, wrappedPayload common.WrappedPayload) (any, error) {
-	for _, processor := range r.processors {
+	for processorIndex, processor := range r.processors {
 		processedPayload, err := processor.Process(ctx, wrappedPayload)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("processor[%d] error: %w", processorIndex, err)
 		}
-		//NOTE(jwetzell) payload has been marked as an end
+		//NOTE(jwetzell) payload has been marked as an end without error
 		if processedPayload.End {
 			return processedPayload.Payload, nil
 		}
