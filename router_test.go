@@ -239,7 +239,7 @@ func TestRouterInputUnknownDestinationModule(t *testing.T) {
 		t.Fatalf("router should have returned exactly 1 routing error, got: %d", len(routingErrors))
 	}
 
-	if routingErrors[0].ProcessError.Error() != "module.output unable to find module with id: test" {
+	if routingErrors[0].ProcessError.Error() != "processor[0] error: module.output unable to find module with id: test" {
 		t.Fatalf("routing output error did not match expected, got: %s", routingErrors[0].ProcessError.Error())
 	}
 }
