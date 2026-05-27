@@ -78,7 +78,7 @@ func (kvs *KVSet) Process(ctx context.Context, wrappedPayload common.WrappedPayl
 		kvs.module = kvModule
 	}
 
-	err := kvs.module.Set(kvs.Key, wrappedPayload.Payload)
+	err := kvs.module.Set(ctx, kvs.Key, wrappedPayload.Payload)
 	if err != nil {
 		wrappedPayload.End = true
 		return wrappedPayload, fmt.Errorf("kv.set error setting key: %w", err)

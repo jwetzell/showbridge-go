@@ -77,7 +77,7 @@ func (kvg *KVGet) Process(ctx context.Context, wrappedPayload common.WrappedPayl
 		kvg.module = kvModule
 	}
 
-	value, err := kvg.module.Get(kvg.Key)
+	value, err := kvg.module.Get(ctx, kvg.Key)
 	if err != nil {
 		wrappedPayload.End = true
 		return wrappedPayload, fmt.Errorf("kv.get error getting key: %w", err)

@@ -89,7 +89,7 @@ func (m *TestKVModule) Id() string {
 	return m.id
 }
 
-func (m *TestKVModule) Get(key string) (any, error) {
+func (m *TestKVModule) Get(ctx context.Context, key string) (any, error) {
 	if m.kvData == nil {
 		return nil, nil
 	}
@@ -100,7 +100,7 @@ func (m *TestKVModule) Get(key string) (any, error) {
 	return value, nil
 }
 
-func (m *TestKVModule) Set(key string, value any) error {
+func (m *TestKVModule) Set(ctx context.Context, key string, value any) error {
 	if m.kvData == nil {
 		m.kvData = make(map[string]any)
 	}

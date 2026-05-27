@@ -17,8 +17,8 @@ type OutputModule interface {
 }
 
 type KeyValueModule interface {
-	Get(key string) (any, error)
-	Set(key string, value any) error
+	Get(ctx context.Context, key string) (any, error)
+	Set(ctx context.Context, key string, value any) error
 }
 
 type DatabaseModule interface {

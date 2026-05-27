@@ -110,9 +110,9 @@ func (rc *RedisClient) Stop() {
 	rc.logger.Debug("done")
 }
 
-func (rc *RedisClient) Get(key string) (any, error) {
+func (rc *RedisClient) Get(ctx context.Context, key string) (any, error) {
 	if rc.client != nil {
-		val, err := rc.client.Get(rc.ctx, key).Result()
+		val, err := rc.client.Get(ctx, key).Result()
 		if err != nil {
 			return nil, err
 		}
@@ -121,9 +121,9 @@ func (rc *RedisClient) Get(key string) (any, error) {
 	return nil, errors.New("redis.client not setup")
 }
 
-func (rc *RedisClient) Set(key string, value any) error {
+func (rc *RedisClient) Set(ctx context.Context, key string, value any) error {
 	if rc.client != nil {
-		status := rc.client.Set(rc.ctx, key, value, 0)
+		status := rc.client.Set(ctx, key, value, 0)
 		return status.Err()
 	}
 	return errors.New("redis.client not setup")
