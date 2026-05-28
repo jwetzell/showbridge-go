@@ -57,14 +57,25 @@ routes:
     processors:
       - type: string.create
         params:
-          template: "hello"
+          template: "wsecho: {{.Payload.UnixMilli}}"
       - type: module.output
         params:
           module: wsecho
+  - input: ticker
+    processors:
+      - type: string.create
+        params:
+          template: "tcpout: {{.Payload.UnixMilli}}"
       - type: string.encode
       - type: module.output
         params:
           module: tcpout
+  - input: ticker
+    processors:
+      - type: string.create
+        params:
+          template: "udpout: {{.Payload.UnixMilli}}"
+      - type: string.encode
       - type: module.output
         params:
           module: udpout
@@ -74,13 +85,14 @@ routes:
         params:
           url: "http://localhost:3000/echo"
           method: "GET"
+      - type: struct.field.get
+        params:
+          name: "Body"
+      - type: string.decode
       - type: debug.log
   - input: tcpin
     processors:
       - type: string.decode
-      - type: debug.log
-  - input: httpin
-    processors:
       - type: debug.log
   - input: udpin
     processors:
@@ -98,12 +110,25 @@ routes:
       - type: debug.log
   - input: natsin
     processors:
+      - type: struct.field.get
+        params:
+          name: "Data"
+      - type: string.decode
       - type: debug.log
+  - input: httpin
+    processors:
+      - type: http.response.create
+        params:
+          status: 200
+          bodyTemplate: "Hello, World!"
+      - type: module.output
+        params:
+          module: httpin
   - input: ticker
     processors:
       - type: string.create
         params:
-          template: "{{.Payload}}"
+          template: "natsout: {{.Payload}}"
       - type: pubsub.publish
         params:
           module: natsout
