@@ -66,7 +66,7 @@ func (t *TimeTimer) Start(ctx context.Context, inputHandler common.InputHandler)
 	t.cancel = cancel
 
 	t.timer = time.NewTimer(time.Millisecond * time.Duration(t.Duration))
-	for {
+	for t.ctx.Err() == nil {
 		select {
 		case <-t.ctx.Done():
 			return nil
@@ -76,15 +76,16 @@ func (t *TimeTimer) Start(ctx context.Context, inputHandler common.InputHandler)
 			}
 		}
 	}
+	<-t.ctx.Done()
+	t.logger.Debug("done")
+	return nil
 }
 
 func (t *TimeTimer) Stop() {
 	if t.cancel != nil {
-		t.cancel()
+		defer t.cancel()
 	}
 	if t.timer != nil {
 		t.timer.Stop()
-		t.timer = nil
 	}
-	t.logger.Debug("done")
 }

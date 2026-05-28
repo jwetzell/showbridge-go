@@ -93,35 +93,34 @@ func (um *UDPMulticast) Start(ctx context.Context, inputHandler common.InputHand
 	um.connMu.Unlock()
 
 	buffer := make([]byte, 2048)
-	for {
-		select {
-		case <-um.ctx.Done():
-			return nil
-		default:
-			um.connMu.Lock()
-			um.conn.SetDeadline(time.Now().Add(time.Millisecond * 200))
+	for um.ctx.Err() == nil {
+		um.conn.SetDeadline(time.Now().Add(time.Millisecond * 200))
 
-			numBytes, _, err := um.conn.ReadFromUDP(buffer)
-			um.connMu.Unlock()
-			if err != nil {
-				//NOTE(jwetzell) we hit deadline
-				if opErr, ok := err.(*net.OpError); ok && opErr.Timeout() {
-					continue
-				}
-				return err
+		numBytes, _, err := um.conn.ReadFromUDP(buffer)
+		if err != nil {
+			if errors.Is(err, net.ErrClosed) {
+				break
 			}
+			//NOTE(jwetzell) we hit deadline
+			if opErr, ok := err.(*net.OpError); ok && opErr.Timeout() {
+				continue
+			}
+			return err
+		}
 
-			if numBytes > 0 {
-				message := buffer[:numBytes]
+		if numBytes > 0 {
+			message := buffer[:numBytes]
 
-				if um.inputHandler != nil {
-					um.inputHandler(um.ctx, um.Id(), message)
-				} else {
-					um.logger.Error("input received but no input handler is configured")
-				}
+			if um.inputHandler != nil {
+				um.inputHandler(um.ctx, um.Id(), message)
+			} else {
+				um.logger.Error("input received but no input handler is configured")
 			}
 		}
 	}
+	<-um.ctx.Done()
+	um.logger.Debug("done")
+	return nil
 }
 
 func (um *UDPMulticast) Output(ctx context.Context, payload any) error {
@@ -141,13 +140,11 @@ func (um *UDPMulticast) Output(ctx context.Context, payload any) error {
 
 func (um *UDPMulticast) Stop() {
 	if um.cancel != nil {
-		um.cancel()
+		defer um.cancel()
 	}
 	um.connMu.Lock()
 	defer um.connMu.Unlock()
 	if um.conn != nil {
 		um.conn.Close()
-		um.conn = nil
 	}
-	um.logger.Debug("done")
 }

@@ -67,25 +67,26 @@ func (i *TimeInterval) Start(ctx context.Context, inputHandler common.InputHandl
 	ticker := time.NewTicker(time.Millisecond * time.Duration(i.Duration))
 	i.ticker = ticker
 
-	for {
+	for i.ctx.Err() == nil {
 		select {
-		case <-i.ctx.Done():
-			return nil
 		case <-ticker.C:
 			if i.inputHandler != nil {
 				i.inputHandler(i.ctx, i.Id(), time.Now())
 			}
+		default:
+			continue
 		}
 	}
+	<-i.ctx.Done()
+	i.logger.Debug("done")
+	return nil
 }
 
 func (i *TimeInterval) Stop() {
 	if i.cancel != nil {
-		i.cancel()
+		defer i.cancel()
 	}
 	if i.ticker != nil {
 		i.ticker.Stop()
-		i.ticker = nil
 	}
-	i.logger.Debug("done")
 }

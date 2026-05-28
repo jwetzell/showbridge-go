@@ -111,32 +111,29 @@ func (us *UDPServer) Start(ctx context.Context, inputHandler common.InputHandler
 	}
 	us.listenerMu.Lock()
 	us.listener = listener
+	us.listenerMu.Unlock()
 
 	buffer := make([]byte, us.BufferSize)
 	for us.ctx.Err() == nil {
-		select {
-		case <-us.ctx.Done():
-			return nil
-		default:
-			listener.SetDeadline(time.Now().Add(time.Millisecond * 200))
+		listener.SetDeadline(time.Now().Add(time.Millisecond * 200))
 
-			numBytes, _, err := listener.ReadFromUDP(buffer)
-			if err != nil {
-				//NOTE(jwetzell) we hit deadline
-				if opErr, ok := err.(*net.OpError); ok && opErr.Timeout() {
-					continue
-				}
-				return err
+		numBytes, _, err := listener.ReadFromUDP(buffer)
+		if err != nil {
+			//NOTE(jwetzell) we hit deadline
+			if opErr, ok := err.(*net.OpError); ok && opErr.Timeout() {
+				continue
 			}
-			message := buffer[:numBytes]
-			if us.inputHandler != nil {
-				us.inputHandler(us.ctx, us.Id(), message)
-			} else {
-				us.logger.Error("input received but no input handler is configured")
-			}
+			break
+		}
+		message := buffer[:numBytes]
+		if us.inputHandler != nil {
+			us.inputHandler(us.ctx, us.Id(), message)
+		} else {
+			us.logger.Error("input received but no input handler is configured")
 		}
 	}
-	us.listenerMu.Unlock()
+	<-us.ctx.Done()
+	us.logger.Debug("done")
 	return nil
 }
 
@@ -146,13 +143,11 @@ func (us *UDPServer) Output(ctx context.Context, payload any) error {
 
 func (us *UDPServer) Stop() {
 	if us.cancel != nil {
-		us.cancel()
+		defer us.cancel()
 	}
 	us.listenerMu.Lock()
 	defer us.listenerMu.Unlock()
 	if us.listener != nil {
 		us.listener.Close()
-		us.listener = nil
 	}
-	us.logger.Debug("done")
 }

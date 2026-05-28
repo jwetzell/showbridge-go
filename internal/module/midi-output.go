@@ -86,6 +86,7 @@ func (mo *MIDIOutput) Start(ctx context.Context, inputHandler common.InputHandle
 	mo.sendFuncMu.Unlock()
 
 	<-mo.ctx.Done()
+	mo.logger.Debug("done")
 	return nil
 }
 
@@ -107,8 +108,7 @@ func (mo *MIDIOutput) Output(ctx context.Context, payload any) error {
 
 func (mo *MIDIOutput) Stop() {
 	if mo.cancel != nil {
-		mo.cancel()
+		defer mo.cancel()
 	}
 	midi.CloseDriver()
-	mo.logger.Debug("done")
 }

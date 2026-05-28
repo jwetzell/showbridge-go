@@ -63,7 +63,7 @@ func (pc *PSNClient) Start(ctx context.Context, inputHandler common.InputHandler
 	pc.connMu.Unlock()
 
 	buffer := make([]byte, 2048)
-	for {
+	for pc.ctx.Err() == nil {
 		select {
 		case <-pc.ctx.Done():
 			return nil
@@ -99,17 +99,18 @@ func (pc *PSNClient) Start(ctx context.Context, inputHandler common.InputHandler
 			}
 		}
 	}
+	<-pc.ctx.Done()
+	pc.logger.Debug("done")
+	return nil
 }
 
 func (pc *PSNClient) Stop() {
 	if pc.cancel != nil {
-		pc.cancel()
+		defer pc.cancel()
 	}
 	pc.connMu.Lock()
 	defer pc.connMu.Unlock()
 	if pc.conn != nil {
 		pc.conn.Close()
-		pc.conn = nil
 	}
-	pc.logger.Debug("done")
 }

@@ -94,20 +94,19 @@ func (rc *RedisClient) Start(ctx context.Context, inputHandler common.InputHandl
 	rc.clientMu.Unlock()
 
 	<-rc.ctx.Done()
+	rc.logger.Debug("done")
 	return nil
 }
 
 func (rc *RedisClient) Stop() {
 	if rc.cancel != nil {
-		rc.cancel()
+		defer rc.cancel()
 	}
 	rc.clientMu.Lock()
 	defer rc.clientMu.Unlock()
 	if rc.client != nil {
 		rc.client.Close()
-		rc.client = nil
 	}
-	rc.logger.Debug("done")
 }
 
 func (rc *RedisClient) Get(ctx context.Context, key string) (any, error) {

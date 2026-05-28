@@ -99,6 +99,7 @@ func (wc *WebSocketClient) Start(ctx context.Context, inputHandler common.InputH
 		time.Sleep(2 * time.Second)
 	}
 	<-wc.ctx.Done()
+	wc.logger.Debug("done")
 	return nil
 }
 
@@ -114,10 +115,6 @@ func (wc *WebSocketClient) readLoop() {
 			if opErr, ok := err.(*net.OpError); ok {
 				// NOTE(jwetzell) we hit deadline
 				if opErr.Timeout() {
-					continue
-				}
-				// NOTE(jwetzell) connection was closed
-				if errors.Is(opErr, net.ErrClosed) {
 					continue
 				}
 			}
@@ -182,13 +179,11 @@ func (wc *WebSocketClient) Output(ctx context.Context, payload any) error {
 
 func (wc *WebSocketClient) Stop() {
 	if wc.cancel != nil {
-		wc.cancel()
+		defer wc.cancel()
 	}
 	wc.connMu.Lock()
 	defer wc.connMu.Unlock()
 	if wc.conn != nil {
 		wc.conn.Close()
-		wc.conn = nil
 	}
-	wc.logger.Debug("done")
 }

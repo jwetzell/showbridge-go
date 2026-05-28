@@ -167,12 +167,13 @@ func (hs *HTTPServer) Start(ctx context.Context, inputHandler common.InputHandle
 	err := httpServer.ListenAndServe()
 	// TODO(jwetzell): handle server closed error differently
 	if err != nil {
-		if err.Error() != "http: Server closed" {
+		if !errors.Is(err, http.ErrServerClosed) {
 			return err
 		}
 	}
 
 	<-hs.ctx.Done()
+	hs.logger.Debug("done")
 	return nil
 }
 
@@ -200,7 +201,7 @@ func (hs *HTTPServer) Output(ctx context.Context, payload any) error {
 
 func (hs *HTTPServer) Stop() {
 	if hs.cancel != nil {
-		hs.cancel()
+		defer hs.cancel()
 	}
 	hs.serverMu.Lock()
 	defer hs.serverMu.Unlock()
@@ -209,7 +210,5 @@ func (hs *HTTPServer) Stop() {
 		hs.server.Shutdown(shutdownCtx)
 		shutdownCancel()
 		<-shutdownCtx.Done()
-		hs.server = nil
 	}
-	hs.logger.Debug("done")
 }

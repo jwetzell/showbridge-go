@@ -100,11 +100,12 @@ func (tc *TCPClient) Start(ctx context.Context, inputHandler common.InputHandler
 	tc.ctx = moduleContext
 	tc.cancel = cancel
 
+CONNECT_RETRY:
 	for tc.ctx.Err() == nil {
 		err := tc.SetupConn()
 		if err != nil {
 			if tc.ctx.Err() != nil {
-				return nil
+				break CONNECT_RETRY
 			}
 			tc.logger.Error("connection error", "error", err.Error())
 			time.Sleep(time.Second * 2)
@@ -112,39 +113,38 @@ func (tc *TCPClient) Start(ctx context.Context, inputHandler common.InputHandler
 		}
 
 		buffer := make([]byte, 1024)
-		select {
-		case <-tc.ctx.Done():
-			return nil
-		default:
-		READ:
-			for {
-				select {
-				case <-tc.ctx.Done():
-					return nil
-				default:
-					byteCount, err := tc.conn.Read(buffer)
 
-					if err != nil {
-						tc.framer.Clear()
-						break READ
+	READ:
+		for tc.ctx.Err() == nil {
+			tc.conn.SetReadDeadline(time.Now().Add(time.Millisecond * 200))
+			byteCount, err := tc.conn.Read(buffer)
+
+			if err != nil {
+				if opErr, ok := err.(*net.OpError); ok {
+					//NOTE(jwetzell) we hit deadline
+					if opErr.Timeout() {
+						continue
 					}
+				}
+				break READ
+			}
 
-					if tc.framer != nil {
-						if byteCount > 0 {
-							messages := tc.framer.Decode(buffer[0:byteCount])
-							for _, message := range messages {
-								if tc.inputHandler != nil {
-									tc.inputHandler(tc.ctx, tc.Id(), message)
-								} else {
-									tc.logger.Error("input received but no input handler is configured")
-								}
-							}
+			if tc.framer != nil {
+				if byteCount > 0 {
+					messages := tc.framer.Decode(buffer[0:byteCount])
+					for _, message := range messages {
+						if tc.inputHandler != nil {
+							tc.inputHandler(tc.ctx, tc.Id(), message)
+						} else {
+							tc.logger.Error("input received but no input handler is configured")
 						}
 					}
 				}
 			}
 		}
 	}
+	<-tc.ctx.Done()
+	tc.logger.Debug("done")
 	return nil
 }
 
@@ -172,14 +172,11 @@ func (tc *TCPClient) Output(ctx context.Context, payload any) error {
 
 func (tc *TCPClient) Stop() {
 	if tc.cancel != nil {
-		tc.cancel()
+		defer tc.cancel()
 	}
 	tc.connMu.Lock()
 	defer tc.connMu.Unlock()
 	if tc.conn != nil {
 		tc.conn.Close()
-		tc.conn = nil
 	}
-	tc.logger.Debug("done")
-
 }

@@ -96,6 +96,7 @@ func (uc *UDPClient) Start(ctx context.Context, inputHandler common.InputHandler
 	}
 
 	<-uc.ctx.Done()
+	uc.logger.Debug("done")
 	return nil
 }
 
@@ -120,14 +121,11 @@ func (uc *UDPClient) Output(ctx context.Context, payload any) error {
 
 func (uc *UDPClient) Stop() {
 	if uc.cancel != nil {
-		uc.cancel()
+		defer uc.cancel()
 	}
 	uc.connMu.Lock()
 	defer uc.connMu.Unlock()
 	if uc.conn != nil {
 		uc.conn.Close()
-		uc.conn = nil
 	}
-
-	uc.logger.Debug("done")
 }

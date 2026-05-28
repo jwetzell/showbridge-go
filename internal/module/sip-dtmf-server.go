@@ -190,6 +190,7 @@ func (sds *SIPDTMFServer) Start(ctx context.Context, inputHandler common.InputHa
 	}
 
 	<-sds.ctx.Done()
+	sds.logger.Debug("done")
 	return nil
 }
 
@@ -286,12 +287,11 @@ func (sds *SIPDTMFServer) Output(ctx context.Context, payload any) error {
 
 func (sds *SIPDTMFServer) Stop() {
 	if sds.cancel != nil {
-		sds.cancel()
+		defer sds.cancel()
 	}
 	sds.uaMu.Lock()
 	defer sds.uaMu.Unlock()
 	if sds.ua != nil {
 		sds.ua.Close()
 	}
-	sds.logger.Debug("done")
 }
