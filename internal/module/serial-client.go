@@ -159,6 +159,8 @@ func (sc *SerialClient) Start(ctx context.Context, inputHandler common.InputHand
 			}
 		}
 	}
+	<-sc.ctx.Done()
+	sc.logger.Debug("done")
 	return nil
 }
 
@@ -176,13 +178,11 @@ func (sc *SerialClient) Output(ctx context.Context, payload any) error {
 
 func (sc *SerialClient) Stop() {
 	if sc.cancel != nil {
-		sc.cancel()
+		defer sc.cancel()
 	}
 	sc.portMu.Lock()
 	defer sc.portMu.Unlock()
 	if sc.port != nil {
 		sc.port.Close()
-		sc.port = nil
 	}
-	sc.logger.Debug("done")
 }

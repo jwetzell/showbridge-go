@@ -152,6 +152,7 @@ func (mc *MQTTClient) Start(ctx context.Context, inputHandler common.InputHandle
 	mc.clientMu.Unlock()
 
 	<-mc.ctx.Done()
+	mc.logger.Debug("done")
 	return nil
 }
 
@@ -189,7 +190,5 @@ func (mc *MQTTClient) Stop() {
 	defer mc.clientMu.Unlock()
 	if mc.client != nil {
 		mc.client.Disconnect(250)
-		mc.client = nil
 	}
-	mc.logger.Debug("done")
 }

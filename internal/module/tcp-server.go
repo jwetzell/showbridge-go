@@ -10,7 +10,6 @@ import (
 	"slices"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
@@ -58,11 +57,13 @@ func init() {
 				return nil, fmt.Errorf("net.tcp.server framing error: %w", err)
 			}
 
-			framer := framer.GetFramer(framingMethodString)
+			inFramer := framer.GetFramer(framingMethodString)
 
-			if framer == nil {
+			if inFramer == nil {
 				return nil, fmt.Errorf("net.tcp.server unknown framing method: %s", framingMethodString)
 			}
+
+			outFramer := framer.GetFramer(framingMethodString)
 
 			ipString, err := params.GetString("ip")
 			if err != nil {
@@ -77,24 +78,33 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			return &TCPServer{Framer: framer, Addr: addr, config: moduleConfig, logger: CreateLogger(moduleConfig)}, nil
+			return &TCPServer{InFramer: inFramer, OutFramer: outFramer, framerType: framingMethodString, Addr: addr, config: moduleConfig, logger: CreateLogger(moduleConfig)}, nil
 		},
 	})
 }
 
+type tcpConnection struct {
+	conn   *net.TCPConn
+	framer framer.Framer
+}
+
 type TCPServer struct {
-	config        config.ModuleConfig
-	Addr          *net.TCPAddr
-	Framer        framer.Framer
-	ctx           context.Context
-	inputHandler  common.InputHandler
-	wg            sync.WaitGroup
-	connections   []*net.TCPConn
-	connectionsMu sync.RWMutex
-	logger        *slog.Logger
-	cancel        context.CancelFunc
-	listener      *net.TCPListener
-	listenerMu    sync.Mutex
+	config                config.ModuleConfig
+	Addr                  *net.TCPAddr
+	InFramer              framer.Framer
+	OutFramer             framer.Framer
+	framerType            string
+	ctx                   context.Context
+	inputHandler          common.InputHandler
+	wg                    sync.WaitGroup
+	connections           []tcpConnection
+	connectionsMu         sync.RWMutex
+	logger                *slog.Logger
+	cancel                context.CancelFunc
+	listener              *net.TCPListener
+	listenerMu            sync.Mutex
+	connectionShutdownCtx context.Context
+	connectionShutdown    context.CancelFunc
 }
 
 func (ts *TCPServer) Id() string {
@@ -107,70 +117,43 @@ func (ts *TCPServer) Type() string {
 
 func (ts *TCPServer) handleClient(client *net.TCPConn) {
 	ts.connectionsMu.Lock()
-	ts.connections = append(ts.connections, client)
+	ts.connections = append(ts.connections, tcpConnection{conn: client, framer: framer.GetFramer(ts.framerType)})
 	ts.connectionsMu.Unlock()
 	ts.logger.Debug("connection accepted", "remoteAddr", client.RemoteAddr().String())
-	defer client.Close()
+	defer func() {
+		client.Close()
+		ts.connectionsMu.Lock()
+		for i := 0; i < len(ts.connections); i++ {
+			if ts.connections[i].conn == client {
+				ts.connections = slices.Delete(ts.connections, i, i+1)
+				break
+			}
+		}
+		ts.connectionsMu.Unlock()
+		ts.logger.Debug("connection closed", "remoteAddr", client.RemoteAddr().String())
+	}()
 
 	buffer := make([]byte, 1024)
-ClientRead:
-	for ts.ctx.Err() == nil {
-		select {
-		case <-ts.ctx.Done():
-			client.Close()
-			ts.connectionsMu.Lock()
-			for i := 0; i < len(ts.connections); i++ {
-				if ts.connections[i] == client {
-					ts.connections = slices.Delete(ts.connections, i, i+1)
-					break
+	for ts.ctx.Err() == nil && ts.connectionShutdownCtx.Err() == nil {
+		client.SetDeadline(time.Now().Add(time.Millisecond * 200))
+		byteCount, err := client.Read(buffer)
+		if err != nil {
+			if opErr, ok := err.(*net.OpError); ok {
+				//NOTE(jwetzell) we hit deadline
+				if opErr.Timeout() {
+					continue
 				}
 			}
-			ts.connectionsMu.Unlock()
-			return
-		default:
-			client.SetDeadline(time.Now().Add(time.Millisecond * 200))
-			byteCount, err := client.Read(buffer)
-
-			if err != nil {
-				if opErr, ok := err.(*net.OpError); ok {
-					//NOTE(jwetzell) we hit deadline
-					if opErr.Timeout() {
-						continue ClientRead
-					}
-					if errors.Is(opErr, syscall.ECONNRESET) {
-						ts.connectionsMu.Lock()
-						for i := 0; i < len(ts.connections); i++ {
-							if ts.connections[i] == client {
-								ts.connections = slices.Delete(ts.connections, i, i+1)
-								break
-							}
-						}
-						ts.logger.Debug("connection reset", "remoteAddr", client.RemoteAddr().String())
-						ts.connectionsMu.Unlock()
-					}
-				}
-
-				if err.Error() == "EOF" {
-					ts.connectionsMu.Lock()
-					for i := 0; i < len(ts.connections); i++ {
-						if ts.connections[i] == client {
-							ts.connections = slices.Delete(ts.connections, i, i+1)
-							break
-						}
-					}
-					ts.connectionsMu.Unlock()
-				}
-				return
-			}
-			if ts.Framer != nil {
-				if byteCount > 0 {
-					messages := ts.Framer.Decode(buffer[0:byteCount])
-					for _, message := range messages {
-						if ts.inputHandler != nil {
-							ts.inputHandler(ts.ctx, ts.Id(), message)
-						} else {
-							ts.logger.Error("input received but no input handler is configured")
-						}
+			break
+		}
+		if ts.InFramer != nil {
+			if byteCount > 0 {
+				messages := ts.InFramer.Decode(buffer[0:byteCount])
+				for _, message := range messages {
+					if ts.inputHandler != nil {
+						ts.inputHandler(ts.ctx, ts.Id(), message)
+					} else {
+						ts.logger.Error("input received but no input handler is configured")
 					}
 				}
 			}
@@ -185,6 +168,10 @@ func (ts *TCPServer) Start(ctx context.Context, inputHandler common.InputHandler
 	ts.ctx = moduleContext
 	ts.cancel = cancel
 
+	shutdownCtx, shutdownCancel := context.WithCancel(context.Background())
+	ts.connectionShutdownCtx = shutdownCtx
+	ts.connectionShutdown = shutdownCancel
+
 	listener, err := net.ListenTCP("tcp", ts.Addr)
 	if err != nil {
 		return err
@@ -198,6 +185,9 @@ AcceptLoop:
 	for ts.ctx.Err() == nil {
 		conn, err := listener.AcceptTCP()
 		if err != nil {
+			if errors.Is(err, net.ErrClosed) {
+				break AcceptLoop
+			}
 			select {
 			case <-ts.ctx.Done():
 				break AcceptLoop
@@ -211,6 +201,8 @@ AcceptLoop:
 		}
 	}
 	ts.wg.Done()
+	<-ts.ctx.Done()
+	ts.logger.Debug("done")
 	return nil
 }
 
@@ -221,15 +213,21 @@ func (ts *TCPServer) Output(ctx context.Context, payload any) error {
 		return errors.New("net.tcp.server is only able to output bytes")
 	}
 	ts.connectionsMu.Lock()
+	defer ts.connectionsMu.Unlock()
 	var errorString strings.Builder
 
+	if ts.OutFramer == nil {
+		return errors.New("no output framer configured")
+	}
+
+	outputBytes := ts.OutFramer.Encode(payloadBytes)
+
 	for _, connection := range ts.connections {
-		_, err := connection.Write(payloadBytes)
+		_, err := connection.conn.Write(outputBytes)
 		if err != nil {
 			fmt.Fprintf(&errorString, "%s\n", err.Error())
 		}
 	}
-	ts.connectionsMu.Unlock()
 
 	if errorString.String() == "" {
 		return nil
@@ -239,14 +237,18 @@ func (ts *TCPServer) Output(ctx context.Context, payload any) error {
 
 func (ts *TCPServer) Stop() {
 	if ts.cancel != nil {
-		ts.cancel()
+		defer ts.cancel()
 	}
+	if ts.connectionShutdown != nil {
+		ts.connectionShutdown()
+	}
+
 	ts.listenerMu.Lock()
 	defer ts.listenerMu.Unlock()
 	if ts.listener != nil {
 		ts.listener.Close()
-		ts.listener = nil
 	}
+	ts.logger.Debug("waiting for connections to close")
 	ts.wg.Wait()
-	ts.logger.Debug("done")
+	ts.logger.Debug("all connections closed")
 }

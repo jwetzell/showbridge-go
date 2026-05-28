@@ -96,9 +96,10 @@ func (ns *NATSServer) Start(ctx context.Context, inputHandler common.InputHandle
 	ns.cancel = cancel
 
 	natsServer, err := server.NewServer(&server.Options{
-		Host:  ns.Ip,
-		Port:  ns.Port,
-		NoLog: true,
+		Host:   ns.Ip,
+		Port:   ns.Port,
+		NoLog:  true,
+		NoSigs: true,
 	})
 
 	if err != nil {
@@ -107,26 +108,26 @@ func (ns *NATSServer) Start(ctx context.Context, inputHandler common.InputHandle
 
 	ns.serverMu.Lock()
 	ns.server = natsServer
-	defer ns.serverMu.Unlock()
 	natsServer.Start()
 
 	if !natsServer.ReadyForConnections(5 * time.Second) {
 		return errors.New("nats.server failed to start")
 	}
+	ns.serverMu.Unlock()
 
 	<-ns.ctx.Done()
-
+	ns.logger.Debug("done")
 	return nil
 }
 
 func (ns *NATSServer) Stop() {
 	if ns.cancel != nil {
-		ns.cancel()
+		defer ns.cancel()
 	}
 	ns.serverMu.Lock()
 	defer ns.serverMu.Unlock()
 	if ns.server != nil {
 		ns.server.Shutdown()
+		ns.server.WaitForShutdown()
 	}
-	ns.logger.Debug("done")
 }

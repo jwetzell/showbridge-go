@@ -63,7 +63,7 @@ func (mcm *MockCounterModule) Type() string {
 
 func (mcm *MockCounterModule) Stop() {
 	if mcm.cancel != nil {
-		mcm.cancel()
+		defer mcm.cancel()
 	}
 }
 

@@ -76,20 +76,19 @@ func (dbs *DbSqlite) Start(ctx context.Context, inputHandler common.InputHandler
 	dbs.db = db
 	dbs.dbMu.Unlock()
 	<-dbs.ctx.Done()
+	dbs.logger.Debug("done")
 	return nil
 }
 
 func (dbs *DbSqlite) Stop() {
 	if dbs.cancel != nil {
-		dbs.cancel()
+		defer dbs.cancel()
 	}
 	dbs.dbMu.Lock()
 	defer dbs.dbMu.Unlock()
 	if dbs.db != nil {
 		dbs.db.Close()
-		dbs.db = nil
 	}
-	dbs.logger.Debug("done")
 }
 
 func (dbs *DbSqlite) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {

@@ -102,6 +102,7 @@ func (nc *NATSClient) Start(ctx context.Context, inputHandler common.InputHandle
 	nc.subMu.Unlock()
 
 	<-nc.ctx.Done()
+	nc.logger.Debug("done")
 	return nil
 }
 
@@ -135,13 +136,12 @@ func (nc *NATSClient) Publish(ctx context.Context, topic string, payload any) er
 
 func (nc *NATSClient) Stop() {
 	if nc.cancel != nil {
-		nc.cancel()
+		defer nc.cancel()
 	}
 	nc.subMu.Lock()
 	defer nc.subMu.Unlock()
 	if nc.sub != nil {
 		nc.sub.Unsubscribe()
-		nc.sub = nil
 	}
 
 	nc.clientMu.Lock()
@@ -150,7 +150,5 @@ func (nc *NATSClient) Stop() {
 		nc.client.Drain()
 		// TODO(jwetzell): setup closed callback to get when client is fully closed
 		nc.client.Close()
-		nc.client = nil
 	}
-	nc.logger.Debug("done")
 }

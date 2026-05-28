@@ -83,17 +83,16 @@ func (mi *MIDIInput) Start(ctx context.Context, inputHandler common.InputHandler
 	mi.stop = stop
 
 	<-mi.ctx.Done()
+	mi.logger.Debug("done")
 	return nil
 }
 
 func (mi *MIDIInput) Stop() {
 	if mi.cancel != nil {
-		mi.cancel()
+		defer mi.cancel()
 	}
 	if mi.stop != nil {
 		mi.stop()
-		mi.stop = nil
 	}
 	midi.CloseDriver()
-	mi.logger.Debug("done")
 }

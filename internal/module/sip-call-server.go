@@ -168,6 +168,7 @@ func (scs *SIPCallServer) Start(ctx context.Context, inputHandler common.InputHa
 	}
 
 	<-scs.ctx.Done()
+	scs.logger.Debug("done")
 	return nil
 }
 
@@ -251,12 +252,11 @@ func (scs *SIPCallServer) Output(ctx context.Context, payload any) error {
 
 func (scs *SIPCallServer) Stop() {
 	if scs.cancel != nil {
-		scs.cancel()
+		defer scs.cancel()
 	}
 	scs.uaMu.Lock()
 	defer scs.uaMu.Unlock()
 	if scs.ua != nil {
 		scs.ua.Close()
 	}
-	scs.logger.Debug("done")
 }
