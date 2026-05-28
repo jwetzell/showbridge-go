@@ -22,12 +22,12 @@ func init() {
 					Title: "Status Code",
 					Type:  "integer",
 				},
-				"body": {
-					Title: "Body",
+				"bodyTemplate": {
+					Title: "Body Template",
 					Type:  "string",
 				},
 			},
-			Required:             []string{"status", "body"},
+			Required:             []string{"status", "bodyTemplate"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
