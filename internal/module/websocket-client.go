@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"net"
 	"net/url"
 	"sync"
 	"time"
@@ -74,7 +73,30 @@ func (wc *WebSocketClient) Type() string {
 func (wc *WebSocketClient) SetupConn() error {
 	wc.connMu.Lock()
 	defer wc.connMu.Unlock()
+	if wc.conn != nil {
+		wc.conn.Close()
+	}
 	conn, _, err := websocket.DefaultDialer.Dial(wc.URL.String(), nil)
+
+	if err != nil {
+		return fmt.Errorf("websocket.client dial error: %w", err)
+	}
+
+	conn.SetCloseHandler(func(code int, text string) error {
+		// NOTE(jwetzell): attempt to send close message back to server before closing connection
+		err := wc.conn.WriteControl(
+			websocket.CloseMessage,
+			websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""),
+			time.Now().Add(time.Minute),
+		)
+		wc.connMu.Lock()
+		defer wc.connMu.Unlock()
+		if wc.conn != nil {
+			wc.conn.Close()
+		}
+		return err
+	})
+
 	wc.conn = conn
 	return err
 }
@@ -92,7 +114,6 @@ func (wc *WebSocketClient) Start(ctx context.Context, inputHandler common.InputH
 			wc.logger.Error("connection error", "error", err)
 		} else {
 			// NOTE(jwetzell): enter read loop until an error occurs
-			wc.logger.Debug("websocket connection established entering read loop")
 			wc.readLoop()
 		}
 		// NOTE(jwetzell): if connection is lost or read error wait before trying again
@@ -109,20 +130,22 @@ func (wc *WebSocketClient) readLoop() {
 			wc.logger.Error("websocket connection is not established")
 			return
 		}
+		// TODO(jwetzell): other ways to timeout?
 		wc.conn.SetReadDeadline(time.Now().Add(5 * time.Second))
 		messageType, message, err := wc.conn.ReadMessage()
 		if err != nil {
-			if opErr, ok := err.(*net.OpError); ok {
-				// NOTE(jwetzell) we hit deadline
-				if opErr.Timeout() {
-					continue
-				}
-			}
-			wc.logger.Error("websocket read error", "error", err)
 			return
 		}
 		if wc.inputHandler != nil {
 			switch messageType {
+			case websocket.CloseMessage:
+				return
+			case websocket.PingMessage:
+				err := wc.conn.WriteMessage(websocket.PongMessage, nil)
+				if err != nil {
+					wc.logger.Error("websocket pong error", "error", err)
+					return
+				}
 			case websocket.TextMessage:
 				wc.inputHandler(wc.ctx, wc.Id(), string(message))
 			case websocket.BinaryMessage:
@@ -184,6 +207,10 @@ func (wc *WebSocketClient) Stop() {
 	wc.connMu.Lock()
 	defer wc.connMu.Unlock()
 	if wc.conn != nil {
+		err := wc.conn.WriteControl(websocket.CloseMessage, nil, time.Now().Add(time.Minute))
+		if err != nil {
+			wc.logger.Error("websocket close error", "error", err)
+		}
 		wc.conn.Close()
 	}
 }
