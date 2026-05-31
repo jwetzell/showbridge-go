@@ -126,6 +126,9 @@ CONNECT_RETRY:
 						continue
 					}
 				}
+				if errors.Is(err, net.ErrClosed) {
+					break CONNECT_RETRY
+				}
 				break READ
 			}
 
