@@ -52,8 +52,8 @@ github.com/ianlancetaylor/demangle v0.0.0-20260505044615-1ff4bf46051f h1:NW3E2QS
 github.com/ianlancetaylor/demangle v0.0.0-20260505044615-1ff4bf46051f/go.mod h1:gx7rwoVhcfuVKG5uya9Hs3Sxj7EIvldVofAWIUtGouw=
 github.com/icholy/digest v1.1.0 h1:HfGg9Irj7i+IX1o1QAmPfIBNu/Q5A5Tu3n/MED9k9H4=
 github.com/icholy/digest v1.1.0/go.mod h1:QNrsSGQ5v7v9cReDI0+eyjsXGUoRSUZQHeQ5C4XLa0Y=
-github.com/jwetzell/artnet-go v0.2.3 h1:yPDckAFFSbJnpjMX5Y+tFh8xiP2zH3iqZxrXZrJg91g=
-github.com/jwetzell/artnet-go v0.2.3/go.mod h1:gli97Z32a0kMkZ6taoTiK7/lqHcF/dhiGjGJdx/PxqA=
+github.com/jwetzell/artnet-go v0.3.0 h1:MDHElOSbpgmIbYGHO9SoxsT7ynrYtV5/UHGT82geHk0=
+github.com/jwetzell/artnet-go v0.3.0/go.mod h1:zqRsSsrd6rPwJacwscPteDqGIqevjZ3Z6dpp092VJ1w=
 github.com/jwetzell/free-d-go v0.2.0 h1:8WQW4du8Sf3d18aUzk9n5jZtHE6WdDQHDFjkFffvycc=
 github.com/jwetzell/free-d-go v0.2.0/go.mod h1:yHuRy51NeDfN26eJ6wzZgys8qyQiS7hkYILw8yF+UJ4=
 github.com/jwetzell/osc-go v0.3.0 h1:z75TxuQSEmdcmZ56OAepkDa3m88SdZh//3m4nBb/XZI=
