@@ -106,12 +106,12 @@ func readConfig(configPath string) (config.Config, error) {
 
 	err = schema.ApplyDefaults(&yamlMap)
 	if err != nil {
-		return config.Config{}, err
+		return config.Config{}, fmt.Errorf("failed to apply defaults: %w", err)
 	}
 
 	err = schema.ValidateConfig(yamlMap)
 	if err != nil {
-		return config.Config{}, err
+		return config.Config{}, fmt.Errorf("failed to validate config: %w", err)
 	}
 
 	validatedConfigBytes, err := json.Marshal(yamlMap)
