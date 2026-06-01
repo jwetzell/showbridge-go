@@ -21,14 +21,16 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"host": {
-					Title: "Host",
-					Type:  "string",
+					Title:       "Host",
+					Description: "the hostname or IP address of the UDP server to connect to",
+					Type:        "string",
 				},
 				"port": {
-					Title:   "Port",
-					Type:    "integer",
-					Minimum: jsonschema.Ptr[float64](1),
-					Maximum: jsonschema.Ptr[float64](65535),
+					Title:       "Port",
+					Description: "the port of the UDP server to connect to",
+					Type:        "integer",
+					Minimum:     jsonschema.Ptr[float64](1),
+					Maximum:     jsonschema.Ptr[float64](65535),
 				},
 			},
 			Required:             []string{"host", "port"},

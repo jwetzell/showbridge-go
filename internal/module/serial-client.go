@@ -25,17 +25,20 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"port": {
-					Title: "Port",
-					Type:  "string",
+					Title:       "Port",
+					Description: "the name of the serial port to connect to",
+					Type:        "string",
 				},
 				"baudRate": {
-					Title: "Baud Rate",
-					Type:  "integer",
+					Title:       "Baud Rate",
+					Description: "the baud rate to use when connecting to the serial port",
+					Type:        "integer",
 				},
 				"framing": {
-					Title: "Framing Method",
-					Type:  "string",
-					Enum:  []any{"LF", "CR", "CRLF", "SLIP", "RAW"},
+					Title:       "Framing Method",
+					Description: "the method to use for framing messages on the serial port",
+					Type:        "string",
+					Enum:        []any{"LF", "CR", "CRLF", "SLIP", "RAW"},
 				},
 			},
 			Required:             []string{"port", "baudRate", "framing"},

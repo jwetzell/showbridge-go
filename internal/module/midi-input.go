@@ -22,8 +22,9 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"port": {
-					Title: "Port",
-					Type:  "string",
+					Title:       "Port",
+					Description: "the name of the MIDI port to listen to",
+					Type:        "string",
 				},
 			},
 			Required:             []string{"port"},

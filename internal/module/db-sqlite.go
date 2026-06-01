@@ -22,8 +22,10 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"dsn": {
-					Type:      "string",
-					MinLength: new(1),
+					Title:       "Data Source Name",
+					Description: "the data source name (DSN) for the SQLite database",
+					Type:        "string",
+					MinLength:   new(1),
 				},
 			},
 			Required:             []string{"dsn"},

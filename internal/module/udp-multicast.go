@@ -22,14 +22,16 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"ip": {
-					Title: "IP",
-					Type:  "string",
+					Title:       "IP",
+					Description: "the multicast address to listen on",
+					Type:        "string",
 				},
 				"port": {
-					Title:   "Port",
-					Type:    "integer",
-					Minimum: jsonschema.Ptr[float64](1024),
-					Maximum: jsonschema.Ptr[float64](65535),
+					Title:       "Port",
+					Description: "the port to listen on",
+					Type:        "integer",
+					Minimum:     jsonschema.Ptr[float64](1024),
+					Maximum:     jsonschema.Ptr[float64](65535),
 				},
 			},
 			Required:             []string{"ip", "port"},
