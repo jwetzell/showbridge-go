@@ -19,12 +19,14 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"module": {
-					Title: "Module ID",
-					Type:  "string",
+					Title:       "Module ID",
+					Description: "ID of the key-value module to set the value in",
+					Type:        "string",
 				},
 				"key": {
-					Title: "Key",
-					Type:  "string",
+					Title:       "Key",
+					Description: "key to set in the key-value module",
+					Type:        "string",
 				},
 			},
 			Required:             []string{"module", "key"},

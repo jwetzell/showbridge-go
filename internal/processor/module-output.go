@@ -20,8 +20,8 @@ func init() {
 			Properties: map[string]*jsonschema.Schema{
 				"module": {
 					Title:       "Module ID",
-					Type:        "string",
 					Description: "ID of module to send output to",
+					Type:        "string",
 				},
 			},
 			Required:             []string{"module"},

@@ -19,8 +19,9 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"name": {
-					Title: "Field Name",
-					Type:  "string",
+					Title:       "Field Name",
+					Description: "name of the struct field to extract",
+					Type:        "string",
 				},
 			},
 			Required:             []string{"name"},

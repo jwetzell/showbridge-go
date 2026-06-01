@@ -18,8 +18,9 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"program": {
-					Title: "Program",
-					Type:  "string",
+					Title:       "Program",
+					Description: "JavaScript program to run",
+					Type:        "string",
 				},
 			},
 			Required:             []string{"program"},

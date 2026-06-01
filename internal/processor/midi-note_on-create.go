@@ -23,16 +23,19 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"channel": {
-					Title: "Channel",
-					Type:  "string",
+					Title:       "Channel",
+					Description: "channel number for the note on message",
+					Type:        "string",
 				},
 				"note": {
-					Title: "Note",
-					Type:  "string",
+					Title:       "Note",
+					Description: "note number for the note on message",
+					Type:        "string",
 				},
 				"velocity": {
-					Title: "Velocity",
-					Type:  "string",
+					Title:       "Velocity",
+					Description: "velocity for the note on message",
+					Type:        "string",
 				},
 			},
 			Required:             []string{"channel", "note", "velocity"},

@@ -18,20 +18,24 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"inMin": {
-					Title: "Input Minimum",
-					Type:  "integer",
+					Title:       "Input Minimum",
+					Description: "minimum value of the input integer",
+					Type:        "integer",
 				},
 				"inMax": {
-					Title: "Input Maximum",
-					Type:  "integer",
+					Title:       "Input Maximum",
+					Description: "maximum value of the input integer",
+					Type:        "integer",
 				},
 				"outMin": {
-					Title: "Output Minimum",
-					Type:  "integer",
+					Title:       "Output Minimum",
+					Description: "minimum value of the output integer",
+					Type:        "integer",
 				},
 				"outMax": {
-					Title: "Output Maximum",
-					Type:  "integer",
+					Title:       "Output Maximum",
+					Description: "maximum value of the output integer",
+					Type:        "integer",
 				},
 			},
 			Required:             []string{"inMin", "inMax", "outMin", "outMax"},

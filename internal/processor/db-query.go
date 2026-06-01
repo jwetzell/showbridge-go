@@ -22,13 +22,13 @@ func init() {
 			Properties: map[string]*jsonschema.Schema{
 				"module": {
 					Title:       "Module ID",
-					Type:        "string",
 					Description: "ID of the database module to query",
+					Type:        "string",
 				},
 				"query": {
 					Title:       "Query",
-					Type:        "string",
 					Description: "SQL query to execute",
+					Type:        "string",
 				},
 			},
 			Required:             []string{"module", "query"},

@@ -18,9 +18,9 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"rate": {
-					Type:        "integer",
 					Title:       "Rate",
-					Description: "The number of events to allow per second.",
+					Description: "number of events to allow per second",
+					Type:        "integer",
 				},
 			},
 			Required: []string{"rate"},

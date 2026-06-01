@@ -19,12 +19,14 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"min": {
-					Title: "Minimum",
-					Type:  "integer",
+					Title:       "Minimum",
+					Description: "inclusive minimum value of the random integer",
+					Type:        "integer",
 				},
 				"max": {
-					Title: "Maximum",
-					Type:  "integer",
+					Title:       "Maximum",
+					Description: "inclusive maximum value of the random integer",
+					Type:        "integer",
 				},
 			},
 			Required:             []string{"min", "max"},
