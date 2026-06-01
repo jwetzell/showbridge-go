@@ -29,7 +29,7 @@ func init() {
 				},
 				"args": {
 					Title:       "Arguments",
-					Description: "Arguments for the OSC message",
+					Description: "arguments for the OSC message",
 					Type:        "array",
 					Items: &jsonschema.Schema{
 						Type: "string",
@@ -37,7 +37,7 @@ func init() {
 				},
 				"types": {
 					Title:       "Argument Types",
-					Description: "string of OSC types corresponding to the arguments",
+					Description: "string of OSC types corresponding to the arguments in args",
 					Type:        "string",
 				},
 			},
