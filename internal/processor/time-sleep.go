@@ -19,8 +19,8 @@ func init() {
 			Properties: map[string]*jsonschema.Schema{
 				"duration": {
 					Title:       "Duration",
+					Description: "time to sleep in milliseconds",
 					Type:        "integer",
-					Description: "Duration to sleep in milliseconds",
 				},
 			},
 			Required:             []string{"duration"},

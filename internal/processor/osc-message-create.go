@@ -23,19 +23,22 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"address": {
-					Title: "Address",
-					Type:  "string",
+					Title:       "Address",
+					Description: "OSC address for the message",
+					Type:        "string",
 				},
 				"args": {
-					Title: "Arguments",
-					Type:  "array",
+					Title:       "Arguments",
+					Description: "Arguments for the OSC message",
+					Type:        "array",
 					Items: &jsonschema.Schema{
 						Type: "string",
 					},
 				},
 				"types": {
-					Title: "Argument Types",
-					Type:  "string",
+					Title:       "Argument Types",
+					Description: "string of OSC types corresponding to the arguments",
+					Type:        "string",
 				},
 			},
 			Required:             []string{"address"},

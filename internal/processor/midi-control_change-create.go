@@ -23,16 +23,19 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"channel": {
-					Title: "Channel",
-					Type:  "string",
+					Title:       "Channel",
+					Description: "channel number for the control change message",
+					Type:        "string",
 				},
 				"control": {
-					Title: "Control",
-					Type:  "string",
+					Title:       "Control",
+					Description: "control number for the control change message",
+					Type:        "string",
 				},
 				"value": {
-					Title: "Value",
-					Type:  "string",
+					Title:       "Value",
+					Description: "value for the control change message",
+					Type:        "string",
 				},
 			},
 			Required:             []string{"channel", "control", "value"},

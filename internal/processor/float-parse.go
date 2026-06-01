@@ -20,10 +20,11 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"bitSize": {
-					Title:   "Bit Size",
-					Type:    "integer",
-					Enum:    []any{32, 64},
-					Default: json.RawMessage("64"),
+					Title:       "Bit Size",
+					Description: "bit size of the resulting float",
+					Type:        "integer",
+					Enum:        []any{32, 64},
+					Default:     json.RawMessage("64"),
 				},
 			},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},

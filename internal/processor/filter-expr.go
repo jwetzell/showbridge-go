@@ -19,8 +19,9 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"expression": {
-					Title: "Expression",
-					Type:  "string",
+					Title:       "Expression",
+					Description: "Expr expression to evaluate, must return a boolean",
+					Type:        "string",
 				},
 			},
 			Required:             []string{"expression"},

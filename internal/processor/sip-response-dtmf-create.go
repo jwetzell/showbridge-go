@@ -21,15 +21,19 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"preWait": {
-					Title: "Pre Wait (ms)",
-					Type:  "integer",
-				},
-				"postWait": {
-					Title: "Post Wait (ms)",
-					Type:  "integer",
+					Title:       "Pre Wait (ms)",
+					Description: "number of milliseconds to wait before sending the DTMF tones",
+					Type:        "integer",
 				},
 				"digits": {
-					Type: "string",
+					Title:       "Digits",
+					Description: "DTMF digits to send",
+					Type:        "string",
+				},
+				"postWait": {
+					Title:       "Post Wait (ms)",
+					Description: "number of milliseconds to wait after sending the DTMF tones",
+					Type:        "integer",
 				},
 			},
 			Required:             []string{"preWait", "postWait", "digits"},

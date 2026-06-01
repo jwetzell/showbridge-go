@@ -19,8 +19,9 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"separator": {
-					Title: "Separator",
-					Type:  "string",
+					Title:       "Separator",
+					Description: "separator to split the string on",
+					Type:        "string",
 				},
 			},
 			Required:             []string{"separator"},

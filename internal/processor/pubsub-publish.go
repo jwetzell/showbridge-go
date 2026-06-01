@@ -22,13 +22,13 @@ func init() {
 			Properties: map[string]*jsonschema.Schema{
 				"module": {
 					Title:       "Module ID",
-					Type:        "string",
 					Description: "ID of the module to publish to",
+					Type:        "string",
 				},
 				"topic": {
 					Title:       "Topic",
+					Description: "topic to publish to",
 					Type:        "string",
-					Description: "Topic to publish to",
 				},
 			},
 			Required:             []string{"module", "topic"},

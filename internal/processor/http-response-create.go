@@ -19,12 +19,14 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"status": {
-					Title: "Status Code",
-					Type:  "integer",
+					Title:       "Status Code",
+					Description: "status code to set on the response",
+					Type:        "integer",
 				},
 				"bodyTemplate": {
-					Title: "Body Template",
-					Type:  "string",
+					Title:       "Body Template",
+					Description: "template for the response body",
+					Type:        "string",
 				},
 			},
 			Required:             []string{"status", "bodyTemplate"},

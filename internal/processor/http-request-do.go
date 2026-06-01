@@ -22,13 +22,15 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"method": {
-					Title: "HTTP Method",
-					Type:  "string",
-					Enum:  []any{"GET", "POST", "PUT", "PATCH", "DELETE"},
+					Title:       "HTTP Method",
+					Description: "method to use for the HTTP request",
+					Type:        "string",
+					Enum:        []any{"GET", "POST", "PUT", "PATCH", "DELETE"},
 				},
 				"url": {
-					Title: "URL",
-					Type:  "string",
+					Title:       "URL",
+					Description: "URL to send the HTTP request to",
+					Type:        "string",
 				},
 			},
 			Required:             []string{"method", "url"},

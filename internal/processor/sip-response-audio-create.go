@@ -19,15 +19,19 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"preWait": {
-					Title: "Pre Wait (ms)",
-					Type:  "integer",
-				},
-				"postWait": {
-					Title: "Post Wait (ms)",
-					Type:  "integer",
+					Title:       "Pre Wait (ms)",
+					Description: "number of milliseconds to wait before playing the audio",
+					Type:        "integer",
 				},
 				"audioFile": {
-					Type: "string",
+					Title:       "Audio File",
+					Description: "path to the audio file to play",
+					Type:        "string",
+				},
+				"postWait": {
+					Title:       "Post Wait (ms)",
+					Description: "number of milliseconds to wait after playing the audio",
+					Type:        "integer",
 				},
 			},
 			Required:             []string{"preWait", "postWait", "audioFile"},

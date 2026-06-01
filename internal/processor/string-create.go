@@ -19,8 +19,9 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"template": {
-					Title: "Template",
-					Type:  "string",
+					Title:       "Template",
+					Description: "template to evaluate",
+					Type:        "string",
 				},
 			},
 			Required:             []string{"template"},

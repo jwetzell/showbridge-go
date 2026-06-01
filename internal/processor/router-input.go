@@ -20,8 +20,8 @@ func init() {
 			Properties: map[string]*jsonschema.Schema{
 				"source": {
 					Title:       "Source",
-					Type:        "string",
 					Description: "source to report as to the router",
+					Type:        "string",
 				},
 			},
 			Required:             []string{"source"},

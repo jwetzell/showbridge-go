@@ -19,8 +19,9 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"pattern": {
-					Title: "Pattern",
-					Type:  "string",
+					Title:       "Pattern",
+					Description: "regex pattern to match against",
+					Type:        "string",
 				},
 			},
 			Required:             []string{"pattern"},
