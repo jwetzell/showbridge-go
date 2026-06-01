@@ -20,8 +20,8 @@ func init() {
 			Properties: map[string]*jsonschema.Schema{
 				"duration": {
 					Title:       "Duration",
+					Description: "time in milliseconds between emitted events",
 					Type:        "integer",
-					Description: "Interval duration in milliseconds",
 				},
 			},
 			Required:             []string{"duration"},

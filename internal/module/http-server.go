@@ -24,10 +24,11 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"port": {
-					Title:   "Port",
-					Type:    "integer",
-					Minimum: jsonschema.Ptr[float64](1024),
-					Maximum: jsonschema.Ptr[float64](65535),
+					Title:       "Port",
+					Description: "the port for the HTTP server to listen on",
+					Type:        "integer",
+					Minimum:     jsonschema.Ptr[float64](1024),
+					Maximum:     jsonschema.Ptr[float64](65535),
 				},
 			},
 			Required:             []string{"port"},

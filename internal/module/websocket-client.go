@@ -23,8 +23,9 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"url": {
-					Title: "URL",
-					Type:  "string",
+					Title:       "URL",
+					Description: "the URL of the WebSocket server to connect",
+					Type:        "string",
 				},
 			},
 			Required:             []string{"url"},

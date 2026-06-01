@@ -21,12 +21,16 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"host": {
-					Type: "string",
+					Title:       "Host",
+					Description: "the hostname or IP address of the Redis server to connect to",
+					Type:        "string",
 				},
 				"port": {
-					Type:    "integer",
-					Minimum: jsonschema.Ptr[float64](1),
-					Maximum: jsonschema.Ptr[float64](65535),
+					Title:       "Port",
+					Description: "the port to use when connecting to the Redis server",
+					Type:        "integer",
+					Minimum:     jsonschema.Ptr[float64](1),
+					Maximum:     jsonschema.Ptr[float64](65535),
 				},
 			},
 			Required:             []string{"host", "port"},

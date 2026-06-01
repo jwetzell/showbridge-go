@@ -20,12 +20,14 @@ func init() {
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"url": {
-					Title: "NATS Server URL",
-					Type:  "string",
+					Title:       "NATS Server URL",
+					Description: "the URL of the NATS server to connect to",
+					Type:        "string",
 				},
 				"subject": {
-					Title: "Subject",
-					Type:  "string",
+					Title:       "Subject",
+					Description: "the subject to subscribe to",
+					Type:        "string",
 				},
 			},
 			Required:             []string{"url", "subject"},
