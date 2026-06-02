@@ -81,7 +81,7 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			return &TCPServer{InFramer: inFramer, OutFramer: outFramer, framerType: framingMethodString, Addr: addr, config: moduleConfig, logger: CreateLogger(moduleConfig)}, nil
+			return &TCPServer{inFramer: inFramer, outFramer: outFramer, framerType: framingMethodString, Addr: addr, config: moduleConfig, logger: CreateLogger(moduleConfig)}, nil
 		},
 	})
 }
@@ -94,8 +94,8 @@ type tcpConnection struct {
 type TCPServer struct {
 	config                config.ModuleConfig
 	Addr                  *net.TCPAddr
-	InFramer              framer.Framer
-	OutFramer             framer.Framer
+	inFramer              framer.Framer
+	outFramer             framer.Framer
 	framerType            string
 	ctx                   context.Context
 	inputHandler          common.InputHandler
@@ -149,9 +149,9 @@ func (ts *TCPServer) handleClient(client *net.TCPConn) {
 			}
 			break
 		}
-		if ts.InFramer != nil {
+		if ts.inFramer != nil {
 			if byteCount > 0 {
-				messages := ts.InFramer.Decode(buffer[0:byteCount])
+				messages := ts.inFramer.Decode(buffer[0:byteCount])
 				for _, message := range messages {
 					if ts.inputHandler != nil {
 						ts.inputHandler(ts.ctx, ts.Id(), message)
@@ -219,11 +219,11 @@ func (ts *TCPServer) Output(ctx context.Context, payload any) error {
 	defer ts.connectionsMu.Unlock()
 	var errorString strings.Builder
 
-	if ts.OutFramer == nil {
+	if ts.outFramer == nil {
 		return errors.New("no output framer configured")
 	}
 
-	outputBytes := ts.OutFramer.Encode(payloadBytes)
+	outputBytes := ts.outFramer.Encode(payloadBytes)
 
 	for _, connection := range ts.connections {
 		_, err := connection.conn.Write(outputBytes)

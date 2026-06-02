@@ -56,11 +56,13 @@ func init() {
 				return nil, fmt.Errorf("serial.client framing error: %w", err)
 			}
 
-			framer := framer.GetFramer(framingMethodString)
+			inFramer := framer.GetFramer(framingMethodString)
 
-			if framer == nil {
+			if inFramer == nil {
 				return nil, fmt.Errorf("serial.client unknown framing method: %s", framingMethodString)
 			}
+
+			outFramer := framer.GetFramer(framingMethodString)
 
 			baudRateInt, err := params.GetInt("baudRate")
 			if err != nil {
@@ -71,7 +73,7 @@ func init() {
 				BaudRate: baudRateInt,
 			}
 
-			return &SerialClient{config: config, Port: portString, Framer: framer, Mode: &mode, logger: CreateLogger(config)}, nil
+			return &SerialClient{config: config, Port: portString, inFramer: inFramer, outFramer: outFramer, Mode: &mode, logger: CreateLogger(config)}, nil
 		},
 	})
 }
@@ -81,7 +83,8 @@ type SerialClient struct {
 	ctx          context.Context
 	inputHandler common.InputHandler
 	Port         string
-	Framer       framer.Framer
+	inFramer     framer.Framer
+	outFramer    framer.Framer
 	Mode         *serial.Mode
 	port         serial.Port
 	logger       *slog.Logger
@@ -142,13 +145,13 @@ func (sc *SerialClient) Start(ctx context.Context, inputHandler common.InputHand
 					byteCount, err := sc.port.Read(buffer)
 
 					if err != nil {
-						sc.Framer.Clear()
+						sc.inFramer.Clear()
 						break READ
 					}
 
-					if sc.Framer != nil {
+					if sc.inFramer != nil {
 						if byteCount > 0 {
-							messages := sc.Framer.Decode(buffer[0:byteCount])
+							messages := sc.inFramer.Decode(buffer[0:byteCount])
 							for _, message := range messages {
 								if sc.inputHandler != nil {
 									sc.inputHandler(sc.ctx, sc.Id(), message)
@@ -175,7 +178,7 @@ func (sc *SerialClient) Output(ctx context.Context, payload any) error {
 		return errors.New("serial.client can only output bytes")
 	}
 
-	_, err := sc.port.Write(sc.Framer.Encode(payloadBytes))
+	_, err := sc.port.Write(sc.outFramer.Encode(payloadBytes))
 	return err
 }
 
@@ -187,5 +190,13 @@ func (sc *SerialClient) Stop() {
 	defer sc.portMu.Unlock()
 	if sc.port != nil {
 		sc.port.Close()
+	}
+
+	if sc.inFramer != nil {
+		sc.inFramer.Clear()
+	}
+
+	if sc.outFramer != nil {
+		sc.outFramer.Clear()
 	}
 }
