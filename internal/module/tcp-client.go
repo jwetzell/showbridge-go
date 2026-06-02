@@ -66,19 +66,22 @@ func init() {
 				return nil, fmt.Errorf("net.tcp.client framing error: %w", err)
 			}
 
-			framer := framer.GetFramer(framingMethodString)
+			inFramer := framer.GetFramer(framingMethodString)
 
-			if framer == nil {
+			if inFramer == nil {
 				return nil, fmt.Errorf("net.tcp.client unknown framing method: %s", framingMethodString)
 			}
-			return &TCPClient{framer: framer, Addr: addr, config: config, logger: CreateLogger(config)}, nil
+
+			outFramer := framer.GetFramer(framingMethodString)
+			return &TCPClient{inFramer: inFramer, outFramer: outFramer, Addr: addr, config: config, logger: CreateLogger(config)}, nil
 		},
 	})
 }
 
 type TCPClient struct {
 	config       config.ModuleConfig
-	framer       framer.Framer
+	inFramer     framer.Framer
+	outFramer    framer.Framer
 	conn         *net.TCPConn
 	ctx          context.Context
 	inputHandler common.InputHandler
@@ -135,9 +138,9 @@ CONNECT_RETRY:
 				break READ
 			}
 
-			if tc.framer != nil {
+			if tc.inFramer != nil {
 				if byteCount > 0 {
-					messages := tc.framer.Decode(buffer[0:byteCount])
+					messages := tc.inFramer.Decode(buffer[0:byteCount])
 					for _, message := range messages {
 						if tc.inputHandler != nil {
 							tc.inputHandler(tc.ctx, tc.Id(), message)
@@ -172,7 +175,7 @@ func (tc *TCPClient) Output(ctx context.Context, payload any) error {
 	if !ok {
 		return errors.New("net.tcp.client is only able to output bytes")
 	}
-	_, err := tc.conn.Write(tc.framer.Encode(payloadBytes))
+	_, err := tc.conn.Write(tc.inFramer.Encode(payloadBytes))
 	return err
 }
 
@@ -184,5 +187,13 @@ func (tc *TCPClient) Stop() {
 	defer tc.connMu.Unlock()
 	if tc.conn != nil {
 		tc.conn.Close()
+	}
+
+	if tc.inFramer != nil {
+		tc.inFramer.Clear()
+	}
+
+	if tc.outFramer != nil {
+		tc.outFramer.Clear()
 	}
 }
