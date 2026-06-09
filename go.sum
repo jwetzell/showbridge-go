@@ -14,8 +14,8 @@ github.com/dylibso/observe-sdk/go v0.0.0-20240828172851-9145d8ad07e1 h1:idfl8M8r
 github.com/dylibso/observe-sdk/go v0.0.0-20240828172851-9145d8ad07e1/go.mod h1:C8DzXehI4zAbrdlbtOByKX6pfivJTBiV9Jjqv56Yd9Q=
 github.com/eclipse/paho.mqtt.golang v1.5.1 h1:/VSOv3oDLlpqR2Epjn1Q7b2bSTplJIeV2ISgCl2W7nE=
 github.com/eclipse/paho.mqtt.golang v1.5.1/go.mod h1:1/yJCneuyOoCOzKSsOTUc0AJfpsItBGWvYpBLimhArU=
-github.com/emiago/diago v0.28.0 h1:VCiimhFYLoBTsxH6WrufLSt6tKWG8Fv7LfCkZHqct2E=
-github.com/emiago/diago v0.28.0/go.mod h1:eQT6j9co9PMQ/25aUiM2jpvwxxWFXLWi2w5R3lZNmKg=
+github.com/emiago/diago v0.29.0 h1:9hy8DDY0vkZgsxq4hD+EmcP2Uc/jhUnEbLI8ArgjlyE=
+github.com/emiago/diago v0.29.0/go.mod h1:UDLuthSV96A0Qf/fUluhBAAAWj0NWHsMZMHPkBy46Y8=
 github.com/emiago/dtls/v3 v3.0.0-20260122183559-8b8d23e359c0 h1:o4LxpUnZ1zxiQ+Qjc9kLwXcjz31NGAHmnZ7xoJto3VM=
 github.com/emiago/dtls/v3 v3.0.0-20260122183559-8b8d23e359c0/go.mod h1:ydcZ977eS1I6uOWodzMuw30BwvNAzT9su/xcNYSJqjA=
 github.com/emiago/sipgo v1.4.0 h1:IRiwIUu4H97gC+vq2zsm3iWe/j08LPExFZRe3kfY0f0=
