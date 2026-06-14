@@ -204,7 +204,10 @@ func (sds *SIPDTMFServer) HandleCall(inDialog *diago.DialogServerSession) error 
 	inDialog.Ringing()
 	inDialog.Answer()
 
-	reader := inDialog.AudioReaderDTMF()
+	reader, err := inDialog.AudioReaderDTMF()
+	if err != nil {
+		return err
+	}
 	userString := ""
 
 	return reader.Listen(func(dtmf rune) error {
@@ -246,7 +249,10 @@ func (sds *SIPDTMFServer) Output(ctx context.Context, payload any) error {
 	payloadDTMFResponse, ok := common.GetAnyAs[processor.SipDTMFResponse](payload)
 
 	if ok {
-		dtmfWriter := call.inDialog.AudioWriterDTMF()
+		dtmfWriter, err := call.inDialog.AudioWriterDTMF()
+		if err != nil {
+			return err
+		}
 
 		time.Sleep(time.Millisecond * time.Duration(payloadDTMFResponse.PreWait))
 		for i, dtmfRune := range payloadDTMFResponse.Digits {
