@@ -212,7 +212,10 @@ func (scs *SIPCallServer) Output(ctx context.Context, payload any) error {
 	payloadDTMFResponse, ok := common.GetAnyAs[processor.SipDTMFResponse](payload)
 
 	if ok {
-		dtmfWriter := call.inDialog.AudioWriterDTMF()
+		dtmfWriter, err := call.inDialog.AudioWriterDTMF()
+		if err != nil {
+			return err
+		}
 		time.Sleep(time.Millisecond * time.Duration(payloadDTMFResponse.PreWait))
 		for i, dtmfRune := range payloadDTMFResponse.Digits {
 			err := dtmfWriter.WriteDTMF(dtmfRune)
