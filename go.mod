@@ -18,7 +18,7 @@ require (
 	github.com/nats-io/nats.go v1.52.0
 	github.com/redis/go-redis/v9 v9.20.0
 	github.com/urfave/cli/v3 v3.10.0
-	gitlab.com/gomidi/midi/v2 v2.3.23
+	gitlab.com/gomidi/midi/v2 v2.3.24
 	go.bug.st/serial v1.7.1
 	golang.org/x/time v0.15.0
 	modernc.org/quickjs v0.18.2
