@@ -126,7 +126,8 @@ CONNECT_RETRY:
 			byteCount, err := tc.conn.Read(buffer)
 
 			if err != nil {
-				if opErr, ok := err.(*net.OpError); ok {
+				opErr, ok := err.(*net.OpError)
+				if ok {
 					//NOTE(jwetzell) we hit deadline
 					if opErr.Timeout() {
 						continue

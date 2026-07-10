@@ -141,7 +141,8 @@ func (ts *TCPServer) handleClient(client *net.TCPConn) {
 		client.SetDeadline(time.Now().Add(time.Millisecond * 200))
 		byteCount, err := client.Read(buffer)
 		if err != nil {
-			if opErr, ok := err.(*net.OpError); ok {
+			opErr, ok := err.(*net.OpError)
+			if ok {
 				//NOTE(jwetzell) we hit deadline
 				if opErr.Timeout() {
 					continue

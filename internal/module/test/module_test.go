@@ -11,7 +11,8 @@ import (
 
 func TestModuleBadRegistrationNoType(t *testing.T) {
 	defer func() {
-		if r := recover(); r == nil {
+		r := recover()
+		if r == nil {
 			t.Fatalf("module registration should have panicked but did not")
 		}
 	}()
@@ -26,7 +27,8 @@ func TestModuleBadRegistrationNoType(t *testing.T) {
 
 func TestModuleBadRegistrationNoNew(t *testing.T) {
 	defer func() {
-		if r := recover(); r == nil {
+		r := recover()
+		if r == nil {
 			t.Fatalf("processor registration should have panicked but did not")
 		}
 	}()
@@ -39,7 +41,8 @@ func TestModuleBadRegistrationNoNew(t *testing.T) {
 
 func TestModuleBadRegistrationExistingType(t *testing.T) {
 	defer func() {
-		if r := recover(); r == nil {
+		r := recover()
+		if r == nil {
 			t.Fatalf("processor registration should have panicked but did not")
 		}
 	}()

@@ -75,7 +75,8 @@ func (pc *PSNClient) Start(ctx context.Context, inputHandler common.InputHandler
 			pc.connMu.Unlock()
 			if err != nil {
 				//NOTE(jwetzell) we hit deadline
-				if opErr, ok := err.(*net.OpError); ok && opErr.Timeout() {
+				opErr, ok := err.(*net.OpError)
+				if ok && opErr.Timeout() {
 					continue
 				}
 				return err

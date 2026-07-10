@@ -104,7 +104,8 @@ func (um *UDPMulticast) Start(ctx context.Context, inputHandler common.InputHand
 				break
 			}
 			//NOTE(jwetzell) we hit deadline
-			if opErr, ok := err.(*net.OpError); ok && opErr.Timeout() {
+			opErr, ok := err.(*net.OpError)
+			if ok && opErr.Timeout() {
 				continue
 			}
 			return err

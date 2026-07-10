@@ -30,7 +30,8 @@ func RegisterModule(mod ModuleRegistration) {
 	moduleRegistryMu.Lock()
 	defer moduleRegistryMu.Unlock()
 
-	if _, ok := moduleRegistry[string(mod.Type)]; ok {
+	_, exists := moduleRegistry[string(mod.Type)]
+	if exists {
 		panic(fmt.Sprintf("module already registered: %s", mod.Type))
 	}
 	moduleRegistry[string(mod.Type)] = mod

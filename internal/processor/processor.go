@@ -35,7 +35,8 @@ func RegisterProcessor(processor ProcessorRegistration) {
 	processorRegistryMu.Lock()
 	defer processorRegistryMu.Unlock()
 
-	if _, ok := processorRegistry[string(processor.Type)]; ok {
+	_, exists := processorRegistry[string(processor.Type)]
+	if exists {
 		panic(fmt.Sprintf("processor already registered: %s", processor.Type))
 	}
 	processorRegistry[string(processor.Type)] = processor
