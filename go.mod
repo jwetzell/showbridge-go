@@ -19,7 +19,7 @@ require (
 	github.com/redis/go-redis/v9 v9.21.0
 	github.com/urfave/cli/v3 v3.10.1
 	gitlab.com/gomidi/midi/v2 v2.3.24
-	go.bug.st/serial v1.7.1
+	go.bug.st/serial v1.8.0
 	golang.org/x/time v0.15.0
 	modernc.org/quickjs v0.21.0
 	modernc.org/sqlite v1.53.0
