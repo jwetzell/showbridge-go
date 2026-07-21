@@ -22,7 +22,7 @@ require (
 	go.bug.st/serial v1.7.1
 	golang.org/x/time v0.15.0
 	modernc.org/quickjs v0.21.0
-	modernc.org/sqlite v1.53.0
+	modernc.org/sqlite v1.54.0
 	sigs.k8s.io/yaml v1.6.0
 )
 
@@ -69,7 +69,7 @@ require (
 	golang.org/x/sys v0.46.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/hraban/opus.v2 v2.0.0-20230925203106-0188a62cb302 // indirect
-	modernc.org/libc v1.73.5 // indirect
+	modernc.org/libc v1.74.1 // indirect
 	modernc.org/libquickjs v0.12.10 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
