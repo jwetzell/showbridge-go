@@ -148,13 +148,13 @@ func (mc *MQTTClient) Start(ctx context.Context, inputHandler common.InputHandle
 	mc.client = mqtt.NewClient(opts)
 
 	token := mc.client.Connect()
+	mc.clientMu.Unlock()
 
 	token.Wait()
 	err := token.Error()
 	if err != nil {
 		return err
 	}
-	mc.clientMu.Unlock()
 
 	<-mc.ctx.Done()
 	mc.logger.Debug("done")
