@@ -24,11 +24,15 @@ func GetProcessorsSchema() *jsonschema.Schema {
 			ID:   proc.Type,
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
+				"id": {
+					Type:      "string",
+					MinLength: new(1),
+				},
 				"type": {
 					Const: jsonschema.Ptr[any](proc.Type),
 				},
 			},
-			Required:             []string{"type"},
+			Required:             []string{"id", "type"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		}
 		if proc.Title != "" {

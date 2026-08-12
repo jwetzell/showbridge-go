@@ -10,6 +10,7 @@ import (
 )
 
 type Route struct {
+	id         string
 	input      string
 	processors []processor.Processor
 }
@@ -32,7 +33,11 @@ func NewRoute(config config.RouteConfig) (*Route, error) {
 		}
 	}
 
-	return &Route{input: config.Input, processors: processors}, nil
+	return &Route{id: config.Id, input: config.Input, processors: processors}, nil
+}
+
+func (r *Route) Id() string {
+	return r.id
 }
 
 func (r *Route) Input() string {
