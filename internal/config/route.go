@@ -1,6 +1,7 @@
 package config
 
 type RouteConfig struct {
+	Id         string            `json:"id"`
 	Input      string            `json:"input"`
 	Processors []ProcessorConfig `json:"processors"`
 }
