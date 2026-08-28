@@ -53,3 +53,20 @@ func TestProcessorBadRegistrationExistingType(t *testing.T) {
 		},
 	})
 }
+
+func TestTestProcessor(t *testing.T) {
+	testProcessor := &test.TestProcessor{
+		Config: config.ProcessorConfig{
+			Id:   "test-id",
+			Type: "test",
+		},
+	}
+
+	if testProcessor.Id() != "test-id" {
+		t.Fatalf("test processor has wrong id: %s", testProcessor.Id())
+	}
+
+	if testProcessor.Type() != "test" {
+		t.Fatalf("test processor has wrong type: %s", testProcessor.Type())
+	}
+}
