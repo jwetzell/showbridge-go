@@ -146,6 +146,10 @@ func (mnoc *MIDINoteOffCreate) Process(ctx context.Context, wrappedPayload commo
 	return wrappedPayload, nil
 }
 
+func (mnoc *MIDINoteOffCreate) Id() string {
+	return mnoc.config.Id
+}
+
 func (mnoc *MIDINoteOffCreate) Type() string {
 	return mnoc.config.Type
 }

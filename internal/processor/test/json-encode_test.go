@@ -18,10 +18,15 @@ func TestJsonEncodeFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "json.encode",
 	})
 	if err != nil {
 		t.Fatalf("failed to create json.encode processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("json.encode processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "json.encode" {

@@ -81,6 +81,10 @@ func (mo *ModuleOutput) Process(ctx context.Context, wrappedPayload common.Wrapp
 	return wrappedPayload, nil
 }
 
+func (mo *ModuleOutput) Id() string {
+	return mo.config.Id
+}
+
 func (mo *ModuleOutput) Type() string {
 	return mo.config.Type
 }

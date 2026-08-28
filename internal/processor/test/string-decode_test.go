@@ -16,10 +16,15 @@ func TestStringDecodeFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "string.decode",
 	})
 	if err != nil {
 		t.Fatalf("failed to create string.decode processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("string.decode processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "string.decode" {

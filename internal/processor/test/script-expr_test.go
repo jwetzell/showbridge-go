@@ -15,6 +15,7 @@ func TestScriptExprFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "script.expr",
 		Params: map[string]any{
 			"expression": "foo + bar",
@@ -22,6 +23,10 @@ func TestScriptExprFromRegistry(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("failed to create script.expr processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("script.expr processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "script.expr" {

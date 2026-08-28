@@ -17,6 +17,7 @@ func TestMIDIMessageUnpackFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "midi.message.unpack",
 	})
 
@@ -24,6 +25,9 @@ func TestMIDIMessageUnpackFromRegistry(t *testing.T) {
 		t.Fatalf("failed to create midi.message.unpack processor: %s", err)
 	}
 
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("midi.message.unpack processor has wrong id: %s", processorInstance.Id())
+	}
 	if processorInstance.Type() != "midi.message.unpack" {
 		t.Fatalf("midi.message.unpack processor has wrong type: %s", processorInstance.Type())
 	}

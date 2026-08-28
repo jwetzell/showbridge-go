@@ -147,6 +147,10 @@ func (mccc *MIDIControlChangeCreate) Process(ctx context.Context, wrappedPayload
 	return wrappedPayload, nil
 }
 
+func (mccc *MIDIControlChangeCreate) Id() string {
+	return mccc.config.Id
+}
+
 func (mccc *MIDIControlChangeCreate) Type() string {
 	return mccc.config.Type
 }

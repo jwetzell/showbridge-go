@@ -17,6 +17,7 @@ func TestOSCMessageCreateFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "osc.message.create",
 		Params: map[string]any{
 			"address": "/test",
@@ -25,6 +26,10 @@ func TestOSCMessageCreateFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create osc.message.create processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("osc.message.create processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "osc.message.create" {

@@ -100,6 +100,10 @@ func (srac *SipResponseAudioCreate) Process(ctx context.Context, wrappedPayload 
 	return wrappedPayload, nil
 }
 
+func (srac *SipResponseAudioCreate) Id() string {
+	return srac.config.Id
+}
+
 func (srac *SipResponseAudioCreate) Type() string {
 	return srac.config.Type
 }

@@ -38,6 +38,10 @@ func (fe *FreeDEncode) Process(ctx context.Context, wrappedPayload common.Wrappe
 	return wrappedPayload, nil
 }
 
+func (fe *FreeDEncode) Id() string {
+	return fe.config.Id
+}
+
 func (fe *FreeDEncode) Type() string {
 	return fe.config.Type
 }

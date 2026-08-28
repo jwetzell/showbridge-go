@@ -16,6 +16,7 @@ func TestHTTPResponseCreateFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "http.response.create",
 		Params: map[string]any{
 			"status":       200,
@@ -25,6 +26,10 @@ func TestHTTPResponseCreateFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create http.response.create processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("http.response.create processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "http.response.create" {

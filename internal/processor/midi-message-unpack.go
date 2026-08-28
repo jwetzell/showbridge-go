@@ -96,6 +96,10 @@ func (mmu *MIDIMessageUnpack) Process(ctx context.Context, wrappedPayload common
 	}
 }
 
+func (mmu *MIDIMessageUnpack) Id() string {
+	return mmu.config.Id
+}
+
 func (mmu *MIDIMessageUnpack) Type() string {
 	return mmu.config.Type
 }

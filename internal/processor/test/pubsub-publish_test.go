@@ -18,6 +18,7 @@ func TestPubSubPublishFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "pubsub.publish",
 		Params: map[string]any{
 			"module": "test",
@@ -26,6 +27,10 @@ func TestPubSubPublishFromRegistry(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("failed to create pubsub.publish processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("pubsub.publish processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "pubsub.publish" {

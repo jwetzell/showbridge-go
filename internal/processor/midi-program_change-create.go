@@ -113,6 +113,10 @@ func (mpcc *MIDIProgramChangeCreate) Process(ctx context.Context, wrappedPayload
 	return wrappedPayload, nil
 }
 
+func (mpcc *MIDIProgramChangeCreate) Id() string {
+	return mpcc.config.Id
+}
+
 func (mpcc *MIDIProgramChangeCreate) Type() string {
 	return mpcc.config.Type
 }

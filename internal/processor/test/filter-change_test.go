@@ -16,10 +16,15 @@ func TestFilterChangeFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "filter.change",
 	})
 	if err != nil {
 		t.Fatalf("failed to create filter.change processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("filter.change processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "filter.change" {

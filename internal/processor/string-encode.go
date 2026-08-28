@@ -36,6 +36,10 @@ func (se *StringEncode) Process(ctx context.Context, wrappedPayload common.Wrapp
 	return wrappedPayload, nil
 }
 
+func (se *StringEncode) Id() string {
+	return se.config.Id
+}
+
 func (se *StringEncode) Type() string {
 	return se.config.Type
 }

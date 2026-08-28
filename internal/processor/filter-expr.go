@@ -76,6 +76,10 @@ func (fe *FilterExpr) Process(ctx context.Context, wrappedPayload common.Wrapped
 	return wrappedPayload, nil
 }
 
+func (fe *FilterExpr) Id() string {
+	return fe.config.Id
+}
+
 func (fe *FilterExpr) Type() string {
 	return fe.config.Type
 }

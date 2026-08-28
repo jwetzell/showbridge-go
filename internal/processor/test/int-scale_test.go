@@ -15,6 +15,7 @@ func TestIntScaleFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "int.scale",
 		Params: map[string]any{
 			"inMin":  0,
@@ -26,6 +27,10 @@ func TestIntScaleFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create int.scale processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("int.scale processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "int.scale" {

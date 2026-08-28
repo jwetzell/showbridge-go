@@ -16,11 +16,16 @@ func TestIntParseFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "int.parse",
 	})
 
 	if err != nil {
 		t.Fatalf("failed to create int.parse processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("int.parse processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "int.parse" {

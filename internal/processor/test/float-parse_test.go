@@ -16,6 +16,7 @@ func TestFloatParseFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "float.parse",
 	})
 
@@ -23,6 +24,9 @@ func TestFloatParseFromRegistry(t *testing.T) {
 		t.Fatalf("failed to create float.parse processor: %s", err)
 	}
 
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("float.parse processor has wrong id: %s", processorInstance.Id())
+	}
 	if processorInstance.Type() != "float.parse" {
 		t.Fatalf("float.parse processor has wrong type: %s", processorInstance.Type())
 	}

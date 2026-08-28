@@ -17,11 +17,16 @@ func TestArtnetPacketDecodeFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "artnet.packet.decode",
 	})
 
 	if err != nil {
 		t.Fatalf("failed to create artnet.packet.decode processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("artnet.packet.decode processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "artnet.packet.decode" {

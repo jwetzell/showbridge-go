@@ -16,6 +16,7 @@ func TestScriptJSFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "script.js",
 		Params: map[string]any{
 			"program": `
@@ -25,6 +26,10 @@ func TestScriptJSFromRegistry(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("failed to create script.js processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("script.js processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "script.js" {

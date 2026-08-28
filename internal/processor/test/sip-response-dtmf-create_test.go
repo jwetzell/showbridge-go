@@ -16,6 +16,7 @@ func TestSipResponseDTMFCreateFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "sip.response.dtmf.create",
 		Params: map[string]any{
 			"preWait":  0,
@@ -26,6 +27,10 @@ func TestSipResponseDTMFCreateFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to filter sip.response.dtmf.create processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("sip.response.dtmf.create processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "sip.response.dtmf.create" {

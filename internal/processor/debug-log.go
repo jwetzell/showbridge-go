@@ -33,7 +33,10 @@ func (dl *DebugLog) Process(ctx context.Context, wrappedPayload common.WrappedPa
 	return wrappedPayload, nil
 }
 
+func (dl *DebugLog) Id() string {
+	return dl.config.Id
+}
+
 func (dl *DebugLog) Type() string {
 	return dl.config.Type
 }
-

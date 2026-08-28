@@ -15,6 +15,7 @@ func TestFloatRandomFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "float.random",
 		Params: map[string]any{
 			"min": 1.0,
@@ -24,6 +25,10 @@ func TestFloatRandomFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create float.random processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("float.random processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "float.random" {

@@ -42,6 +42,10 @@ func (je *JsonEncode) Process(ctx context.Context, wrappedPayload common.Wrapped
 	return wrappedPayload, nil
 }
 
+func (je *JsonEncode) Id() string {
+	return je.config.Id
+}
+
 func (je *JsonEncode) Type() string {
 	return je.config.Type
 }

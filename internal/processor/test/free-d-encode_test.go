@@ -17,11 +17,16 @@ func TestFreeDEncodeFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "freed.encode",
 	})
 
 	if err != nil {
 		t.Fatalf("failed to create freed.encode processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("freed.encode processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "freed.encode" {

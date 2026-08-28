@@ -49,6 +49,10 @@ func (ts *TimeSleep) Process(ctx context.Context, wrappedPayload common.WrappedP
 	return wrappedPayload, nil
 }
 
+func (ts *TimeSleep) Id() string {
+	return ts.config.Id
+}
+
 func (ts *TimeSleep) Type() string {
 	return ts.config.Type
 }
