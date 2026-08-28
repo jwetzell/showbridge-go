@@ -16,11 +16,16 @@ func TestDebugLogFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "debug.log",
 	})
 
 	if err != nil {
 		t.Fatalf("failed to create debug.log processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("debug.log processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "debug.log" {

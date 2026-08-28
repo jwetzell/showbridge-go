@@ -16,6 +16,7 @@ func TestFilterExprFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "filter.expr",
 		Params: map[string]any{
 			"expression": "foo + bar",
@@ -23,6 +24,10 @@ func TestFilterExprFromRegistry(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("failed to create filter.expr processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("filter.expr processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "filter.expr" {

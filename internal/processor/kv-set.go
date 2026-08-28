@@ -89,6 +89,10 @@ func (kvs *KVSet) Process(ctx context.Context, wrappedPayload common.WrappedPayl
 	return wrappedPayload, nil
 }
 
+func (kvs *KVSet) Id() string {
+	return kvs.config.Id
+}
+
 func (kvs *KVSet) Type() string {
 	return kvs.config.Type
 }

@@ -17,11 +17,16 @@ func TestOSCMessageDecodeFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "osc.message.decode",
 	})
 
 	if err != nil {
 		t.Fatalf("failed to create osc.message.decode processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("osc.message.decode processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "osc.message.decode" {

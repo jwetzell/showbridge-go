@@ -182,32 +182,32 @@ func init() {
 			}
 
 			return &FreeDCreate{
-				config: config,
-				Id:     idTemplate,
-				Pan:    panTemplate,
-				Tilt:   tiltTemplate,
-				Roll:   rollTemplate,
-				PosX:   posXTemplate,
-				PosY:   posYTemplate,
-				PosZ:   posZTemplate,
-				Zoom:   zoomTemplate,
-				Focus:  focusTemplate,
+				config:        config,
+				IdTemplate:    idTemplate,
+				PanTemplate:   panTemplate,
+				TiltTemplate:  tiltTemplate,
+				RollTemplate:  rollTemplate,
+				PosXTemplate:  posXTemplate,
+				PosYTemplate:  posYTemplate,
+				PosZTemplate:  posZTemplate,
+				ZoomTemplate:  zoomTemplate,
+				FocusTemplate: focusTemplate,
 			}, nil
 		},
 	})
 }
 
 type FreeDCreate struct {
-	config config.ProcessorConfig
-	Id     *template.Template
-	Pan    *template.Template
-	Tilt   *template.Template
-	Roll   *template.Template
-	PosX   *template.Template
-	PosY   *template.Template
-	PosZ   *template.Template
-	Zoom   *template.Template
-	Focus  *template.Template
+	config        config.ProcessorConfig
+	IdTemplate    *template.Template
+	PanTemplate   *template.Template
+	TiltTemplate  *template.Template
+	RollTemplate  *template.Template
+	PosXTemplate  *template.Template
+	PosYTemplate  *template.Template
+	PosZTemplate  *template.Template
+	ZoomTemplate  *template.Template
+	FocusTemplate *template.Template
 }
 
 func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
@@ -215,7 +215,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload common.Wrappe
 	templateData := wrappedPayload
 
 	var idBuffer bytes.Buffer
-	err := fc.Id.Execute(&idBuffer, templateData)
+	err := fc.IdTemplate.Execute(&idBuffer, templateData)
 
 	if err != nil {
 		wrappedPayload.End = true
@@ -232,7 +232,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload common.Wrappe
 	}
 
 	var panBuffer bytes.Buffer
-	err = fc.Pan.Execute(&panBuffer, templateData)
+	err = fc.PanTemplate.Execute(&panBuffer, templateData)
 
 	if err != nil {
 		wrappedPayload.End = true
@@ -249,7 +249,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload common.Wrappe
 	}
 
 	var tiltBuffer bytes.Buffer
-	err = fc.Tilt.Execute(&tiltBuffer, templateData)
+	err = fc.TiltTemplate.Execute(&tiltBuffer, templateData)
 
 	if err != nil {
 		wrappedPayload.End = true
@@ -266,7 +266,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload common.Wrappe
 	}
 
 	var rollBuffer bytes.Buffer
-	err = fc.Roll.Execute(&rollBuffer, templateData)
+	err = fc.RollTemplate.Execute(&rollBuffer, templateData)
 
 	if err != nil {
 		wrappedPayload.End = true
@@ -283,7 +283,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload common.Wrappe
 	}
 
 	var posXBuffer bytes.Buffer
-	err = fc.PosX.Execute(&posXBuffer, templateData)
+	err = fc.PosXTemplate.Execute(&posXBuffer, templateData)
 
 	if err != nil {
 		wrappedPayload.End = true
@@ -300,7 +300,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload common.Wrappe
 	}
 
 	var posYBuffer bytes.Buffer
-	err = fc.PosY.Execute(&posYBuffer, templateData)
+	err = fc.PosYTemplate.Execute(&posYBuffer, templateData)
 
 	if err != nil {
 		wrappedPayload.End = true
@@ -317,7 +317,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload common.Wrappe
 	}
 
 	var posZBuffer bytes.Buffer
-	err = fc.PosZ.Execute(&posZBuffer, templateData)
+	err = fc.PosZTemplate.Execute(&posZBuffer, templateData)
 
 	if err != nil {
 		wrappedPayload.End = true
@@ -334,7 +334,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload common.Wrappe
 	}
 
 	var zoomBuffer bytes.Buffer
-	err = fc.Zoom.Execute(&zoomBuffer, templateData)
+	err = fc.ZoomTemplate.Execute(&zoomBuffer, templateData)
 
 	if err != nil {
 		wrappedPayload.End = true
@@ -351,7 +351,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload common.Wrappe
 	}
 
 	var focusBuffer bytes.Buffer
-	err = fc.Focus.Execute(&focusBuffer, templateData)
+	err = fc.FocusTemplate.Execute(&focusBuffer, templateData)
 
 	if err != nil {
 		wrappedPayload.End = true
@@ -382,6 +382,10 @@ func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload common.Wrappe
 	wrappedPayload.Payload = payloadMessage
 
 	return wrappedPayload, nil
+}
+
+func (fc *FreeDCreate) Id() string {
+	return fc.config.Id
 }
 
 func (fc *FreeDCreate) Type() string {

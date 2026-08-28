@@ -17,6 +17,7 @@ func TestScriptWASMFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "script.wasm",
 		Params: map[string]any{
 			"path": "good.wasm",
@@ -24,6 +25,10 @@ func TestScriptWASMFromRegistry(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("failed to create script.wasm processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("script.wasm processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "script.wasm" {

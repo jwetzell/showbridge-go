@@ -143,6 +143,10 @@ func (dq *DbQuery) Process(ctx context.Context, wrappedPayload common.WrappedPay
 	return wrappedPayload, nil
 }
 
+func (dq *DbQuery) Id() string {
+	return dq.config.Id
+}
+
 func (dq *DbQuery) Type() string {
 	return dq.config.Type
 }

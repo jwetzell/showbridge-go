@@ -18,6 +18,7 @@ func TestDbQueryFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "db.query",
 		Params: map[string]any{
 			"module": "test",
@@ -26,6 +27,10 @@ func TestDbQueryFromRegistry(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("failed to create db.query processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("db.query processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "db.query" {

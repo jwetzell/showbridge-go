@@ -135,6 +135,10 @@ func (sj *ScriptJS) Process(ctx context.Context, wrappedPayload common.WrappedPa
 	return wrappedPayload, nil
 }
 
+func (sj *ScriptJS) Id() string {
+	return sj.config.Id
+}
+
 func (sj *ScriptJS) Type() string {
 	return sj.config.Type
 }

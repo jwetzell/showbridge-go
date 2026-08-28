@@ -16,6 +16,7 @@ func TestFilterRegexFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "filter.regex",
 		Params: map[string]any{
 			"pattern": "hello",
@@ -23,6 +24,10 @@ func TestFilterRegexFromRegistry(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("failed to create filter.regex processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("filter.regex processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "filter.regex" {

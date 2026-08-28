@@ -17,6 +17,7 @@ func TestRouterInputFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "router.input",
 		Params: config.Params{
 			"source": "test",
@@ -25,6 +26,10 @@ func TestRouterInputFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create router.input processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("router.input processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "router.input" {

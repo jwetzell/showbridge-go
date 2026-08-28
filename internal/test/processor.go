@@ -9,6 +9,10 @@ import (
 type TestProcessor struct {
 }
 
+func (p *TestProcessor) Id() string {
+	return "test-id"
+}
+
 func (p *TestProcessor) Type() string {
 	return "test"
 }

@@ -17,10 +17,15 @@ func TestStringEncodeFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "string.encode",
 	})
 	if err != nil {
 		t.Fatalf("failed to create string.encode processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("string.encode processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "string.encode" {

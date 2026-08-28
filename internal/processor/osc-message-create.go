@@ -157,6 +157,10 @@ func (omc *OSCMessageCreate) Process(ctx context.Context, wrappedPayload common.
 	return wrappedPayload, nil
 }
 
+func (omc *OSCMessageCreate) Id() string {
+	return omc.config.Id
+}
+
 func (omc *OSCMessageCreate) Type() string {
 	return omc.config.Type
 }

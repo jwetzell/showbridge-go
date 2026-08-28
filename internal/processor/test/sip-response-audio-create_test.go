@@ -16,6 +16,7 @@ func TestSipResponseAudioCreateFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "sip.response.audio.create",
 		Params: map[string]any{
 			"preWait":   0,
@@ -26,6 +27,10 @@ func TestSipResponseAudioCreateFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to filter sip.response.audio.create processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("sip.response.audio.create processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "sip.response.audio.create" {

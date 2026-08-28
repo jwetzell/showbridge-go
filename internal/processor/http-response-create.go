@@ -85,6 +85,10 @@ func (hrc *HTTPResponseCreate) Process(ctx context.Context, wrappedPayload commo
 	return wrappedPayload, nil
 }
 
+func (hrc *HTTPResponseCreate) Id() string {
+	return hrc.config.Id
+}
+
 func (hrc *HTTPResponseCreate) Type() string {
 	return hrc.config.Type
 }

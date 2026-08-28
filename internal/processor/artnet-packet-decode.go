@@ -44,6 +44,10 @@ func (apd *ArtNetPacketDecode) Process(ctx context.Context, wrappedPayload commo
 	return wrappedPayload, nil
 }
 
+func (apd *ArtNetPacketDecode) Id() string {
+	return apd.config.Id
+}
+
 func (apd *ArtNetPacketDecode) Type() string {
 	return apd.config.Type
 }

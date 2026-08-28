@@ -17,6 +17,7 @@ func TestStringSplitFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "string.split",
 		Params: map[string]any{
 			"separator": ",",
@@ -24,6 +25,10 @@ func TestStringSplitFromRegistry(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("failed to create string.split processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("string.split processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "string.split" {

@@ -114,6 +114,10 @@ func (hrd *HTTPRequestDo) Process(ctx context.Context, wrappedPayload common.Wra
 	return wrappedPayload, nil
 }
 
+func (hrd *HTTPRequestDo) Id() string {
+	return hrd.config.Id
+}
+
 func (hrd *HTTPRequestDo) Type() string {
 	return hrd.config.Type
 }

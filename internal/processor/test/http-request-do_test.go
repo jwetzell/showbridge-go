@@ -16,6 +16,7 @@ func TestHTTPRequestCreateFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "http.request.do",
 		Params: map[string]any{
 			"method": "GET",
@@ -25,6 +26,10 @@ func TestHTTPRequestCreateFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create http.request.do processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("http.request.do processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "http.request.do" {

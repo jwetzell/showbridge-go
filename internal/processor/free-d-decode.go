@@ -21,9 +21,9 @@ func init() {
 
 type FreeDDecode struct {
 	config config.ProcessorConfig
-	buf [29]byte
+	buf    [29]byte
 }
-	
+
 func (fd *FreeDDecode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
@@ -47,6 +47,10 @@ func (fd *FreeDDecode) Process(ctx context.Context, wrappedPayload common.Wrappe
 	}
 	wrappedPayload.Payload = payloadMessage
 	return wrappedPayload, nil
+}
+
+func (fd *FreeDDecode) Id() string {
+	return fd.config.Id
 }
 
 func (fd *FreeDDecode) Type() string {

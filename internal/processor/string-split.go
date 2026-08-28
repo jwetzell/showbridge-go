@@ -59,6 +59,10 @@ func (ss *StringSplit) Process(ctx context.Context, wrappedPayload common.Wrappe
 	return wrappedPayload, nil
 }
 
+func (ss *StringSplit) Id() string {
+	return ss.config.Id
+}
+
 func (ss *StringSplit) Type() string {
 	return ss.config.Type
 }

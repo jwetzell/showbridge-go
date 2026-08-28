@@ -17,6 +17,7 @@ func TestModuleOutputFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "module.output",
 		Params: config.Params{
 			"module": "test",
@@ -25,6 +26,10 @@ func TestModuleOutputFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create module.output processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("module.output processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "module.output" {

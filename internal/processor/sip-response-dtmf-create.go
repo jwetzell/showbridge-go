@@ -110,6 +110,10 @@ func (srdc *SipResponseDTMFCreate) Process(ctx context.Context, wrappedPayload c
 	return wrappedPayload, nil
 }
 
+func (srdc *SipResponseDTMFCreate) Id() string {
+	return srdc.config.Id
+}
+
 func (srdc *SipResponseDTMFCreate) Type() string {
 	return srdc.config.Type
 }

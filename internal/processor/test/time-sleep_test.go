@@ -15,6 +15,7 @@ func TestTimeSleepFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "time.sleep",
 		Params: map[string]any{
 			"duration": 1000,
@@ -23,6 +24,10 @@ func TestTimeSleepFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create time.sleep processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("time.sleep processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "time.sleep" {

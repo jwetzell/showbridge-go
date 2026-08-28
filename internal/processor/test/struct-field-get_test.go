@@ -17,6 +17,7 @@ func TestStructFieldGetFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "struct.field.get",
 		Params: map[string]any{
 			"name": "Data",
@@ -24,6 +25,10 @@ func TestStructFieldGetFromRegistry(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("failed to create struct.field.get processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("struct.field.get processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "struct.field.get" {

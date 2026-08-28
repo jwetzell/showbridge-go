@@ -66,6 +66,10 @@ func (ir *IntRandom) Process(ctx context.Context, wrappedPayload common.WrappedP
 	return wrappedPayload, nil
 }
 
+func (ir *IntRandom) Id() string {
+	return ir.config.Id
+}
+
 func (ir *IntRandom) Type() string {
 	return ir.config.Type
 }

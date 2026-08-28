@@ -38,6 +38,10 @@ func (mme *MIDIMessageEncode) Process(ctx context.Context, wrappedPayload common
 	return wrappedPayload, nil
 }
 
+func (mme *MIDIMessageEncode) Id() string {
+	return mme.config.Id
+}
+
 func (mme *MIDIMessageEncode) Type() string {
 	return mme.config.Type
 }

@@ -65,6 +65,10 @@ func (se *ScriptExpr) Process(ctx context.Context, wrappedPayload common.Wrapped
 	return wrappedPayload, nil
 }
 
+func (se *ScriptExpr) Id() string {
+	return se.config.Id
+}
+
 func (se *ScriptExpr) Type() string {
 	return se.config.Type
 }

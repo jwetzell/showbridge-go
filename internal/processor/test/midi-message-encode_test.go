@@ -17,11 +17,16 @@ func TestMIDIMessageEncodeFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "midi.message.encode",
 	})
 
 	if err != nil {
 		t.Fatalf("failed to create midi.message.encode processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("midi.message.encode processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "midi.message.encode" {

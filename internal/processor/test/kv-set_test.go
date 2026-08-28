@@ -17,6 +17,7 @@ func TestKvSetFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "kv.set",
 		Params: map[string]any{
 			"module": "test",
@@ -27,6 +28,9 @@ func TestKvSetFromRegistry(t *testing.T) {
 		t.Fatalf("failed to create kv.set processor: %s", err)
 	}
 
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("kv.set processor has wrong id: %s", processorInstance.Id())
+	}
 	if processorInstance.Type() != "kv.set" {
 		t.Fatalf("kv.set processor has wrong type: %s", processorInstance.Type())
 	}

@@ -17,6 +17,7 @@ func TestMIDIProgramChangeCreateFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "midi.program_change.create",
 		Params: map[string]any{
 			"channel": "1",
@@ -26,6 +27,10 @@ func TestMIDIProgramChangeCreateFromRegistry(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("failed to create midi.program_change.create processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("midi.program_change.create processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "midi.program_change.create" {

@@ -16,6 +16,7 @@ func TestStringCreateFromRegistry(t *testing.T) {
 	}
 
 	processorInstance, err := registration.New(config.ProcessorConfig{
+		Id:   "test-id",
 		Type: "string.create",
 		Params: map[string]any{
 			"template": "{{.Payload}}",
@@ -23,6 +24,10 @@ func TestStringCreateFromRegistry(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("failed to create string.create processor: %s", err)
+	}
+
+	if processorInstance.Id() != "test-id" {
+		t.Fatalf("string.create processor has wrong id: %s", processorInstance.Id())
 	}
 
 	if processorInstance.Type() != "string.create" {

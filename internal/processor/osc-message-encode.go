@@ -42,6 +42,10 @@ func (ome *OSCMessageEncode) Process(ctx context.Context, wrappedPayload common.
 	return wrappedPayload, nil
 }
 
+func (ome *OSCMessageEncode) Id() string {
+	return ome.config.Id
+}
+
 func (ome *OSCMessageEncode) Type() string {
 	return ome.config.Type
 }
