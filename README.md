@@ -2,7 +2,8 @@
 
 # showbridge (go edition)
 
-[![Coverage](https://github.com/jwetzell/showbridge-go/wiki/coverage.svg)](https://raw.githack.com/wiki/jwetzell/showbridge-go/coverage.html)
+[![codecov](https://codecov.io/gh/jwetzell/showbridge-go/graph/badge.svg?token=T4XAAKZN14)](https://codecov.io/gh/jwetzell/showbridge-go)
+
 Simple protocol router _/s_
 
 </div>
