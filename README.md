@@ -25,7 +25,6 @@ Simple protocol router _/s_
 - Serial (not included in pre-built binaries yet)
 - [OSC](https://opensoundcontrol.stanford.edu/spec-1_0.html)
 - [FreeD](https://ptzoptics.com/freed/)
-- [SIP](https://en.wikipedia.org/wiki/Session_Initiation_Protocol)
 - [Redis](https://redis.io/)
 
 ### CLI Usage
