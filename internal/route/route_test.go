@@ -5,8 +5,8 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
-	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/route"
 	"github.com/jwetzell/showbridge-go/internal/test"
 )

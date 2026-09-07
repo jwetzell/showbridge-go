@@ -4,8 +4,8 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
-	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 	"gitlab.com/gomidi/midi/v2"
 )

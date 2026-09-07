@@ -7,8 +7,8 @@ import (
 	"github.com/expr-lang/expr"
 	"github.com/expr-lang/expr/vm"
 	"github.com/google/jsonschema-go/jsonschema"
+	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
-	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
 // NOTE(jwetzell): see language definition https://expr-lang.org/docs/language-definition

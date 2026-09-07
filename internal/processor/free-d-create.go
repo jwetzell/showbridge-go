@@ -9,8 +9,8 @@ import (
 
 	"github.com/google/jsonschema-go/jsonschema"
 	freeD "github.com/jwetzell/free-d-go"
+	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
-	"github.com/jwetzell/showbridge-go/internal/config"
 )
 
 func init() {

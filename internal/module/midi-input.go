@@ -1,4 +1,4 @@
-//go:build cgo
+//go:build cgo && !android
 
 package module
 
@@ -8,8 +8,8 @@ import (
 	"log/slog"
 
 	"github.com/google/jsonschema-go/jsonschema"
+	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
-	"github.com/jwetzell/showbridge-go/internal/config"
 	"gitlab.com/gomidi/midi/v2"
 	_ "gitlab.com/gomidi/midi/v2/drivers/rtmididrv"
 )

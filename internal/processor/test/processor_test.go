@@ -3,7 +3,7 @@ package processor_test
 import (
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/test"
 )

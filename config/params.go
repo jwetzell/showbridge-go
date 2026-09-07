@@ -94,6 +94,11 @@ func (p Params) GetStringSlice(key string) ([]string, error) {
 		return nil, ErrParamNotFound
 	}
 
+	alreadyStringSlice, ok := value.([]string)
+	if ok {
+		return alreadyStringSlice, nil
+	}
+
 	interfaceSlice, ok := value.([]any)
 	if !ok {
 		return nil, ErrParamNotSlice

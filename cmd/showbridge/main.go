@@ -13,7 +13,7 @@ import (
 	"syscall"
 
 	"github.com/jwetzell/showbridge-go"
-	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/schema"
 	"github.com/urfave/cli/v3"
 	"sigs.k8s.io/yaml"

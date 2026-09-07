@@ -7,9 +7,9 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/api"
 	"github.com/jwetzell/showbridge-go/internal/common"
-	"github.com/jwetzell/showbridge-go/internal/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
 	"github.com/jwetzell/showbridge-go/internal/route"
 )

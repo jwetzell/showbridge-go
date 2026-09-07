@@ -6,7 +6,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/internal/config"
+	"github.com/jwetzell/showbridge-go/config"
 )
 
 func TestGoodStringParamsJSON(t *testing.T) {
