@@ -20,7 +20,7 @@ require (
 	github.com/urfave/cli/v3 v3.11.0
 	gitlab.com/gomidi/midi/v2 v2.3.24
 	go.bug.st/serial v1.8.0
-	golang.org/x/time v0.15.0
+	golang.org/x/time v0.16.0
 	modernc.org/quickjs v0.24.2
 	modernc.org/sqlite v1.58.0
 	sigs.k8s.io/yaml v1.6.0
