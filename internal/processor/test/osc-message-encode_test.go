@@ -43,16 +43,16 @@ func TestGoodOSCMessageEncode(t *testing.T) {
 	}{
 		{
 			name: "basic OSC message",
-			payload: &osc.OSCMessage{
+			payload: &osc.Message{
 				Address: "/test",
 			},
 			expected: []byte{47, 116, 101, 115, 116, 0, 0, 0, 44, 0, 0, 0},
 		},
 		{
 			name: "basic OSC message with argument",
-			payload: &osc.OSCMessage{
+			payload: &osc.Message{
 				Address: "/test",
-				Args: []osc.OSCArg{
+				Args: []osc.Arg{
 					{
 						Type:  "i",
 						Value: int32(42),
@@ -96,9 +96,9 @@ func TestBadOSCMessageEncode(t *testing.T) {
 		},
 		{
 			name: "invalid OSC message argument",
-			payload: &osc.OSCMessage{
+			payload: &osc.Message{
 				Address: "test",
-				Args:    []osc.OSCArg{},
+				Args:    []osc.Arg{},
 			},
 			errorString: "osc.message.encode processor failed to encode OSCMessage: OSC Message address must start with /",
 		},
@@ -120,9 +120,9 @@ func TestBadOSCMessageEncode(t *testing.T) {
 
 func BenchmarkOSCMessageEncode(b *testing.B) {
 	processorInstance := processor.OSCMessageEncode{}
-	payload := &osc.OSCMessage{
+	payload := &osc.Message{
 		Address: "/test",
-		Args: []osc.OSCArg{
+		Args: []osc.Arg{
 			{
 				Type:  "i",
 				Value: int32(42),

@@ -39,22 +39,22 @@ func TestGoodOSCMessageDecode(t *testing.T) {
 	tests := []struct {
 		name     string
 		payload  []byte
-		expected *osc.OSCMessage
+		expected *osc.Message
 	}{
 		{
 			name:    "basic OSC message",
 			payload: []byte{47, 116, 101, 115, 116, 0, 0, 0, 44, 0, 0, 0},
-			expected: &osc.OSCMessage{
+			expected: &osc.Message{
 				Address: "/test",
-				Args:    []osc.OSCArg{},
+				Args:    []osc.Arg{},
 			},
 		},
 		{
 			name:    "basic OSC message with argument",
 			payload: []byte{47, 116, 101, 115, 116, 0, 0, 0, 44, 105, 0, 0, 0, 0, 0, 42},
-			expected: &osc.OSCMessage{
+			expected: &osc.Message{
 				Address: "/test",
-				Args: []osc.OSCArg{
+				Args: []osc.Arg{
 					{
 						Type:  "i",
 						Value: int32(42),
@@ -72,7 +72,7 @@ func TestGoodOSCMessageDecode(t *testing.T) {
 				t.Fatalf("osc.message.decode processing failed: %s", err)
 			}
 
-			gotMessage, ok := got.Payload.(*osc.OSCMessage)
+			gotMessage, ok := got.Payload.(*osc.Message)
 			if !ok {
 				t.Fatalf("osc.message.decode returned a %T payload: %+v", got, got)
 			}

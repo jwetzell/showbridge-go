@@ -66,7 +66,7 @@ func TestGoodJsonEncode(t *testing.T) {
 	}{
 		{
 			name: "basic struct",
-			payload: osc.OSCMessage{
+			payload: osc.Message{
 				Address: "/hello",
 			},
 			expected: []byte("{\"address\":\"/hello\",\"args\":null}"),

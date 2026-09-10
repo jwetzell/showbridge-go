@@ -26,7 +26,7 @@ func init() {
 
 func (ome *OSCMessageEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
-	payloadMessage, ok := common.GetAnyAs[*osc.OSCMessage](payload)
+	payloadMessage, ok := common.GetAnyAs[*osc.Message](payload)
 
 	if !ok {
 		wrappedPayload.End = true

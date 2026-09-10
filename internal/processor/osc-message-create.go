@@ -60,7 +60,7 @@ func init() {
 			argStrings, err := params.GetStringSlice("args")
 			if err != nil {
 				if errors.Is(err, config.ErrParamNotFound) {
-					return &OSCMessageCreate{config: processorConfig, Address: addressTemplate}, nil
+					return &MessageCreate{config: processorConfig, Address: addressTemplate}, nil
 				} else {
 					return nil, fmt.Errorf("osc.message.create args error: %w", err)
 				}
@@ -86,19 +86,19 @@ func init() {
 				}
 				argTemplates = append(argTemplates, argTemplate)
 			}
-			return &OSCMessageCreate{config: processorConfig, Address: addressTemplate, Args: argTemplates, Types: typesString}, nil
+			return &MessageCreate{config: processorConfig, Address: addressTemplate, Args: argTemplates, Types: typesString}, nil
 		},
 	})
 }
 
-type OSCMessageCreate struct {
+type MessageCreate struct {
 	config  config.ProcessorConfig
 	Address *template.Template
 	Args    []*template.Template
 	Types   string
 }
 
-func (omc *OSCMessageCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (omc *MessageCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
 	templateData := wrappedPayload
 
@@ -122,11 +122,11 @@ func (omc *OSCMessageCreate) Process(ctx context.Context, wrappedPayload common.
 		return wrappedPayload, errors.New("osc.message.create address must start with '/'")
 	}
 
-	payloadMessage := &osc.OSCMessage{
+	payloadMessage := &osc.Message{
 		Address: addressString,
 	}
 
-	args := []osc.OSCArg{}
+	args := []osc.Arg{}
 
 	for argIndex, argTemplate := range omc.Args {
 		var argBuffer bytes.Buffer
@@ -157,83 +157,83 @@ func (omc *OSCMessageCreate) Process(ctx context.Context, wrappedPayload common.
 	return wrappedPayload, nil
 }
 
-func (omc *OSCMessageCreate) Id() string {
+func (omc *MessageCreate) Id() string {
 	return omc.config.Id
 }
 
-func (omc *OSCMessageCreate) Type() string {
+func (omc *MessageCreate) Type() string {
 	return omc.config.Type
 }
 
-func argToTypedArg(rawArg string, oscType byte) (osc.OSCArg, error) {
+func argToTypedArg(rawArg string, oscType byte) (osc.Arg, error) {
 
 	switch oscType {
 	case 's':
-		return osc.OSCArg{
+		return osc.Arg{
 			Value: rawArg,
 			Type:  "s",
 		}, nil
 	case 'i':
 		number, err := strconv.ParseInt(rawArg, 10, 32)
 		if err != nil {
-			return osc.OSCArg{}, err
+			return osc.Arg{}, err
 		}
-		return osc.OSCArg{
+		return osc.Arg{
 			Value: int32(number),
 			Type:  "i",
 		}, nil
 	case 'f':
 		number, err := strconv.ParseFloat(rawArg, 32)
 		if err != nil {
-			return osc.OSCArg{}, err
+			return osc.Arg{}, err
 		}
-		return osc.OSCArg{
+		return osc.Arg{
 			Value: float32(number),
 			Type:  "f",
 		}, nil
 	case 'b':
 		data, err := hex.DecodeString(rawArg)
 		if err != nil {
-			return osc.OSCArg{}, err
+			return osc.Arg{}, err
 		}
-		return osc.OSCArg{
+		return osc.Arg{
 			Value: data,
 			Type:  "b",
 		}, nil
 	case 'h':
 		number, err := strconv.ParseInt(rawArg, 10, 64)
 		if err != nil {
-			return osc.OSCArg{}, err
+			return osc.Arg{}, err
 		}
-		return osc.OSCArg{
+		return osc.Arg{
 			Value: int64(number),
 			Type:  "h",
 		}, nil
 	case 'd':
 		number, err := strconv.ParseFloat(rawArg, 64)
 		if err != nil {
-			return osc.OSCArg{}, err
+			return osc.Arg{}, err
 		}
-		return osc.OSCArg{
+		return osc.Arg{
 			Value: float64(number),
 			Type:  "d",
 		}, nil
 	case 'T':
-		return osc.OSCArg{
+		return osc.Arg{
 			Value: true,
 			Type:  "T",
 		}, nil
 	case 'F':
-		return osc.OSCArg{
+		return osc.Arg{
 			Value: false,
 			Type:  "F",
 		}, nil
 	case 'N':
-		return osc.OSCArg{
+		return osc.Arg{
 			Value: nil,
 			Type:  "N",
 		}, nil
 	default:
-		return osc.OSCArg{}, fmt.Errorf("osc.message.create unhandled osc type: %c", oscType)
+		return osc.Arg{}, fmt.Errorf("osc.message.create unhandled osc type: %c", oscType)
 	}
 }
