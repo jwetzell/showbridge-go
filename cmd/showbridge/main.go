@@ -14,7 +14,7 @@ import (
 
 	"github.com/jwetzell/showbridge-go"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/internal/schema"
+	"github.com/jwetzell/showbridge-go/schema"
 	"github.com/urfave/cli/v3"
 	"sigs.k8s.io/yaml"
 )

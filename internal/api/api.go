@@ -13,7 +13,7 @@ import (
 
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
-	"github.com/jwetzell/showbridge-go/internal/schema"
+	"github.com/jwetzell/showbridge-go/schema"
 )
 
 type ApiServer struct {
