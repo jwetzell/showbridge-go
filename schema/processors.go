@@ -2,6 +2,7 @@ package schema
 
 import (
 	"encoding/json"
+	"slices"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/processor"
@@ -49,6 +50,8 @@ func GetProcessorsSchema() *jsonschema.Schema {
 		}
 		processorDefinitionSchemas = append(processorDefinitionSchemas, processorSchema)
 	}
+
+	slices.SortFunc(processorDefinitionSchemas, schemaCmp)
 	schema.Items = &jsonschema.Schema{
 		OneOf: processorDefinitionSchemas,
 	}

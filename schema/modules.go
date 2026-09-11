@@ -2,6 +2,7 @@ package schema
 
 import (
 	"encoding/json"
+	"slices"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/internal/module"
@@ -49,6 +50,7 @@ func GetModulesSchema() *jsonschema.Schema {
 		}
 		moduleDefinitionSchemas = append(moduleDefinitionSchemas, moduleSchema)
 	}
+	slices.SortFunc(moduleDefinitionSchemas, schemaCmp)
 	schema.Items = &jsonschema.Schema{
 		OneOf: moduleDefinitionSchemas,
 	}

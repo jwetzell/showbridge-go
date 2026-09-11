@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"cmp"
 	"fmt"
 	"net/url"
 
@@ -23,4 +24,8 @@ func GetResolvedConfigSchema() (*jsonschema.Resolved, error) {
 		},
 		ValidateDefaults: true,
 	})
+}
+
+func schemaCmp(a, b *jsonschema.Schema) int {
+	return cmp.Compare(a.ID, b.ID)
 }
