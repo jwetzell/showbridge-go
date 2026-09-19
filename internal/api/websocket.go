@@ -77,6 +77,6 @@ READ_LOOP:
 		}
 
 	}
-	//NOTE(jwetzell): remove ws connection
+	// NOTE(jwetzell): remove ws connection
 	as.eventRouter.RemoveEventDestination(eventDestination)
 }

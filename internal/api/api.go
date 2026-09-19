@@ -113,7 +113,7 @@ func (as *ApiServer) handleConfigHTTP(w http.ResponseWriter, req *http.Request) 
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(configJSON)
 	case http.MethodPut:
-		//TODO(jwetzell): again way too much marshaling
+		// TODO(jwetzell): again way too much marshaling
 		cfgBytes, err := io.ReadAll(req.Body)
 		if err != nil {
 			http.Error(w, "Bad request", http.StatusBadRequest)

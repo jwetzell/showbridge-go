@@ -64,7 +64,7 @@ func TestGoodArtnetPacketDecode(t *testing.T) {
 				t.Fatalf("artnet.packet.decode processing failed: %s", err)
 			}
 
-			//TODO(jwetzell): work out better way to compare the any/any
+			// TODO(jwetzell): work out better way to compare the any/any
 			if !reflect.DeepEqual(got.Payload, test.expected) {
 				t.Fatalf("artnet.packet.decode got %+v (%T), expected %+v (%T)", got.Payload, got.Payload, test.expected, test.expected)
 			}

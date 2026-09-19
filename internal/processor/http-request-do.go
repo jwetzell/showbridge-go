@@ -84,7 +84,7 @@ func (hrd *HTTPRequestDo) Process(ctx context.Context, wrappedPayload common.Wra
 
 	urlString := urlBuffer.String()
 
-	//TODO(jwetzell): support body
+	// TODO(jwetzell): support body
 	request, err := http.NewRequest(hrd.Method, urlString, bytes.NewBuffer([]byte{}))
 
 	if err != nil {
@@ -106,7 +106,7 @@ func (hrd *HTTPRequestDo) Process(ctx context.Context, wrappedPayload common.Wra
 		return wrappedPayload, err
 	}
 
-	//TODO(jwetzell): support headers, etc
+	// TODO(jwetzell): support headers, etc
 	wrappedPayload.Payload = HTTPResponse{
 		Status: response.StatusCode,
 		Body:   body,

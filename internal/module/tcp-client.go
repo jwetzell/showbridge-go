@@ -128,7 +128,7 @@ CONNECT_RETRY:
 			if err != nil {
 				opErr, ok := err.(*net.OpError)
 				if ok {
-					//NOTE(jwetzell) we hit deadline
+					// NOTE(jwetzell) we hit deadline
 					if opErr.Timeout() {
 						continue
 					}

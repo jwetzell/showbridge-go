@@ -95,7 +95,7 @@ func readConfig(configPath string) (config.Config, error) {
 		return config.Config{}, err
 	}
 
-	//TODO(jwetzell): this is an annoying amount of marshaling
+	// TODO(jwetzell): this is an annoying amount of marshaling
 
 	yamlMap := make(map[string]any)
 

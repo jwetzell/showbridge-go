@@ -70,7 +70,7 @@ func TestGoodFreeDEncode(t *testing.T) {
 				t.Fatalf("freed.encode processing failed: %s", err)
 			}
 
-			//TODO(jwetzell): work out better way to compare the any/any
+			// TODO(jwetzell): work out better way to compare the any/any
 			if !reflect.DeepEqual(got.Payload, test.expected) {
 				t.Fatalf("freed.encode got %+v (%T), expected %+v (%T)", got.Payload, got.Payload, test.expected, test.expected)
 			}

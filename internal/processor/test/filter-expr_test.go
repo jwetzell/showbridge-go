@@ -96,7 +96,7 @@ func TestGoodFilterExpr(t *testing.T) {
 				t.Fatalf("filter.expr processing failed: %s", err)
 			}
 
-			//TODO(jwetzell): work out better way to compare the any/any
+			// TODO(jwetzell): work out better way to compare the any/any
 			if got.End != !testCase.match {
 				t.Fatalf("filter.expr did fitler properly %+v (%T), expected %+v (%T)", got, got, testCase.match, testCase.match)
 			}

@@ -74,7 +74,7 @@ func (pc *PSNClient) Start(ctx context.Context, inputHandler common.InputHandler
 			numBytes, _, err := pc.conn.ReadFromUDP(buffer)
 			pc.connMu.Unlock()
 			if err != nil {
-				//NOTE(jwetzell) we hit deadline
+				// NOTE(jwetzell) we hit deadline
 				opErr, ok := err.(*net.OpError)
 				if ok && opErr.Timeout() {
 					continue

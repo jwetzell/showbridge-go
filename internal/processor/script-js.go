@@ -65,7 +65,7 @@ type ScriptJS struct {
 
 func (sj *ScriptJS) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
-	//NOTE(jwetzell): some weird conversion going on with these types
+	// NOTE(jwetzell): some weird conversion going on with these types
 	_, isUint8Slice := common.GetAnyAs[[]uint8](wrappedPayload.Payload)
 	_, isByteSlice := common.GetAnyAs[[]byte](wrappedPayload.Payload)
 

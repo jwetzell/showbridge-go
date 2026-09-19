@@ -50,7 +50,7 @@ func (r *Route) ProcessPayload(ctx context.Context, wrappedPayload common.Wrappe
 		if err != nil {
 			return nil, fmt.Errorf("processor[%d] error: %w", processorIndex, err)
 		}
-		//NOTE(jwetzell) payload has been marked as an end without error
+		// NOTE(jwetzell) payload has been marked as an end without error
 		if processedPayload.End {
 			return processedPayload.Payload, nil
 		}

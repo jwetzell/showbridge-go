@@ -103,7 +103,7 @@ func (um *UDPMulticast) Start(ctx context.Context, inputHandler common.InputHand
 			if errors.Is(err, net.ErrClosed) {
 				break
 			}
-			//NOTE(jwetzell) we hit deadline
+			// NOTE(jwetzell) we hit deadline
 			opErr, ok := err.(*net.OpError)
 			if ok && opErr.Timeout() {
 				continue

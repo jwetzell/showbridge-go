@@ -87,7 +87,7 @@ func TestGoodScriptExpr(t *testing.T) {
 				t.Fatalf("script.expr processing failed: %s", err)
 			}
 
-			//TODO(jwetzell): work out better way to compare the any/any
+			// TODO(jwetzell): work out better way to compare the any/any
 			if got.Payload != test.expected {
 				t.Fatalf("script.expr got %+v (%T), expected %+v (%T)", got, got, test.expected, test.expected)
 			}

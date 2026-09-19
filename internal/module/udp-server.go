@@ -122,7 +122,7 @@ func (us *UDPServer) Start(ctx context.Context, inputHandler common.InputHandler
 
 		numBytes, _, err := listener.ReadFromUDP(buffer)
 		if err != nil {
-			//NOTE(jwetzell) we hit deadline
+			// NOTE(jwetzell) we hit deadline
 			opErr, ok := err.(*net.OpError)
 			if ok && opErr.Timeout() {
 				continue
