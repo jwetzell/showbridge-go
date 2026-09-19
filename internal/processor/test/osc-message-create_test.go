@@ -64,8 +64,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 			name: "address with template and string arg",
 			params: map[string]any{
 				"address": "/test/{{.Payload.Value}}",
-				"args":    []any{"arg1"},
-				"types":   "s",
+				"args":    []map[string]any{{"value": "arg1", "type": "s"}},
 			},
 			payload:  map[string]any{"Value": "value"},
 			expected: &osc.Message{Address: "/test/value", Args: []osc.Arg{{Value: "arg1", Type: "s"}}},
@@ -74,8 +73,11 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 			name: "address with template and mixed args",
 			params: map[string]any{
 				"address": "/test/{{.Payload.Value}}",
-				"args":    []any{"arg1", "42", "3.14"},
-				"types":   "sif",
+				"args": []map[string]any{
+					{"value": "arg1", "type": "s"},
+					{"value": "42", "type": "i"},
+					{"value": "3.14", "type": "f"},
+				},
 			},
 			payload: map[string]any{"Value": "value"},
 			expected: &osc.Message{
@@ -91,8 +93,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 			name: "address with template and int64 arg",
 			params: map[string]any{
 				"address": "/test/{{.Payload.Value}}",
-				"args":    []any{"42"},
-				"types":   "h",
+				"args":    []map[string]any{{"value": "42", "type": "h"}},
 			},
 			payload:  map[string]any{"Value": "value"},
 			expected: &osc.Message{Address: "/test/value", Args: []osc.Arg{{Value: int64(42), Type: "h"}}},
@@ -101,8 +102,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 			name: "address with template and double arg",
 			params: map[string]any{
 				"address": "/test/{{.Payload.Value}}",
-				"args":    []any{"42"},
-				"types":   "d",
+				"args":    []map[string]any{{"value": "42", "type": "d"}},
 			},
 			payload:  map[string]any{"Value": "value"},
 			expected: &osc.Message{Address: "/test/value", Args: []osc.Arg{{Value: float64(42), Type: "d"}}},
@@ -111,8 +111,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 			name: "address with template and true arg",
 			params: map[string]any{
 				"address": "/test/{{.Payload.Value}}",
-				"args":    []any{""},
-				"types":   "T",
+				"args":    []map[string]any{{"value": "", "type": "T"}},
 			},
 			payload:  map[string]any{"Value": "value"},
 			expected: &osc.Message{Address: "/test/value", Args: []osc.Arg{{Value: true, Type: "T"}}},
@@ -121,8 +120,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 			name: "address with template and false arg",
 			params: map[string]any{
 				"address": "/test/{{.Payload.Value}}",
-				"args":    []any{""},
-				"types":   "F",
+				"args":    []map[string]any{{"value": "", "type": "F"}},
 			},
 			payload:  map[string]any{"Value": "value"},
 			expected: &osc.Message{Address: "/test/value", Args: []osc.Arg{{Value: false, Type: "F"}}},
@@ -131,8 +129,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 			name: "address with template and nil arg",
 			params: map[string]any{
 				"address": "/test/{{.Payload.Value}}",
-				"args":    []any{""},
-				"types":   "N",
+				"args":    []map[string]any{{"value": "", "type": "N"}},
 			},
 			payload:  map[string]any{"Value": "value"},
 			expected: &osc.Message{Address: "/test/value", Args: []osc.Arg{{Value: nil, Type: "N"}}},
@@ -141,8 +138,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 			name: "blob arg",
 			params: map[string]any{
 				"address": "/test",
-				"args":    []any{"deadbeef"},
-				"types":   "b",
+				"args":    []map[string]any{{"value": "deadbeef", "type": "b"}},
 			},
 			payload:  "",
 			expected: &osc.Message{Address: "/test", Args: []osc.Arg{{Value: []byte{0xde, 0xad, 0xbe, 0xef}, Type: "b"}}},
@@ -224,66 +220,51 @@ func TestBadOSCMessageCreate(t *testing.T) {
 			params: map[string]any{
 				"address": "/test",
 				"args":    "not an array",
-				"types":   "s",
 			},
 			payload:     "test",
 			errorString: "osc.message.create args error: not a slice",
 		},
 		{
-			name: "args without types parameter",
+			name: "args not an object array",
 			params: map[string]any{
 				"address": "/test",
 				"args":    []any{"arg1"},
 			},
 			payload:     "test",
-			errorString: "osc.message.create types error: not found",
+			errorString: "osc.message.create args error: not an object slice",
 		},
 		{
-			name: "args and types length mismatch",
+			name: "arg value not a string",
 			params: map[string]any{
 				"address": "/test",
-				"args":    []any{"arg1", "arg2"},
-				"types":   "s",
+				"args":    []map[string]any{{"value": 123, "type": "s"}},
 			},
 			payload:     "test",
-			errorString: "osc.message.create args and types must be the same length",
-		},
-		{
-			name: "non-string arg",
-			params: map[string]any{
-				"address": "/test",
-				"args":    []any{"arg1", 123},
-				"types":   "ss",
-			},
-			payload:     "test",
-			errorString: "osc.message.create args error: not a string slice",
+			errorString: "osc.message.create arg value error: not a string",
 		},
 		{
 			name: "bad arg template",
 			params: map[string]any{
 				"address": "/test",
-				"args":    []any{"{{"},
-				"types":   "s",
+				"args":    []map[string]any{{"value": "{{", "type": "s"}},
 			},
 			payload:     "test",
 			errorString: "template: arg:1: unclosed action",
 		},
 		{
-			name: "non-string types parameter",
+			name: "non-string type parameter",
 			params: map[string]any{
 				"address": "/test",
-				"args":    []any{"arg1"},
-				"types":   123,
+				"args":    []map[string]any{{"value": "arg1", "type": 123}},
 			},
 			payload:     "test",
-			errorString: "osc.message.create types error: not a string",
+			errorString: "osc.message.create arg type error: not a string",
 		},
 		{
 			name: "invalid type in types parameter",
 			params: map[string]any{
 				"address": "/test",
-				"args":    []any{"arg1"},
-				"types":   "x",
+				"args":    []map[string]any{{"value": "arg1", "type": "x"}},
 			},
 			payload:     "test",
 			errorString: "osc.message.create unhandled osc type: x",
@@ -313,11 +294,10 @@ func TestBadOSCMessageCreate(t *testing.T) {
 			errorString: "osc.message.create address must start with '/'",
 		},
 		{
-			name: "address template with missing field",
+			name: "arg template with missing field",
 			params: map[string]any{
 				"address": "/test",
-				"args":    []any{"{{.missing}}"},
-				"types":   "s",
+				"args":    []map[string]any{{"value": "{{.missing}}", "type": "s"}},
 			},
 			payload:     "test",
 			errorString: "template: arg:1:2: executing \"arg\" at <.missing>: can't evaluate field missing in type common.WrappedPayload",
@@ -326,8 +306,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 			name: "wrong arg type for int arg",
 			params: map[string]any{
 				"address": "/test",
-				"args":    []any{"{{.Payload}}"},
-				"types":   "i",
+				"args":    []map[string]any{{"value": "{{.Payload}}", "type": "i"}},
 			},
 			payload:     "test",
 			errorString: "strconv.ParseInt: parsing \"test\": invalid syntax",
@@ -336,8 +315,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 			name: "wrong arg type for float arg",
 			params: map[string]any{
 				"address": "/test",
-				"args":    []any{"{{.Payload}}"},
-				"types":   "f",
+				"args":    []map[string]any{{"value": "{{.Payload}}", "type": "f"}},
 			},
 			payload:     "test",
 			errorString: "strconv.ParseFloat: parsing \"test\": invalid syntax",
@@ -346,8 +324,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 			name: "wrong arg type for blob arg",
 			params: map[string]any{
 				"address": "/test",
-				"args":    []any{"{{.Payload}}"},
-				"types":   "b",
+				"args":    []map[string]any{{"value": "{{.Payload}}", "type": "b"}},
 			},
 			payload:     "test",
 			errorString: "encoding/hex: invalid byte: U+0074 't'",
@@ -356,8 +333,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 			name: "wrong arg type for int64 arg",
 			params: map[string]any{
 				"address": "/test",
-				"args":    []any{"{{.Payload}}"},
-				"types":   "h",
+				"args":    []map[string]any{{"value": "{{.Payload}}", "type": "h"}},
 			},
 			payload:     "test",
 			errorString: "strconv.ParseInt: parsing \"test\": invalid syntax",
@@ -366,8 +342,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 			name: "wrong arg type for double arg",
 			params: map[string]any{
 				"address": "/test",
-				"args":    []any{"{{.Payload}}"},
-				"types":   "d",
+				"args":    []map[string]any{{"value": "{{.Payload}}", "type": "d"}},
 			},
 			payload:     "test",
 			errorString: "strconv.ParseFloat: parsing \"test\": invalid syntax",
@@ -416,8 +391,7 @@ func BenchmarkOSCMessageCreate(b *testing.B) {
 		Type: "osc.message.create",
 		Params: map[string]any{
 			"address": "/hello",
-			"args":    []any{"{{.Payload}}"},
-			"types":   "i",
+			"args":    []map[string]any{{"value": "{{.Payload}}", "type": "i"}},
 		},
 	})
 

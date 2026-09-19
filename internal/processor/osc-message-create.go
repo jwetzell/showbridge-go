@@ -32,13 +32,22 @@ func init() {
 					Description: "arguments for the OSC message",
 					Type:        "array",
 					Items: &jsonschema.Schema{
-						Type: "string",
+						Type: "object",
+						Properties: map[string]*jsonschema.Schema{
+							"value": {
+								Title:       "Value",
+								Description: "Value of the argument",
+								Type:        "string",
+							},
+							"type": {
+								Title:       "Type",
+								Description: "OSC type of the argument",
+								Type:        "string",
+							},
+						},
+						Required:             []string{"value", "type"},
+						AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 					},
-				},
-				"types": {
-					Title:       "Argument Types",
-					Description: "string of OSC types corresponding to the arguments in args",
-					Type:        "string",
 				},
 			},
 			Required:             []string{"address"},
@@ -57,7 +66,7 @@ func init() {
 				return nil, err
 			}
 
-			argStrings, err := params.GetStringSlice("args")
+			argObjects, err := params.GetObjectSlice("args")
 			if err != nil {
 				if errors.Is(err, config.ErrParamNotFound) {
 					return &MessageCreate{config: processorConfig, Address: addressTemplate}, nil
@@ -66,27 +75,39 @@ func init() {
 				}
 			}
 
-			typesString, err := params.GetString("types")
-			if err != nil {
-				return nil, fmt.Errorf("osc.message.create types error: %w", err)
-			}
-
-			if len(argStrings) != len(typesString) {
-				return nil, errors.New("osc.message.create args and types must be the same length")
+			types := []string{}
+			for _, argObject := range argObjects {
+				argType, ok := argObject["type"]
+				if !ok {
+					return nil, errors.New("osc.message.create arg type error: not found")
+				}
+				argTypeStr, ok := argType.(string)
+				if !ok {
+					return nil, errors.New("osc.message.create arg type error: not a string")
+				}
+				types = append(types, argTypeStr)
 			}
 
 			argTemplates := []*template.Template{}
 
-			for _, argString := range argStrings {
+			for _, argObject := range argObjects {
+				argValue, ok := argObject["value"]
+				if !ok {
+					return nil, errors.New("osc.message.create arg value error: not found")
+				}
+				argValueStr, ok := argValue.(string)
+				if !ok {
+					return nil, errors.New("osc.message.create arg value error: not a string")
+				}
 
-				argTemplate, err := template.New("arg").Parse(argString)
+				argTemplate, err := template.New("arg").Parse(argValueStr)
 
 				if err != nil {
 					return nil, err
 				}
 				argTemplates = append(argTemplates, argTemplate)
 			}
-			return &MessageCreate{config: processorConfig, Address: addressTemplate, Args: argTemplates, Types: typesString}, nil
+			return &MessageCreate{config: processorConfig, Address: addressTemplate, Args: argTemplates, Types: types}, nil
 		},
 	})
 }
@@ -95,7 +116,7 @@ type MessageCreate struct {
 	config  config.ProcessorConfig
 	Address *template.Template
 	Args    []*template.Template
-	Types   string
+	Types   []string
 }
 
 func (omc *MessageCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
@@ -165,15 +186,15 @@ func (omc *MessageCreate) Type() string {
 	return omc.config.Type
 }
 
-func argToTypedArg(rawArg string, oscType byte) (osc.Arg, error) {
+func argToTypedArg(rawArg string, oscType string) (osc.Arg, error) {
 
 	switch oscType {
-	case 's':
+	case "s":
 		return osc.Arg{
 			Value: rawArg,
 			Type:  "s",
 		}, nil
-	case 'i':
+	case "i":
 		number, err := strconv.ParseInt(rawArg, 10, 32)
 		if err != nil {
 			return osc.Arg{}, err
@@ -182,7 +203,7 @@ func argToTypedArg(rawArg string, oscType byte) (osc.Arg, error) {
 			Value: int32(number),
 			Type:  "i",
 		}, nil
-	case 'f':
+	case "f":
 		number, err := strconv.ParseFloat(rawArg, 32)
 		if err != nil {
 			return osc.Arg{}, err
@@ -191,7 +212,7 @@ func argToTypedArg(rawArg string, oscType byte) (osc.Arg, error) {
 			Value: float32(number),
 			Type:  "f",
 		}, nil
-	case 'b':
+	case "b":
 		data, err := hex.DecodeString(rawArg)
 		if err != nil {
 			return osc.Arg{}, err
@@ -200,7 +221,7 @@ func argToTypedArg(rawArg string, oscType byte) (osc.Arg, error) {
 			Value: data,
 			Type:  "b",
 		}, nil
-	case 'h':
+	case "h":
 		number, err := strconv.ParseInt(rawArg, 10, 64)
 		if err != nil {
 			return osc.Arg{}, err
@@ -209,7 +230,7 @@ func argToTypedArg(rawArg string, oscType byte) (osc.Arg, error) {
 			Value: int64(number),
 			Type:  "h",
 		}, nil
-	case 'd':
+	case "d":
 		number, err := strconv.ParseFloat(rawArg, 64)
 		if err != nil {
 			return osc.Arg{}, err
@@ -218,22 +239,22 @@ func argToTypedArg(rawArg string, oscType byte) (osc.Arg, error) {
 			Value: float64(number),
 			Type:  "d",
 		}, nil
-	case 'T':
+	case "T":
 		return osc.Arg{
 			Value: true,
 			Type:  "T",
 		}, nil
-	case 'F':
+	case "F":
 		return osc.Arg{
 			Value: false,
 			Type:  "F",
 		}, nil
-	case 'N':
+	case "N":
 		return osc.Arg{
 			Value: nil,
 			Type:  "N",
 		}, nil
 	default:
-		return osc.Arg{}, fmt.Errorf("osc.message.create unhandled osc type: %c", oscType)
+		return osc.Arg{}, fmt.Errorf("osc.message.create unhandled osc type: %s", oscType)
 	}
 }

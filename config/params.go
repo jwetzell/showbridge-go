@@ -18,6 +18,7 @@ var (
 	ErrParamNotStringSlice = errors.New("not a string slice")
 	ErrParamNotByteSlice   = errors.New("not a byte slice")
 	ErrParamNotIntSlice    = errors.New("not an int slice")
+	ErrParamNotObjectSlice = errors.New("not an object slice")
 )
 
 func (p Params) GetString(key string) (string, error) {
@@ -142,4 +143,31 @@ func (p Params) GetByteSlice(key string) ([]byte, error) {
 	}
 
 	return byteSlice, nil
+}
+
+func (p Params) GetObjectSlice(key string) ([]map[string]interface{}, error) {
+	value, ok := p[key]
+	if !ok {
+		return nil, ErrParamNotFound
+	}
+
+	alreadyObjectSlice, ok := value.([]map[string]interface{})
+	if ok {
+		return alreadyObjectSlice, nil
+	}
+
+	interfaceSlice, ok := value.([]any)
+	if !ok {
+		return nil, ErrParamNotSlice
+	}
+
+	objectSlice := make([]map[string]interface{}, len(interfaceSlice))
+	for i, v := range interfaceSlice {
+		obj, ok := v.(map[string]interface{})
+		if !ok {
+			return nil, ErrParamNotObjectSlice
+		}
+		objectSlice[i] = obj
+	}
+	return objectSlice, nil
 }
