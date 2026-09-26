@@ -8,34 +8,34 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/module"
 )
 
-func TestDbPostgresFromRegistry(t *testing.T) {
-	registration, ok := module.GetModuleRegistration("db.postgres")
+func TestPostgresClientFromRegistry(t *testing.T) {
+	registration, ok := module.GetModuleRegistration("postgres.client")
 	if !ok {
-		t.Fatalf("db.postgres module not registered")
+		t.Fatalf("postgres.client module not registered")
 	}
 
 	moduleInstance, err := registration.New(config.ModuleConfig{
 		Id:   "test",
-		Type: "db.postgres",
+		Type: "postgres.client",
 		Params: map[string]any{
 			"url": "postgres://localhost:5432",
 		},
 	})
 
 	if err != nil {
-		t.Fatalf("failed to create db.postgres module: %s", err)
+		t.Fatalf("failed to create postgres.client module: %s", err)
 	}
 
 	if moduleInstance.Id() != "test" {
-		t.Fatalf("db.postgres module has wrong id: %s", moduleInstance.Id())
+		t.Fatalf("postgres.client module has wrong id: %s", moduleInstance.Id())
 	}
 
-	if moduleInstance.Type() != "db.postgres" {
-		t.Fatalf("db.postgres module has wrong type: %s", moduleInstance.Type())
+	if moduleInstance.Type() != "postgres.client" {
+		t.Fatalf("postgres.client module has wrong type: %s", moduleInstance.Type())
 	}
 }
 
-func TestGoodDbPostgres(t *testing.T) {
+func TestGoodPostgresClient(t *testing.T) {
 
 	testCases := []struct {
 		name   string
@@ -45,19 +45,19 @@ func TestGoodDbPostgres(t *testing.T) {
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.GetModuleRegistration("db.postgres")
+			registration, ok := module.GetModuleRegistration("postgres.client")
 			if !ok {
-				t.Fatalf("db.postgres module not registered")
+				t.Fatalf("postgres.client module not registered")
 			}
 
 			moduleInstance, err := registration.New(config.ModuleConfig{
 				Id:     "test",
-				Type:   "db.postgres",
+				Type:   "postgres.client",
 				Params: test.params,
 			})
 
 			if err != nil {
-				t.Fatalf("db.postgres failed to create module: %s", err)
+				t.Fatalf("postgres.client failed to create module: %s", err)
 			}
 			// TODO(jwetzell) this is kind of hacky
 			go func() {
@@ -67,13 +67,13 @@ func TestGoodDbPostgres(t *testing.T) {
 			err = moduleInstance.Start(t.Context(), nil)
 
 			if err != nil {
-				t.Fatalf("db.postgres failed to start: %s", err)
+				t.Fatalf("postgres.client failed to start: %s", err)
 			}
 		})
 	}
 }
 
-func TestBadDbPostgres(t *testing.T) {
+func TestBadPostgresClient(t *testing.T) {
 	tests := []struct {
 		name        string
 		params      map[string]any
@@ -82,32 +82,32 @@ func TestBadDbPostgres(t *testing.T) {
 		{
 			name:        "no url param",
 			params:      map[string]any{},
-			errorString: "db.postgres url error: not found",
+			errorString: "postgres.client url error: not found",
 		},
 		{
 			name:        "non-string url",
 			params:      map[string]any{"url": 123},
-			errorString: "db.postgres url error: not a string",
+			errorString: "postgres.client url error: not a string",
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.GetModuleRegistration("db.postgres")
+			registration, ok := module.GetModuleRegistration("postgres.client")
 			if !ok {
-				t.Fatalf("db.postgres module not registered")
+				t.Fatalf("postgres.client module not registered")
 			}
 
 			moduleInstance, err := registration.New(config.ModuleConfig{
 				Id:     "test",
-				Type:   "db.postgres",
+				Type:   "postgres.client",
 				Params: test.params,
 			})
 
 			if err != nil {
 				if test.errorString != err.Error() {
-					t.Fatalf("db.postgres got error '%s', expected '%s'", err.Error(), test.errorString)
+					t.Fatalf("postgres.client got error '%s', expected '%s'", err.Error(), test.errorString)
 				}
 				return
 			}
@@ -115,11 +115,11 @@ func TestBadDbPostgres(t *testing.T) {
 			err = moduleInstance.Start(t.Context(), nil)
 
 			if err == nil {
-				t.Fatalf("db.postgres expected to fail")
+				t.Fatalf("postgres.client expected to fail")
 			}
 
 			if err.Error() != test.errorString {
-				t.Fatalf("db.postgres got error '%s', expected '%s'", err.Error(), test.errorString)
+				t.Fatalf("postgres.client got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
 	}
