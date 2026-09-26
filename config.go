@@ -16,6 +16,9 @@ func (r *Router) GetRunningConfig() config.Config {
 }
 
 func (r *Router) UpdateConfig(newConfig config.Config, triggerChangeChan bool) ([]config.ModuleError, []config.RouteError, error) {
+
+	newConfig = config.CleanConfig(newConfig)
+
 	if !r.runningConfigMu.TryLock() {
 		return nil, nil, errors.New("config update in progress")
 	}

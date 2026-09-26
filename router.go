@@ -107,6 +107,7 @@ func (r *Router) getModule(moduleId string) common.Module {
 }
 
 func NewRouter(routerConfig config.Config) (*Router, []config.ModuleError, []config.RouteError) {
+	routerConfig = config.CleanConfig(routerConfig)
 
 	router := Router{
 		ModuleInstances: make(map[string]common.Module),
