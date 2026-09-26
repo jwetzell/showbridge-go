@@ -33,7 +33,7 @@ func GetProcessorsSchema() *jsonschema.Schema {
 					Const: jsonschema.Ptr[any](proc.Type),
 				},
 			},
-			Required:             []string{"id", "type"},
+			Required:             []string{"type"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		}
 		if proc.Title != "" {

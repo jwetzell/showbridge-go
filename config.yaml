@@ -13,15 +13,11 @@ modules:
       port: 8000
 routes:
   - input: http
-    id: http-to-osc
     processors:
-      - id: create-osc
-        type: osc.message.create
+      - type: osc.message.create
         params:
           address: "{{.Payload.URL.Path}}"
-      - id: encode-osc
-        type: osc.message.encode
-      - id: output-osc
-        type: module.output
+      - type: osc.message.encode
+      - type: module.output
         params:
           module: udp

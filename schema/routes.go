@@ -27,7 +27,7 @@ var RoutesConfigSchema = jsonschema.Schema{
 				Ref: "https://showbridge.io/processors.schema.json",
 			},
 		},
-		Required:             []string{"id", "input"},
+		Required:             []string{"input"},
 		AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 	},
 	Default: json.RawMessage(`[]`),
