@@ -8,69 +8,56 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/module"
 )
 
-func TestDbSqliteFromRegistry(t *testing.T) {
-	registration, ok := module.GetModuleRegistration("db.sqlite")
+func TestMySQLClientFromRegistry(t *testing.T) {
+	registration, ok := module.GetModuleRegistration("mysql.client")
 	if !ok {
-		t.Fatalf("db.sqlite module not registered")
+		t.Fatalf("mysql.client module not registered")
 	}
 
 	moduleInstance, err := registration.New(config.ModuleConfig{
 		Id:   "test",
-		Type: "db.sqlite",
+		Type: "mysql.client",
 		Params: map[string]any{
-			"dsn": ":memory:",
+			"dsn": "mysql:mysql@tcp(127.0.0.1:3306)/test",
 		},
 	})
 
 	if err != nil {
-		t.Fatalf("failed to create db.sqlite module: %s", err)
+		t.Fatalf("failed to create mysql.client module: %s", err)
 	}
 
 	if moduleInstance.Id() != "test" {
-		t.Fatalf("db.sqlite module has wrong id: %s", moduleInstance.Id())
+		t.Fatalf("mysql.client module has wrong id: %s", moduleInstance.Id())
 	}
 
-	if moduleInstance.Type() != "db.sqlite" {
-		t.Fatalf("db.sqlite module has wrong type: %s", moduleInstance.Type())
+	if moduleInstance.Type() != "mysql.client" {
+		t.Fatalf("mysql.client module has wrong type: %s", moduleInstance.Type())
 	}
 }
 
-func TestGoodDbSqlite(t *testing.T) {
+func TestGoodMySQLClient(t *testing.T) {
 
 	testCases := []struct {
 		name   string
 		params map[string]any
-	}{
-		{
-			name: "in memory db",
-			params: map[string]any{
-				"dsn": ":memory:",
-			},
-		},
-		{
-			name: "file db",
-			params: map[string]any{
-				"dsn": "test.db",
-			},
-		},
-	}
+	}{}
 
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.GetModuleRegistration("db.sqlite")
+			registration, ok := module.GetModuleRegistration("mysql.client")
 			if !ok {
-				t.Fatalf("db.sqlite module not registered")
+				t.Fatalf("mysql.client module not registered")
 			}
 
 			moduleInstance, err := registration.New(config.ModuleConfig{
 				Id:     "test",
-				Type:   "db.sqlite",
+				Type:   "mysql.client",
 				Params: test.params,
 			})
 
 			if err != nil {
-				t.Fatalf("db.sqlite failed to create module: %s", err)
+				t.Fatalf("mysql.client failed to create module: %s", err)
 			}
 			// TODO(jwetzell) this is kind of hacky
 			go func() {
@@ -80,13 +67,13 @@ func TestGoodDbSqlite(t *testing.T) {
 			err = moduleInstance.Start(t.Context(), nil)
 
 			if err != nil {
-				t.Fatalf("db.sqlite failed to start: %s", err)
+				t.Fatalf("mysql.client failed to start: %s", err)
 			}
 		})
 	}
 }
 
-func TestBadDbSqlite(t *testing.T) {
+func TestBadMySQLClient(t *testing.T) {
 	tests := []struct {
 		name        string
 		params      map[string]any
@@ -95,32 +82,32 @@ func TestBadDbSqlite(t *testing.T) {
 		{
 			name:        "no dsn param",
 			params:      map[string]any{},
-			errorString: "db.sqlite dsn error: not found",
+			errorString: "mysql.client dsn error: not found",
 		},
 		{
 			name:        "non-string dsn",
 			params:      map[string]any{"dsn": 123},
-			errorString: "db.sqlite dsn error: not a string",
+			errorString: "mysql.client dsn error: not a string",
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			registration, ok := module.GetModuleRegistration("db.sqlite")
+			registration, ok := module.GetModuleRegistration("mysql.client")
 			if !ok {
-				t.Fatalf("db.sqlite module not registered")
+				t.Fatalf("mysql.client module not registered")
 			}
 
 			moduleInstance, err := registration.New(config.ModuleConfig{
 				Id:     "test",
-				Type:   "db.sqlite",
+				Type:   "mysql.client",
 				Params: test.params,
 			})
 
 			if err != nil {
 				if test.errorString != err.Error() {
-					t.Fatalf("db.sqlite got error '%s', expected '%s'", err.Error(), test.errorString)
+					t.Fatalf("mysql.client got error '%s', expected '%s'", err.Error(), test.errorString)
 				}
 				return
 			}
@@ -128,11 +115,11 @@ func TestBadDbSqlite(t *testing.T) {
 			err = moduleInstance.Start(t.Context(), nil)
 
 			if err == nil {
-				t.Fatalf("db.sqlite expected to fail")
+				t.Fatalf("mysql.client expected to fail")
 			}
 
 			if err.Error() != test.errorString {
-				t.Fatalf("db.sqlite got error '%s', expected '%s'", err.Error(), test.errorString)
+				t.Fatalf("mysql.client got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
 	}

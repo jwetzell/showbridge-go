@@ -6,25 +6,24 @@ import (
 	"fmt"
 	"log/slog"
 	"sync"
-	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "modernc.org/sqlite"
 )
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "db.mysql",
-		Title: "MySQL Database",
+		Type:  "sqlite.client",
+		Title: "SQLite Client",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
 				"dsn": {
-					Title:       "Database DSN",
-					Description: "the connection DSN for the MySQL database",
+					Title:       "Data Source Name",
+					Description: "the data source name (DSN) for the SQLite database",
 					Type:        "string",
 					MinLength:   new(1),
 				},
@@ -37,15 +36,15 @@ func init() {
 
 			dsnString, err := params.GetString("dsn")
 			if err != nil {
-				return nil, fmt.Errorf("db.mysql dsn error: %w", err)
+				return nil, fmt.Errorf("sqlite.client dsn error: %w", err)
 			}
 
-			return &DbMysql{Dsn: dsnString, config: config, logger: CreateLogger(config)}, nil
+			return &SqliteClient{Dsn: dsnString, config: config, logger: CreateLogger(config)}, nil
 		},
 	})
 }
 
-type DbMysql struct {
+type SqliteClient struct {
 	config       config.ModuleConfig
 	Dsn          string
 	ctx          context.Context
@@ -56,31 +55,25 @@ type DbMysql struct {
 	cancel       context.CancelFunc
 }
 
-func (dbs *DbMysql) Id() string {
+func (dbs *SqliteClient) Id() string {
 	return dbs.config.Id
 }
 
-func (dbs *DbMysql) Type() string {
+func (dbs *SqliteClient) Type() string {
 	return dbs.config.Type
 }
 
-func (dbs *DbMysql) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (dbs *SqliteClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	dbs.logger.Debug("running")
 	dbs.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	dbs.ctx = moduleContext
 	dbs.cancel = cancel
 
-	db, err := sql.Open("mysql", dbs.Dsn)
+	db, err := sql.Open("sqlite", dbs.Dsn)
 	if err != nil {
-		return fmt.Errorf("db.mysql error connecting to database: %w", err)
+		return fmt.Errorf("sqlite.client error opening database: %w", err)
 	}
-
-	// TODO(jwetzell): make configurable
-	db.SetConnMaxLifetime(time.Minute * 3)
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(10)
-
 	dbs.dbMu.Lock()
 	dbs.db = db
 	dbs.dbMu.Unlock()
@@ -89,7 +82,7 @@ func (dbs *DbMysql) Start(ctx context.Context, inputHandler common.InputHandler)
 	return nil
 }
 
-func (dbs *DbMysql) Stop() {
+func (dbs *SqliteClient) Stop() {
 	if dbs.cancel != nil {
 		defer dbs.cancel()
 	}
@@ -100,7 +93,7 @@ func (dbs *DbMysql) Stop() {
 	}
 }
 
-func (dbs *DbMysql) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
+func (dbs *SqliteClient) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
 	dbs.dbMu.Lock()
 	defer dbs.dbMu.Unlock()
 	if dbs.db == nil {
