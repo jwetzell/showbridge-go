@@ -75,6 +75,7 @@ func TestNewRouter(t *testing.T) {
 				Type: "mock.counter",
 			},
 		},
+		Routes: []config.RouteConfig{},
 	}
 
 	router, moduleErrors, routeErrors := showbridge.NewRouter(routerConfig)
