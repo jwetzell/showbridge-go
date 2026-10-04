@@ -22,7 +22,7 @@ require (
 	gitlab.com/gomidi/midi/v2 v2.3.24
 	go.bug.st/serial v1.8.0
 	golang.org/x/time v0.16.0
-	modernc.org/quickjs v0.24.2
+	modernc.org/quickjs v0.25.0
 	modernc.org/sqlite v1.60.0
 	sigs.k8s.io/yaml v1.6.0
 )
