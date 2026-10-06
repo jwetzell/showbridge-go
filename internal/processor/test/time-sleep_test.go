@@ -2,6 +2,7 @@ package processor_test
 
 import (
 	"testing"
+	"testing/synctest"
 
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
@@ -44,7 +45,7 @@ func TestGoodTimeSleep(t *testing.T) {
 		{
 			name:    "string payload",
 			payload: "hello",
-			params:  map[string]any{"duration": 100},
+			params:  map[string]any{"duration": 10000},
 		},
 	}
 
@@ -64,15 +65,18 @@ func TestGoodTimeSleep(t *testing.T) {
 				t.Fatalf("time.sleep failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			synctest.Test(t, func(t *testing.T) {
+				got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
-			if err != nil {
-				t.Fatalf("time.sleep processing failed: %s", err)
-			}
+				if err != nil {
+					t.Fatalf("time.sleep processing failed: %s", err)
+				}
 
-			if got.Payload != test.payload {
-				t.Fatalf("time.sleep got %+v, expected %+v", got, test.payload)
-			}
+				if got.Payload != test.payload {
+					t.Fatalf("time.sleep got %+v, expected %+v", got, test.payload)
+				}
+			})
+
 		})
 	}
 }
