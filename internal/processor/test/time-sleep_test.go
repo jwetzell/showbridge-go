@@ -123,15 +123,17 @@ func TestBadTimeSleep(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			synctest.Test(t, func(t *testing.T) {
+				got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
 
-			if err == nil {
-				t.Fatalf("time.sleep expected to fail but succeeded, got: %v", got)
+				if err == nil {
+					t.Fatalf("time.sleep expected to fail but succeeded, got: %v", got)
 
-			}
-			if err.Error() != test.errorString {
-				t.Fatalf("time.sleep got error '%s', expected '%s'", err.Error(), test.errorString)
-			}
+				}
+				if err.Error() != test.errorString {
+					t.Fatalf("time.sleep got error '%s', expected '%s'", err.Error(), test.errorString)
+				}
+			})
 		})
 	}
 }
