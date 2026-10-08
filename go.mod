@@ -1,6 +1,6 @@
 module github.com/jwetzell/showbridge-go
 
-go 1.27.0
+go 1.27.1
 
 require (
 	github.com/eclipse/paho.mqtt.golang v1.5.1
@@ -12,7 +12,7 @@ require (
 	github.com/jackc/pgx/v5 v5.11.0
 	github.com/jwetzell/artnet-go v0.3.0
 	github.com/jwetzell/free-d-go v0.2.0
-	github.com/jwetzell/osc-go v0.4.0
+	github.com/jwetzell/osc-go v0.5.0
 	github.com/jwetzell/psn-go v0.3.0
 	github.com/nats-io/nats-server/v2 v2.15.0
 	github.com/nats-io/nats.go v1.54.0
