@@ -55,49 +55,49 @@ type SqliteClient struct {
 	cancel       context.CancelFunc
 }
 
-func (dbs *SqliteClient) Id() string {
-	return dbs.config.Id
+func (sc *SqliteClient) Id() string {
+	return sc.config.Id
 }
 
-func (dbs *SqliteClient) Type() string {
-	return dbs.config.Type
+func (sc *SqliteClient) Type() string {
+	return sc.config.Type
 }
 
-func (dbs *SqliteClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
-	dbs.logger.Debug("running")
-	dbs.inputHandler = inputHandler
+func (sc *SqliteClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
+	sc.logger.Debug("running")
+	sc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
-	dbs.ctx = moduleContext
-	dbs.cancel = cancel
+	sc.ctx = moduleContext
+	sc.cancel = cancel
 
-	db, err := sql.Open("sqlite", dbs.Dsn)
+	db, err := sql.Open("sqlite", sc.Dsn)
 	if err != nil {
 		return fmt.Errorf("sqlite.client error opening database: %w", err)
 	}
-	dbs.dbMu.Lock()
-	dbs.db = db
-	dbs.dbMu.Unlock()
-	<-dbs.ctx.Done()
-	dbs.logger.Debug("done")
+	sc.dbMu.Lock()
+	sc.db = db
+	sc.dbMu.Unlock()
+	<-sc.ctx.Done()
+	sc.logger.Debug("done")
 	return nil
 }
 
-func (dbs *SqliteClient) Stop() {
-	if dbs.cancel != nil {
-		defer dbs.cancel()
+func (sc *SqliteClient) Stop() {
+	if sc.cancel != nil {
+		defer sc.cancel()
 	}
-	dbs.dbMu.Lock()
-	defer dbs.dbMu.Unlock()
-	if dbs.db != nil {
-		dbs.db.Close()
+	sc.dbMu.Lock()
+	defer sc.dbMu.Unlock()
+	if sc.db != nil {
+		sc.db.Close()
 	}
 }
 
-func (dbs *SqliteClient) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
-	dbs.dbMu.Lock()
-	defer dbs.dbMu.Unlock()
-	if dbs.db == nil {
+func (sc *SqliteClient) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
+	sc.dbMu.Lock()
+	defer sc.dbMu.Unlock()
+	if sc.db == nil {
 		return nil, fmt.Errorf("database not initialized")
 	}
-	return dbs.db.QueryContext(ctx, query, args...)
+	return sc.db.QueryContext(ctx, query, args...)
 }

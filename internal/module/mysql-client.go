@@ -56,22 +56,22 @@ type MySQLClient struct {
 	cancel       context.CancelFunc
 }
 
-func (dbs *MySQLClient) Id() string {
-	return dbs.config.Id
+func (mc *MySQLClient) Id() string {
+	return mc.config.Id
 }
 
-func (dbs *MySQLClient) Type() string {
-	return dbs.config.Type
+func (mc *MySQLClient) Type() string {
+	return mc.config.Type
 }
 
-func (dbs *MySQLClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
-	dbs.logger.Debug("running")
-	dbs.inputHandler = inputHandler
+func (mc *MySQLClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
+	mc.logger.Debug("running")
+	mc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
-	dbs.ctx = moduleContext
-	dbs.cancel = cancel
+	mc.ctx = moduleContext
+	mc.cancel = cancel
 
-	db, err := sql.Open("mysql", dbs.Dsn)
+	db, err := sql.Open("mysql", mc.Dsn)
 	if err != nil {
 		return fmt.Errorf("mysql.client error connecting to database: %w", err)
 	}
@@ -81,30 +81,30 @@ func (dbs *MySQLClient) Start(ctx context.Context, inputHandler common.InputHand
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(10)
 
-	dbs.dbMu.Lock()
-	dbs.db = db
-	dbs.dbMu.Unlock()
-	<-dbs.ctx.Done()
-	dbs.logger.Debug("done")
+	mc.dbMu.Lock()
+	mc.db = db
+	mc.dbMu.Unlock()
+	<-mc.ctx.Done()
+	mc.logger.Debug("done")
 	return nil
 }
 
-func (dbs *MySQLClient) Stop() {
-	if dbs.cancel != nil {
-		defer dbs.cancel()
+func (mc *MySQLClient) Stop() {
+	if mc.cancel != nil {
+		defer mc.cancel()
 	}
-	dbs.dbMu.Lock()
-	defer dbs.dbMu.Unlock()
-	if dbs.db != nil {
-		dbs.db.Close()
+	mc.dbMu.Lock()
+	defer mc.dbMu.Unlock()
+	if mc.db != nil {
+		mc.db.Close()
 	}
 }
 
-func (dbs *MySQLClient) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
-	dbs.dbMu.Lock()
-	defer dbs.dbMu.Unlock()
-	if dbs.db == nil {
+func (mc *MySQLClient) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
+	mc.dbMu.Lock()
+	defer mc.dbMu.Unlock()
+	if mc.db == nil {
 		return nil, fmt.Errorf("database not initialized")
 	}
-	return dbs.db.QueryContext(ctx, query, args...)
+	return mc.db.QueryContext(ctx, query, args...)
 }

@@ -55,49 +55,49 @@ type PostgresClient struct {
 	cancel       context.CancelFunc
 }
 
-func (dbs *PostgresClient) Id() string {
-	return dbs.config.Id
+func (pc *PostgresClient) Id() string {
+	return pc.config.Id
 }
 
-func (dbs *PostgresClient) Type() string {
-	return dbs.config.Type
+func (pc *PostgresClient) Type() string {
+	return pc.config.Type
 }
 
-func (dbs *PostgresClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
-	dbs.logger.Debug("running")
-	dbs.inputHandler = inputHandler
+func (pc *PostgresClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
+	pc.logger.Debug("running")
+	pc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
-	dbs.ctx = moduleContext
-	dbs.cancel = cancel
+	pc.ctx = moduleContext
+	pc.cancel = cancel
 
-	db, err := sql.Open("pgx", dbs.Url)
+	db, err := sql.Open("pgx", pc.Url)
 	if err != nil {
 		return fmt.Errorf("postgres.client error connecting to database: %w", err)
 	}
-	dbs.dbMu.Lock()
-	dbs.db = db
-	dbs.dbMu.Unlock()
-	<-dbs.ctx.Done()
-	dbs.logger.Debug("done")
+	pc.dbMu.Lock()
+	pc.db = db
+	pc.dbMu.Unlock()
+	<-pc.ctx.Done()
+	pc.logger.Debug("done")
 	return nil
 }
 
-func (dbs *PostgresClient) Stop() {
-	if dbs.cancel != nil {
-		defer dbs.cancel()
+func (pc *PostgresClient) Stop() {
+	if pc.cancel != nil {
+		defer pc.cancel()
 	}
-	dbs.dbMu.Lock()
-	defer dbs.dbMu.Unlock()
-	if dbs.db != nil {
-		dbs.db.Close()
+	pc.dbMu.Lock()
+	defer pc.dbMu.Unlock()
+	if pc.db != nil {
+		pc.db.Close()
 	}
 }
 
-func (dbs *PostgresClient) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
-	dbs.dbMu.Lock()
-	defer dbs.dbMu.Unlock()
-	if dbs.db == nil {
+func (pc *PostgresClient) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
+	pc.dbMu.Lock()
+	defer pc.dbMu.Unlock()
+	if pc.db == nil {
 		return nil, fmt.Errorf("database not initialized")
 	}
-	return dbs.db.QueryContext(ctx, query, args...)
+	return pc.db.QueryContext(ctx, query, args...)
 }
