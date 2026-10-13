@@ -3,10 +3,8 @@ package processor
 import (
 	"bytes"
 	"context"
-	"encoding/hex"
 	"errors"
 	"fmt"
-	"strconv"
 	"text/template"
 
 	"github.com/google/jsonschema-go/jsonschema"
@@ -43,6 +41,8 @@ func init() {
 								Title:       "Type",
 								Description: "OSC type of the argument",
 								Type:        "string",
+								MinLength:   jsonschema.Ptr[int](1),
+								MaxLength:   jsonschema.Ptr[int](1),
 							},
 						},
 						Required:             []string{"value", "type"},
@@ -75,7 +75,7 @@ func init() {
 				}
 			}
 
-			types := []string{}
+			types := []rune{}
 			for _, argObject := range argObjects {
 				argType, ok := argObject["type"]
 				if !ok {
@@ -85,7 +85,11 @@ func init() {
 				if !ok {
 					return nil, errors.New("osc.message.create arg type error: not a string")
 				}
-				types = append(types, argTypeStr)
+
+				if len(argTypeStr) != 1 {
+					return nil, errors.New("osc.message.create arg type error: must be a single character")
+				}
+				types = append(types, rune(argTypeStr[0]))
 			}
 
 			argTemplates := []*template.Template{}
@@ -116,7 +120,7 @@ type MessageCreate struct {
 	config  config.ProcessorConfig
 	Address *template.Template
 	Args    []*template.Template
-	Types   []string
+	Types   []rune
 }
 
 func (omc *MessageCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
@@ -160,11 +164,11 @@ func (omc *MessageCreate) Process(ctx context.Context, wrappedPayload common.Wra
 
 		argString := argBuffer.String()
 
-		typedArg, err := argToTypedArg(argString, omc.Types[argIndex])
+		typedArg, err := osc.ArgFromStringAndType(argString, omc.Types[argIndex])
 
 		if err != nil {
 			wrappedPayload.End = true
-			return wrappedPayload, err
+			return wrappedPayload, fmt.Errorf("osc.message.create arg conversion error: %w", err)
 		}
 
 		args = append(args, typedArg)
@@ -184,77 +188,4 @@ func (omc *MessageCreate) Id() string {
 
 func (omc *MessageCreate) Type() string {
 	return omc.config.Type
-}
-
-func argToTypedArg(rawArg string, oscType string) (osc.Arg, error) {
-
-	switch oscType {
-	case "s":
-		return osc.Arg{
-			Value: rawArg,
-			Type:  "s",
-		}, nil
-	case "i":
-		number, err := strconv.ParseInt(rawArg, 10, 32)
-		if err != nil {
-			return osc.Arg{}, err
-		}
-		return osc.Arg{
-			Value: int32(number),
-			Type:  "i",
-		}, nil
-	case "f":
-		number, err := strconv.ParseFloat(rawArg, 32)
-		if err != nil {
-			return osc.Arg{}, err
-		}
-		return osc.Arg{
-			Value: float32(number),
-			Type:  "f",
-		}, nil
-	case "b":
-		data, err := hex.DecodeString(rawArg)
-		if err != nil {
-			return osc.Arg{}, err
-		}
-		return osc.Arg{
-			Value: data,
-			Type:  "b",
-		}, nil
-	case "h":
-		number, err := strconv.ParseInt(rawArg, 10, 64)
-		if err != nil {
-			return osc.Arg{}, err
-		}
-		return osc.Arg{
-			Value: int64(number),
-			Type:  "h",
-		}, nil
-	case "d":
-		number, err := strconv.ParseFloat(rawArg, 64)
-		if err != nil {
-			return osc.Arg{}, err
-		}
-		return osc.Arg{
-			Value: float64(number),
-			Type:  "d",
-		}, nil
-	case "T":
-		return osc.Arg{
-			Value: true,
-			Type:  "T",
-		}, nil
-	case "F":
-		return osc.Arg{
-			Value: false,
-			Type:  "F",
-		}, nil
-	case "N":
-		return osc.Arg{
-			Value: nil,
-			Type:  "N",
-		}, nil
-	default:
-		return osc.Arg{}, fmt.Errorf("osc.message.create unhandled osc type: %s", oscType)
-	}
 }

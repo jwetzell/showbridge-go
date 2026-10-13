@@ -54,7 +54,7 @@ func TestGoodOSCMessageEncode(t *testing.T) {
 				Address: "/test",
 				Args: []osc.Arg{
 					{
-						Type:  "i",
+						Type:  'i',
 						Value: int32(42),
 					},
 				},
@@ -124,7 +124,7 @@ func BenchmarkOSCMessageEncode(b *testing.B) {
 		Address: "/test",
 		Args: []osc.Arg{
 			{
-				Type:  "i",
+				Type:  'i',
 				Value: int32(42),
 			},
 		},

@@ -56,7 +56,7 @@ func TestGoodOSCMessageDecode(t *testing.T) {
 				Address: "/test",
 				Args: []osc.Arg{
 					{
-						Type:  "i",
+						Type:  'i',
 						Value: int32(42),
 					},
 				},
