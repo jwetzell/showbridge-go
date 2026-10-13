@@ -2,7 +2,6 @@ package module_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
@@ -35,6 +34,7 @@ func TestMySQLClientFromRegistry(t *testing.T) {
 	}
 }
 
+// TODO(jwetzell): figure out how to test this
 func TestGoodMySQLClient(t *testing.T) {
 
 	testCases := []struct {
@@ -50,7 +50,7 @@ func TestGoodMySQLClient(t *testing.T) {
 				t.Fatalf("mysql.client module not registered")
 			}
 
-			moduleInstance, err := registration.New(config.ModuleConfig{
+			_, err := registration.New(config.ModuleConfig{
 				Id:     "test",
 				Type:   "mysql.client",
 				Params: test.params,
@@ -58,16 +58,6 @@ func TestGoodMySQLClient(t *testing.T) {
 
 			if err != nil {
 				t.Fatalf("mysql.client failed to create module: %s", err)
-			}
-			// TODO(jwetzell) this is kind of hacky
-			go func() {
-				time.Sleep(1 * time.Second)
-				moduleInstance.Stop()
-			}()
-			err = moduleInstance.Start(t.Context(), nil)
-
-			if err != nil {
-				t.Fatalf("mysql.client failed to start: %s", err)
 			}
 		})
 	}

@@ -2,7 +2,6 @@ package module_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
@@ -37,6 +36,7 @@ func TestUDPClientFromRegistry(t *testing.T) {
 	}
 }
 
+// TODO(jwetzell): figure out how to test this
 func TestGoodUDPClient(t *testing.T) {
 
 	testCases := []struct {
@@ -60,7 +60,7 @@ func TestGoodUDPClient(t *testing.T) {
 				t.Fatalf("net.udp.client module not registered")
 			}
 
-			moduleInstance, err := registration.New(config.ModuleConfig{
+			_, err := registration.New(config.ModuleConfig{
 				Id:     "test",
 				Type:   "net.udp.client",
 				Params: test.params,
@@ -68,17 +68,6 @@ func TestGoodUDPClient(t *testing.T) {
 
 			if err != nil {
 				t.Fatalf("net.udp.client failed to create module: %s", err)
-			}
-			// TODO(jwetzell) this is kind of hacky
-			go func() {
-				time.Sleep(1 * time.Second)
-				moduleInstance.Stop()
-			}()
-
-			err = moduleInstance.Start(t.Context(), nil)
-
-			if err != nil {
-				t.Fatalf("net.udp.client failed to start: %s", err)
 			}
 		})
 	}

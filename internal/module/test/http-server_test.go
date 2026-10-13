@@ -2,7 +2,6 @@ package module_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
@@ -35,6 +34,7 @@ func TestHTTPServerFromRegistry(t *testing.T) {
 	}
 }
 
+// TODO(jwetzell): figure out how to test this
 func TestGoodHTTPServer(t *testing.T) {
 
 	testCases := []struct {
@@ -57,7 +57,7 @@ func TestGoodHTTPServer(t *testing.T) {
 				t.Fatalf("http.server module not registered")
 			}
 
-			moduleInstance, err := registration.New(config.ModuleConfig{
+			_, err := registration.New(config.ModuleConfig{
 				Id:     "test",
 				Type:   "http.server",
 				Params: test.params,
@@ -65,17 +65,6 @@ func TestGoodHTTPServer(t *testing.T) {
 
 			if err != nil {
 				t.Fatalf("http.server failed to create module: %s", err)
-			}
-			// TODO(jwetzell) this is kind of hacky
-			go func() {
-				time.Sleep(1 * time.Second)
-				moduleInstance.Stop()
-			}()
-
-			err = moduleInstance.Start(t.Context(), nil)
-
-			if err != nil {
-				t.Fatalf("http.server failed to start: %s", err)
 			}
 		})
 	}

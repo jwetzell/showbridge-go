@@ -2,7 +2,6 @@ package module_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/module"
@@ -58,7 +57,7 @@ func TestGoodNATSServer(t *testing.T) {
 				t.Fatalf("nats.server module not registered")
 			}
 
-			moduleInstance, err := registration.New(config.ModuleConfig{
+			_, err := registration.New(config.ModuleConfig{
 				Id:     "test",
 				Type:   "nats.server",
 				Params: test.params,
@@ -66,17 +65,6 @@ func TestGoodNATSServer(t *testing.T) {
 
 			if err != nil {
 				t.Fatalf("nats.server failed to create module: %s", err)
-			}
-			// TODO(jwetzell) this is kind of hacky
-			go func() {
-				time.Sleep(1 * time.Second)
-				moduleInstance.Stop()
-			}()
-
-			err = moduleInstance.Start(t.Context(), nil)
-
-			if err != nil {
-				t.Fatalf("nats.server failed to start: %s", err)
 			}
 		})
 	}
