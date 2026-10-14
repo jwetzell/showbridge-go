@@ -1,7 +1,6 @@
 package processor_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/config"
@@ -102,29 +101,5 @@ func TestBadStringDecode(t *testing.T) {
 				t.Fatalf("string.decode got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
-	}
-}
-
-func BenchmarkStringDecode(b *testing.B) {
-	registration, ok := processor.GetProcessorRegistration("string.decode")
-	if !ok {
-		b.Fatalf("string.decode processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Type: "string.decode",
-	})
-
-	if err != nil {
-		b.Fatalf("string.decode failed to create processor: %s", err)
-	}
-
-	count := 0
-	for b.Loop() {
-		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: fmt.Appendf(nil, "%d", count)})
-		if err != nil {
-			b.Fatalf("string.decode processing failed: %s", err)
-		}
-		count++
 	}
 }

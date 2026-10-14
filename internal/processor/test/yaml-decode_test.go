@@ -1,7 +1,6 @@
 package processor_test
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -128,29 +127,5 @@ func TestBadYamlDecode(t *testing.T) {
 				t.Fatalf("yaml.decode got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
-	}
-}
-
-func BenchmarkYamlDecode(b *testing.B) {
-	registration, ok := processor.GetProcessorRegistration("yaml.decode")
-	if !ok {
-		b.Fatalf("yaml.decode processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Type: "yaml.decode",
-	})
-
-	if err != nil {
-		b.Fatalf("yaml.decode failed to create processor: %s", err)
-	}
-
-	count := 0
-	for b.Loop() {
-		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: fmt.Appendf(nil, "{\"key\":%d}", count)})
-		if err != nil {
-			b.Fatalf("yaml.decode processing failed: %s", err)
-		}
-		count++
 	}
 }

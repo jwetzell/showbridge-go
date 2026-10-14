@@ -164,32 +164,3 @@ func TestBadMIDIControlChangeCreate(t *testing.T) {
 		})
 	}
 }
-
-func BenchmarkMIDIControlChangeCreate(b *testing.B) {
-	registration, ok := processor.GetProcessorRegistration("midi.control_change.create")
-	if !ok {
-		b.Fatalf("midi.control_change.create processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Type: "midi.control_change.create",
-		Params: map[string]any{
-			"channel": "1",
-			"control": "64",
-			"value":   "127",
-		},
-	})
-
-	if err != nil {
-		b.Fatalf("midi.control_change.create failed to create processor: %s", err)
-	}
-
-	count := 0
-	for b.Loop() {
-		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: count})
-		if err != nil {
-			b.Fatalf("midi.control_change.create processing failed: %s", err)
-		}
-		count++
-	}
-}

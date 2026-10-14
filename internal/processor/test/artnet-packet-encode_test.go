@@ -101,21 +101,3 @@ func TestBadArtnetPacketEncode(t *testing.T) {
 		})
 	}
 }
-
-func BenchmarkArtnetPacketEncode(b *testing.B) {
-	processorInstance := processor.ArtNetPacketEncode{}
-	payload := &artnet.ArtDmx{
-		Sequence: 237,
-		Physical: 0,
-		SubUni:   1,
-		Net:      0,
-		Data:     make([]uint8, 512),
-	}
-
-	for b.Loop() {
-		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: payload})
-		if err != nil {
-			b.Fatalf("artnet.packet.encode processing failed: %s", err)
-		}
-	}
-}

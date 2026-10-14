@@ -232,34 +232,3 @@ func TestBadKvGet(t *testing.T) {
 		})
 	}
 }
-
-func BenchmarkKvGet(b *testing.B) {
-	registration, ok := processor.GetProcessorRegistration("kv.get")
-	if !ok {
-		b.Fatalf("kv.get processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Type: "kv.get",
-		Params: map[string]any{
-			"module": "test",
-			"key":    "test",
-		},
-	})
-
-	if err != nil {
-		b.Fatalf("kv.get failed to create processor: %s", err)
-	}
-	modules := map[string]common.Module{
-		"test": test.NewTestKVModule("test", map[string]any{
-			"test": "test",
-		}),
-	}
-
-	for b.Loop() {
-		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: nil, Modules: modules})
-		if err != nil {
-			b.Fatalf("kv.get processing failed: %s", err)
-		}
-	}
-}

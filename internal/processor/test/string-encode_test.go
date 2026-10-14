@@ -1,7 +1,6 @@
 package processor_test
 
 import (
-	"fmt"
 	"slices"
 	"testing"
 
@@ -108,29 +107,5 @@ func TestBadStringEncode(t *testing.T) {
 				t.Fatalf("string.encode got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
-	}
-}
-
-func BenchmarkStringEncode(b *testing.B) {
-	registration, ok := processor.GetProcessorRegistration("string.encode")
-	if !ok {
-		b.Fatalf("string.encode processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Type: "string.encode",
-	})
-
-	if err != nil {
-		b.Fatalf("string.encode failed to create processor: %s", err)
-	}
-
-	count := 0
-	for b.Loop() {
-		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: fmt.Sprintf("%d", count)})
-		if err != nil {
-			b.Fatalf("string.encode processing failed: %s", err)
-		}
-		count++
 	}
 }

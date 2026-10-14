@@ -1,7 +1,6 @@
 package processor_test
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -128,29 +127,5 @@ func TestBadJsonDecode(t *testing.T) {
 				t.Fatalf("json.decode got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
 		})
-	}
-}
-
-func BenchmarkJsonDecode(b *testing.B) {
-	registration, ok := processor.GetProcessorRegistration("json.decode")
-	if !ok {
-		b.Fatalf("json.decode processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Type: "json.decode",
-	})
-
-	if err != nil {
-		b.Fatalf("json.decode failed to create processor: %s", err)
-	}
-
-	count := 0
-	for b.Loop() {
-		_, err := processorInstance.Process(b.Context(), common.WrappedPayload{Payload: fmt.Appendf(nil, "{\"key\":%d}", count)})
-		if err != nil {
-			b.Fatalf("json.decode processing failed: %s", err)
-		}
-		count++
 	}
 }
