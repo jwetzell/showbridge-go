@@ -3,6 +3,7 @@ package processor
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"text/template"
 
@@ -13,8 +14,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "http.response.create",
-		Title: "Create HTTP Response",
+		Type:        "http.response",
+		Title:       "HTTP Response",
+		Description: "Respond to the current HTTP request if there is one",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
@@ -37,12 +39,12 @@ func init() {
 
 			statusNum, err := params.GetInt("status")
 			if err != nil {
-				return nil, fmt.Errorf("http.response.create status error: %w", err)
+				return nil, fmt.Errorf("http.response status error: %w", err)
 			}
 
 			bodyTemplateString, err := params.GetString("bodyTemplate")
 			if err != nil {
-				return nil, fmt.Errorf("http.response.create bodyTemplate error: %w", err)
+				return nil, fmt.Errorf("http.response bodyTemplate error: %w", err)
 			}
 
 			bodyTemplate, err := template.New("body").Parse(bodyTemplateString)
@@ -52,23 +54,23 @@ func init() {
 			}
 
 			// TODO(jwetzell): support other body kind (direct bytes from input, from file?)
-			return &HTTPResponseCreate{config: config, Status: int(statusNum), BodyTmpl: bodyTemplate}, nil
+			return &HTTPResponse{config: config, Status: int(statusNum), BodyTmpl: bodyTemplate}, nil
 		},
 	})
 }
 
-type HTTPResponseCreate struct {
+type HTTPResponse struct {
 	Status   int
 	BodyTmpl *template.Template
 	config   config.ProcessorConfig
 }
 
-type HTTPResponse struct {
+type httpResponse struct {
 	Status int
 	Body   []byte
 }
 
-func (hrc *HTTPResponseCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (hrc *HTTPResponse) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 	templateData := wrappedPayload
 
 	var bodyBuffer bytes.Buffer
@@ -78,17 +80,44 @@ func (hrc *HTTPResponseCreate) Process(ctx context.Context, wrappedPayload commo
 		wrappedPayload.End = true
 		return wrappedPayload, err
 	}
-	wrappedPayload.Payload = HTTPResponse{
-		Status: hrc.Status,
-		Body:   bodyBuffer.Bytes(),
+
+	responseWriter, ok := ctx.Value(common.HttpServerResponseContextKey).(*common.HTTPServerResponseWriter)
+
+	if !ok {
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("http.response input must come from a http.server")
 	}
+
+	locked := responseWriter.TryLock()
+	if !locked {
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("http.response could not acquire lock on response writer")
+	}
+	defer responseWriter.Unlock()
+
+	if responseWriter.Done() {
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("http.response response writer has already been written to")
+	}
+
+	responseWriter.WriteHeader(hrc.Status)
+	_, err = responseWriter.Write(bodyBuffer.Bytes())
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+
+	// wrappedPayload.Payload = httpResponse{
+	// 	Status: hrc.Status,
+	// 	Body:   bodyBuffer.Bytes(),
+	// }
 	return wrappedPayload, nil
 }
 
-func (hrc *HTTPResponseCreate) Id() string {
+func (hrc *HTTPResponse) Id() string {
 	return hrc.config.Id
 }
 
-func (hrc *HTTPResponseCreate) Type() string {
+func (hrc *HTTPResponse) Type() string {
 	return hrc.config.Type
 }

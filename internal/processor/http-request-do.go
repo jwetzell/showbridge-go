@@ -107,7 +107,7 @@ func (hrd *HTTPRequestDo) Process(ctx context.Context, wrappedPayload common.Wra
 	}
 
 	// TODO(jwetzell): support headers, etc
-	wrappedPayload.Payload = HTTPResponse{
+	wrappedPayload.Payload = httpResponse{
 		Status: response.StatusCode,
 		Body:   body,
 	}
