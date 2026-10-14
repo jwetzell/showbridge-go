@@ -13,20 +13,6 @@ Simple protocol router _/s_
 	<a href="https://docs.showbridge.io">Documentation</a>
 </p>
 
-### Supported Protocols
-
-- HTTP
-- UDP
-- TCP
-- [MQTT](https://mqtt.org/)
-- [NATS](https://nats.io/)
-- [PosiStageNet](https://posistage.net/)
-- MIDI (not included in pre-built binaries yet)
-- Serial (not included in pre-built binaries yet)
-- [OSC](https://opensoundcontrol.stanford.edu/spec-1_0.html)
-- [FreeD](https://ptzoptics.com/freed/)
-- [Redis](https://redis.io/)
-
 ### CLI Usage
 
 ```
