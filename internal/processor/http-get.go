@@ -118,8 +118,10 @@ func (hrd *HTTPGet) Process(ctx context.Context, wrappedPayload common.WrappedPa
 
 	// TODO(jwetzell): support headers, etc
 	wrappedPayload.Payload = httpResponse{
-		Status: response.StatusCode,
-		Body:   body,
+		Status:     response.Status,
+		StatusCode: response.StatusCode,
+		Proto:      response.Proto,
+		Body:       body,
 	}
 	return wrappedPayload, nil
 }

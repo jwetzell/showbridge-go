@@ -66,8 +66,10 @@ type HTTPResponse struct {
 }
 
 type httpResponse struct {
-	Status int
-	Body   []byte
+	Status     string
+	StatusCode int
+	Proto      string
+	Body       []byte
 }
 
 func (hrc *HTTPResponse) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
