@@ -597,7 +597,7 @@ func TestBadByteSliceParamsJSON(t *testing.T) {
 		},
 		{
 			name:        "not a slice",
-			paramsJSON:  `{"key": "value"}`,
+			paramsJSON:  `{"key": 123}`,
 			key:         "key",
 			returnError: config.ErrParamNotByteSlice,
 		},

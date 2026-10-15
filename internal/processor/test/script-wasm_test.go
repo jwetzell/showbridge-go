@@ -140,7 +140,7 @@ func TestBadScriptWASM(t *testing.T) {
 			params: map[string]any{
 				"path": "good.wasm",
 			},
-			payload:     "hello",
+			payload:     123,
 			errorString: "script.wasm can only process a byte array",
 		},
 		{

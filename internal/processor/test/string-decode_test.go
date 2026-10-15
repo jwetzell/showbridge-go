@@ -85,7 +85,7 @@ func TestBadStringDecode(t *testing.T) {
 	}{
 		{
 			name:        "non-[]byte input",
-			payload:     "hello",
+			payload:     123,
 			errorString: "string.decode processor only accepts a []byte",
 		},
 	}
