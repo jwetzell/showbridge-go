@@ -16,37 +16,27 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "http.request.do",
-		Title: "Do HTTP Request",
+		Type:        "http.get",
+		Title:       "HTTP GET Request",
+		Description: "Performs an HTTP GET request to the specified URL",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
-				"method": {
-					Title:       "HTTP Method",
-					Description: "method to use for the HTTP request",
-					Type:        "string",
-					Enum:        []any{"GET", "POST", "PUT", "PATCH", "DELETE"},
-				},
 				"url": {
 					Title:       "URL",
 					Description: "URL to send the HTTP request to",
 					Type:        "string",
 				},
 			},
-			Required:             []string{"method", "url"},
+			Required:             []string{"url"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 
-			methodString, err := params.GetString("method")
-			if err != nil {
-				return nil, fmt.Errorf("http.request.do method error: %w", err)
-			}
-
 			urlString, err := params.GetString("url")
 			if err != nil {
-				return nil, fmt.Errorf("http.request.do url error: %w", err)
+				return nil, fmt.Errorf("http.get url error: %w", err)
 			}
 
 			urlTemplate, err := template.New("url").Parse(urlString)
@@ -58,19 +48,18 @@ func init() {
 				Timeout: 10 * time.Second,
 			}
 
-			return &HTTPRequestDo{config: config, URL: urlTemplate, Method: methodString, client: client}, nil
+			return &HTTPGet{config: config, URL: urlTemplate, client: client}, nil
 		},
 	})
 }
 
-type HTTPRequestDo struct {
+type HTTPGet struct {
 	config config.ProcessorConfig
 	client *http.Client
-	Method string
 	URL    *template.Template
 }
 
-func (hrd *HTTPRequestDo) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (hrd *HTTPGet) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 
 	templateData := wrappedPayload
 
@@ -84,15 +73,7 @@ func (hrd *HTTPRequestDo) Process(ctx context.Context, wrappedPayload common.Wra
 
 	urlString := urlBuffer.String()
 
-	// TODO(jwetzell): support body
-	request, err := http.NewRequest(hrd.Method, urlString, bytes.NewBuffer([]byte{}))
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	response, err := hrd.client.Do(request)
+	response, err := hrd.client.Get(urlString)
 
 	if err != nil {
 		wrappedPayload.End = true
@@ -114,10 +95,10 @@ func (hrd *HTTPRequestDo) Process(ctx context.Context, wrappedPayload common.Wra
 	return wrappedPayload, nil
 }
 
-func (hrd *HTTPRequestDo) Id() string {
+func (hrd *HTTPGet) Id() string {
 	return hrd.config.Id
 }
 
-func (hrd *HTTPRequestDo) Type() string {
+func (hrd *HTTPGet) Type() string {
 	return hrd.config.Type
 }
