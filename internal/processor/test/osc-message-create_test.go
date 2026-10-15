@@ -231,7 +231,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 				"args":    []any{"arg1"},
 			},
 			payload:     "test",
-			errorString: "osc.message.create args error: not an object slice",
+			errorString: "osc.message.create args error: not a map slice",
 		},
 		{
 			name: "arg value not a string",

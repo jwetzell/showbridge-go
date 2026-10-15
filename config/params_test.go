@@ -3,6 +3,7 @@ package config_test
 import (
 	"encoding/json"
 	"errors"
+	"reflect"
 	"slices"
 	"testing"
 
@@ -622,6 +623,162 @@ func TestBadByteSliceParamsJSON(t *testing.T) {
 			}
 			if !errors.Is(err, testCase.returnError) {
 				t.Fatalf("GetByteSlice got error '%s', expected '%s'", err, testCase.returnError)
+			}
+		})
+	}
+}
+
+func TestGoodMapSliceParamsJSON(t *testing.T) {
+	testCases := []struct {
+		name       string
+		paramsJSON string
+		key        string
+		expected   []map[string]interface{}
+	}{
+		{
+			name:       "simple map slice",
+			paramsJSON: `{"key": [{"a": "1", "b": "2"}]}`,
+			key:        "key",
+			expected:   []map[string]interface{}{{"a": "1", "b": "2"}},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			params := config.Params{}
+			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
+			if err != nil {
+				t.Fatalf("Failed to unmarshal params JSON: %v", err)
+			}
+			value, err := params.GetMapSlice(testCase.key)
+			if err != nil {
+				t.Fatalf("GetMapSlice returned error: %v", err)
+			}
+			if !reflect.DeepEqual(value, testCase.expected) {
+				t.Fatalf("GetMapSlice got %v, expected %v", value, testCase.expected)
+			}
+		})
+	}
+}
+
+func TestBadMapSliceParamsJSON(t *testing.T) {
+	testCases := []struct {
+		name        string
+		paramsJSON  string
+		key         string
+		returnError error
+	}{
+		{
+			name:        "key not found",
+			paramsJSON:  `{"key": ["value1", "value2"]}`,
+			key:         "test",
+			returnError: config.ErrParamNotFound,
+		},
+		{
+			name:        "not a map",
+			paramsJSON:  `{"key": 123}`,
+			key:         "key",
+			returnError: config.ErrParamNotSlice,
+		},
+		{
+			name:        "not a map slice",
+			paramsJSON:  `{"key": [123]}`,
+			key:         "key",
+			returnError: config.ErrParamNotMapSlice,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			params := config.Params{}
+			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
+			if err != nil {
+				t.Fatalf("Failed to unmarshal params JSON: %v", err)
+			}
+			value, err := params.GetMapSlice(testCase.key)
+			if err == nil {
+				t.Fatalf("GetMapSlice expected to fail but succeeded, got: %v", value)
+			}
+			if !errors.Is(err, testCase.returnError) {
+				t.Fatalf("GetMapSlice got error '%s', expected '%s'", err, testCase.returnError)
+			}
+		})
+	}
+}
+
+func TestGoodStringMapParamsJSON(t *testing.T) {
+	testCases := []struct {
+		name       string
+		paramsJSON string
+		key        string
+		expected   map[string]string
+	}{
+		{
+			name:       "simple map",
+			paramsJSON: `{"key": {"a": "1", "b": "2"}}`,
+			key:        "key",
+			expected:   map[string]string{"a": "1", "b": "2"},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			params := config.Params{}
+			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
+			if err != nil {
+				t.Fatalf("Failed to unmarshal params JSON: %v", err)
+			}
+			value, err := params.GetStringMap(testCase.key)
+			if err != nil {
+				t.Fatalf("GetStringMap returned error: %v", err)
+			}
+			if !reflect.DeepEqual(value, testCase.expected) {
+				t.Fatalf("GetStringMap got %v, expected %v", value, testCase.expected)
+			}
+		})
+	}
+}
+
+func TestBadStringMapParamsJSON(t *testing.T) {
+	testCases := []struct {
+		name        string
+		paramsJSON  string
+		key         string
+		returnError error
+	}{
+		{
+			name:        "key not found",
+			paramsJSON:  `{"key": ["value1", "value2"]}`,
+			key:         "test",
+			returnError: config.ErrParamNotFound,
+		},
+		{
+			name:        "not a map",
+			paramsJSON:  `{"key": 123}`,
+			key:         "key",
+			returnError: config.ErrParamNotMap,
+		},
+		{
+			name:        "not a string map",
+			paramsJSON:  `{"key": {"a": 1}}`,
+			key:         "key",
+			returnError: config.ErrParamNotStringMap,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			params := config.Params{}
+			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
+			if err != nil {
+				t.Fatalf("Failed to unmarshal params JSON: %v", err)
+			}
+			value, err := params.GetStringMap(testCase.key)
+			if err == nil {
+				t.Fatalf("GetStringMap expected to fail but succeeded, got: %v", value)
+			}
+			if !errors.Is(err, testCase.returnError) {
+				t.Fatalf("GetStringMap got error '%s', expected '%s'", err, testCase.returnError)
 			}
 		})
 	}
