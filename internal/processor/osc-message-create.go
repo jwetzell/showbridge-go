@@ -66,7 +66,7 @@ func init() {
 				return nil, err
 			}
 
-			argObjects, err := params.GetObjectSlice("args")
+			argObjects, err := params.GetMapSlice("args")
 			if err != nil {
 				if errors.Is(err, config.ErrParamNotFound) {
 					return &MessageCreate{config: processorConfig, Address: addressTemplate}, nil
