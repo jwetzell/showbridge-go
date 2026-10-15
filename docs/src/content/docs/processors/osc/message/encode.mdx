@@ -1,0 +1,18 @@
+---
+title: Encode OSC Message
+sidebar:
+  label: Encode
+  order: 2
+---
+import SchemaInfo from '../../../../../components/SchemaInfo.astro';
+
+The `osc.message.encode` processor takes an OSC message and turns it into an array of bytes. This processor will return an error if the OSC message cannot be turned into bytes.
+
+<SchemaInfo type="processor" id="osc.message.encode"/>
+
+### Example
+
+```yaml
+- id: encode
+  type: osc.message.encode
+```

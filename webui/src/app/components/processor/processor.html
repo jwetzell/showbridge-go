@@ -1,0 +1,99 @@
+@if (processor() && schema()) {
+  <div class="flex items-start m-2 w-fit">
+    <div
+      class="flex flex-col bg-gray-800 border-2 {{
+        isInError() ? 'border-red-500' : 'border-gray-600'
+      }} border-solid w-fit h-full"
+    >
+      <div class="flex items-center justify-center">
+        @if (inDragList()) {
+          <div
+            cdkDragHandle
+            class="flex items-center justify-center bg-transparent hover:bg-gray-700 hover:cursor-move text-blue-400"
+          >
+            <mat-icon>drag_indicator</mat-icon>
+          </div>
+        }
+        <div class="grow ml-1 mr-3 text-white">
+          {{ schema()?.title || processor()?.type }}
+        </div>
+        <div
+          class="flex items-center justify-center hover:bg-gray-700 hover:cursor-pointer"
+          (click)="delete.emit()"
+        >
+          <mat-icon class="text-red-500!">close</mat-icon>
+        </div>
+      </div>
+      @if (hasParams()) {
+        <hr class="bg-gray-600 h-0.5 border-0" />
+        <div>
+          <app-params-form
+            [paramsSchema]="schema()?.properties?.params"
+            [data]="params()"
+            (updated)="paramsUpdated($event)"
+          ></app-params-form>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div *cdkDragPreview class="flex items-start m-2 w-fit">
+    <div
+      class="flex flex-col bg-gray-800 border-2 {{
+        isInError() ? 'border-red-500' : 'border-gray-600'
+      }} border-solid w-fit h-full"
+    >
+      <div class="flex items-center justify-center">
+        @if (inDragList()) {
+          <div
+            cdkDragHandle
+            class="flex items-center justify-center bg-transparent hover:bg-gray-700 hover:cursor-move text-blue-400"
+          >
+            <mat-icon>drag_indicator</mat-icon>
+          </div>
+        }
+        <div class="grow ml-1 mr-3 text-white">
+          {{ schema()?.title || processor()?.type }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *cdkDragPlaceholder class="flex items-start m-2 w-fit">
+    <div
+      class="flex flex-col bg-gray-800 border-2 {{
+        isInError() ? 'border-red-500' : 'border-gray-600'
+      }} border-solid w-fit h-full opacity-30"
+    >
+      <div class="flex items-center justify-center">
+        @if (inDragList()) {
+          <div
+            cdkDragHandle
+            class="flex items-center justify-center bg-transparent hover:bg-gray-700 hover:cursor-move text-blue-400"
+          >
+            <mat-icon>drag_indicator</mat-icon>
+          </div>
+        }
+        <div class="grow ml-1 mr-3 text-white">
+          {{ schema()?.title || processor()?.type }}
+        </div>
+        <div
+          class="flex items-center justify-center hover:bg-gray-700 hover:cursor-pointer"
+          (click)="delete.emit()"
+        >
+          <mat-icon class="text-red-500!">close</mat-icon>
+        </div>
+      </div>
+      @if (hasParams()) {
+        <hr class="bg-gray-600 h-0.5 border-0" />
+        <div>
+          <app-params-form
+            [paramsSchema]="schema()?.properties?.params"
+            [data]="params()"
+            (updated)="paramsUpdated($event)"
+          ></app-params-form>
+        </div>
+      }
+    </div>
+  </div>
+}

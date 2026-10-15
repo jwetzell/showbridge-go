@@ -1,0 +1,22 @@
+---
+title: Parse Int
+sidebar:
+  label: Parse
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The `int.parse` processor takes a string and parses it as an integer with the specified `base` and `bitSize`. This processor will return an error if the message being processed is not a string or if the string cannot be parsed into an integer.
+
+<SchemaInfo type="processor" id="int.parse"/>
+
+### Example
+
+This would parse the string payload as a 32 bit, base 10 integer and set the payload to that value.
+
+```yaml
+- id: parse
+  type: int.parse
+  params:
+    bitSize: 32
+```

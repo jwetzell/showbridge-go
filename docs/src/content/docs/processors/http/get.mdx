@@ -1,0 +1,24 @@
+---
+title: Make HTTP GET Request
+sidebar:
+  label: GET
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+This process will make an HTTP GET request to the specified URL. The response will be passed through to the next processor in the chain. This processor will return an error if the request fails for any reason (e.g. network error, invalid URL, etc.).
+
+<SchemaInfo type="processor" id="http.get"/>
+
+### Example
+
+Make a GET request to `https://httpbin.org`
+
+```yaml
+- id: get-example-com
+  type: http.get
+  params:
+    url: https://httpbin.org/get
+    headers:
+      Accept: application/json
+```

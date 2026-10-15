@@ -1,0 +1,23 @@
+---
+title: Run WASM (Extism) Plugin
+sidebar:
+  label: WASM
+  order: 3
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+This processor will load and execute a WASM plugin using the [Extism](https://extism.org/) runtime. The processor will execute the specified function in the WASM plugin and return the result as the new payload. This processor will return an error if the plugin cannot be loaded, if the function cannot be executed, or if there is an error during execution. The incoming payload will be passed as the argument to the WASM function. If the plugin is successfully executed, the result of the function will be returned as the new payload.
+
+<SchemaInfo type="processor" id="script.wasm"/>
+
+### Example
+
+This example will load the plugin at `./test.wasm` and execute the `test` function
+
+```yaml
+- id: wasm
+  type: script.wasm
+  params:
+    path: "./test.wasm"
+    function: "test"
+```

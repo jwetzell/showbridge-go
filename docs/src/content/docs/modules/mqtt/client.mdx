@@ -1,0 +1,26 @@
+---
+title: MQTT Client
+sidebar:
+  label: Client
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The `mqtt.client` module connects to a MQTT broker and emits a message messages based on the subscribed topic it receives from the port. This module is also capable of publishing MQTT messages to the connected broker.
+
+<SchemaInfo type="module" id="mqtt.client"></SchemaInfo>
+
+This module implements the `PubSubModule` interface.
+
+### Example
+
+Open a mqtt connection to `test.mosquitto.org` subscribing to the `showbridge` topic.
+
+```yaml
+- id: mqttClient
+  type: mqtt.client
+  params:
+    broker: "mqtt://test.mosquitto.org:1833"
+    topic: showbridge
+    clientId: showbridge
+```

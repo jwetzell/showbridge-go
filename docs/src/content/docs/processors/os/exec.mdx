@@ -1,0 +1,23 @@
+---
+title: Execute Command
+sidebar:
+  label: Exec
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+This processor will execute a command with the provided arguments. This processor will return an error if any of the required parameters are missing or if the parameters are of the wrong type. The command parameter is required, while the args parameter is optional.
+
+<SchemaInfo type="processor" id="os.exec"/>
+
+### Example
+
+Run `echo` command.
+  
+```yaml
+- id: create
+  type: os.exec
+  params:
+    command: "echo"
+    args: ["hello"]
+```

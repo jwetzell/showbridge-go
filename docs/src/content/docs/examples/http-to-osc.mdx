@@ -1,0 +1,39 @@
+---
+title: HTTP > OSC
+sidebar:
+  order: 1
+---
+
+import { Code } from "@astrojs/starlight/components";
+
+This config starts an HTTP server listening on port `3000`. Any HTTP request coming into that server will result in a OSC message being sent to `127.0.0.1:8000` with the address set to the path from the incoming HTTP message.
+
+export const example = `
+api:
+  enabled: true
+  port: 8080
+modules:
+  - id: http
+    type: http.server
+    params:
+      port: 3000
+  - id: udp
+    type: net.udp.client
+    params:
+      host: 127.0.0.1
+      port: 8000
+routes:
+  - id: http-to-osc
+    input: http
+    processors:
+      - id: create-osc-message
+        type: osc.message.create    # create OSC message
+        params:
+          address: "{{.Payload.URL.Path}}"  # template the address from the incoming message
+      - id: send-osc
+        type: module.output         # output to the udp module
+        params:
+          module: udp
+`;
+
+<Code code={example} title="config.yaml" lang="yaml" />

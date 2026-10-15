@@ -1,0 +1,22 @@
+---
+title: Create Random Int
+sidebar:
+  order: 2
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The `int.random` processor will set the payload to a random integer between the specified `min` and `max` value.
+
+<SchemaInfo type="processor" id="int.random"/>
+
+### Example
+
+This would generate a random integer between -127 and 127 and set the payload to that value.
+
+```yaml
+- id: random
+  type: int.random
+  params:
+    min: -127
+    max: 127
+```

@@ -1,0 +1,12 @@
+---
+title: Payload
+sidebar:
+  order: 5
+---
+
+[Processors](/concepts/Processors) operator on a "wrapped" version of the message produces by the module. This wrapped version is available to all processors and is defined as follows:
+
+- **Payload**: the actual message produced by the module (or the result of the previous [processor](/concepts/processors) in the [route](/concepts/routes)).
+- **Source**: the id of the module that produced the original payload.
+- **Sender**: the network address of the module that produced the message (if applicable not all modules will have a sender address).
+- **Modules**: a map of all [modules](/concepts/modules) in the router with the module id as the key and the module instance as the value.

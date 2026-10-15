@@ -1,0 +1,35 @@
+<div class="flex flex-col">
+  <div class="flex items-center">
+    <div
+      matTooltip="Add Route"
+      class="flex items-center justify-center w-10 h-10 bg-transparent hover:bg-gray-700 hover:cursor-pointer text-blue-400"
+      (click)="addRoute()"
+      role="button"
+      aria-label="Add Route"
+    >
+      <mat-icon>add</mat-icon>
+    </div>
+    <div class="text-white">Routes</div>
+  </div>
+  <div
+    class="grow overflow-x-hidden overflow-y-auto gap-1.5"
+    cdkDropList
+    (cdkDropListDropped)="drop($event)"
+    [cdkDropListData]="routes()"
+  >
+    @for (route of routes(); track route.id; let i = $index) {
+      <div class="m-2" cdkDrag>
+        <app-route
+          [id]="listService.pathToId(`routes/${i}`)"
+          [path]="`routes/${i}`"
+          (updated)="routeUpdated(i, $event)"
+          [route]="route"
+          [moduleIds]="moduleIds() || []"
+          (delete)="deleteRoute(i)"
+          (moveProcessor)="moveProcessorBetweenRoutes($event)"
+          [inDragList]="true"
+        ></app-route>
+      </div>
+    }
+  </div>
+</div>

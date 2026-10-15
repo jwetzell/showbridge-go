@@ -1,0 +1,21 @@
+---
+title: Create MIDI Prgoram Change
+sidebar:
+  label: Create
+  order: 1
+---
+import SchemaInfo from '../../../../../components/SchemaInfo.astro';
+
+This processor will create a MIDI Program Change message with the specified channel and program number.
+
+<SchemaInfo type="processor" id="midi.program_change.create"/>
+
+### Example
+
+```yaml
+- id: create
+  type: midi.program_change.create
+  params:
+    channel: "1"
+    program: "10"
+```

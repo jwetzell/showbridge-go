@@ -1,0 +1,27 @@
+---
+title: Execute JavaScript
+sidebar:
+  label: JavaScript
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The `script.js` processor takes in any payload type and executes a JavaScript function that is able to process the payload. The end value of `payload` will be returned as the output of the processor.
+
+Ending with a `payload` value of `undefined` is treated the same as any other processor returning `nil`.
+
+This run your JavaScript program in a [sandboxed environment](https://gitlab.com/cznic/quickjs). It currently support the [ES2023](https://tc39.es/ecma262/2023/) specification.
+
+<SchemaInfo type="processor" id="script.js"/>
+
+### Example
+
+Replace all occurrences of `|` with `,` in the payload
+
+```yaml
+- id: javascript
+  type: script.js
+  params:
+    program: |
+      payload = payload.replaceAll('|',',');
+```

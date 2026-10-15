@@ -1,0 +1,22 @@
+---
+title: Write File
+sidebar:
+  label: Write File
+  order: 2
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+This processor will write the incoming payload to a file at the specified path. This processor will return an error if any of the required parameters are missing or if the parameters are of the wrong type. The incoming payload will be written to the specified file.
+
+<SchemaInfo type="processor" id="os.writefile"/>
+
+### Example
+
+Write the incoming payload to a file.
+  
+```yaml
+- id: write
+  type: os.writefile
+  params:
+    path: "/tmp/test.txt"
+```

@@ -1,0 +1,194 @@
+@if (module() && schema()) {
+  <div
+    class="flex flex-col bg-gray-800 border-2 {{
+      isInError() ? 'border-red-500' : 'border-gray-600'
+    }} border-solid w-full h-full"
+  >
+    <div class="flex items-center justify-center">
+      @if (inDragList()) {
+        <div
+          cdkDragHandle
+          class="flex items-center justify-center bg-transparent hover:bg-gray-700 hover:cursor-move text-blue-400"
+        >
+          <mat-icon>drag_indicator</mat-icon>
+        </div>
+      }
+      <div class="flex items-center">
+        <mat-icon [style.color]="inputIndicatorColor()" matTooltip="Input Indicator"
+          >keyboard_arrow_down</mat-icon
+        >
+        <mat-icon [style.color]="outputIndicatorColor()" matTooltip="Output Indicator"
+          >keyboard_arrow_up</mat-icon
+        >
+      </div>
+      <div class="text-white">
+        {{ schema().title || module()?.type }}
+      </div>
+      <div class="grow"></div>
+      <div
+        class="flex items-center justify-center hover:bg-gray-700 hover:cursor-pointer"
+        (click)="delete.emit()"
+        role="button"
+        aria-label="Delete Module"
+      >
+        <mat-icon class="text-red-500!">close</mat-icon>
+      </div>
+    </div>
+    <hr class="bg-gray-600 h-0.5 border-0" />
+    <div>
+      <form [formGroup]="formGroup" class="h-full">
+        <div class="m-2">
+          <div class="flex items-center m-1">
+            <label class="mr-2 text-white"> ID: </label>
+            <input
+              type="text"
+              class="pl-1 border-2 border-gray-200 text-white border-solid rounded-sm"
+              [placeholder]="'module-1'"
+              [formControlName]="'id'"
+            />
+            <mat-icon class="text-white!" matTooltip="String">abc</mat-icon>
+            @if (!formGroup.controls['id'].valid) {
+              <!-- TODO(jwetzell): better error displaying -->
+              <div class="ml-2 text-red-500">{{ formGroup.controls['id'].errors | json }}</div>
+            }
+          </div>
+          <app-params-form
+            [paramsSchema]="schema()?.properties?.params"
+            [data]="params()"
+            (updated)="paramsUpdated($event)"
+          ></app-params-form>
+        </div>
+      </form>
+    </div>
+    <div>
+      @if (moduleConfigErrors().length > 0) {
+        <div class="m-2 p-2 border-2 border-red-500">
+          <div class="flex items-center mb-2 text-red-500">
+            <mat-icon>error</mat-icon>
+            <span class="ml-1">Module Errors</span>
+          </div>
+          @for (error of moduleConfigErrors(); track $index) {
+            <div class="ml-4 mb-1 text-white">
+              {{ error.error }}
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <div *cdkDragPreview class="flex items-start m-2 w-fit">
+    <div
+      class="flex flex-col bg-gray-800 border-2 {{
+        isInError() ? 'border-red-500' : 'border-gray-600'
+      }} border-solid w-full h-full"
+    >
+      <div class="flex items-center justify-center">
+        @if (inDragList()) {
+          <div
+            cdkDragHandle
+            class="flex items-center justify-center bg-transparent hover:bg-gray-700 hover:cursor-move text-blue-400"
+          >
+            <mat-icon>drag_indicator</mat-icon>
+          </div>
+        }
+        <div class="flex items-center">
+          <mat-icon [style.color]="inputIndicatorColor()" matTooltip="Input Indicator"
+            >keyboard_arrow_down</mat-icon
+          >
+          <mat-icon [style.color]="outputIndicatorColor()" matTooltip="Output Indicator"
+            >keyboard_arrow_up</mat-icon
+          >
+        </div>
+        <div class="text-white">
+          {{ schema().title || module()?.type }}
+        </div>
+        <div class="grow"></div>
+        <div
+          class="flex items-center justify-center hover:bg-gray-700 hover:cursor-pointer"
+          (click)="delete.emit()"
+        >
+          <mat-icon class="text-red-500!">close</mat-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *cdkDragPlaceholder class="flex items-start m-2 w-fit">
+    <div
+      class="flex flex-col bg-gray-800 border-2 {{
+        isInError() ? 'border-red-500' : 'border-gray-600'
+      }} border-solid w-full h-full opacity-30"
+    >
+      <div class="flex items-center justify-center">
+        @if (inDragList()) {
+          <div
+            cdkDragHandle
+            class="flex items-center justify-center bg-transparent hover:bg-gray-700 hover:cursor-move text-blue-400"
+          >
+            <mat-icon>drag_indicator</mat-icon>
+          </div>
+        }
+        <div class="flex items-center">
+          <mat-icon [style.color]="inputIndicatorColor()" matTooltip="Input Indicator"
+            >keyboard_arrow_down</mat-icon
+          >
+          <mat-icon [style.color]="outputIndicatorColor()" matTooltip="Output Indicator"
+            >keyboard_arrow_up</mat-icon
+          >
+        </div>
+        <div class="text-white">
+          {{ schema().title || module()?.type }}
+        </div>
+        <div class="grow"></div>
+        <div
+          class="flex items-center justify-center hover:bg-gray-700 hover:cursor-pointer"
+          (click)="delete.emit()"
+        >
+          <mat-icon class="text-red-500!">close</mat-icon>
+        </div>
+      </div>
+      <hr class="bg-gray-600 h-0.5 border-0" />
+      <div>
+        <form [formGroup]="formGroup" class="h-full">
+          <div class="m-2">
+            <div class="flex items-center m-1">
+              <label class="mr-2 text-white"> ID: </label>
+              <input
+                type="text"
+                class="pl-1 border-2 border-gray-200 text-white border-solid rounded-sm"
+                [placeholder]="'module-1'"
+                [formControlName]="'id'"
+              />
+              <mat-icon class="text-white!" matTooltip="String">abc</mat-icon>
+              @if (!formGroup.controls['id'].valid) {
+                <!-- TODO(jwetzell): better error displaying -->
+                <div class="ml-2 text-red-500">{{ formGroup.controls['id'].errors | json }}</div>
+              }
+            </div>
+            <app-params-form
+              [paramsSchema]="schema()?.properties?.params"
+              [data]="params()"
+              (updated)="paramsUpdated($event)"
+            ></app-params-form>
+          </div>
+        </form>
+      </div>
+      <div>
+        @if (moduleConfigErrors().length > 0) {
+          <div class="m-2 p-2 border-2 border-red-500">
+            <div class="flex items-center mb-2 text-red-500">
+              <mat-icon>error</mat-icon>
+              <span class="ml-1">Module Errors</span>
+            </div>
+            @for (error of moduleConfigErrors(); track $index) {
+              <div class="ml-4 mb-1 text-white">
+                {{ error.error }}
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

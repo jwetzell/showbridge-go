@@ -1,0 +1,25 @@
+---
+title: Redis Client
+sidebar:
+  label: Client
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The `redis.client` module connects to a Redis server. This module does not produce any messages and so using it as an `input` to a [route](/concepts/routes) would be pointless.
+
+<SchemaInfo type="module" id="redis.client"></SchemaInfo>
+
+This module implements the `KeyValueModule` interface.
+
+### Example
+
+Connect to a Redis server running on `localhost` at port `6379`.
+
+```yaml
+- id: redisClient
+  type: redis.client
+  params:
+    host: "localhost"
+    port: 6379
+```

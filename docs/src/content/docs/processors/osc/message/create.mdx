@@ -1,0 +1,27 @@
+---
+title: Create OSC Message
+sidebar:
+  label: Create
+  order: 1
+---
+import SchemaInfo from '../../../../../components/SchemaInfo.astro';
+
+This processor will create an OSC message from the provided parameters. This processor will return an error if any of the required parameters are missing or if the parameters are of the wrong type. The address parameter is required, while the args and types parameters are optional. However, if args are provided, then types must also be provided and must match the amount of args provided.
+
+<SchemaInfo type="processor" id="osc.message.create"/>
+
+### Example
+
+Create an OSC message with the address `/test/message` and two integer arguments from the payload of the message being processed.
+
+```yaml
+- id: create
+  type: osc.message.create
+  params:
+    address: "/test/message"
+    args:
+      - value: "{{.Payload[0]}}"
+        type: "i"
+      - value: "{{.Payload[1]}}"
+        type: "i"
+```

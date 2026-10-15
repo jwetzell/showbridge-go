@@ -1,0 +1,35 @@
+name: Publish to docs site
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "docs/v*"
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+          cache-dependency-path: "package-lock.json"
+
+      - name: Install Node.js dependencies
+        run: npm ci
+
+      - name: build docs
+        run: npm run build:prod
+
+      - name: publish docs
+        uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287 # v4.4.0
+        with:
+          server: ${{secrets.DOCS_FTP_HOST}}
+          username: ${{secrets.DOCS_FTP_USERNAME}}
+          password: ${{secrets.DOCS_FTP_PASSWORD}}
+          local-dir: ./dist/
+          server-dir: ./
+          port: 21
+          protocol: ftps

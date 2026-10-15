@@ -1,0 +1,72 @@
+<div class="h-screen max-h-screen flex flex-col">
+  <div class="w-full">
+    <mat-toolbar color="primary">
+      @if (eventsService.status() === 'open') {
+        <div
+          [matTooltip]="
+            'Connected' +
+            (eventsService.socketRoundTripLatency() !== null
+              ? ' (' + eventsService.socketRoundTripLatency() + ' ms)'
+              : '')
+          "
+          class="h-3 w-3 rounded-full bg-green-400 mr-2"
+        ></div>
+      } @else if (eventsService.status() === 'closed') {
+        <div matTooltip="Disconnected" class="h-3 w-3 rounded-full bg-orange-400 mr-2"></div>
+      } @else if (eventsService.status() === 'error') {
+        <div matTooltip="Error" class="h-3 w-3 rounded-full bg-red-400 mr-2"></div>
+      }
+      <span>showbridge</span>
+      <div>
+        <label class="ml-4 mr-2">URL:</label>
+        <input
+          type="text"
+          class="pl-1 border-2 border-gray-200 text-white border-solid rounded-sm"
+          [placeholder]="'http://localhost:8000'"
+          [value]="settingsService.baseUrl()"
+          (change)="settingsService.updateBaseUrl($event.target.value)"
+        />
+      </div>
+      <span class="flex-auto"></span>
+      @if (configService.pendingConfigIsValid()) {
+        <button
+          mat-icon-button
+          matTooltip="Apply Config"
+          (click)="applyConfig()"
+          [disabled]="!configService.configIsDirty()"
+        >
+          <mat-icon>save</mat-icon>
+        </button>
+      } @else {
+        <div
+          class="flex items-center justify-center text-red-500 hover:cursor-pointer"
+          matTooltip="Config Errors"
+        >
+          <mat-icon>error</mat-icon>
+        </div>
+      }
+    </mat-toolbar>
+  </div>
+  @if (eventsService.status() === 'open' && schemaService.schemasLoaded()) {
+    <div class="grow overflow-hidden flex m-2">
+      <div class="grow overflow-y-auto">
+        <app-module-list
+          [modules]="config()?.modules"
+          (updated)="modulesUpdated($event)"
+        ></app-module-list>
+        <app-route-list
+          [routes]="config()?.routes"
+          [moduleIds]="moduleIds()"
+          (updated)="routesUpdated($event)"
+        ></app-route-list>
+      </div>
+      <div class="w-1/2 overflow-y-hidden">
+        <app-config-preview [config]="config()"></app-config-preview>
+      </div>
+    </div>
+  } @else {
+    <div class="grow flex items-center justify-center">
+      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    </div>
+  }
+</div>

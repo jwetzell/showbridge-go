@@ -1,0 +1,22 @@
+---
+title: Regex Filter
+sidebar:
+  label: Regex
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The `filter.regex` processor matches incoming string payload against a regular expression. If there is a match then the payload is sent through. This processor will return an error if the message being processed is not a string.
+
+<SchemaInfo type="processor" id="filter.regex"/>
+
+### Example
+
+Match strings starting with `hello`
+
+```yaml
+- id: filter
+  type: filter.regex
+  params:
+    pattern: "^hello.*"
+```

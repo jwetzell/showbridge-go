@@ -1,0 +1,26 @@
+---
+title: HTTP Response
+sidebar:
+  label: Response
+  order: 2
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+This processor will create a new HTTP response with the specified status code and body template.
+The created response will be used to response to an incoming HTTP request if there is one present. 
+If there is no HTTP request in the current route context this step will error. 
+This means that usually the input to the route should be a `http.server` module
+
+<SchemaInfo type="processor" id="http.response"/>
+
+### Example
+
+This would create an HTTP response with a status code of `200` and a body of `OK`
+
+```yaml
+- id: create-response
+  type: http.response
+  params:
+    status: 200
+    bodyTemplate: "OK"
+```

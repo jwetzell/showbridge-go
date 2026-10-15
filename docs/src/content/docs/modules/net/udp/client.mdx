@@ -1,0 +1,23 @@
+---
+title: UDP Client
+sidebar:
+  label: Client
+  order: 1
+---
+import SchemaInfo from '../../../../../components/SchemaInfo.astro';
+
+The `net.udp.client` module sends messages to a the configured `host` and `port`. This module does not produce any messages and so using it as an `input` to a [route](/concepts/routes) would be pointless.
+
+<SchemaInfo type="module" id="net.udp.client"></SchemaInfo>
+
+### Example
+
+setup up a UDP client that will send UDP packets to `127.0.0.1` on port 8888
+
+```yaml
+- id: udpClient
+  type: net.udp.client
+  params:
+    host: 127.0.0.1
+    port: 8888
+```

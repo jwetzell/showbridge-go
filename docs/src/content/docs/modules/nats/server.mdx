@@ -1,0 +1,23 @@
+---
+title: NATS Server
+sidebar:
+  label: Server
+  order: 2
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+This module starts a NATS server that listens for incoming connections.
+
+<SchemaInfo type="module" id="nats.server"></SchemaInfo>
+
+### Example
+
+Start a local NATS server listening on port 5555
+
+```yaml
+- id: natsServer
+  type: nats.server
+  params:
+    ip: 127.0.0.1
+    port: 4222
+```

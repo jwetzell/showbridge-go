@@ -1,0 +1,25 @@
+---
+title: NATS Client
+sidebar:
+  label: Client
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+This module connects to a [NATS](https://nats.io/) server and subscribes to a subject.
+
+<SchemaInfo type="module" id="nats.client"></SchemaInfo>
+
+This module implements the `PubSubModule` interface.
+
+### Example
+
+Connect to a local NATS server and subscribe to the `events` subject
+
+```yaml
+- id: natsClient
+  type: nats.client
+  params:
+    url: nats://localhost:4222
+    subject: events
+```

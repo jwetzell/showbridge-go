@@ -1,0 +1,21 @@
+---
+title: Dictionary
+sidebar:
+  label: Dictionary
+  order: 2
+---
+
+- **router**: throughout documentation I will use the term router to refer to a configured/running instance of showbridge
+- **modules**: modules are configured instances that can produce or consume message like a TCP server or a UDP client
+- **routes**: routes take messages coming from a module (input), pass the
+- **processors**: processors process messages, this can be anything such as:
+  - [decoding bytes into a string](/processors/string/decode)
+  - [creating random numbers](/processors/int/random)
+  - [filtering OSC message](/processors/osc/message/filter)
+  - [running custom JavaScript snippets](/processors/script/js)
+
+import { Aside } from "@astrojs/starlight/components";
+
+<Aside type="note">
+  Router output is also handled by [a processor](/processors/router/output)!
+</Aside>

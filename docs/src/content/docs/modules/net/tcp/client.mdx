@@ -1,0 +1,24 @@
+---
+title: TCP Client
+sidebar:
+  label: Client
+  order: 1
+---
+import SchemaInfo from '../../../../../components/SchemaInfo.astro';
+
+The `net.tcp.client` module connects to TCP server and emits messages based on the data it receives from the server that it connects to. Messages are determined by "framing" techniques as TCP is a stream based protocol. The module will attempt to reconnect anytime the connection is closed.
+
+<SchemaInfo type="module" id="net.tcp.client"></SchemaInfo>
+
+### Example
+
+Open a TCP connection to `127.0.0.1` port 8888, any incoming data will be split on line-feed (`\n`)
+
+```yaml
+- id: tcpClient
+  type: net.tcp.client
+  params:
+    host: 127.0.0.1
+    port: 8888
+    framing: LF
+```

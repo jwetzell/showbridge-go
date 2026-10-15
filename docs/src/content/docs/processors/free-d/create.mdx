@@ -1,0 +1,28 @@
+---
+title: Create FreeD
+sidebar:
+  label: Create
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+This processor will create a new FreeD message with the specified parameters.
+
+<SchemaInfo type="processor" id="freed.create"/>
+
+### Example
+
+```yaml
+- id: freed-message
+  type: freed.create
+  params:
+    id: "1"
+    pan: "45"
+    tilt: "30"
+    roll: "0"
+    posX: "10"
+    posY: "5"
+    posZ: "15"
+    zoom: "2"
+    focus: "1"
+```

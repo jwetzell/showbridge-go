@@ -1,0 +1,21 @@
+---
+title: UDP Multicast
+sidebar:
+  label: Multicast
+  order: 3
+---
+import SchemaInfo from '../../../../../components/SchemaInfo.astro';
+
+<SchemaInfo type="module" id="net.udp.multicast"></SchemaInfo>
+
+### Example
+
+Listen to the mDNS multicast address on port 5353
+
+```yaml
+- id: mdnsListener
+  type: net.udp.multicast
+  params:
+    ip: 224.0.0.251
+    port: 5353
+```

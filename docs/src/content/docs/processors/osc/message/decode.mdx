@@ -1,0 +1,18 @@
+---
+title: Decode OSC Message
+sidebar:
+  label: Decode
+  order: 3
+---
+import SchemaInfo from '../../../../../components/SchemaInfo.astro';
+
+The `osc.message.decode` processor takes a array of bytes and turn it into OSC message if it can be. This processor will return an error if the bytes cannot be parsed as an OSC message
+
+<SchemaInfo type="processor" id="osc.message.decode"/>
+
+### Example
+
+```yaml
+- id: decode
+  type: osc.message.decode
+```

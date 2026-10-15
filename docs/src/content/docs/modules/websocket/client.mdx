@@ -1,0 +1,22 @@
+---
+title: WebSocket Client
+sidebar:
+  label: Client
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The `websocket.client` module opens a websocket connection to the specified URL. This module supports both text and binary websocket messages.
+
+<SchemaInfo type="module" id="websocket.client"></SchemaInfo>
+
+### Example
+
+Connect to the example WS server at `echo.websocket.org`.
+
+```yaml
+- id: websocket
+  type: websocket.client
+  params:
+    url: "wss://echo.websocket.org"
+```

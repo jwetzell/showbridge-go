@@ -1,0 +1,18 @@
+---
+title: Decode String
+sidebar:
+  label: Decode
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The `string.decode` processor takes a array of bytes and turn it into string. This processor will return an error if the message being processed is not an array of bytes.
+
+<SchemaInfo type="processor" id="string.decode"/>
+
+### Example
+
+```yaml
+- id: decode
+  type: string.decode
+```

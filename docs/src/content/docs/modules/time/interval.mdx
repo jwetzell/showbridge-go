@@ -1,0 +1,21 @@
+---
+title: Interval
+sidebar:
+  order: 2
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The `time.interval` module emits a message at a specified duration. Sending any message to this module will reset the interval timer.
+
+<SchemaInfo type="module" id="time.interval"/>
+
+### Example snippet
+
+Emits a message every 3 seconds
+
+```yaml
+- id: every3Secs
+  type: time.interval
+    params:
+      duration: 3000
+```

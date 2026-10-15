@@ -1,0 +1,24 @@
+---
+title: Create Random Float
+sidebar:
+  label: Random
+  order: 2
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The `float.random` processor will set the payload to a random float between the specified `min` and `max` value.
+
+<SchemaInfo type="processor" id="float.random"/>
+
+### Example
+
+This would generate a random 64-bit float between 1.1 and 1.5 and set the payload to that value.
+
+```yaml
+- id: random
+  type: float.random
+  params:
+    bitSize: 64
+    min: 1.0
+    max: 1.5
+```

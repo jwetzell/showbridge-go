@@ -1,0 +1,24 @@
+---
+title: Get Key/Value
+sidebar:
+  label: Get
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The `kv.get` processor gets the value associated with a key from a module that implements the `KeyValueModule` interface.
+The output payload is the value if the key is found.
+
+<SchemaInfo type="processor" id="kv.get"/>
+
+### Example
+
+This will attempt to get the value for the `counter` key from the module with an id of `redis`
+
+```yaml
+- id: get
+  type: kv.get
+  params:
+    module: redis
+    key: counter
+```

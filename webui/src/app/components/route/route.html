@@ -1,0 +1,272 @@
+@if (route()) {
+  <!-- <div class="flex items-start m-2 w-fit border-2 border-red-500"> -->
+  <div
+    class="flex flex-col bg-gray-800 border-2 {{
+      isInError() ? 'border-red-500' : 'border-gray-600'
+    }} border-solid w-full"
+  >
+    <div class="flex items-center justify-end">
+      @if (inDragList()) {
+        <div
+          cdkDragHandle
+          class="flex items-center justify-center bg-transparent hover:bg-gray-700 hover:cursor-move text-blue-400"
+        >
+          <mat-icon>drag_indicator</mat-icon>
+        </div>
+      }
+      <div class="flex items-center">
+        <mat-icon [style.color]="indicatorColor()" matTooltip="Route Indicator"
+          >chevron_right</mat-icon
+        >
+      </div>
+      <div class="grow text-left ml-2 text-white">Route {{ index() }}</div>
+      <div
+        class="flex items-center justify-center hover:bg-gray-700 hover:cursor-pointer"
+        (click)="delete.emit()"
+        role="button"
+        aria-label="Delete Route"
+      >
+        <mat-icon class="text-red-500!">close</mat-icon>
+      </div>
+    </div>
+    <hr class="bg-gray-600 h-0.5 border-0" />
+    <div>
+      <form [formGroup]="formGroup">
+        <div class="m-2">
+          <div class="flex items-center m-1">
+            <label class="mr-2 text-white"> Input: </label>
+            <select
+              class="pl-1 border-2 border-gray-200 text-white border-solid rounded-sm w-full"
+              formControlName="input"
+            >
+              @for (option of moduleIds(); track option) {
+                <option [value]="option">
+                  {{ option }}
+                </option>
+              }
+            </select>
+            @if (!formGroup.controls['input'].valid) {
+              <!-- TODO(jwetzell): better error displaying -->
+              <div class="ml-2 text-red-500">{{ formGroup.controls['input'].errors | json }}</div>
+            }
+          </div>
+        </div>
+      </form>
+      <div>
+        <div class="flex items-center">
+          @if (schemaService.processorTypes.length > 0) {
+            <div
+              matTooltip="Add Processor"
+              class="flex items-center justify-center w-10 h-10 bg-transparent hover:bg-gray-700 hover:cursor-pointer text-blue-400"
+              [matMenuTriggerFor]="addProcessorMenu"
+            >
+              <mat-icon>add</mat-icon>
+            </div>
+            <mat-menu #addProcessorMenu="matMenu">
+              @for (processorType of schemaService.processorTypes; track processorType) {
+                <button mat-menu-item (click)="addProcessor(processorType.type)">
+                  <span>{{ processorType.name }}</span>
+                </button>
+              }
+            </mat-menu>
+          }
+          <div class="text-md text-white text-center">Processors</div>
+        </div>
+        @if (processors() !== undefined && processors()!.length > 0) {
+          <div
+            class="border-2 border-gray-500 m-2"
+            cdkDropList
+            [id]="processorListId()"
+            [cdkDropListConnectedTo]="listsService.processorListIds"
+            (cdkDropListDropped)="drop($event)"
+            [cdkDropListData]="route()?.processors"
+          >
+            @for (processor of processors(); track processor.id; let i = $index) {
+              <div cdkDrag>
+                <app-processor
+                  [path]="path() + '/processors/' + i"
+                  (updated)="processorUpdated(i, $event)"
+                  [processor]="processor"
+                  (delete)="deleteProcessor(i)"
+                  [inDragList]="true"
+                ></app-processor>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+    <div>
+      @if (routeConfigErrors().length > 0) {
+        <div class="m-2 p-2 border-2 border-red-500">
+          <div class="flex items-center mb-2 text-red-500">
+            <mat-icon>error</mat-icon>
+            <span class="ml-1">Route Errors</span>
+          </div>
+          @for (error of routeConfigErrors(); track error.index) {
+            <div class="ml-4 mb-1 text-white">
+              {{ error.error }}
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+  <!-- </div> -->
+
+  <ng-template #addProcessorMenu>
+    @if (schemaService.processorTypes.length > 0) {
+      <div cdkMenu class="context-menu">
+        @for (processorType of schemaService.processorTypes; track processorType) {
+          <button cdkMenuItem class="context-menu-item" (click)="addProcessor(processorType.type)">
+            <span>{{ processorType.name }}</span>
+          </button>
+        }
+      </div>
+    }
+  </ng-template>
+
+  <div *cdkDragPreview class="flex items-start m-2 w-fit">
+    <div
+      class="flex flex-col bg-gray-800 border-2 {{
+        isInError() ? 'border-red-500' : 'border-gray-600'
+      }} border-solid w-full"
+    >
+      <div class="flex items-center justify-end">
+        @if (inDragList()) {
+          <div
+            cdkDragHandle
+            class="flex items-center justify-center bg-transparent hover:bg-gray-700 hover:cursor-move text-blue-400"
+          >
+            <mat-icon>drag_indicator</mat-icon>
+          </div>
+        }
+        <div class="flex items-center">
+          <mat-icon [style.color]="indicatorColor()" matTooltip="Route Indicator"
+            >chevron_right</mat-icon
+          >
+        </div>
+        <div class="grow text-left ml-2 text-white">Route</div>
+        <div
+          class="flex items-center justify-center hover:bg-gray-700 hover:cursor-pointer"
+          (click)="delete.emit()"
+        >
+          <mat-icon class="text-red-500!">close</mat-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *cdkDragPlaceholder class="flex items-start m-2 w-fit">
+    <div
+      class="flex flex-col bg-gray-800 border-2 {{
+        isInError() ? 'border-red-500' : 'border-gray-600'
+      }} border-solid w-full opacity-30"
+    >
+      <div class="flex items-center justify-end">
+        @if (inDragList()) {
+          <div
+            cdkDragHandle
+            class="flex items-center justify-center bg-transparent hover:bg-gray-700 hover:cursor-move text-blue-400"
+          >
+            <mat-icon>drag_indicator</mat-icon>
+          </div>
+        }
+        <div class="flex items-center">
+          <mat-icon [style.color]="indicatorColor()" matTooltip="Route Indicator"
+            >chevron_right</mat-icon
+          >
+        </div>
+        <div class="grow text-left ml-2 text-white">Route</div>
+        <div
+          class="flex items-center justify-center hover:bg-gray-700 hover:cursor-pointer"
+          (click)="delete.emit()"
+        >
+          <mat-icon class="text-red-500!">close</mat-icon>
+        </div>
+      </div>
+      <hr class="bg-gray-600 h-0.5 border-0" />
+      <div>
+        <form [formGroup]="formGroup">
+          <div class="m-2">
+            <div class="flex items-center m-1">
+              <label class="mr-2 text-white"> Input: </label>
+              <select
+                class="pl-1 border-2 border-gray-200 text-white border-solid rounded-sm w-full"
+                formControlName="input"
+              >
+                @for (option of moduleIds(); track option) {
+                  <option [value]="option">
+                    {{ option }}
+                  </option>
+                }
+              </select>
+              @if (!formGroup.controls['input'].valid) {
+                <!-- TODO(jwetzell): better error displaying -->
+                <div class="ml-2 text-red-500">{{ formGroup.controls['input'].errors | json }}</div>
+              }
+            </div>
+          </div>
+        </form>
+        <div>
+          <div class="flex items-center">
+            @if (schemaService.processorTypes.length > 0) {
+              <div
+                matTooltip="Add Processor"
+                class="flex items-center justify-center w-10 h-10 bg-transparent hover:bg-gray-700 hover:cursor-pointer text-blue-400"
+                [matMenuTriggerFor]="addProcessorMenu"
+              >
+                <mat-icon>add</mat-icon>
+              </div>
+              <mat-menu #addProcessorMenu="matMenu">
+                @for (processorType of schemaService.processorTypes; track processorType) {
+                  <button mat-menu-item (click)="addProcessor(processorType.type)">
+                    <span>{{ processorType.name }}</span>
+                  </button>
+                }
+              </mat-menu>
+            }
+            <div class="text-md text-white text-center">Processors</div>
+          </div>
+          @if (processors() !== undefined && processors()!.length > 0) {
+            <div
+              class="border-2 border-gray-500 m-2"
+              cdkDropList
+              [id]="processorListId()"
+              [cdkDropListConnectedTo]="listsService.processorListIds"
+              (cdkDropListDropped)="drop($event)"
+              [cdkDropListData]="route()?.processors"
+            >
+              @for (processor of processors(); track processor.id; let i = $index) {
+                <div cdkDrag>
+                  <app-processor
+                    [path]="path() + '/processors/' + i"
+                    (updated)="processorUpdated(i, $event)"
+                    [processor]="processor"
+                    (delete)="deleteProcessor(i)"
+                    [inDragList]="true"
+                  ></app-processor>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+      <div>
+        @if (routeConfigErrors().length > 0) {
+          <div class="m-2 p-2 border-2 border-red-500">
+            <div class="flex items-center mb-2 text-red-500">
+              <mat-icon>error</mat-icon>
+              <span class="ml-1">Route Errors</span>
+            </div>
+            @for (error of routeConfigErrors(); track error.index) {
+              <div class="ml-4 mb-1 text-white">
+                {{ error.error }}
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

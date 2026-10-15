@@ -1,0 +1,25 @@
+---
+title: Database Query
+sidebar:
+  label: Query
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The `db.query` processor will issue a query to the specified module and return the result to the next processor in line.
+The module must implement the `DatabaseModule` interface for this processor to work.
+This processor will return an error if any of the required parameters are missing/invalid or if the module does not implement the `DatabaseModule` interface.
+
+<SchemaInfo type="processor" id="db.query"/>
+
+### Example
+
+Issue a `SELECT` statement to a module with id `sqlite`.
+
+```yaml
+- id: query
+  type: db.query
+  params:
+    module: sqlite
+    query: "SELECT * from users;"
+```

@@ -1,0 +1,22 @@
+---
+title: Create MIDI Control Change
+sidebar:
+  label: Create
+  order: 1
+---
+import SchemaInfo from '../../../../../components/SchemaInfo.astro';
+
+This processor will create a MIDI Control Change message with the specified channel, control number, and control value.
+
+<SchemaInfo type="processor" id="midi.control_change.create"/>
+
+### Example
+
+```yaml
+- id: create
+  type: midi.control_change.create
+  params:
+    channel: "1"
+    control: "64"
+    value: "127"
+```

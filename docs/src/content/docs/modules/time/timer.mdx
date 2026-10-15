@@ -1,0 +1,21 @@
+---
+title: Timer
+sidebar:
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The `time.timer` module emits only one message after a specified duration. Sending any message to this module will reset the timer.
+
+<SchemaInfo type="module" id="time.timer"></SchemaInfo>
+
+### Example snippet
+
+Emits a message 5 seconds after the module is initialized
+
+```yaml
+- id: 5secs
+  type: time.timer
+    params:
+      duration: 5000
+```

@@ -1,0 +1,22 @@
+---
+title: Split String
+sidebar:
+  label: Split
+  order: 5
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The `string.split` processor takes a string and turns it into an array of strings by splitting on `params.separator`. This processor will return an error if the message being processed is not a string.
+
+<SchemaInfo type="processor" id="string.split"/>
+
+### Example
+
+Split incoming string on `,` i.e `"one,two,three"` -> `["one","two","three"]`
+
+```yaml
+- id: split
+  type: string.split
+  params:
+    separator: ","
+```

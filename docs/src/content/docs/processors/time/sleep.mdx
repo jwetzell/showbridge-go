@@ -1,0 +1,22 @@
+---
+title: Sleep
+sidebar:
+  label: Sleep
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The `time.sleep` processor will sleep for the specified `duration` in milliseconds before passing the message to the next processor.
+
+<SchemaInfo type="processor" id="time.sleep"/>
+
+### Example
+
+This would sleep for 5 seconds before passing the message to the next processor.
+
+```yaml
+- id: sleep
+  type: time.sleep
+  params:
+    duration: 5000
+```

@@ -1,0 +1,18 @@
+---
+title: Decode MIDI Message
+sidebar:
+  label: Decode
+  order: 3
+---
+import SchemaInfo from '../../../../../components/SchemaInfo.astro';
+
+This processor will decode incoming bytes into a MIDI message. This processor will return an error if the message being processed is not an array of bytes.
+
+<SchemaInfo type="processor" id="midi.message.decode"/>
+
+### Example
+
+```yaml
+- id: decode
+  type: midi.message.decode
+```

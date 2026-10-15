@@ -1,0 +1,30 @@
+---
+title: Serial Client
+sidebar:
+  label: Client
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+import { Aside } from "@astrojs/starlight/components";
+
+<Aside type="caution">
+  This module is not currently included in the docker builds of
+  [showbridge](https://hub.docker.com/r/jwetzell/showbridge)
+</Aside>
+
+The `serial.client` module connects to a serial device and emits a message messages based on the data it receives from the port. Messages are determined by "framing" techniques as serial is a stream based protocol.
+
+<SchemaInfo type="module" id="serial.client"></SchemaInfo>
+
+### Example
+
+Open a serial connection to `/dev/ttyS0` with a buad rate of `115200`, any incoming data will be split on line-feed (`\n`)
+
+```yaml
+- id: serialClient
+  type: serial.client
+  params:
+    port: "/dev/ttyS0"
+    baudRate: 115200
+    framing: LF
+```

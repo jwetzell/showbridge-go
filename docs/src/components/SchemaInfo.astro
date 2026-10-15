@@ -1,0 +1,25 @@
+---
+import moduleSchema from '../data/modules.schema.json';
+import processorSchema from '../data/processors.schema.json';
+import Params from './Params.astro';
+const {type, id} = Astro.props;
+var schema;
+
+switch(type) {
+    case 'module':
+        schema = moduleSchema.items?.oneOf?.find(schema=>schema["$id"] === id);
+        break;
+    case 'processor':
+        schema = processorSchema.items?.oneOf?.find(schema=>schema["$id"] === id);
+        break;
+}
+---
+{
+schema !== undefined && 
+<div>
+    <ul>
+        {schema.properties.type !== undefined && <li><strong>type</strong>:&nbsp;<code>{schema.properties.type.const}</code></li>}
+        {schema.properties.params !== undefined && <li><strong>params</strong>:<Params schema={schema.properties.params}/></li>}
+    </ul>
+</div>
+}

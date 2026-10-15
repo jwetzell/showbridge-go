@@ -1,0 +1,23 @@
+---
+title: UDP Server
+sidebar:
+  label: Server
+  order: 2
+---
+import SchemaInfo from '../../../../../components/SchemaInfo.astro';
+
+The `net.udp.server` module emits a message for every incoming UDP datagram.
+
+<SchemaInfo type="module" id="net.udp.server"></SchemaInfo>
+
+### Example
+
+Start a UDP server listening on port 8888 and only on `127.0.0.1`
+
+```yaml
+- id: udpServer
+  type: net.udp.server
+  params:
+    ip: 127.0.0.1
+    port: 8888
+```

@@ -1,0 +1,22 @@
+---
+title: Read File
+sidebar:
+  label: Read File
+  order: 2
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+This processor will read the contents of a file at the specified path. This processor will return an error if any of the required parameters are missing or if the parameters are of the wrong type. The path parameter is required.
+
+<SchemaInfo type="processor" id="os.readfile"/>
+
+### Example
+
+Read the contents of a file.
+  
+```yaml
+- id: read
+  type: os.readfile
+  params:
+    path: "/tmp/test.txt"
+```

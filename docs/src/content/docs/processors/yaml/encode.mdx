@@ -1,0 +1,18 @@
+---
+title: Encode YAML
+sidebar:
+  label: Encode
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+This processor will encode an incoming object into a YAML byte array. This processor will return an error if the message being processed is not able to be serialized as YAML.
+
+<SchemaInfo type="processor" id="yaml.encode"/>
+
+### Example
+
+```yaml
+- id: encode
+  type: yaml.encode
+```

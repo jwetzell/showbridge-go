@@ -1,0 +1,22 @@
+---
+title: Execute Expr Expression
+sidebar:
+  label: Expr
+  order: 2
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The processor will execute the provided Expr expression and return the result as the new payload. This processor will return an error if the expression cannot be executed or if there is an error during execution. The expression will have access to the [wrapped payload](/concepts/payloads).
+
+<SchemaInfo type="processor" id="script.expr"/>
+
+### Example
+
+This example will add 1 to the wrapped payload.
+
+```yaml
+- id: expr
+  type: script.expr
+  params:
+    expression: "Payload + 1"
+```

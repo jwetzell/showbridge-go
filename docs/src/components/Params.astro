@@ -1,0 +1,28 @@
+---
+const {schema} = Astro.props
+---
+<ul>
+{Object.keys(schema.properties).map((key)=>{
+    const propertySchema = schema.properties[key]
+    const isRequired = schema.required ? schema.required.includes(key) : false
+
+    var description = ""
+
+    if (!isRequired) {
+        if (propertySchema.default !== undefined) {
+            description += `(optional, default <code>${JSON.stringify(propertySchema.default)}</code>)`
+        } else {
+            description += "(optional)"
+        }
+    }
+
+    if (propertySchema.description) {
+        description += ` ${propertySchema.description}`
+    }
+
+    if (description !== "") {
+        description = ": " + description
+    }
+    return <li><strong>{key}</strong><Fragment set:html={description}/></li>
+})}
+</ul>

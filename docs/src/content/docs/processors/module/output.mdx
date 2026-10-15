@@ -1,0 +1,22 @@
+---
+title: Output to module
+sidebar:
+  label: Output
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The `module.output` processor takes any payload and outputs to the specified module.
+
+<SchemaInfo type="processor" id="module.output"/>
+
+### Example
+
+Output whatever payload comes through this processor to the `osc-out` module.
+
+```yaml
+- id: output
+  type: module.output
+  params:
+    module: osc-out
+```

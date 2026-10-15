@@ -1,0 +1,18 @@
+---
+title: Encode FreeD
+sidebar:
+  label: Encode
+  order: 2
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+This processor will encode a FreeD message into an array of bytes. This processor will return an error if the message being processed is not a FreeD message.
+
+<SchemaInfo type="processor" id="freed.encode"/>
+
+### Example
+
+```yaml
+- id: encode
+  type: freed.encode
+```

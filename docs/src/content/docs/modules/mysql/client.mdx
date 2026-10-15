@@ -1,0 +1,25 @@
+---
+title: MySQL Client
+sidebar:
+  label: Client
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The `mysql.client` module can open a connection to MySQL databases
+
+<SchemaInfo type="module" id="mysql.client"></SchemaInfo>
+
+This module implements the `DatabaseModule` interface.
+
+
+### Example
+
+Opens a connection to a MySQL database
+
+```yaml
+- id: myDatabase
+  type: mysql.client
+  params:
+    dsn: "user:password@tcp(localhost:3306)/mydatabase"
+```

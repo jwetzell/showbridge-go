@@ -1,0 +1,22 @@
+---
+title: Create MIDI Note Off
+sidebar:
+  label: Create
+  order: 1
+---
+import SchemaInfo from '../../../../../components/SchemaInfo.astro';
+
+This processor will create a MIDI Note Off message with the specified channel, note, and velocity.
+
+<SchemaInfo type="processor" id="midi.note_off.create"/>
+
+### Example
+
+```yaml
+- id: create
+  type: midi.note_off.create
+  params:
+    channel: "1"
+    note: "60"
+    velocity: "127"
+```
