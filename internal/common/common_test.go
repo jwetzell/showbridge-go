@@ -4,6 +4,7 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/jwetzell/osc-go"
 	"github.com/jwetzell/showbridge-go/internal/common"
 )
 
@@ -178,6 +179,16 @@ func TestGoodGetAnyAsByteSlice(t *testing.T) {
 			value:      []float64{1, 2, 3},
 			typedValue: []byte{1, 2, 3},
 		},
+		{
+			name:       "string",
+			value:      "value",
+			typedValue: []byte("value"),
+		},
+		{
+			name:       "something that implements BinaryMashaler",
+			value:      osc.Message{Address: "/test"},
+			typedValue: []byte{47, 116, 101, 115, 116, 0, 0, 0, 44, 0, 0, 0},
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -200,11 +211,15 @@ func TestBadGetAnyAsByteSlice(t *testing.T) {
 	}{
 		{
 			name:  "not a slice",
-			value: "value",
+			value: 123,
 		},
 		{
-			name:  "not a int slice",
+			name:  "not a slice of numbers",
 			value: []any{"value1", 2},
+		},
+		{
+			name:  "BinaryMashaler w/ error",
+			value: osc.Message{Address: "test"},
 		},
 	}
 

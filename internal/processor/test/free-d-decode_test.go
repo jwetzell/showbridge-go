@@ -87,7 +87,7 @@ func TestBadFreeDDecode(t *testing.T) {
 	}{
 		{
 			name:        "not a byte slice",
-			payload:     "test",
+			payload:     123,
 			errorString: "freed.decode processor only accepts a []byte",
 		},
 	}

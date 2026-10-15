@@ -1,6 +1,7 @@
 package common
 
 import (
+	"encoding"
 	"math"
 	"reflect"
 )
@@ -90,6 +91,21 @@ func GetAnyAsByteSlice(value any) ([]byte, bool) {
 	// check for a slice
 	v := reflect.ValueOf(value)
 	if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
+
+		valueString, ok := value.(string)
+		if ok {
+			return []byte(valueString), true
+		}
+		// something that can be marshaled to []byte
+		valueMarshalBinary, ok := value.(encoding.BinaryMarshaler)
+		if ok {
+			bytes, err := valueMarshalBinary.MarshalBinary()
+			if err != nil {
+				return nil, false
+			}
+			return bytes, true
+		}
+
 		return nil, false
 	}
 

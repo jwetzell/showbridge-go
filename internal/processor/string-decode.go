@@ -24,8 +24,15 @@ type StringDecode struct {
 
 func (sd *StringDecode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
-	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 
+	// payload is already a string, return it as is
+	_, ok := payload.(string)
+	if ok {
+		return wrappedPayload, nil
+	}
+
+	// payload is convertible to a byte slice
+	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 	if !ok {
 		wrappedPayload.End = true
 		return wrappedPayload, errors.New("string.decode processor only accepts a []byte")

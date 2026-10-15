@@ -17,7 +17,6 @@ routes:
       - type: osc.message.create
         params:
           address: "{{.Payload.URL.Path}}"
-      - type: osc.message.encode
       - type: module.output
         params:
           module: udp

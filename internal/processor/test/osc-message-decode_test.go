@@ -93,7 +93,7 @@ func TestBadOSCMessageDecode(t *testing.T) {
 	}{
 		{
 			name:        "non []byte payload",
-			payload:     "test",
+			payload:     123,
 			errorString: "osc.message.decode processor only accepts a []byte payload",
 		},
 		{

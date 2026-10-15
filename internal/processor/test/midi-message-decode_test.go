@@ -76,7 +76,7 @@ func TestBadMIDIMessageDecode(t *testing.T) {
 	}{
 		{
 			name:        "non-byte slice payload",
-			payload:     "12345",
+			payload:     12345,
 			errorString: "midi.message.decode processor only accepts a []byte",
 		},
 	}

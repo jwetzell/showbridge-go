@@ -81,7 +81,7 @@ func TestBadArtnetPacketDecode(t *testing.T) {
 	}{
 		{
 			name:        "not a byte slice",
-			payload:     "not a byte slice",
+			payload:     123,
 			errorString: "artnet.packet.decode processor only accepts a []byte",
 		},
 		{

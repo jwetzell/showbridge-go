@@ -66,7 +66,6 @@ routes:
       - type: string.create
         params:
           template: "tcpout: {{.Payload.UnixMilli}}"
-      - type: string.encode
       - type: module.output
         params:
           module: tcpout
@@ -75,7 +74,6 @@ routes:
       - type: string.create
         params:
           template: "udpout: {{.Payload.UnixMilli}}"
-      - type: string.encode
       - type: module.output
         params:
           module: udpout
@@ -117,13 +115,10 @@ routes:
       - type: debug.log
   - input: httpin
     processors:
-      - type: http.response.create
+      - type: http.response
         params:
           status: 200
           bodyTemplate: "Hello, World!"
-      - type: module.output
-        params:
-          module: httpin
   - input: ticker
     processors:
       - type: string.create
