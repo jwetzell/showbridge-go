@@ -18,7 +18,9 @@ var (
 	ErrParamNotStringSlice = errors.New("not a string slice")
 	ErrParamNotByteSlice   = errors.New("not a byte slice")
 	ErrParamNotIntSlice    = errors.New("not an int slice")
-	ErrParamNotObjectSlice = errors.New("not an object slice")
+	ErrParamNotMapSlice    = errors.New("not a map slice")
+	ErrParamNotMap         = errors.New("not a map")
+	ErrParamNotStringMap   = errors.New("not a string map")
 )
 
 func (p Params) GetString(key string) (string, error) {
@@ -145,15 +147,42 @@ func (p Params) GetByteSlice(key string) ([]byte, error) {
 	return byteSlice, nil
 }
 
-func (p Params) GetObjectSlice(key string) ([]map[string]interface{}, error) {
+func (p Params) GetStringMap(key string) (map[string]string, error) {
 	value, ok := p[key]
 	if !ok {
 		return nil, ErrParamNotFound
 	}
 
-	alreadyObjectSlice, ok := value.([]map[string]interface{})
+	alreadyStringMap, ok := value.(map[string]string)
 	if ok {
-		return alreadyObjectSlice, nil
+		return alreadyStringMap, nil
+	}
+
+	interfaceMap, ok := value.(map[string]interface{})
+	if !ok {
+		return nil, ErrParamNotMap
+	}
+
+	stringMap := make(map[string]string, len(interfaceMap))
+	for k, v := range interfaceMap {
+		str, ok := v.(string)
+		if !ok {
+			return nil, ErrParamNotStringMap
+		}
+		stringMap[k] = str
+	}
+	return stringMap, nil
+}
+
+func (p Params) GetMapSlice(key string) ([]map[string]interface{}, error) {
+	value, ok := p[key]
+	if !ok {
+		return nil, ErrParamNotFound
+	}
+
+	alreadyMapSlice, ok := value.([]map[string]interface{})
+	if ok {
+		return alreadyMapSlice, nil
 	}
 
 	interfaceSlice, ok := value.([]any)
@@ -161,13 +190,13 @@ func (p Params) GetObjectSlice(key string) ([]map[string]interface{}, error) {
 		return nil, ErrParamNotSlice
 	}
 
-	objectSlice := make([]map[string]interface{}, len(interfaceSlice))
+	mapSlice := make([]map[string]interface{}, len(interfaceSlice))
 	for i, v := range interfaceSlice {
 		obj, ok := v.(map[string]interface{})
 		if !ok {
-			return nil, ErrParamNotObjectSlice
+			return nil, ErrParamNotMapSlice
 		}
-		objectSlice[i] = obj
+		mapSlice[i] = obj
 	}
-	return objectSlice, nil
+	return mapSlice, nil
 }
