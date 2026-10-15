@@ -3,6 +3,8 @@ package processor
 import (
 	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -27,12 +29,21 @@ func init() {
 					Description: "URL to send the HTTP request to",
 					Type:        "string",
 				},
+				"headers": {
+					Title:       "Headers",
+					Description: "HTTP headers to include in the request",
+					Type:        "object",
+					AdditionalProperties: &jsonschema.Schema{
+						Type: "string",
+					},
+					Default: json.RawMessage("{}"),
+				},
 			},
 			Required:             []string{"url"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
+		New: func(processorConfig config.ProcessorConfig) (Processor, error) {
+			params := processorConfig.Params
 
 			urlString, err := params.GetString("url")
 			if err != nil {
@@ -48,15 +59,24 @@ func init() {
 				Timeout: 10 * time.Second,
 			}
 
-			return &HTTPGet{config: config, URL: urlTemplate, client: client}, nil
+			headers, err := params.GetStringMap("headers")
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					headers = map[string]string{}
+				} else {
+					return nil, fmt.Errorf("http.get headers error: %w", err)
+				}
+			}
+			return &HTTPGet{config: processorConfig, URL: urlTemplate, client: client, Headers: headers}, nil
 		},
 	})
 }
 
 type HTTPGet struct {
-	config config.ProcessorConfig
-	client *http.Client
-	URL    *template.Template
+	config  config.ProcessorConfig
+	client  *http.Client
+	URL     *template.Template
+	Headers map[string]string
 }
 
 func (hrd *HTTPGet) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
@@ -73,7 +93,16 @@ func (hrd *HTTPGet) Process(ctx context.Context, wrappedPayload common.WrappedPa
 
 	urlString := urlBuffer.String()
 
-	response, err := hrd.client.Get(urlString)
+	request, err := http.NewRequest("GET", urlString, nil)
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, err
+	}
+	for key, value := range hrd.Headers {
+		request.Header.Set(key, value)
+	}
+
+	response, err := hrd.client.Do(request)
 
 	if err != nil {
 		wrappedPayload.End = true

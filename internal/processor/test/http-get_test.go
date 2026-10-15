@@ -112,6 +112,24 @@ func TestBadHTTPGet(t *testing.T) {
 			payload:     nil,
 			errorString: "template: url:1: unclosed action",
 		},
+		{
+			name: "headers not a map",
+			params: map[string]any{
+				"url":     "http://example.com",
+				"headers": "not a map",
+			},
+			payload:     nil,
+			errorString: "http.get headers error: not a map",
+		},
+		{
+			name: "headers not a string map",
+			params: map[string]any{
+				"url":     "http://example.com",
+				"headers": map[string]any{"key": 123},
+			},
+			payload:     nil,
+			errorString: "http.get headers error: not a string map",
+		},
 	}
 
 	for _, test := range tests {
