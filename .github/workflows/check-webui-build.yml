@@ -17,9 +17,12 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
+          cache-dependency-path: 'webui/package-lock.json'
 
       - name: Install Node.js dependencies
         run: npm ci
+        working-directory: ./webui
 
-      - run: npm run build
+      - name: Build webui
+        run: npm run build
+        working-directory: ./webui

@@ -16,13 +16,15 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
-          cache-dependency-path: './package-lock.json'
+          cache-dependency-path: 'webui/package-lock.json'
 
       - name: install dependencies
         run: npm ci
+        working-directory: ./webui
 
       - name: build
         run: npm run build
+        working-directory: ./webui
 
       - name: publish
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
@@ -30,6 +32,7 @@ jobs:
           server: ${{secrets.WEBUI_FTP_HOST}}
           username: ${{secrets.WEBUI_FTP_USERNAME}}
           password: ${{secrets.WEBUI_FTP_PASSWORD}}
-          local-dir: ./dist/webui/browser/
+          local-dir: ./webui/dist/webui/browser/
+          server-dir: ./
           port: 21
           protocol: ftps

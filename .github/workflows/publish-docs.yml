@@ -15,13 +15,15 @@ jobs:
         with:
           node-version-file: ".nvmrc"
           cache: "npm"
-          cache-dependency-path: "package-lock.json"
+          cache-dependency-path: "docs/package-lock.json"
 
       - name: Install Node.js dependencies
         run: npm ci
+        working-directory: ./docs
 
       - name: build docs
         run: npm run build:prod
+        working-directory: ./docs
 
       - name: publish docs
         uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287 # v4.4.0
@@ -29,7 +31,7 @@ jobs:
           server: ${{secrets.DOCS_FTP_HOST}}
           username: ${{secrets.DOCS_FTP_USERNAME}}
           password: ${{secrets.DOCS_FTP_PASSWORD}}
-          local-dir: ./dist/
+          local-dir: ./docs/dist/
           server-dir: ./
           port: 21
           protocol: ftps
