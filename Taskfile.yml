@@ -1,0 +1,92 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+output: prefixed
+
+tasks:
+  default:
+    cmds:
+      - task: cmd:build
+
+  cmd:dev:
+    desc: Run the cli with the development configuration and debug on
+    cmds:
+      - go run ./cmd/showbridge --config.yaml --log-level=debug
+
+  cmd:build:
+    desc: Build the showbridge cli
+    deps: [test:all]
+    failfast: false
+    cmds:
+      - task: webui:build
+        vars:
+          WEBUI_BASE_HREF: /ui/
+      - go build ./cmd/showbridge
+
+  test:all:
+    desc: Run the test suite for the showbridge project
+    cmds:
+      - go test ./...
+
+  webui:dev:
+    desc: Run the development server for the web UI
+    dir: ./webui
+    cmds:
+      - npm ci
+      - npm run start
+
+  webui:build:
+    desc: Build the web UI
+    dir: ./webui
+    deps: [webui:test]
+    cmds:
+      - npm ci
+      - npm run build -- --base-href={{.WEBUI_BASE_HREF}}
+
+  webui:test:
+    desc: Run the test suite for the web UI
+    dir: ./webui
+    cmds:
+      - npm ci
+      - npm run test
+    
+  docs:dev:
+    desc: Run the development server for the documentation site
+    dir: ./docs
+    cmds:
+      - npm ci
+      - npm run start
+
+  docs:build:
+    desc: Build the documentation site
+    deps: [docs:schema]
+    failfast: true
+    dir: ./docs
+    cmds:
+      - npm ci
+      - npm run build
+  
+  docs:schema:
+    desc: Generate the JSON schema files for the documentation site
+    cmds: 
+      - task: genschema
+        vars:
+          SCHEMA: processors
+          OUTPUT: ./docs/src/data/processors.schema.json
+      - task: genschema
+        vars:
+          SCHEMA: modules
+          OUTPUT: ./docs/src/data/modules.schema.json
+      - task: genschema
+        vars:
+          SCHEMA: config
+          OUTPUT: ./docs/src/data/config.schema.json
+      - task: genschema
+        vars:
+          SCHEMA: routes
+          OUTPUT: ./docs/src/data/routes.schema.json
+          
+  genschema:
+    cmds:
+      - go run ./tools/genschema {{.SCHEMA}} | jq -S '.' > {{.OUTPUT}}
