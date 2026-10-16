@@ -30,7 +30,7 @@ func handleWebUI(w http.ResponseWriter, req *http.Request) {
 			if errors.Is(err, fs.ErrNotExist) {
 				pathToLoad = index
 			} else {
-				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				http.Error(w, "Internal server error: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
 		}
@@ -43,7 +43,7 @@ func handleWebUI(w http.ResponseWriter, req *http.Request) {
 		}
 		file, err := webUIFS.ReadFile(pathToLoad)
 		if err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			http.Error(w, "Internal server error: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 		w.Header().Set("Access-Control-Allow-Origin", "*")
