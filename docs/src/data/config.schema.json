@@ -1,0 +1,42 @@
+{
+  "$id": "https://showbridge.io/config.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "showbridge configuration",
+  "properties": {
+    "api": {
+      "$id": "https://showbridge.io/api.schema.json",
+      "additionalProperties": false,
+      "default": {
+        "enabled": false,
+        "port": 8080
+      },
+      "properties": {
+        "enabled": {
+          "default": false,
+          "description": "Whether the API server is enabled",
+          "type": "boolean"
+        },
+        "port": {
+          "default": 8080,
+          "description": "Port for the API server to listen on",
+          "maximum": 65535,
+          "minimum": 1024,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "port"
+      ],
+      "type": "object"
+    },
+    "modules": {
+      "$ref": "https://showbridge.io/modules.schema.json"
+    },
+    "routes": {
+      "$ref": "https://showbridge.io/routes.schema.json"
+    }
+  },
+  "title": "Config",
+  "type": "object"
+}

@@ -1,0 +1,28 @@
+{
+  "$id": "https://showbridge.io/routes.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "default": [],
+  "description": "route configurations",
+  "items": {
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "input": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "processors": {
+        "$ref": "https://showbridge.io/processors.schema.json"
+      }
+    },
+    "required": [
+      "input"
+    ],
+    "type": "object"
+  },
+  "title": "Routes",
+  "type": "array"
+}
