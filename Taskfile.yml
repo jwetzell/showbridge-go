@@ -17,12 +17,9 @@ tasks:
   cmd:build:
     desc: Build the showbridge cli
     deps: [test:all]
-    failfast: false
+    failfast: true
     cmds:
-      - task: webui:build
-        vars:
-          WEBUI_BASE_HREF: /ui/
-      - go build ./cmd/showbridge
+      - go build -ldflags="-s -w" ./cmd/showbridge 
 
   test:all:
     desc: Run the test suite for the showbridge project
