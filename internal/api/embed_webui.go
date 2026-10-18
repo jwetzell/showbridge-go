@@ -1,4 +1,4 @@
-//go:build showbridge_webui
+//go:build embed_webui
 
 package api
 

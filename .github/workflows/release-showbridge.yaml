@@ -132,7 +132,7 @@ jobs:
           path: internal/api/webui/
       - name: build
         run: |
-          CGO_ENABLED=1 go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" -tags=showbridge_webui ./cmd/showbridge
+          CGO_ENABLED=1 go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" -tags=embed_webui ./cmd/showbridge
           tar -czf showbridge_${SHOWBRIDGE_VERSION}_linux-arm64.tar.gz showbridge
       - name: upload linux artifacts
         uses: actions/upload-artifact@v7
@@ -173,11 +173,11 @@ jobs:
           path: internal/api/webui/
       - name: build amd64
         run: |
-          CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="zig cc -target x86_64-windows-gnu" CXX="zig c++ -target x86_64-windows-gnu" go build -o showbridge.exe -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" -tags=showbridge_webui ./cmd/showbridge
+          CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="zig cc -target x86_64-windows-gnu" CXX="zig c++ -target x86_64-windows-gnu" go build -o showbridge.exe -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" -tags=embed_webui ./cmd/showbridge
           zip showbridge_${SHOWBRIDGE_VERSION}_windows-amd64.zip showbridge.exe
       - name: build arm64
         run: |
-          CGO_ENABLED=1 GOOS=windows GOARCH=arm64 CC="zig cc -target aarch64-windows-gnu" CXX="zig c++ -target aarch64-windows-gnu" go build -o showbridge.exe -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" -tags=showbridge_webui ./cmd/showbridge
+          CGO_ENABLED=1 GOOS=windows GOARCH=arm64 CC="zig cc -target aarch64-windows-gnu" CXX="zig c++ -target aarch64-windows-gnu" go build -o showbridge.exe -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" -tags=embed_webui ./cmd/showbridge
           zip showbridge_${SHOWBRIDGE_VERSION}_windows-arm64.zip showbridge.exe
       - name: upload windows artifacts
         uses: actions/upload-artifact@v7
@@ -214,7 +214,7 @@ jobs:
           path: internal/api/webui/
       - name: build
         run: |
-          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" -tags=showbridge_webui ./cmd/showbridge
+          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" -tags=embed_webui ./cmd/showbridge
           tar -czf showbridge_${SHOWBRIDGE_VERSION}_macOS-arm64.tar.gz showbridge
       - name: upload macos artifacts
         uses: actions/upload-artifact@v7
@@ -251,7 +251,7 @@ jobs:
           path: internal/api/webui/
       - name: build
         run: |
-          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" -tags=showbridge_webui ./cmd/showbridge
+          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -o showbridge -ldflags="-s -w -X main.version=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}" -tags=embed_webui ./cmd/showbridge
           tar -czf showbridge_${SHOWBRIDGE_VERSION}_macOS-amd64.tar.gz showbridge
       - name: upload macos artifacts
         uses: actions/upload-artifact@v7

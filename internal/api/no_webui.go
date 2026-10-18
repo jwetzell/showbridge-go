@@ -1,4 +1,4 @@
-//go:build !showbridge_webui
+//go:build !embed_webui
 
 package api
 
@@ -7,6 +7,5 @@ import (
 )
 
 func handleWebUI(w http.ResponseWriter, req *http.Request) {
-
 	http.Error(w, "Web UI is not enabled", http.StatusNotImplemented)
 }
