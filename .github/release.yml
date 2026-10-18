@@ -24,6 +24,12 @@ changelog:
     - title: CLI ⌨️
       labels:
         - cli
+    - title: Web Interface 🌐
+      labels:
+        - webui
+    - title: Documentation 📝
+      labels:
+        - docs
     - title: Other Changes
       labels:
         - "*"
