@@ -4,13 +4,13 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { ProcessorConfig } from '../../models/config';
 import { SchemaService } from '../../services/schema';
-import { ParamsFormComponent } from '../params-form/params-form';
+import { SchemaFormModule } from '../schema-form-module/schema-form.module';
 
 @Component({
   selector: 'app-processor',
   imports: [
     MatIconModule,
-    ParamsFormComponent,
+    SchemaFormModule,
     ReactiveFormsModule,
     CdkDragHandle,
     CdkDragPreview,

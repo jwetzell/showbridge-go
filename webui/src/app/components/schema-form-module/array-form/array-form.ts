@@ -1,19 +1,16 @@
-import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, inject, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { ParamInfo } from '../../models/form';
-import { ListsService } from '../../services/lists';
-import { SchemaService } from '../../services/schema';
-import { parseStringToArray } from '../../utils/params';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { ChangeDetectionStrategy, Component, inject, Input, OnInit } from '@angular/core';
+import { ParamInfo } from '../../../models/form';
+import { ListsService } from '../../../services/lists';
+import { SchemaService } from '../../../services/schema';
+import { parseStringToArray } from '../../../utils/params';
 
 @Component({
   selector: 'app-array-form',
   templateUrl: './array-form.html',
   styleUrl: './array-form.css',
-  imports: [MatIconModule, FormsModule, CdkDrag, CdkDropList],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: true,
+  standalone: false,
 })
 export class ArrayFormComponent implements OnInit {
   @Input() paramFormControl?: any;
@@ -27,7 +24,7 @@ export class ArrayFormComponent implements OnInit {
   private schemaService = inject(SchemaService);
   public listsService = inject(ListsService);
 
-  constructor() {}
+  constructor() { }
 
   ngOnInit(): void {
     if (this.paramFormControl && this.paramInfo?.schema) {

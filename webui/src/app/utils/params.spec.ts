@@ -108,6 +108,82 @@ describe('params utils - schema to form', () => {
         },
       },
     },
+    {
+      name: 'array of objects property',
+      schema: {
+        type: 'object',
+        properties: {
+          "args": {
+            "description": "arguments",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "description": "type of the argument",
+                  "maxLength": 1,
+                  "minLength": 1,
+                  "title": "Type",
+                  "type": "string"
+                },
+                "value": {
+                  "description": "value of the argument",
+                  "title": "Value",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "value",
+                "type"
+              ],
+              "type": "object"
+            },
+            "title": "Arguments",
+            "type": "array"
+          },
+        },
+        required: [],
+      },
+      formInfo: {
+        formGroup: new FormGroup({
+          args: new FormControl(''),
+        }),
+        paramsInfo: {
+          args: {
+            key: 'args',
+            display: 'Arguments',
+            type: 'array',
+            hint: 'arguments',
+            isConst: false,
+            schema: {
+              title: 'Arguments',
+              description: 'arguments',
+              type: 'array',
+              items: {
+                type: 'object',
+                additionalProperties: false,
+                properties: {
+                  type: {
+                    description: 'type of the argument',
+                    maxLength: 1,
+                    minLength: 1,
+                    title: 'Type',
+                    type: 'string'
+                  },
+                  value: {
+                    description: 'value of the argument',
+                    title: 'Value',
+                    type: 'string'
+                  }
+                },
+                required: ['value', 'type']
+              }
+            },
+            placeholder: '',
+            default: undefined,
+          },
+        },
+      },
+    }
   ];
 
   tests.forEach((testCase) => {

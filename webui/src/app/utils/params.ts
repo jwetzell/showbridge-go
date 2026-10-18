@@ -48,6 +48,14 @@ export function schemaToParamsFormInfo(schema: SomeJSONSchema): ParamsFormInfo {
               validators.push(Validators.pattern(new RegExp(paramSchema.pattern)));
             }
 
+            if (paramSchema.minLength) {
+              validators.push(Validators.minLength(paramSchema.minLength));
+            }
+
+            if (paramSchema.maxLength) {
+              validators.push(Validators.maxLength(paramSchema.maxLength));
+            }
+
             if (schema.required) {
               if (schema.required.includes(paramKey)) {
                 validators.push(Validators.required);

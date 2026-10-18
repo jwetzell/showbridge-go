@@ -9,6 +9,7 @@ import {
   signal,
   ChangeDetectionStrategy,
 } from '@angular/core';
+import { SchemaFormModule } from '../schema-form-module/schema-form.module';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,14 +21,12 @@ import { ModuleConfig } from '../../models/config';
 import { ConfigService } from '../../services/config';
 import { EventsService } from '../../services/events';
 import { SchemaService } from '../../services/schema';
-import { ParamsFormComponent } from '../params-form/params-form';
 
 @Component({
   selector: 'app-module',
   imports: [
     MatFormFieldModule,
     MatIconModule,
-    ParamsFormComponent,
     ReactiveFormsModule,
     MatMenuModule,
     MatTooltipModule,
@@ -35,6 +34,7 @@ import { ParamsFormComponent } from '../params-form/params-form';
     CdkDragHandle,
     CdkDragPreview,
     CdkDragPlaceholder,
+    SchemaFormModule,
   ],
   templateUrl: './module.html',
   changeDetection: ChangeDetectionStrategy.Eager,
