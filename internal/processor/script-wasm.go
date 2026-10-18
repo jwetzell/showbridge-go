@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 
 	extism "github.com/extism/go-sdk"
 	"github.com/google/jsonschema-go/jsonschema"
@@ -79,6 +80,9 @@ func init() {
 			}, []extism.HostFunction{})
 
 			if err != nil {
+				if errors.Is(err, os.ErrNotExist) {
+					return nil, fmt.Errorf("script.wasm file not found: %s", pathString)
+				}
 				return nil, err
 			}
 

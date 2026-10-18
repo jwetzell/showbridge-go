@@ -158,7 +158,7 @@ func TestBadScriptWASM(t *testing.T) {
 				"path": "asdf.wasm",
 			},
 			payload:     []byte("hello"),
-			errorString: "open asdf.wasm: no such file or directory",
+			errorString: "script.wasm file not found: asdf.wasm",
 		},
 	}
 
