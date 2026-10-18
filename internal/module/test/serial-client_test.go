@@ -1,3 +1,5 @@
+//go:build cgo
+
 package module_test
 
 import (
