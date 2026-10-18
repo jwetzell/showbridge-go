@@ -19,10 +19,8 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'webui/package-lock.json'
 
-      - name: Install Node.js dependencies
-        run: npm ci
-        working-directory: ./webui
+      - name: Install Task
+        uses: go-task/setup-task@v2
 
       - name: Build webui
-        run: npm run build
-        working-directory: ./webui
+        run: task webui:build

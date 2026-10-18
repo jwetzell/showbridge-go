@@ -18,13 +18,11 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'webui/package-lock.json'
 
-      - name: install dependencies
-        run: npm ci
-        working-directory: ./webui
+      - name: Install Task
+        uses: go-task/setup-task@v2
 
-      - name: build
-        run: npm run build
-        working-directory: ./webui
+      - name: Build webui
+        run: task webui:build
 
       - name: publish
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0

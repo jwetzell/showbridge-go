@@ -19,10 +19,8 @@ jobs:
           cache: "npm"
           cache-dependency-path: "docs/package-lock.json"
 
-      - name: Install Node.js dependencies
-        run: npm ci
-        working-directory: ./docs
+      - name: Install Task
+        uses: go-task/setup-task@v2
 
       - name: Build docs
-        run: npm run build
-        working-directory: ./docs
+        run: task docs:build

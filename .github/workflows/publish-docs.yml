@@ -17,13 +17,11 @@ jobs:
           cache: "npm"
           cache-dependency-path: "docs/package-lock.json"
 
-      - name: Install Node.js dependencies
-        run: npm ci
-        working-directory: ./docs
+      - name: Install Task
+        uses: go-task/setup-task@v2
 
-      - name: build docs
-        run: npm run build:prod
-        working-directory: ./docs
+      - name: Build docs
+        run: task docs:build
 
       - name: publish docs
         uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287 # v4.4.0
