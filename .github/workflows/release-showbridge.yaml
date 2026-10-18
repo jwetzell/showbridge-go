@@ -110,7 +110,7 @@ jobs:
           draft: true
           files: showbridge_*.tar.gz
   windows:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: setup_release
     env:
       SHOWBRIDGE_VERSION: ${{ needs.setup_release.outputs.version }}
@@ -126,19 +126,11 @@ jobs:
           go-version-file: "go.mod"
       - name: Install Task
         uses: go-task/setup-task@v2
-      - name: setup zig
-        uses: mlugg/setup-zig@v2
-        with:
-          version: 0.16.0
-      - name: build amd64
+      - name: build
         run: |
-          CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="zig cc -target x86_64-windows-gnu" CXX="zig c++ -target x86_64-windows-gnu" task cmd:build OUTPUT=showbridge.exe VERSION=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}
-          zip showbridge_${SHOWBRIDGE_VERSION}_windows-amd64.zip showbridge.exe
-      - name: build arm64
-        run: |
-          CGO_ENABLED=1 GOOS=windows GOARCH=arm64 CC="zig cc -target aarch64-windows-gnu" CXX="zig c++ -target aarch64-windows-gnu" task cmd:build OUTPUT=showbridge.exe VERSION=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}
-          zip showbridge_${SHOWBRIDGE_VERSION}_windows-arm64.zip showbridge.exe
-      - name: upload windows artifacts
+          CGO_ENABLED=1 task cmd:build OUTPUT=showbridge.exe VERSION=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}
+          Compress-Archive -Path "showbridge.exe" -DestinationPath "showbridge_${SHOWBRIDGE_VERSION}_windows-amd64.zip"
+      - name: upload windows artifact
         uses: actions/upload-artifact@v7
         if: github.event_name == 'workflow_dispatch'
         with:
