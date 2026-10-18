@@ -1,40 +1,22 @@
-import { JsonPipe } from '@angular/common';
 import {
+  ChangeDetectionStrategy,
   Component,
   effect,
   input,
   OnDestroy,
   output,
-  ChangeDetectionStrategy,
 } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { SomeJSONSchema } from 'ajv/dist/types/json-schema';
 import { cloneDeep, has, isEqual } from 'lodash-es';
 import { Subscription } from 'rxjs';
-import { ParamInfo, ParamsFormInfo } from '../../models/form';
-import { cleanParams, schemaToParamsFormInfo } from '../../utils/params';
-import { ArrayFormComponent } from '../array-form/array-form';
+import { ParamInfo, ParamsFormInfo } from '../../../models/form';
+import { cleanParams, schemaToParamsFormInfo } from '../../../utils/params';
 @Component({
   selector: 'app-params-form',
   templateUrl: './params-form.html',
   styleUrls: ['./params-form.css'],
-  imports: [
-    MatIconModule,
-    MatTooltipModule,
-    JsonPipe,
-    MatFormFieldModule,
-    MatInputModule,
-    ReactiveFormsModule,
-    ArrayFormComponent,
-    MatTabsModule,
-  ],
   changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: true,
+  standalone: false,
 })
 export class ParamsFormComponent implements OnDestroy {
   data = input<any>();

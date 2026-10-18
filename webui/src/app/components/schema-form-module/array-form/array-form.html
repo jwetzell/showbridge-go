@@ -6,13 +6,13 @@
           <label for="item-{{ i }}" class="text-white mr-1 hover:cursor-move" cdkDragHandle
             >{{ i }}:</label
           >
-          <!-- @if (paramInfo?.schema.items.type === 'object') {
+          @if (paramInfo?.schema.items.type === 'object') {
             <app-params-form
               [paramsSchema]="paramInfo?.schema.items"
               [data]="item"
               (updated)="updateItem(i, $event)"
             ></app-params-form>
-          } -->
+          }
           @if (paramInfo?.schema.items.type !== 'object') {
             <!-- TODO(jwetzell): add input validation using info from schema -->
             <input
