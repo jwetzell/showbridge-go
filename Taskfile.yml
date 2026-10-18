@@ -12,7 +12,12 @@ tasks:
   cmd:dev:
     desc: Run the cli with the development configuration and debug on
     cmds:
-      - go run ./cmd/showbridge --config.yaml --log-level=debug
+      - task: webui:build
+        vars:
+          WEBUI_BASE_HREF: /ui/
+      - rm -rf internal/api/webui
+      - mv webui/dist/webui internal/api/webui
+      - go run -tags=embed_webui ./cmd/showbridge --config=config.yaml --log-level=debug
 
   cmd:build:
     desc: Build the showbridge cli
