@@ -200,6 +200,8 @@ jobs:
         uses: actions/setup-go@v7
         with:
           go-version-file: "go.mod"
+      - name: Install Task
+        uses: go-task/setup-task@v2
       - name: build
         run: |
           CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 task cmd:build OUTPUT=showbridge VERSION=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}
