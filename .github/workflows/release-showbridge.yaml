@@ -130,8 +130,8 @@ jobs:
         env:
           CGO_ENABLED: 1
         run: |
-          task cmd:build OUTPUT=showbridge.exe VERSION="$env:SHOWBRIDGE_VERSION-$env:SHORT_COMMIT"
-          Compress-Archive -Path "showbridge.exe" -DestinationPath "showbridge_$env:SHOWBRIDGE_VERSION_windows-amd64.zip"
+          task cmd:build OUTPUT=showbridge.exe VERSION="${env:SHOWBRIDGE_VERSION}-${env:SHORT_COMMIT}"
+          Compress-Archive -Path "showbridge.exe" -DestinationPath "showbridge_${env:SHOWBRIDGE_VERSION}_windows-amd64.zip"
       - name: upload windows artifact
         uses: actions/upload-artifact@v7
         if: github.event_name == 'workflow_dispatch'
