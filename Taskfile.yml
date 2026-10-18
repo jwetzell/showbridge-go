@@ -12,11 +12,6 @@ tasks:
   cmd:dev:
     desc: Run the cli with the development configuration and debug on
     cmds:
-      - task: webui:build
-        vars:
-          WEBUI_BASE_HREF: /ui/
-      - rm -rf internal/api/webui
-      - mv webui/dist/webui internal/api/webui
       - go run -tags=embed_webui ./cmd/showbridge --config=config.yaml --log-level=debug
 
   cmd:build:
@@ -24,7 +19,12 @@ tasks:
     deps: [test:all]
     failfast: true
     cmds:
-      - go build -ldflags="-s -w" ./cmd/showbridge 
+      - task: webui:build
+        vars:
+          WEBUI_BASE_HREF: /ui/
+      - rm -rf internal/api/webui
+      - mv webui/dist/webui internal/api/webui
+      - go build -tags=embed_webui -ldflags="-s -w" ./cmd/showbridge 
 
   test:all:
     desc: Run the test suite for the showbridge project
