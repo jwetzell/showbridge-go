@@ -1,4 +1,4 @@
-name: Publish to docs site
+name: Publish Documentation
 on:
   workflow_dispatch:
   push:

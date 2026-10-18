@@ -1,4 +1,4 @@
-name: publish
+name: Publish Web Interface
 on:
   workflow_dispatch:
   push:

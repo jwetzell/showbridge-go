@@ -1,4 +1,4 @@
-name: Check docs builds
+name: Check @showbridge/docs builds
 on:
   pull_request:
     branches:

@@ -1,4 +1,4 @@
-name: showbridge release
+name: Release showbridge CLI
 
 on:
   push:
