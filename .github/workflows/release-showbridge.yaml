@@ -127,8 +127,10 @@ jobs:
       - name: Install Task
         uses: go-task/setup-task@v2
       - name: build
+        env:
+          CGO_ENABLED: 1
         run: |
-          CGO_ENABLED=1 task cmd:build OUTPUT=showbridge.exe VERSION=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}
+          task cmd:build OUTPUT=showbridge.exe VERSION=${SHOWBRIDGE_VERSION}-${SHORT_COMMIT}
           Compress-Archive -Path "showbridge.exe" -DestinationPath "showbridge_${SHOWBRIDGE_VERSION}_windows-amd64.zip"
       - name: upload windows artifact
         uses: actions/upload-artifact@v7
