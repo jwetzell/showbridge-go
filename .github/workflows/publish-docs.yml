@@ -16,6 +16,14 @@ jobs:
           node-version-file: "docs/.nvmrc"
           cache: "npm"
           cache-dependency-path: "docs/package-lock.json"
+      
+      - name: setup go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: "go.mod"
+      
+      - name: install alsa lib
+        run: sudo apt-get install -y libasound2-dev
 
       - name: Install Task
         uses: go-task/setup-task@v2
