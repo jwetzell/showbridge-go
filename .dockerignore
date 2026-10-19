@@ -3,3 +3,6 @@ Dockerfile
 .vscode
 README.md
 LICENSE
+docs
+webui/dist.
+node_modules
