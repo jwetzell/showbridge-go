@@ -18,6 +18,6 @@
     "@astrojs/starlight": "0.42.6",
     "astro": "7.4.2",
     "sharp": "0.35.5",
-    "typescript": "6.0.3"
+    "typescript": "7.0.2"
   }
 }
