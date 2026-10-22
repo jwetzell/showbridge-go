@@ -5,34 +5,9 @@ import (
 	"testing"
 
 	"github.com/jwetzell/artnet-go"
-	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
-
-func TestArtnetPacketEncodeFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("artnet.packet.encode")
-	if !ok {
-		t.Fatalf("artnet.packet.encode processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "artnet.packet.encode",
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create artnet.packet.encode processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("artnet.packet.encode processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "artnet.packet.encode" {
-		t.Fatalf("artnet.packet.encode processor has wrong type: %s", processorInstance.Type())
-	}
-}
 
 func TestGoodArtnetPacketEncode(t *testing.T) {
 	packetEncoder := processor.ArtNetPacketEncode{}

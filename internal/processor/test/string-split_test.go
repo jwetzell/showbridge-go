@@ -9,50 +9,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-func TestStringSplitFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("string.split")
-	if !ok {
-		t.Fatalf("string.split processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "string.split",
-		Params: map[string]any{
-			"separator": ",",
-		},
-	})
-	if err != nil {
-		t.Fatalf("failed to create string.split processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("string.split processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "string.split" {
-		t.Fatalf("string.split processor has wrong type: %s", processorInstance.Type())
-	}
-
-	payload := "part1,part2,part3"
-	expected := []string{"part1", "part2", "part3"}
-
-	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: payload})
-	if err != nil {
-		t.Fatalf("string.split processing failed: %s", err)
-	}
-
-	gotStrings, ok := got.Payload.([]string)
-
-	if !ok {
-		t.Fatalf("string.split should return a slice of strings")
-	}
-
-	if !slices.Equal(gotStrings, expected) {
-		t.Fatalf("string.split got %+v, expected %+v", got, expected)
-	}
-}
-
 func TestGoodStringSplit(t *testing.T) {
 	tests := []struct {
 		name     string

@@ -10,48 +10,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
-func TestRouterInputFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("router.input")
-	if !ok {
-		t.Fatalf("router.input processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "router.input",
-		Params: config.Params{
-			"source": "test",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create router.input processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("router.input processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "router.input" {
-		t.Fatalf("router.input processor has wrong type: %s", processorInstance.Type())
-	}
-
-	payload := "test"
-	expected := "test"
-
-	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
-		InputHandler: test.GetNewTestRouter().HandleInput,
-		Payload:      payload,
-	})
-	if err != nil {
-		t.Fatalf("router.input processing failed: %s", err)
-	}
-
-	if got.Payload != expected {
-		t.Fatalf("router.input got %+v, expected %+v", got, expected)
-	}
-}
-
 func TestGoodRouterInput(t *testing.T) {
 
 	testCases := []struct {

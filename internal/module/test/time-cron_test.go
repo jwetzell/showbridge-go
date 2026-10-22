@@ -7,33 +7,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/module"
 )
 
-func TestTimeCronFromRegistry(t *testing.T) {
-	registration, ok := module.GetModuleRegistration("time.cron")
-	if !ok {
-		t.Fatalf("time.cron module not registered")
-	}
-
-	moduleInstance, err := registration.New(config.ModuleConfig{
-		Id:   "test",
-		Type: "time.cron",
-		Params: map[string]any{
-			"cron": "* * * * *",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create time.cron module: %s", err)
-	}
-
-	if moduleInstance.Id() != "test" {
-		t.Fatalf("time.cron module has wrong id: %s", moduleInstance.Id())
-	}
-
-	if moduleInstance.Type() != "time.cron" {
-		t.Fatalf("time.cron module has wrong type: %s", moduleInstance.Type())
-	}
-}
-
 func TestGoodTimeCron(t *testing.T) {
 
 	testCases := []struct {

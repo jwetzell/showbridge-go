@@ -65,14 +65,6 @@ type NATSClient struct {
 	clientMu     sync.Mutex
 }
 
-func (nc *NATSClient) Id() string {
-	return nc.config.Id
-}
-
-func (nc *NATSClient) Type() string {
-	return nc.config.Type
-}
-
 func (nc *NATSClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	nc.logger.Debug("running")
 	nc.inputHandler = inputHandler
@@ -92,7 +84,7 @@ func (nc *NATSClient) Start(ctx context.Context, inputHandler common.InputHandle
 
 	sub, err := nc.client.Subscribe(nc.Subject, func(msg *nats.Msg) {
 		if nc.inputHandler != nil {
-			nc.inputHandler(nc.ctx, nc.Id(), msg)
+			nc.inputHandler(nc.ctx, nc.config.Id, msg)
 		}
 	})
 

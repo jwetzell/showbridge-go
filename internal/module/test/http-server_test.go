@@ -7,33 +7,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/module"
 )
 
-func TestHTTPServerFromRegistry(t *testing.T) {
-	registration, ok := module.GetModuleRegistration("http.server")
-	if !ok {
-		t.Fatalf("http.server module not registered")
-	}
-
-	moduleInstance, err := registration.New(config.ModuleConfig{
-		Id:   "test",
-		Type: "http.server",
-		Params: map[string]any{
-			"port": 3000,
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create http.server module: %s", err)
-	}
-
-	if moduleInstance.Id() != "test" {
-		t.Fatalf("http.server module has wrong id: %s", moduleInstance.Id())
-	}
-
-	if moduleInstance.Type() != "http.server" {
-		t.Fatalf("http.server module has wrong type: %s", moduleInstance.Type())
-	}
-}
-
 // TODO(jwetzell): figure out how to test this
 func TestGoodHTTPServer(t *testing.T) {
 

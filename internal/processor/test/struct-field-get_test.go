@@ -10,44 +10,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
-func TestStructFieldGetFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("struct.field.get")
-	if !ok {
-		t.Fatalf("struct.field.get processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "struct.field.get",
-		Params: map[string]any{
-			"name": "Data",
-		},
-	})
-	if err != nil {
-		t.Fatalf("failed to create struct.field.get processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("struct.field.get processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "struct.field.get" {
-		t.Fatalf("struct.field.get processor has wrong type: %s", processorInstance.Type())
-	}
-
-	payload := test.TestStruct{Data: "hello"}
-	expected := "hello"
-
-	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: payload})
-	if err != nil {
-		t.Fatalf("struct.field.get processing failed: %s", err)
-	}
-
-	if got.Payload != expected {
-		t.Fatalf("struct.field.get got %+v, expected %+v", got, expected)
-	}
-}
-
 func TestGoodStructFieldGet(t *testing.T) {
 
 	tests := []struct {

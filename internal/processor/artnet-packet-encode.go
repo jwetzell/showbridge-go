@@ -42,11 +42,3 @@ func (ape *ArtNetPacketEncode) Process(ctx context.Context, wrappedPayload commo
 
 	return wrappedPayload, nil
 }
-
-func (ape *ArtNetPacketEncode) Id() string {
-	return ape.config.Id
-}
-
-func (ape *ArtNetPacketEncode) Type() string {
-	return ape.config.Type
-}

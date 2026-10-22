@@ -66,11 +66,3 @@ func (sfg *StructFieldGet) Process(ctx context.Context, wrappedPayload common.Wr
 	wrappedPayload.Payload = field.Interface()
 	return wrappedPayload, nil
 }
-
-func (sfg *StructFieldGet) Id() string {
-	return sfg.config.Id
-}
-
-func (sfg *StructFieldGet) Type() string {
-	return sfg.config.Type
-}

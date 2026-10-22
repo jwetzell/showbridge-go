@@ -63,14 +63,6 @@ type WebSocketClient struct {
 	connMu       sync.Mutex
 }
 
-func (wc *WebSocketClient) Id() string {
-	return wc.config.Id
-}
-
-func (wc *WebSocketClient) Type() string {
-	return wc.config.Type
-}
-
 func (wc *WebSocketClient) SetupConn() error {
 	wc.connMu.Lock()
 	defer wc.connMu.Unlock()
@@ -148,9 +140,9 @@ func (wc *WebSocketClient) readLoop() {
 					return
 				}
 			case websocket.TextMessage:
-				wc.inputHandler(wc.ctx, wc.Id(), string(message))
+				wc.inputHandler(wc.ctx, wc.config.Id, string(message))
 			case websocket.BinaryMessage:
-				wc.inputHandler(wc.ctx, wc.Id(), message)
+				wc.inputHandler(wc.ctx, wc.config.Id, message)
 			default:
 				wc.logger.Warn("unsupported message type received", "messageType", messageType)
 			}

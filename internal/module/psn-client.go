@@ -33,14 +33,6 @@ type PSNClient struct {
 	connMu       sync.Mutex
 }
 
-func (pc *PSNClient) Id() string {
-	return pc.config.Id
-}
-
-func (pc *PSNClient) Type() string {
-	return pc.config.Type
-}
-
 func (pc *PSNClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	pc.logger.Debug("running")
 	pc.inputHandler = inputHandler
@@ -92,7 +84,7 @@ func (pc *PSNClient) Start(ctx context.Context, inputHandler common.InputHandler
 				if pc.inputHandler != nil {
 					// TODO(jwetzell): better input handling
 					for _, tracker := range pc.decoder.Trackers {
-						pc.inputHandler(pc.ctx, pc.Id(), tracker)
+						pc.inputHandler(pc.ctx, pc.config.Id, tracker)
 					}
 				} else {
 					pc.logger.Error("has no input handler")

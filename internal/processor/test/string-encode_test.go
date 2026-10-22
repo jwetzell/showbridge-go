@@ -4,51 +4,9 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
-
-func TestStringEncodeFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("string.encode")
-	if !ok {
-		t.Fatalf("string.encode processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "string.encode",
-	})
-	if err != nil {
-		t.Fatalf("failed to create string.encode processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("string.encode processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "string.encode" {
-		t.Fatalf("string.encode processor has wrong type: %s", processorInstance.Type())
-	}
-
-	payload := "hello"
-	expected := []byte{'h', 'e', 'l', 'l', 'o'}
-
-	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: payload})
-	if err != nil {
-		t.Fatalf("string.encode processing failed: %s", err)
-	}
-
-	gotBytes, ok := got.Payload.([]byte)
-
-	if !ok {
-		t.Fatalf("string.encode should return byte slice")
-	}
-
-	if !slices.Equal(gotBytes, expected) {
-		t.Fatalf("string.encode got %+v, expected %+v", got, expected)
-	}
-}
 
 func TestGoodStringEncode(t *testing.T) {
 	stringEncoder := processor.StringEncode{}

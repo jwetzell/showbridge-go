@@ -92,14 +92,6 @@ type SerialClient struct {
 	portMu       sync.Mutex
 }
 
-func (sc *SerialClient) Id() string {
-	return sc.config.Id
-}
-
-func (sc *SerialClient) Type() string {
-	return sc.config.Type
-}
-
 func (sc *SerialClient) SetupPort() error {
 	sc.portMu.Lock()
 	defer sc.portMu.Unlock()
@@ -154,7 +146,7 @@ func (sc *SerialClient) Start(ctx context.Context, inputHandler common.InputHand
 							messages := sc.inFramer.Decode(buffer[0:byteCount])
 							for _, message := range messages {
 								if sc.inputHandler != nil {
-									sc.inputHandler(sc.ctx, sc.Id(), message)
+									sc.inputHandler(sc.ctx, sc.config.Id, message)
 								} else {
 									sc.logger.Error("input received but no router is configured")
 								}

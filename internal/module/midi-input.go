@@ -52,14 +52,6 @@ type MIDIInput struct {
 	stop         func()
 }
 
-func (mi *MIDIInput) Id() string {
-	return mi.config.Id
-}
-
-func (mi *MIDIInput) Type() string {
-	return mi.config.Type
-}
-
 func (mi *MIDIInput) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	mi.logger.Debug("running")
 	mi.inputHandler = inputHandler
@@ -74,7 +66,7 @@ func (mi *MIDIInput) Start(ctx context.Context, inputHandler common.InputHandler
 
 	stop, err := midi.ListenTo(in, func(msg midi.Message, timestampms int32) {
 		if mi.inputHandler != nil {
-			mi.inputHandler(mi.ctx, mi.Id(), msg)
+			mi.inputHandler(mi.ctx, mi.config.Id, msg)
 		}
 	}, midi.UseSysEx())
 

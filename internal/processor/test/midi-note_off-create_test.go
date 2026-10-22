@@ -12,35 +12,7 @@ import (
 	"gitlab.com/gomidi/midi/v2"
 )
 
-func TestMIDINoteOffCreteaFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("midi.note_off.create")
-	if !ok {
-		t.Fatalf("midi.note_off.create processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "midi.note_off.create",
-		Params: map[string]any{
-			"channel":  "1",
-			"note":     "60",
-			"velocity": "100",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create midi.note_off.create processor: %s", err)
-	}
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("midi.note_off.create processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "midi.note_off.create" {
-		t.Fatalf("midi.note_off.create processor has wrong type: %s", processorInstance.Type())
-	}
-}
-
-func TestGoodMIDINoteOffCretea(t *testing.T) {
+func TestGoodMIDINoteOffCreate(t *testing.T) {
 
 	tests := []struct {
 		name     string
@@ -93,7 +65,7 @@ func TestGoodMIDINoteOffCretea(t *testing.T) {
 	}
 }
 
-func TestBadMIDINoteOffCretea(t *testing.T) {
+func TestBadMIDINoteOffCreate(t *testing.T) {
 
 	tests := []struct {
 		name        string

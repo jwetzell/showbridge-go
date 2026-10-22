@@ -69,14 +69,6 @@ type UDPMulticast struct {
 	connMu       sync.Mutex
 }
 
-func (um *UDPMulticast) Id() string {
-	return um.config.Id
-}
-
-func (um *UDPMulticast) Type() string {
-	return um.config.Type
-}
-
 func (um *UDPMulticast) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	um.logger.Debug("running")
 	um.inputHandler = inputHandler
@@ -115,7 +107,7 @@ func (um *UDPMulticast) Start(ctx context.Context, inputHandler common.InputHand
 			message := buffer[:numBytes]
 
 			if um.inputHandler != nil {
-				um.inputHandler(um.ctx, um.Id(), message)
+				um.inputHandler(um.ctx, um.config.Id, message)
 			} else {
 				um.logger.Error("input received but no input handler is configured")
 			}

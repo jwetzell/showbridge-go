@@ -383,11 +383,3 @@ func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload common.Wrappe
 
 	return wrappedPayload, nil
 }
-
-func (fc *FreeDCreate) Id() string {
-	return fc.config.Id
-}
-
-func (fc *FreeDCreate) Type() string {
-	return fc.config.Type
-}

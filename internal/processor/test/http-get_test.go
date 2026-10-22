@@ -9,33 +9,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-func TestHTTPGetFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("http.get")
-	if !ok {
-		t.Fatalf("http.get processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "http.get",
-		Params: map[string]any{
-			"url": "http://example.com",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create http.get processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("http.get processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "http.get" {
-		t.Fatalf("http.get processor has wrong type: %s", processorInstance.Type())
-	}
-}
-
 // TODO(jwetzell): figure out how to test this
 func TestGoodHTTPGet(t *testing.T) {
 

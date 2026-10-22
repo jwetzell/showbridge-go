@@ -125,11 +125,3 @@ func (hrd *HTTPGet) Process(ctx context.Context, wrappedPayload common.WrappedPa
 	}
 	return wrappedPayload, nil
 }
-
-func (hrd *HTTPGet) Id() string {
-	return hrd.config.Id
-}
-
-func (hrd *HTTPGet) Type() string {
-	return hrd.config.Type
-}

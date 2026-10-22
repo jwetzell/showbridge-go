@@ -50,14 +50,6 @@ type TimeTimer struct {
 	cancel       context.CancelFunc
 }
 
-func (t *TimeTimer) Id() string {
-	return t.config.Id
-}
-
-func (t *TimeTimer) Type() string {
-	return t.config.Type
-}
-
 func (t *TimeTimer) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	t.logger.Debug("running")
 	t.inputHandler = inputHandler
@@ -72,7 +64,7 @@ func (t *TimeTimer) Start(ctx context.Context, inputHandler common.InputHandler)
 			return nil
 		case time := <-t.timer.C:
 			if t.inputHandler != nil {
-				t.inputHandler(t.ctx, t.Id(), time)
+				t.inputHandler(t.ctx, t.config.Id, time)
 			}
 		}
 	}

@@ -8,32 +8,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-func TestScriptExprFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("script.expr")
-	if !ok {
-		t.Fatalf("script.expr processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "script.expr",
-		Params: map[string]any{
-			"expression": "foo + bar",
-		},
-	})
-	if err != nil {
-		t.Fatalf("failed to create script.expr processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("script.expr processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "script.expr" {
-		t.Fatalf("script.expr processor has wrong type: %s", processorInstance.Type())
-	}
-}
-
 func TestGoodScriptExpr(t *testing.T) {
 	tests := []struct {
 		name     string

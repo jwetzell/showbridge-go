@@ -6,8 +6,6 @@ import (
 )
 
 type Module interface {
-	Id() string
-	Type() string
 	Start(context.Context, InputHandler) error
 	Stop()
 }

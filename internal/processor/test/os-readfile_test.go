@@ -10,32 +10,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
-func TestOsReadFileFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("os.readfile")
-	if !ok {
-		t.Fatalf("os.readfile processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "os.readfile",
-		Params: map[string]any{
-			"path": "/tmp/test.txt",
-		},
-	})
-	if err != nil {
-		t.Fatalf("failed to create os.readfile processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("os.readfile processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "os.readfile" {
-		t.Fatalf("os.readfile processor has wrong type: %s", processorInstance.Type())
-	}
-}
-
 func TestGoodOsReadFile(t *testing.T) {
 	testCases := []struct {
 		name     string

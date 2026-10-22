@@ -97,11 +97,3 @@ func (is *IntScale) Process(ctx context.Context, wrappedPayload common.WrappedPa
 	wrappedPayload.Payload = payloadInt
 	return wrappedPayload, nil
 }
-
-func (is *IntScale) Id() string {
-	return is.config.Id
-}
-
-func (is *IntScale) Type() string {
-	return is.config.Type
-}

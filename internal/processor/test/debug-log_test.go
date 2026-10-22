@@ -9,42 +9,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-func TestDebugLogFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("debug.log")
-	if !ok {
-		t.Fatalf("debug.log processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "debug.log",
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create debug.log processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("debug.log processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "debug.log" {
-		t.Fatalf("debug.log processor has wrong type: %s", processorInstance.Type())
-	}
-
-	payload := "test"
-	expected := "test"
-
-	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: payload})
-	if err != nil {
-		t.Fatalf("debug.log processing failed: %s", err)
-	}
-
-	if got.Payload != expected {
-		t.Fatalf("debug.log got %+v, expected %+v", got, expected)
-	}
-}
-
 func TestGoodDebugLog(t *testing.T) {
 
 	tests := []struct {

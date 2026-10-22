@@ -36,11 +36,3 @@ func (je *YamlEncode) Process(ctx context.Context, wrappedPayload common.Wrapped
 	wrappedPayload.Payload = payloadBytes
 	return wrappedPayload, nil
 }
-
-func (je *YamlEncode) Id() string {
-	return je.config.Id
-}
-
-func (je *YamlEncode) Type() string {
-	return je.config.Type
-}

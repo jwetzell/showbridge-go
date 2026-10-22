@@ -32,11 +32,3 @@ func (dl *DebugLog) Process(ctx context.Context, wrappedPayload common.WrappedPa
 	dl.logger.Debug("", "payload", payloadString, "payloadType", payloadType)
 	return wrappedPayload, nil
 }
-
-func (dl *DebugLog) Id() string {
-	return dl.config.Id
-}
-
-func (dl *DebugLog) Type() string {
-	return dl.config.Type
-}

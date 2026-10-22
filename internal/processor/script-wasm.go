@@ -123,11 +123,3 @@ func (sw *ScriptWASM) Process(ctx context.Context, wrappedPayload common.Wrapped
 
 	return wrappedPayload, nil
 }
-
-func (sw *ScriptWASM) Id() string {
-	return sw.config.Id
-}
-
-func (sw *ScriptWASM) Type() string {
-	return sw.config.Type
-}

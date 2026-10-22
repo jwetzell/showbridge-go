@@ -11,8 +11,6 @@ import (
 )
 
 type Processor interface {
-	Id() string
-	Type() string
 	Process(context.Context, common.WrappedPayload) (common.WrappedPayload, error)
 }
 

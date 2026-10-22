@@ -8,50 +8,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-func TestFilterRegexFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("filter.regex")
-	if !ok {
-		t.Fatalf("filter.regex processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "filter.regex",
-		Params: map[string]any{
-			"pattern": "hello",
-		},
-	})
-	if err != nil {
-		t.Fatalf("failed to create filter.regex processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("filter.regex processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "filter.regex" {
-		t.Fatalf("filter.regex processor has wrong type: %s", processorInstance.Type())
-	}
-
-	payload := "hello"
-	expected := "hello"
-
-	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: payload})
-	if err != nil {
-		t.Fatalf("filter.regex processing failed: %s", err)
-	}
-
-	gotString, ok := got.Payload.(string)
-
-	if !ok {
-		t.Fatalf("filter.regex should return string")
-	}
-
-	if gotString != expected {
-		t.Fatalf("filter.regex got %+v, expected %+v", got, expected)
-	}
-}
-
 func TestGoodFilterRegex(t *testing.T) {
 	tests := []struct {
 		name    string

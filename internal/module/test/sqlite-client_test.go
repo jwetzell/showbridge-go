@@ -7,33 +7,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/module"
 )
 
-func TestSqliteClientFromRegistry(t *testing.T) {
-	registration, ok := module.GetModuleRegistration("sqlite.client")
-	if !ok {
-		t.Fatalf("sqlite.client module not registered")
-	}
-
-	moduleInstance, err := registration.New(config.ModuleConfig{
-		Id:   "test",
-		Type: "sqlite.client",
-		Params: map[string]any{
-			"dsn": ":memory:",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create sqlite.client module: %s", err)
-	}
-
-	if moduleInstance.Id() != "test" {
-		t.Fatalf("sqlite.client module has wrong id: %s", moduleInstance.Id())
-	}
-
-	if moduleInstance.Type() != "sqlite.client" {
-		t.Fatalf("sqlite.client module has wrong type: %s", moduleInstance.Type())
-	}
-}
-
 // TODO(jwetzell): figure out how to test this
 func TestGoodSqliteClient(t *testing.T) {
 

@@ -67,11 +67,3 @@ func (ri *RouterInput) Process(ctx context.Context, wrappedPayload common.Wrappe
 
 	return wrappedPayload, nil
 }
-
-func (ri *RouterInput) Id() string {
-	return ri.config.Id
-}
-
-func (ri *RouterInput) Type() string {
-	return ri.config.Type
-}

@@ -49,14 +49,6 @@ type TimeInterval struct {
 	cancel       context.CancelFunc
 }
 
-func (i *TimeInterval) Id() string {
-	return i.config.Id
-}
-
-func (i *TimeInterval) Type() string {
-	return i.config.Type
-}
-
 func (i *TimeInterval) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	i.logger.Debug("running")
 	i.inputHandler = inputHandler
@@ -71,7 +63,7 @@ func (i *TimeInterval) Start(ctx context.Context, inputHandler common.InputHandl
 		select {
 		case <-ticker.C:
 			if i.inputHandler != nil {
-				i.inputHandler(i.ctx, i.Id(), time.Now())
+				i.inputHandler(i.ctx, i.config.Id, time.Now())
 			}
 		default:
 			continue

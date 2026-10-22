@@ -8,36 +8,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-func TestIntScaleFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("int.scale")
-	if !ok {
-		t.Fatalf("int.scale processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "int.scale",
-		Params: map[string]any{
-			"inMin":  0,
-			"inMax":  10,
-			"outMin": 0,
-			"outMax": 127,
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create int.scale processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("int.scale processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "int.scale" {
-		t.Fatalf("int.scale processor has wrong type: %s", processorInstance.Type())
-	}
-}
-
 func TestGoodIntScale(t *testing.T) {
 	tests := []struct {
 		name     string

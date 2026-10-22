@@ -115,11 +115,3 @@ func (hrc *HTTPResponse) Process(ctx context.Context, wrappedPayload common.Wrap
 	// }
 	return wrappedPayload, nil
 }
-
-func (hrc *HTTPResponse) Id() string {
-	return hrc.config.Id
-}
-
-func (hrc *HTTPResponse) Type() string {
-	return hrc.config.Type
-}

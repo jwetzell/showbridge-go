@@ -7,33 +7,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/module"
 )
 
-func TestWebSocketClientFromRegistry(t *testing.T) {
-	registration, ok := module.GetModuleRegistration("websocket.client")
-	if !ok {
-		t.Fatalf("websocket.client module not registered")
-	}
-
-	moduleInstance, err := registration.New(config.ModuleConfig{
-		Id:   "test",
-		Type: "websocket.client",
-		Params: map[string]any{
-			"url": "ws://localhost",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create websocket.client module: %s", err)
-	}
-
-	if moduleInstance.Id() != "test" {
-		t.Fatalf("websocket.client module has wrong id: %s", moduleInstance.Id())
-	}
-
-	if moduleInstance.Type() != "websocket.client" {
-		t.Fatalf("websocket.client module has wrong type: %s", moduleInstance.Type())
-	}
-}
-
 func TestBadWebSocketClient(t *testing.T) {
 	tests := []struct {
 		name        string

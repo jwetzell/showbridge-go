@@ -66,14 +66,6 @@ type IOResponseData struct {
 	Status   string            `json:"status"`
 }
 
-func (hs *HTTPServer) Id() string {
-	return hs.config.Id
-}
-
-func (hs *HTTPServer) Type() string {
-	return hs.config.Type
-}
-
 func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	responseWriter := common.NewHTTPServerResponseWriter(w)
 
@@ -83,7 +75,7 @@ func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if hs.inputHandler != nil {
 		inputContext := context.WithValue(hs.ctx, common.HttpServerResponseContextKey, responseWriter)
-		aRouteFound, routingErrors := hs.inputHandler(inputContext, hs.Id(), r)
+		aRouteFound, routingErrors := hs.inputHandler(inputContext, hs.config.Id, r)
 		if !responseWriter.Done() {
 			if aRouteFound {
 				if routingErrors != nil {

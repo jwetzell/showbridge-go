@@ -12,34 +12,6 @@ import (
 	"gitlab.com/gomidi/midi/v2"
 )
 
-func TestMIDIProgramChangeCreateFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("midi.program_change.create")
-	if !ok {
-		t.Fatalf("midi.program_change.create processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "midi.program_change.create",
-		Params: map[string]any{
-			"channel": "1",
-			"program": "60",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create midi.program_change.create processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("midi.program_change.create processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "midi.program_change.create" {
-		t.Fatalf("midi.program_change.create processor has wrong type: %s", processorInstance.Type())
-	}
-}
-
 func TestGoodMIDIProgramChangeCreate(t *testing.T) {
 
 	tests := []struct {

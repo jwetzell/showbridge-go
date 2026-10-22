@@ -64,11 +64,3 @@ func (sc *StringCreate) Process(ctx context.Context, wrappedPayload common.Wrapp
 
 	return wrappedPayload, nil
 }
-
-func (sc *StringCreate) Id() string {
-	return sc.config.Id
-}
-
-func (sc *StringCreate) Type() string {
-	return sc.config.Type
-}

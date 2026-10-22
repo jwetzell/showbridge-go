@@ -110,14 +110,6 @@ type TCPServer struct {
 	connectionShutdown    context.CancelFunc
 }
 
-func (ts *TCPServer) Id() string {
-	return ts.config.Id
-}
-
-func (ts *TCPServer) Type() string {
-	return ts.config.Type
-}
-
 func (ts *TCPServer) handleClient(client *net.TCPConn) {
 	ts.connectionsMu.Lock()
 	ts.connections = append(ts.connections, tcpConnection{conn: client, framer: framer.GetFramer(ts.framerType)})
@@ -155,7 +147,7 @@ func (ts *TCPServer) handleClient(client *net.TCPConn) {
 				messages := ts.inFramer.Decode(buffer[0:byteCount])
 				for _, message := range messages {
 					if ts.inputHandler != nil {
-						ts.inputHandler(ts.ctx, ts.Id(), message)
+						ts.inputHandler(ts.ctx, ts.config.Id, message)
 					} else {
 						ts.logger.Error("input received but no input handler is configured")
 					}

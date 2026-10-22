@@ -7,34 +7,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/module"
 )
 
-func TestNATSServerFromRegistry(t *testing.T) {
-	registration, ok := module.GetModuleRegistration("nats.server")
-	if !ok {
-		t.Fatalf("nats.server module not registered")
-	}
-
-	moduleInstance, err := registration.New(config.ModuleConfig{
-		Id:   "test",
-		Type: "nats.server",
-		Params: map[string]any{
-			"ip":   "127.0.0.1",
-			"port": 4222,
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create nats.server module: %s", err)
-	}
-
-	if moduleInstance.Id() != "test" {
-		t.Fatalf("nats.server module has wrong id: %s", moduleInstance.Id())
-	}
-
-	if moduleInstance.Type() != "nats.server" {
-		t.Fatalf("nats.server module has wrong type: %s", moduleInstance.Type())
-	}
-}
-
 func TestGoodNATSServer(t *testing.T) {
 
 	testCases := []struct {

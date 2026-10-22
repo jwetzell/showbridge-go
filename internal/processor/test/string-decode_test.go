@@ -3,45 +3,9 @@ package processor_test
 import (
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
-
-func TestStringDecodeFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("string.decode")
-	if !ok {
-		t.Fatalf("string.decode processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "string.decode",
-	})
-	if err != nil {
-		t.Fatalf("failed to create string.decode processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("string.decode processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "string.decode" {
-		t.Fatalf("string.decode processor has wrong type: %s", processorInstance.Type())
-	}
-
-	payload := []byte{'h', 'e', 'l', 'l', 'o'}
-	expected := "hello"
-
-	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: payload})
-	if err != nil {
-		t.Fatalf("string.decode processing failed: %s", err)
-	}
-
-	if got.Payload != expected {
-		t.Fatalf("string.decode got %+v, expected %+v", got, expected)
-	}
-}
 
 func TestGoodStringDecode(t *testing.T) {
 	stringDecoder := processor.StringDecode{}

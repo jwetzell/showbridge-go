@@ -76,11 +76,3 @@ func (orf *OsReadFile) Process(ctx context.Context, wrappedPayload common.Wrappe
 	wrappedPayload.Payload = data
 	return wrappedPayload, nil
 }
-
-func (orf *OsReadFile) Id() string {
-	return orf.config.Id
-}
-
-func (orf *OsReadFile) Type() string {
-	return orf.config.Type
-}

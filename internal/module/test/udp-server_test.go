@@ -7,33 +7,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/module"
 )
 
-func TestUDPServerFromRegistry(t *testing.T) {
-	registration, ok := module.GetModuleRegistration("net.udp.server")
-	if !ok {
-		t.Fatalf("net.udp.server module not registered")
-	}
-
-	moduleInstance, err := registration.New(config.ModuleConfig{
-		Id:   "test",
-		Type: "net.udp.server",
-		Params: map[string]any{
-			"port": 8000,
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create udp.server module: %s", err)
-	}
-
-	if moduleInstance.Id() != "test" {
-		t.Fatalf("udp.server module has wrong id: %s", moduleInstance.Id())
-	}
-
-	if moduleInstance.Type() != "net.udp.server" {
-		t.Fatalf("net.udp.server module has wrong type: %s", moduleInstance.Type())
-	}
-}
-
 // TODO(jwetzell): figure out how to test this
 func TestGoodUDPServer(t *testing.T) {
 

@@ -182,11 +182,3 @@ func (omc *MessageCreate) Process(ctx context.Context, wrappedPayload common.Wra
 	wrappedPayload.Payload = payloadMessage
 	return wrappedPayload, nil
 }
-
-func (omc *MessageCreate) Id() string {
-	return omc.config.Id
-}
-
-func (omc *MessageCreate) Type() string {
-	return omc.config.Type
-}

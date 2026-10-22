@@ -4,54 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
-
-func TestYamlDecodeFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("yaml.decode")
-	if !ok {
-		t.Fatalf("yaml.decode processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "yaml.decode",
-	})
-	if err != nil {
-		t.Fatalf("failed to create yaml.decode processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("yaml.decode processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "yaml.decode" {
-		t.Fatalf("yaml.decode processor has wrong type: %s", processorInstance.Type())
-	}
-
-	payload := "{\"property\":\"hello\"}"
-
-	expected := map[string]any{
-		"property": "hello",
-	}
-
-	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: payload})
-	if err != nil {
-		t.Fatalf("yaml.decode processing failed: %s", err)
-	}
-
-	gotMap, ok := got.Payload.(map[string]any)
-
-	if !ok {
-		t.Fatalf("yaml.decode should return byte slice")
-	}
-
-	if !reflect.DeepEqual(gotMap, expected) {
-		t.Fatalf("yaml.decode got %+v, expected %+v", got, expected)
-	}
-}
 
 func TestGoodYamlDecode(t *testing.T) {
 	jsonDecoder := processor.YamlDecode{}

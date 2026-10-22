@@ -7,30 +7,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/module"
 )
 
-func TestPSNClientFromRegistry(t *testing.T) {
-	registration, ok := module.GetModuleRegistration("psn.client")
-	if !ok {
-		t.Fatalf("psn.client module not registered")
-	}
-
-	moduleInstance, err := registration.New(config.ModuleConfig{
-		Id:   "test",
-		Type: "psn.client",
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create psn.client module: %s", err)
-	}
-
-	if moduleInstance.Id() != "test" {
-		t.Fatalf("psn.client module has wrong id: %s", moduleInstance.Id())
-	}
-
-	if moduleInstance.Type() != "psn.client" {
-		t.Fatalf("psn.client module has wrong type: %s", moduleInstance.Type())
-	}
-}
-
 func TestBadPSNClient(t *testing.T) {
 	tests := []struct {
 		name        string

@@ -84,11 +84,3 @@ func (ip *IntParse) Process(ctx context.Context, wrappedPayload common.WrappedPa
 	wrappedPayload.Payload = payloadInt
 	return wrappedPayload, nil
 }
-
-func (ip *IntParse) Id() string {
-	return ip.config.Id
-}
-
-func (ip *IntParse) Type() string {
-	return ip.config.Type
-}

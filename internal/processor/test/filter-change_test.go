@@ -1,50 +1,12 @@
 package processor_test
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
-
-func TestFilterChangeFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("filter.change")
-	if !ok {
-		t.Fatalf("filter.change processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "filter.change",
-	})
-	if err != nil {
-		t.Fatalf("failed to create filter.change processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("filter.change processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "filter.change" {
-		t.Fatalf("filter.change processor has wrong type: %s", processorInstance.Type())
-	}
-
-	payload := "hello"
-	expected := "hello"
-
-	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
-		Payload: payload,
-	})
-	if err != nil {
-		t.Fatalf("filter.change processing failed: %s", err)
-	}
-
-	if !reflect.DeepEqual(got.Payload, expected) {
-		t.Fatalf("filter.change got %+v, expected %+v", got.Payload, expected)
-	}
-}
 
 func TestGoodFilterChange(t *testing.T) {
 	tests := []struct {

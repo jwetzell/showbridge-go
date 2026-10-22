@@ -8,34 +8,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-func TestFloatRandomFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("float.random")
-	if !ok {
-		t.Fatalf("float.random processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "float.random",
-		Params: map[string]any{
-			"min": 1.0,
-			"max": 10.0,
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create float.random processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("float.random processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "float.random" {
-		t.Fatalf("float.random processor has wrong type: %s", processorInstance.Type())
-	}
-}
-
 func TestGoodFloatRandom(t *testing.T) {
 	tests := []struct {
 		name    string

@@ -85,11 +85,3 @@ func (smg *StructMethodGet) Process(ctx context.Context, wrappedPayload common.W
 	wrappedPayload.Payload = results
 	return wrappedPayload, nil
 }
-
-func (smg *StructMethodGet) Id() string {
-	return smg.config.Id
-}
-
-func (smg *StructMethodGet) Type() string {
-	return smg.config.Type
-}

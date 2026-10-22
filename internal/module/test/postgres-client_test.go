@@ -7,33 +7,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/module"
 )
 
-func TestPostgresClientFromRegistry(t *testing.T) {
-	registration, ok := module.GetModuleRegistration("postgres.client")
-	if !ok {
-		t.Fatalf("postgres.client module not registered")
-	}
-
-	moduleInstance, err := registration.New(config.ModuleConfig{
-		Id:   "test",
-		Type: "postgres.client",
-		Params: map[string]any{
-			"url": "postgres://localhost:5432",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create postgres.client module: %s", err)
-	}
-
-	if moduleInstance.Id() != "test" {
-		t.Fatalf("postgres.client module has wrong id: %s", moduleInstance.Id())
-	}
-
-	if moduleInstance.Type() != "postgres.client" {
-		t.Fatalf("postgres.client module has wrong type: %s", moduleInstance.Type())
-	}
-}
-
 // TODO(jwetzell): figure out how to test this
 func TestGoodPostgresClient(t *testing.T) {
 

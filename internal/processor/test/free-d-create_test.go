@@ -10,41 +10,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-func TestFreeDCreateFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("freed.create")
-	if !ok {
-		t.Fatalf("freed.create processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "freed.create",
-		Params: map[string]any{
-			"id":    "0",
-			"pan":   "0",
-			"tilt":  "0",
-			"roll":  "0",
-			"posX":  "0",
-			"posY":  "0",
-			"posZ":  "0",
-			"zoom":  "0",
-			"focus": "0",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create freed.create processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("freed.create processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "freed.create" {
-		t.Fatalf("freed.create processor has wrong type: %s", processorInstance.Type())
-	}
-}
-
 func TestGoodFreeDCreate(t *testing.T) {
 
 	tests := []struct {

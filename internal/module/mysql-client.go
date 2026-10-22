@@ -56,14 +56,6 @@ type MySQLClient struct {
 	cancel       context.CancelFunc
 }
 
-func (mc *MySQLClient) Id() string {
-	return mc.config.Id
-}
-
-func (mc *MySQLClient) Type() string {
-	return mc.config.Type
-}
-
 func (mc *MySQLClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	mc.logger.Debug("running")
 	mc.inputHandler = inputHandler

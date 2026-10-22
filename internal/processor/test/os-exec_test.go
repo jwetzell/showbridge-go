@@ -10,32 +10,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
-func TestOsExecFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("os.exec")
-	if !ok {
-		t.Fatalf("os.exec processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "os.exec",
-		Params: map[string]any{
-			"command": "ls",
-		},
-	})
-	if err != nil {
-		t.Fatalf("failed to create os.exec processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("os.exec processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "os.exec" {
-		t.Fatalf("os.exec processor has wrong type: %s", processorInstance.Type())
-	}
-}
-
 func TestGoodOsExec(t *testing.T) {
 	testCases := []struct {
 		name     string

@@ -9,33 +9,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/module"
 )
 
-func TestMIDIOutputFromRegistry(t *testing.T) {
-	registration, ok := module.GetModuleRegistration("midi.output")
-	if !ok {
-		t.Fatalf("midi.output module not registered")
-	}
-
-	moduleInstance, err := registration.New(config.ModuleConfig{
-		Id:   "test",
-		Type: "midi.output",
-		Params: map[string]any{
-			"port": "test",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create midi.output module: %s", err)
-	}
-
-	if moduleInstance.Id() != "test" {
-		t.Fatalf("midi.output module has wrong id: %s", moduleInstance.Id())
-	}
-
-	if moduleInstance.Type() != "midi.output" {
-		t.Fatalf("midi.output module has wrong type: %s", moduleInstance.Type())
-	}
-}
-
 func TestBadMIDIOutput(t *testing.T) {
 	tests := []struct {
 		name        string

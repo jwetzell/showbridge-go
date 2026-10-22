@@ -9,32 +9,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
-func TestFilterExprFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("filter.expr")
-	if !ok {
-		t.Fatalf("filter.expr processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "filter.expr",
-		Params: map[string]any{
-			"expression": "foo + bar",
-		},
-	})
-	if err != nil {
-		t.Fatalf("failed to create filter.expr processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("filter.expr processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "filter.expr" {
-		t.Fatalf("filter.expr processor has wrong type: %s", processorInstance.Type())
-	}
-}
-
 func TestGoodFilterExpr(t *testing.T) {
 	testCases := []struct {
 		name    string

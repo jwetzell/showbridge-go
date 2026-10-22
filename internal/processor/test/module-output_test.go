@@ -10,51 +10,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
-func TestModuleOutputFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("module.output")
-	if !ok {
-		t.Fatalf("module.output processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "module.output",
-		Params: config.Params{
-			"module": "test",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create module.output processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("module.output processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "module.output" {
-		t.Fatalf("module.output processor has wrong type: %s", processorInstance.Type())
-	}
-
-	payload := "test"
-	expected := "test"
-
-	router := test.GetNewTestRouter()
-
-	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
-		InputHandler: router.HandleInput,
-		Modules:      map[string]common.Module{"test": &test.TestOutputModule{}},
-		Payload:      payload,
-	})
-	if err != nil {
-		t.Fatalf("module.output processing failed: %s", err)
-	}
-
-	if got.Payload != expected {
-		t.Fatalf("module.output got %+v, expected %+v", got, expected)
-	}
-}
-
 func TestGoodModuleOutput(t *testing.T) {
 
 	testCases := []struct {

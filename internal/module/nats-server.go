@@ -82,14 +82,6 @@ type NATSServer struct {
 	serverMu     sync.Mutex
 }
 
-func (ns *NATSServer) Id() string {
-	return ns.config.Id
-}
-
-func (ns *NATSServer) Type() string {
-	return ns.config.Type
-}
-
 func (ns *NATSServer) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	ns.logger.Debug("running")
 	ns.inputHandler = inputHandler

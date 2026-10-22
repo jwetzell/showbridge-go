@@ -5,56 +5,9 @@ import (
 	"testing"
 
 	"github.com/jwetzell/osc-go"
-	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
-
-func TestJsonEncodeFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("json.encode")
-	if !ok {
-		t.Fatalf("json.encode processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "json.encode",
-	})
-	if err != nil {
-		t.Fatalf("failed to create json.encode processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("json.encode processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "json.encode" {
-		t.Fatalf("json.encode processor has wrong type: %s", processorInstance.Type())
-	}
-
-	payload := struct {
-		Property string `json:"property"`
-	}{
-		Property: "hello",
-	}
-
-	expected := []byte("{\"property\":\"hello\"}")
-
-	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: payload})
-	if err != nil {
-		t.Fatalf("json.encode processing failed: %s", err)
-	}
-
-	gotBytes, ok := got.Payload.([]byte)
-
-	if !ok {
-		t.Fatalf("json.encode should return byte slice got %T: %+v", got.Payload, got.Payload)
-	}
-
-	if !slices.Equal(gotBytes, expected) {
-		t.Fatalf("json.encode got %+v, expected %+v", got, expected)
-	}
-}
 
 func TestGoodJsonEncode(t *testing.T) {
 	jsonEncoder := processor.JsonEncode{}

@@ -39,11 +39,3 @@ func (mmd *MIDIMessageDecode) Process(ctx context.Context, wrappedPayload common
 	wrappedPayload.Payload = payloadMessage
 	return wrappedPayload, nil
 }
-
-func (mmd *MIDIMessageDecode) Id() string {
-	return mmd.config.Id
-}
-
-func (mmd *MIDIMessageDecode) Type() string {
-	return mmd.config.Type
-}

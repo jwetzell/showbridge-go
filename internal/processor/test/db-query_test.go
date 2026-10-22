@@ -11,50 +11,6 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-func TestDbQueryFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("db.query")
-	if !ok {
-		t.Fatalf("db.query processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "db.query",
-		Params: map[string]any{
-			"module": "test",
-			"query":  "SELECT 1;",
-		},
-	})
-	if err != nil {
-		t.Fatalf("failed to create db.query processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("db.query processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "db.query" {
-		t.Fatalf("db.query processor has wrong type: %s", processorInstance.Type())
-	}
-
-	payload := "hello"
-	expected := map[string]any{"1": int64(1)}
-
-	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
-		Payload: payload,
-		Modules: map[string]common.Module{
-			"test": test.NewTestDBModule("test"),
-		},
-	})
-	if err != nil {
-		t.Fatalf("db.query processing failed: %s", err)
-	}
-
-	if !reflect.DeepEqual(got.Payload, expected) {
-		t.Fatalf("db.query got %+v, expected %+v", got.Payload, expected)
-	}
-}
-
 func TestGoodDbQuery(t *testing.T) {
 
 	testCases := []struct {

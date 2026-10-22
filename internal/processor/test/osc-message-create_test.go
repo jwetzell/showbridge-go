@@ -10,33 +10,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-func TestOSCMessageCreateFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("osc.message.create")
-	if !ok {
-		t.Fatalf("osc.message.create processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "osc.message.create",
-		Params: map[string]any{
-			"address": "/test",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create osc.message.create processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("osc.message.create processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "osc.message.create" {
-		t.Fatalf("osc.message.create processor has wrong type: %s", processorInstance.Type())
-	}
-}
-
 func TestGoodOSCMessageCreate(t *testing.T) {
 	tests := []struct {
 		name     string

@@ -96,11 +96,3 @@ func (fr *FloatRandom) Process(ctx context.Context, wrappedPayload common.Wrappe
 	wrappedPayload.End = true
 	return wrappedPayload, errors.New("float.random bitSize error: must be 32 or 64")
 }
-
-func (fr *FloatRandom) Id() string {
-	return fr.config.Id
-}
-
-func (fr *FloatRandom) Type() string {
-	return fr.config.Type
-}

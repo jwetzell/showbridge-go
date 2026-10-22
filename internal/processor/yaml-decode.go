@@ -49,11 +49,3 @@ func (jd *YamlDecode) Process(ctx context.Context, wrappedPayload common.Wrapped
 	return wrappedPayload, nil
 
 }
-
-func (jd *YamlDecode) Id() string {
-	return jd.config.Id
-}
-
-func (jd *YamlDecode) Type() string {
-	return jd.config.Type
-}

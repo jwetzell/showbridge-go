@@ -55,14 +55,6 @@ type PostgresClient struct {
 	cancel       context.CancelFunc
 }
 
-func (pc *PostgresClient) Id() string {
-	return pc.config.Id
-}
-
-func (pc *PostgresClient) Type() string {
-	return pc.config.Type
-}
-
 func (pc *PostgresClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	pc.logger.Debug("running")
 	pc.inputHandler = inputHandler

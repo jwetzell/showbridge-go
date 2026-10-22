@@ -52,11 +52,3 @@ func (fc *FilterRate) Process(ctx context.Context, wrappedPayload common.Wrapped
 	}
 	return wrappedPayload, nil
 }
-
-func (fc *FilterRate) Id() string {
-	return fc.config.Id
-}
-
-func (fc *FilterRate) Type() string {
-	return fc.config.Type
-}

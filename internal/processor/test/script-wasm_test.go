@@ -9,33 +9,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-func TestScriptWASMFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("script.wasm")
-	if !ok {
-		t.Fatalf("script.wasm processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "script.wasm",
-		Params: map[string]any{
-			"path": "good.wasm",
-		},
-	})
-	if err != nil {
-		t.Fatalf("failed to create script.wasm processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("script.wasm processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "script.wasm" {
-		t.Fatalf("script.wasm processor has wrong type: %s", processorInstance.Type())
-	}
-
-}
-
 func TestGoodScriptWASM(t *testing.T) {
 	tests := []struct {
 		name     string

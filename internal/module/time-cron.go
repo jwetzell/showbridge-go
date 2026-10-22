@@ -51,14 +51,6 @@ type TimeCron struct {
 	cron         *cron.Cron
 }
 
-func (t *TimeCron) Id() string {
-	return t.config.Id
-}
-
-func (t *TimeCron) Type() string {
-	return t.config.Type
-}
-
 func (t *TimeCron) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	t.logger.Debug("running")
 	t.inputHandler = inputHandler
@@ -70,7 +62,7 @@ func (t *TimeCron) Start(ctx context.Context, inputHandler common.InputHandler) 
 
 	t.cron.AddFunc(t.CronString, func() {
 		if t.inputHandler != nil {
-			t.inputHandler(t.ctx, t.Id(), time.Now())
+			t.inputHandler(t.ctx, t.config.Id, time.Now())
 		}
 	})
 	t.cron.Start()

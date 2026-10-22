@@ -7,33 +7,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/module"
 )
 
-func TestMySQLClientFromRegistry(t *testing.T) {
-	registration, ok := module.GetModuleRegistration("mysql.client")
-	if !ok {
-		t.Fatalf("mysql.client module not registered")
-	}
-
-	moduleInstance, err := registration.New(config.ModuleConfig{
-		Id:   "test",
-		Type: "mysql.client",
-		Params: map[string]any{
-			"dsn": "mysql:mysql@tcp(127.0.0.1:3306)/test",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create mysql.client module: %s", err)
-	}
-
-	if moduleInstance.Id() != "test" {
-		t.Fatalf("mysql.client module has wrong id: %s", moduleInstance.Id())
-	}
-
-	if moduleInstance.Type() != "mysql.client" {
-		t.Fatalf("mysql.client module has wrong type: %s", moduleInstance.Type())
-	}
-}
-
 // TODO(jwetzell): figure out how to test this
 func TestGoodMySQLClient(t *testing.T) {
 

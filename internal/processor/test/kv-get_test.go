@@ -10,52 +10,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
-func TestKvGetFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("kv.get")
-	if !ok {
-		t.Fatalf("kv.get processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "kv.get",
-		Params: map[string]any{
-			"module": "test",
-			"key":    "test",
-		},
-	})
-	if err != nil {
-		t.Fatalf("failed to create kv.get processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("kv.get processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "kv.get" {
-		t.Fatalf("kv.get processor has wrong type: %s", processorInstance.Type())
-	}
-
-	payload := "hello"
-	expected := "test"
-
-	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
-		Modules: map[string]common.Module{
-			"test": test.NewTestKVModule("test", map[string]any{
-				"test": "test",
-			}),
-		},
-		Payload: payload,
-	})
-	if err != nil {
-		t.Fatalf("kv.get processing failed: %s", err)
-	}
-
-	if got.Payload != expected {
-		t.Fatalf("kv.get got %+v, expected %+v", got.Payload, expected)
-	}
-}
-
 func TestGoodKvGet(t *testing.T) {
 
 	testCases := []struct {

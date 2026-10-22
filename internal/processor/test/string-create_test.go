@@ -9,44 +9,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
-func TestStringCreateFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("string.create")
-	if !ok {
-		t.Fatalf("string.create processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "string.create",
-		Params: map[string]any{
-			"template": "{{.Payload}}",
-		},
-	})
-	if err != nil {
-		t.Fatalf("failed to create string.create processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("string.create processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "string.create" {
-		t.Fatalf("string.create processor has wrong type: %s", processorInstance.Type())
-	}
-
-	payload := "hello"
-	expected := "hello"
-
-	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: payload})
-	if err != nil {
-		t.Fatalf("string.create processing failed: %s", err)
-	}
-
-	if got.Payload != expected {
-		t.Fatalf("string.create got %+v, expected %+v", got, expected)
-	}
-}
-
 func TestGoodStringCreate(t *testing.T) {
 
 	tests := []struct {

@@ -5,34 +5,9 @@ import (
 	"testing"
 
 	freeD "github.com/jwetzell/free-d-go"
-	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
-
-func TestFreeDDecodeFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("freed.decode")
-	if !ok {
-		t.Fatalf("freed.decode processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "freed.decode",
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create freed.decode processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("freed.decode processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "freed.decode" {
-		t.Fatalf("freed.decode processor has wrong type: %s", processorInstance.Type())
-	}
-}
 
 func TestGoodFreeDDecode(t *testing.T) {
 	packetEncoder := processor.FreeDDecode{}

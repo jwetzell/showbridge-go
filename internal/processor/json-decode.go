@@ -49,11 +49,3 @@ func (jd *JsonDecode) Process(ctx context.Context, wrappedPayload common.Wrapped
 	return wrappedPayload, nil
 
 }
-
-func (jd *JsonDecode) Id() string {
-	return jd.config.Id
-}
-
-func (jd *JsonDecode) Type() string {
-	return jd.config.Type
-}

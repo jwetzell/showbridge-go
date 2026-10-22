@@ -114,11 +114,3 @@ func (oe *OsExec) Process(ctx context.Context, wrappedPayload common.WrappedPayl
 	wrappedPayload.Payload = out
 	return wrappedPayload, nil
 }
-
-func (oe *OsExec) Id() string {
-	return oe.config.Id
-}
-
-func (oe *OsExec) Type() string {
-	return oe.config.Type
-}

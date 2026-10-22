@@ -87,11 +87,3 @@ func (owf *OsWriteFile) Process(ctx context.Context, wrappedPayload common.Wrapp
 	}
 	return wrappedPayload, nil
 }
-
-func (owf *OsWriteFile) Id() string {
-	return owf.config.Id
-}
-
-func (owf *OsWriteFile) Type() string {
-	return owf.config.Type
-}

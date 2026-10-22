@@ -10,32 +10,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
-func TestOsWriteFileFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("os.writefile")
-	if !ok {
-		t.Fatalf("os.writefile processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "os.writefile",
-		Params: map[string]any{
-			"path": "/tmp/test.txt",
-		},
-	})
-	if err != nil {
-		t.Fatalf("failed to create os.writefile processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("os.writefile processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "os.writefile" {
-		t.Fatalf("os.writefile processor has wrong type: %s", processorInstance.Type())
-	}
-}
-
 func TestGoodOsWriteFile(t *testing.T) {
 	testCases := []struct {
 		name     string

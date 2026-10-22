@@ -8,30 +8,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-func TestIntParseFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("int.parse")
-	if !ok {
-		t.Fatalf("int.parse processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "int.parse",
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create int.parse processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("int.parse processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "int.parse" {
-		t.Fatalf("int.parse processor has wrong type: %s", processorInstance.Type())
-	}
-}
-
 func TestGoodIntParse(t *testing.T) {
 	tests := []struct {
 		name     string

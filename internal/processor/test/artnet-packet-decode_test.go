@@ -5,34 +5,9 @@ import (
 	"testing"
 
 	"github.com/jwetzell/artnet-go"
-	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
-
-func TestArtnetPacketDecodeFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("artnet.packet.decode")
-	if !ok {
-		t.Fatalf("artnet.packet.decode processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "artnet.packet.decode",
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create artnet.packet.decode processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("artnet.packet.decode processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "artnet.packet.decode" {
-		t.Fatalf("artnet.packet.decode processor has wrong type: %s", processorInstance.Type())
-	}
-}
 
 func TestGoodArtnetPacketDecode(t *testing.T) {
 	packetDecoder := processor.ArtNetPacketDecode{}

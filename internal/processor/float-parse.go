@@ -67,11 +67,3 @@ func (fp *FloatParse) Process(ctx context.Context, wrappedPayload common.Wrapped
 	wrappedPayload.Payload = payloadFloat
 	return wrappedPayload, nil
 }
-
-func (fp *FloatParse) Id() string {
-	return fp.config.Id
-}
-
-func (fp *FloatParse) Type() string {
-	return fp.config.Type
-}

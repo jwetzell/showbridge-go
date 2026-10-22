@@ -34,11 +34,3 @@ func (fc *FilterChange) Process(ctx context.Context, wrappedPayload common.Wrapp
 
 	return wrappedPayload, nil
 }
-
-func (fc *FilterChange) Id() string {
-	return fc.config.Id
-}
-
-func (fc *FilterChange) Type() string {
-	return fc.config.Type
-}

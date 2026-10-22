@@ -68,11 +68,3 @@ func (fr *FilterRegex) Process(ctx context.Context, wrappedPayload common.Wrappe
 	wrappedPayload.Payload = payloadString
 	return wrappedPayload, nil
 }
-
-func (fr *FilterRegex) Id() string {
-	return fr.config.Id
-}
-
-func (fr *FilterRegex) Type() string {
-	return fr.config.Type
-}

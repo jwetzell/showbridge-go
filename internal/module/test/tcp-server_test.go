@@ -7,34 +7,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/module"
 )
 
-func TestTCPServerFromRegistry(t *testing.T) {
-	registration, ok := module.GetModuleRegistration("net.tcp.server")
-	if !ok {
-		t.Fatalf("net.tcp.server module not registered")
-	}
-
-	moduleInstance, err := registration.New(config.ModuleConfig{
-		Id:   "test",
-		Type: "net.tcp.server",
-		Params: map[string]any{
-			"port":    8000,
-			"framing": "LF",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create net.tcp.server module: %s", err)
-	}
-
-	if moduleInstance.Id() != "test" {
-		t.Fatalf("net.tcp.server module has wrong id: %s", moduleInstance.Id())
-	}
-
-	if moduleInstance.Type() != "net.tcp.server" {
-		t.Fatalf("net.tcp.server module has wrong type: %s", moduleInstance.Type())
-	}
-}
-
 // TODO(jwetzell): figure out how to test this
 func TestGoodTCPServer(t *testing.T) {
 

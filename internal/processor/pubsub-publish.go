@@ -103,11 +103,3 @@ func (psp *PubSubPublish) Process(ctx context.Context, wrappedPayload common.Wra
 
 	return wrappedPayload, nil
 }
-
-func (psp *PubSubPublish) Id() string {
-	return psp.config.Id
-}
-
-func (psp *PubSubPublish) Type() string {
-	return psp.config.Type
-}

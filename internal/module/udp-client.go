@@ -69,14 +69,6 @@ type UDPClient struct {
 	connMu       sync.Mutex
 }
 
-func (uc *UDPClient) Id() string {
-	return uc.config.Id
-}
-
-func (uc *UDPClient) Type() string {
-	return uc.config.Type
-}
-
 func (uc *UDPClient) SetupConn() error {
 	uc.connMu.Lock()
 	defer uc.connMu.Unlock()

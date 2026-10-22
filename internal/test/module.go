@@ -25,14 +25,6 @@ func (m *TestModule) Start(ctx context.Context, inputHandler common.InputHandler
 
 func (m *TestModule) Stop() {}
 
-func (m *TestModule) Type() string {
-	return "test.plain"
-}
-
-func (m *TestModule) Id() string {
-	return "test"
-}
-
 func NewTestOutputModule(id string) *TestOutputModule {
 	return &TestOutputModule{
 		id: id,
@@ -54,14 +46,6 @@ func (m *TestOutputModule) Output(ctx context.Context, payload any) error {
 
 func (m *TestOutputModule) Stop() {}
 
-func (m *TestOutputModule) Type() string {
-	return "test.output"
-}
-
-func (m *TestOutputModule) Id() string {
-	return m.id
-}
-
 func NewTestKVModule(id string, presetValues map[string]any) *TestKVModule {
 	return &TestKVModule{
 		id:     id,
@@ -80,14 +64,6 @@ func (m *TestKVModule) Start(ctx context.Context, inputHandler common.InputHandl
 }
 
 func (m *TestKVModule) Stop() {}
-
-func (m *TestKVModule) Type() string {
-	return "test.kv"
-}
-
-func (m *TestKVModule) Id() string {
-	return m.id
-}
 
 func (m *TestKVModule) Get(ctx context.Context, key string) (any, error) {
 	if m.kvData == nil {
@@ -149,14 +125,6 @@ func (m *TestDBModule) QueryContext(ctx context.Context, query string, args ...a
 
 func (m *TestDBModule) Stop() {}
 
-func (m *TestDBModule) Type() string {
-	return "test.db"
-}
-
-func (m *TestDBModule) Id() string {
-	return m.id
-}
-
 func NewTestPubSubModule(id string) *TestPubSubModule {
 	return &TestPubSubModule{
 		id: id,
@@ -177,11 +145,3 @@ func (m *TestPubSubModule) Publish(ctx context.Context, topic string, payload an
 }
 
 func (m *TestPubSubModule) Stop() {}
-
-func (m *TestPubSubModule) Type() string {
-	return "test.pubsub"
-}
-
-func (m *TestPubSubModule) Id() string {
-	return m.id
-}

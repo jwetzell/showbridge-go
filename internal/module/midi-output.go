@@ -56,14 +56,6 @@ type MIDIOutput struct {
 	sendFuncMu   sync.Mutex
 }
 
-func (mo *MIDIOutput) Id() string {
-	return mo.config.Id
-}
-
-func (mo *MIDIOutput) Type() string {
-	return mo.config.Type
-}
-
 func (mo *MIDIOutput) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	mo.logger.Debug("running")
 	mo.inputHandler = inputHandler

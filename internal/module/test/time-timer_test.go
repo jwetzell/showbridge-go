@@ -7,33 +7,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/module"
 )
 
-func TestTimeTimerFromRegistry(t *testing.T) {
-	registration, ok := module.GetModuleRegistration("time.timer")
-	if !ok {
-		t.Fatalf("time.timer module not registered")
-	}
-
-	moduleInstance, err := registration.New(config.ModuleConfig{
-		Id:   "test",
-		Type: "time.timer",
-		Params: map[string]any{
-			"duration": 1000,
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create time.timer module: %s", err)
-	}
-
-	if moduleInstance.Id() != "test" {
-		t.Fatalf("time.timer module has wrong id: %s", moduleInstance.Id())
-	}
-
-	if moduleInstance.Type() != "time.timer" {
-		t.Fatalf("time.timer module has wrong type: %s", moduleInstance.Type())
-	}
-}
-
 // TODO(jwetzell): figure out how to test this
 func TestGoodTimeTimer(t *testing.T) {
 

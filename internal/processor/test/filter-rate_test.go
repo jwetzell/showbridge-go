@@ -9,32 +9,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
-func TestFilterRateFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("filter.rate")
-	if !ok {
-		t.Fatalf("filter.rate processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "filter.rate",
-		Params: map[string]any{
-			"rate": 1,
-		},
-	})
-	if err != nil {
-		t.Fatalf("failed to create filter.rate processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("filter.rate processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "filter.rate" {
-		t.Fatalf("filter.rate processor has wrong type: %s", processorInstance.Type())
-	}
-}
-
 func TestGoodFilterRate(t *testing.T) {
 	testCases := []struct {
 		name    string

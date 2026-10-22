@@ -91,14 +91,6 @@ type TCPClient struct {
 	connMu       sync.Mutex
 }
 
-func (tc *TCPClient) Id() string {
-	return tc.config.Id
-}
-
-func (tc *TCPClient) Type() string {
-	return tc.config.Type
-}
-
 func (tc *TCPClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	tc.logger.Debug("running")
 	tc.inputHandler = inputHandler
@@ -144,7 +136,7 @@ CONNECT_RETRY:
 					messages := tc.inFramer.Decode(buffer[0:byteCount])
 					for _, message := range messages {
 						if tc.inputHandler != nil {
-							tc.inputHandler(tc.ctx, tc.Id(), message)
+							tc.inputHandler(tc.ctx, tc.config.Id, message)
 						} else {
 							tc.logger.Error("input received but no input handler is configured")
 						}

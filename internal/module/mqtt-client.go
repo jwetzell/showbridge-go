@@ -114,14 +114,6 @@ type MQTTClient struct {
 	clientMu     sync.Mutex
 }
 
-func (mc *MQTTClient) Id() string {
-	return mc.config.Id
-}
-
-func (mc *MQTTClient) Type() string {
-	return mc.config.Type
-}
-
 func (mc *MQTTClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	mc.logger.Debug("running")
 	mc.inputHandler = inputHandler
@@ -138,7 +130,7 @@ func (mc *MQTTClient) Start(ctx context.Context, inputHandler common.InputHandle
 	opts.OnConnect = func(c mqtt.Client) {
 		token := mc.client.Subscribe(mc.Topic, 1, func(c mqtt.Client, m mqtt.Message) {
 			if mc.inputHandler != nil {
-				mc.inputHandler(mc.ctx, mc.Id(), m)
+				mc.inputHandler(mc.ctx, mc.config.Id, m)
 			}
 		})
 		token.Wait()

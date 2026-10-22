@@ -9,46 +9,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-func TestScriptJSFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("script.js")
-	if !ok {
-		t.Fatalf("script.js processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "script.js",
-		Params: map[string]any{
-			"program": `
-			payload = payload + 1
-			`,
-		},
-	})
-	if err != nil {
-		t.Fatalf("failed to create script.js processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("script.js processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "script.js" {
-		t.Fatalf("script.js processor has wrong type: %s", processorInstance.Type())
-	}
-
-	payload := 1
-	expected := 2
-
-	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: payload})
-	if err != nil {
-		t.Fatalf("script.js processing failed: %s", err)
-	}
-
-	if got.Payload != expected {
-		t.Fatalf("script.js got %+v, expected %+v", got, expected)
-	}
-}
-
 func TestScriptJSNoProgram(t *testing.T) {
 	registration, ok := processor.GetProcessorRegistration("script.js")
 	if !ok {

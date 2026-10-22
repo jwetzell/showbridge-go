@@ -93,14 +93,6 @@ type UDPServer struct {
 	listenerMu   sync.Mutex
 }
 
-func (us *UDPServer) Id() string {
-	return us.config.Id
-}
-
-func (us *UDPServer) Type() string {
-	return us.config.Type
-}
-
 func (us *UDPServer) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	us.logger.Debug("running")
 	us.inputHandler = inputHandler
@@ -131,7 +123,7 @@ func (us *UDPServer) Start(ctx context.Context, inputHandler common.InputHandler
 		}
 		message := buffer[:numBytes]
 		if us.inputHandler != nil {
-			us.inputHandler(us.ctx, us.Id(), message)
+			us.inputHandler(us.ctx, us.config.Id, message)
 		} else {
 			us.logger.Error("input received but no input handler is configured")
 		}

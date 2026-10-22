@@ -55,14 +55,6 @@ type SqliteClient struct {
 	cancel       context.CancelFunc
 }
 
-func (sc *SqliteClient) Id() string {
-	return sc.config.Id
-}
-
-func (sc *SqliteClient) Type() string {
-	return sc.config.Type
-}
-
 func (sc *SqliteClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	sc.logger.Debug("running")
 	sc.inputHandler = inputHandler

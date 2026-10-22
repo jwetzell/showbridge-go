@@ -12,29 +12,6 @@ import (
 	"gitlab.com/gomidi/midi/v2"
 )
 
-func TestMIDIMessageUnpackFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("midi.message.unpack")
-	if !ok {
-		t.Fatalf("midi.message.unpack processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "midi.message.unpack",
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create midi.message.unpack processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("midi.message.unpack processor has wrong id: %s", processorInstance.Id())
-	}
-	if processorInstance.Type() != "midi.message.unpack" {
-		t.Fatalf("midi.message.unpack processor has wrong type: %s", processorInstance.Type())
-	}
-}
-
 func TestGoodMIDIMessageUnpack(t *testing.T) {
 	processorInstance := &processor.MIDIMessageUnpack{}
 	tests := []struct {

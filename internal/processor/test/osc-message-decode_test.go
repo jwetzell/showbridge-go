@@ -5,34 +5,9 @@ import (
 	"testing"
 
 	"github.com/jwetzell/osc-go"
-	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
-
-func TestOSCMessageDecodeFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("osc.message.decode")
-	if !ok {
-		t.Fatalf("osc.message.decode processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "osc.message.decode",
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create osc.message.decode processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("osc.message.decode processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "osc.message.decode" {
-		t.Fatalf("osc.message.decode processor has wrong type: %s", processorInstance.Type())
-	}
-}
 
 func TestGoodOSCMessageDecode(t *testing.T) {
 	processorInstance := processor.OSCMessageDecode{}

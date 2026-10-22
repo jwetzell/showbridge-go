@@ -8,29 +8,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-func TestFloatParseFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("float.parse")
-	if !ok {
-		t.Fatalf("float.parse processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "float.parse",
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create float.parse processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("float.parse processor has wrong id: %s", processorInstance.Id())
-	}
-	if processorInstance.Type() != "float.parse" {
-		t.Fatalf("float.parse processor has wrong type: %s", processorInstance.Type())
-	}
-}
-
 func TestGoodFloatParse(t *testing.T) {
 	tests := []struct {
 		name     string

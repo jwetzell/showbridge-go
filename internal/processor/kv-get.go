@@ -88,11 +88,3 @@ func (kvg *KVGet) Process(ctx context.Context, wrappedPayload common.WrappedPayl
 	wrappedPayload.Payload = value
 	return wrappedPayload, nil
 }
-
-func (kvg *KVGet) Id() string {
-	return kvg.config.Id
-}
-
-func (kvg *KVGet) Type() string {
-	return kvg.config.Type
-}

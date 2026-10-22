@@ -48,11 +48,3 @@ func (fd *FreeDDecode) Process(ctx context.Context, wrappedPayload common.Wrappe
 	wrappedPayload.Payload = payloadMessage
 	return wrappedPayload, nil
 }
-
-func (fd *FreeDDecode) Id() string {
-	return fd.config.Id
-}
-
-func (fd *FreeDDecode) Type() string {
-	return fd.config.Type
-}

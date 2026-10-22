@@ -6,35 +6,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 	"gitlab.com/gomidi/midi/v2"
 )
-
-func TestMIDIMessageDecodeFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("midi.message.decode")
-	if !ok {
-		t.Fatalf("midi.message.decode processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "midi.message.decode",
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create midi.message.decode processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("midi.message.decode processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "midi.message.decode" {
-		t.Fatalf("midi.message.decode processor has wrong type: %s", processorInstance.Type())
-	}
-}
 
 func TestGoodMIDIMessageDecode(t *testing.T) {
 	processorInstance := &processor.MIDIMessageDecode{}

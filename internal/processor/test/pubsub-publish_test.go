@@ -11,50 +11,6 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-func TestPubSubPublishFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("pubsub.publish")
-	if !ok {
-		t.Fatalf("pubsub.publish processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "pubsub.publish",
-		Params: map[string]any{
-			"module": "test",
-			"topic":  "test",
-		},
-	})
-	if err != nil {
-		t.Fatalf("failed to create pubsub.publish processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("pubsub.publish processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "pubsub.publish" {
-		t.Fatalf("pubsub.publish processor has wrong type: %s", processorInstance.Type())
-	}
-
-	payload := "hello"
-	expected := "hello"
-
-	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
-		Payload: payload,
-		Modules: map[string]common.Module{
-			"test": test.NewTestPubSubModule("test"),
-		},
-	})
-	if err != nil {
-		t.Fatalf("pubsub.publish processing failed: %s", err)
-	}
-
-	if !reflect.DeepEqual(got.Payload, expected) {
-		t.Fatalf("pubsub.publish got %+v, expected %+v", got.Payload, expected)
-	}
-}
-
 func TestGoodPubSubPublish(t *testing.T) {
 
 	testCases := []struct {

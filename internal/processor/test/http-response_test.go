@@ -9,34 +9,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-func TestHTTPResponseFromRegistry(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("http.response")
-	if !ok {
-		t.Fatalf("http.response processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Id:   "test-id",
-		Type: "http.response",
-		Params: map[string]any{
-			"status":       200,
-			"bodyTemplate": "Hello, World!",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("failed to create http.response processor: %s", err)
-	}
-
-	if processorInstance.Id() != "test-id" {
-		t.Fatalf("http.response processor has wrong id: %s", processorInstance.Id())
-	}
-
-	if processorInstance.Type() != "http.response" {
-		t.Fatalf("http.response processor has wrong type: %s", processorInstance.Type())
-	}
-}
-
 // TODO(jwetzell): figure out how to test the actual HTTP response writing
 func TestGoodHTTPResponseCreate(t *testing.T) {
 

@@ -43,11 +43,3 @@ func (sd *StringDecode) Process(ctx context.Context, wrappedPayload common.Wrapp
 	wrappedPayload.Payload = payloadMessage
 	return wrappedPayload, nil
 }
-
-func (sd *StringDecode) Id() string {
-	return sd.config.Id
-}
-
-func (sd *StringDecode) Type() string {
-	return sd.config.Type
-}

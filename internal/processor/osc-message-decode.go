@@ -51,11 +51,3 @@ func (omd *OSCMessageDecode) Process(ctx context.Context, wrappedPayload common.
 	wrappedPayload.Payload = message
 	return wrappedPayload, nil
 }
-
-func (omd *OSCMessageDecode) Id() string {
-	return omd.config.Id
-}
-
-func (omd *OSCMessageDecode) Type() string {
-	return omd.config.Type
-}
