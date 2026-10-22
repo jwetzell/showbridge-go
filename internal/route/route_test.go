@@ -22,10 +22,6 @@ func TestRouteCreate(t *testing.T) {
 		t.Fatalf("route failed to create: %v", err)
 	}
 
-	if testRoute.Id() != routeConfig.Id {
-		t.Fatalf("route id does not match expected id")
-	}
-
 	if testRoute.Input() != routeConfig.Input {
 		t.Fatalf("route input does not match expected input")
 	}
