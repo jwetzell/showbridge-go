@@ -36,8 +36,9 @@ func NewRoute(config config.RouteConfig) (*Route, error) {
 	return &Route{id: config.Id, input: config.Input, processors: processors}, nil
 }
 
-func (r *Route) Input() string {
-	return r.input
+func (r *Route) Matches(source string) bool {
+	// TODO(jwetzell): maybe support more complex matching logic in the future? regex? wildcards?
+	return r.input == source
 }
 
 func (r *Route) ProcessPayload(ctx context.Context, wrappedPayload common.WrappedPayload) (any, error) {

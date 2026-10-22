@@ -203,7 +203,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 			r.logger.Error("nil route instance found", "routeIndex", routeIndex)
 			continue
 		}
-		if routeInstance.Input() == sourceId {
+		if routeInstance.Matches(sourceId) {
 			routeWaitGroup.Go(func() {
 
 				routeFound.Store(true)

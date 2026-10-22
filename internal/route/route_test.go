@@ -11,22 +11,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
-func TestRouteCreate(t *testing.T) {
-	routeConfig := config.RouteConfig{
-		Id:    "test-route",
-		Input: "input",
-	}
-
-	testRoute, err := route.NewRoute(routeConfig)
-	if err != nil {
-		t.Fatalf("route failed to create: %v", err)
-	}
-
-	if testRoute.Input() != routeConfig.Input {
-		t.Fatalf("route input does not match expected input")
-	}
-}
-
 type MockRouter struct{}
 
 func (mr *MockRouter) HandleInput(ctx context.Context, sourceId string, payload any) (bool, []common.RouteIOError) {
