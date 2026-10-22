@@ -10,3 +10,8 @@ type RouteIOError struct {
 	Index        int   `json:"index"`
 	ProcessError error `json:"processError"`
 }
+
+type Route interface {
+	ProcessPayload(ctx context.Context, wrappedPayload WrappedPayload) (any, error)
+	Matches(source string) bool
+}

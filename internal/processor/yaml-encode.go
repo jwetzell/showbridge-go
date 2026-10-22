@@ -13,7 +13,7 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "yaml.encode",
 		Title: "Encode YAML",
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (common.Processor, error) {
 			return &YamlEncode{config: config}, nil
 		},
 	})

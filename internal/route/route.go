@@ -9,14 +9,14 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-type Route struct {
+type route struct {
 	id         string
 	input      string
-	processors []processor.Processor
+	processors []common.Processor
 }
 
-func NewRoute(config config.RouteConfig) (*Route, error) {
-	processors := []processor.Processor{}
+func NewRoute(config config.RouteConfig) (common.Route, error) {
+	processors := []common.Processor{}
 
 	if len(config.Processors) > 0 {
 		for _, processorDecl := range config.Processors {
@@ -33,15 +33,15 @@ func NewRoute(config config.RouteConfig) (*Route, error) {
 		}
 	}
 
-	return &Route{id: config.Id, input: config.Input, processors: processors}, nil
+	return &route{id: config.Id, input: config.Input, processors: processors}, nil
 }
 
-func (r *Route) Matches(source string) bool {
+func (r *route) Matches(source string) bool {
 	// TODO(jwetzell): maybe support more complex matching logic in the future? regex? wildcards?
 	return r.input == source
 }
 
-func (r *Route) ProcessPayload(ctx context.Context, wrappedPayload common.WrappedPayload) (any, error) {
+func (r *route) ProcessPayload(ctx context.Context, wrappedPayload common.WrappedPayload) (any, error) {
 	for processorIndex, processor := range r.processors {
 		processedPayload, err := processor.Process(ctx, wrappedPayload)
 		if err != nil {

@@ -13,7 +13,7 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "freed.encode",
 		Title: "Encode FreeD",
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (common.Processor, error) {
 			return &FreeDEncode{config: config}, nil
 		},
 	})

@@ -6,7 +6,6 @@ import (
 
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/common"
-	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
 func (r *Router) GetRunningConfig() config.Config {
@@ -41,7 +40,7 @@ func (r *Router) UpdateConfig(newConfig config.Config, triggerChangeChan bool) (
 	r.moduleWait.Wait()
 
 	r.ModuleInstances = make(map[string]common.Module)
-	r.RouteInstances = []*route.Route{}
+	r.RouteInstances = []common.Route{}
 
 	var moduleErrors []config.ModuleError
 

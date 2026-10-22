@@ -42,7 +42,7 @@ func init() {
 			Required:             []string{"url"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(processorConfig config.ProcessorConfig) (Processor, error) {
+		New: func(processorConfig config.ProcessorConfig) (common.Processor, error) {
 			params := processorConfig.Params
 
 			urlString, err := params.GetString("url")

@@ -37,7 +37,7 @@ func init() {
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 			Required:             []string{"command"},
 		},
-		New: func(moduleConfig config.ProcessorConfig) (Processor, error) {
+		New: func(moduleConfig config.ProcessorConfig) (common.Processor, error) {
 			params := moduleConfig.Params
 
 			commandString, err := params.GetString("command")

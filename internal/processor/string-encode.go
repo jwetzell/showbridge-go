@@ -12,7 +12,7 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "string.encode",
 		Title: "Encode String",
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (common.Processor, error) {
 			return &StringEncode{config: config}, nil
 		},
 	})

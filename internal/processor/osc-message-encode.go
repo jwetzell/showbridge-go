@@ -18,7 +18,7 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "osc.message.encode",
 		Title: "Encode OSC Message",
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (common.Processor, error) {
 			return &OSCMessageEncode{config: config}, nil
 		},
 	})

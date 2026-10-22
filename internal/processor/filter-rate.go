@@ -25,7 +25,7 @@ func init() {
 			},
 			Required: []string{"rate"},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (common.Processor, error) {
 			params := config.Params
 			rateInt, err := params.GetInt("rate")
 			if err != nil {

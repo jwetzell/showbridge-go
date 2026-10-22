@@ -79,7 +79,7 @@ func init() {
 			},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (common.Processor, error) {
 
 			// TODO(jwetzell): make some params optional
 			params := config.Params

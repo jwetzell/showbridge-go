@@ -32,7 +32,7 @@ func init() {
 			Required:             []string{"module", "key"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (common.Processor, error) {
 
 			params := config.Params
 

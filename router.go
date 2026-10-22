@@ -21,7 +21,7 @@ type Router struct {
 	// TODO(jwetzell): do these need to be guarded against concurrency?
 	ModuleInstances map[string]common.Module
 	// TODO(jwetzell): change to something easier to lookup
-	RouteInstances      []*route.Route
+	RouteInstances      []common.Route
 	ConfigChange        chan config.Config
 	moduleWait          sync.WaitGroup
 	logger              *slog.Logger
@@ -111,7 +111,7 @@ func NewRouter(routerConfig config.Config) (*Router, []config.ModuleError, []con
 
 	router := Router{
 		ModuleInstances: make(map[string]common.Module),
-		RouteInstances:  []*route.Route{},
+		RouteInstances:  []common.Route{},
 		ConfigChange:    make(chan config.Config, 1),
 		logger:          slog.Default().With("component", "router"),
 		runningConfig:   routerConfig,

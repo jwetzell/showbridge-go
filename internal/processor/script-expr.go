@@ -33,7 +33,7 @@ func init() {
 			Required:             []string{"expression"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (common.Processor, error) {
 			params := config.Params
 
 			expressionString, err := params.GetString("expression")

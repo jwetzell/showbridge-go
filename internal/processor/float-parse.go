@@ -29,7 +29,7 @@ func init() {
 			},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(moduleConfig config.ProcessorConfig) (Processor, error) {
+		New: func(moduleConfig config.ProcessorConfig) (common.Processor, error) {
 			params := moduleConfig.Params
 
 			bitSizeNum, err := params.GetInt("bitSize")

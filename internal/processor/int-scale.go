@@ -41,7 +41,7 @@ func init() {
 			Required:             []string{"inMin", "inMax", "outMin", "outMax"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (common.Processor, error) {
 			params := config.Params
 
 			inMinInt, err := params.GetInt("inMin")

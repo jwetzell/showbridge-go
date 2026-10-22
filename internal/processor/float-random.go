@@ -40,7 +40,7 @@ func init() {
 			Required:             []string{"min", "max"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(processorConfig config.ProcessorConfig) (Processor, error) {
+		New: func(processorConfig config.ProcessorConfig) (common.Processor, error) {
 			params := processorConfig.Params
 
 			bitSizeInt, err := params.GetInt("bitSize")

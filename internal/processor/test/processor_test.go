@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/internal/common"
 	"github.com/jwetzell/showbridge-go/internal/processor"
 	"github.com/jwetzell/showbridge-go/internal/test"
 )
@@ -18,7 +19,7 @@ func TestProcessorBadRegistrationNoType(t *testing.T) {
 
 	processor.RegisterProcessor(processor.ProcessorRegistration{
 		Type: "",
-		New: func(config config.ProcessorConfig) (processor.Processor, error) {
+		New: func(config config.ProcessorConfig) (common.Processor, error) {
 			return &test.TestProcessor{}, nil
 		},
 	})
@@ -48,7 +49,7 @@ func TestProcessorBadRegistrationExistingType(t *testing.T) {
 
 	processor.RegisterProcessor(processor.ProcessorRegistration{
 		Type: "string.create",
-		New: func(config config.ProcessorConfig) (processor.Processor, error) {
+		New: func(config config.ProcessorConfig) (common.Processor, error) {
 			return &test.TestProcessor{}, nil
 		},
 	})

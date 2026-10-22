@@ -1,7 +1,6 @@
 package processor
 
 import (
-	"context"
 	"fmt"
 	"sync"
 
@@ -10,16 +9,12 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/common"
 )
 
-type Processor interface {
-	Process(context.Context, common.WrappedPayload) (common.WrappedPayload, error)
-}
-
 type ProcessorRegistration struct {
 	Type         string             `json:"type"`
 	Title        string             `json:"title,omitempty"`
 	Description  string             `json:"description,omitempty"`
 	ParamsSchema *jsonschema.Schema `json:"paramsSchema,omitempty"`
-	New          func(config.ProcessorConfig) (Processor, error)
+	New          func(config.ProcessorConfig) (common.Processor, error)
 }
 
 func RegisterProcessor(processor ProcessorRegistration) {

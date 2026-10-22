@@ -26,7 +26,7 @@ func init() {
 			Required:             []string{"duration"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (common.Processor, error) {
 			params := config.Params
 
 			durationNum, err := params.GetInt("duration")

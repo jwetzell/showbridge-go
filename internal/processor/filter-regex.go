@@ -27,7 +27,7 @@ func init() {
 			Required:             []string{"pattern"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (common.Processor, error) {
 			params := config.Params
 
 			patternString, err := params.GetString("pattern")

@@ -16,7 +16,7 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "midi.message.unpack",
 		Title: "Unpack MIDI Message",
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (common.Processor, error) {
 			return &MIDIMessageUnpack{config: config}, nil
 		},
 	})
