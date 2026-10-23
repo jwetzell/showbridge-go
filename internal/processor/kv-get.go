@@ -58,14 +58,14 @@ type KVGet struct {
 	module   common.KeyValueModule
 }
 
-func (kvg *KVGet) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (kvg *KVGet) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
 	if kvg.module == nil {
-		if wrappedPayload.Modules == nil {
+		if moduleManager == nil {
 			wrappedPayload.End = true
-			return wrappedPayload, errors.New("kv.get wrapped payload has no modules")
+			return wrappedPayload, errors.New("kv.get module manager is nil")
 		}
 
-		module, ok := wrappedPayload.Modules[kvg.ModuleId]
+		module, ok := moduleManager.GetModule(kvg.ModuleId)
 		if !ok {
 			wrappedPayload.End = true
 			return wrappedPayload, fmt.Errorf("kv.get unable to find module with id: %s", kvg.ModuleId)

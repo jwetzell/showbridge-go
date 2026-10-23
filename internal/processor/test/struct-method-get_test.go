@@ -99,7 +99,7 @@ func TestGoodStructMethodGet(t *testing.T) {
 				t.Fatalf("struct.method.get failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err != nil {
 				t.Fatalf("struct.method.get processing failed: %s", err)
@@ -171,7 +171,7 @@ func TestBadStructMethodGet(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("struct.method.get expected to fail but got payload: %+v", got)

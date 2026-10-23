@@ -23,7 +23,7 @@ type YamlDecode struct {
 	config config.ProcessorConfig
 }
 
-func (jd *YamlDecode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (jd *YamlDecode) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 
 	payloadBytes, ok := common.GetAnyAsByteSlice(payload)

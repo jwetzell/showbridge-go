@@ -72,7 +72,7 @@ type httpResponse struct {
 	Body       []byte
 }
 
-func (hrc *HTTPResponse) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (hrc *HTTPResponse) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
 	templateData := wrappedPayload
 
 	var bodyBuffer bytes.Buffer

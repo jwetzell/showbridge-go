@@ -14,12 +14,19 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/route"
 )
 
+type moduleManager map[string]common.Module
+
+func (m moduleManager) GetModule(moduleId string) (common.Module, bool) {
+	moduleInstance, ok := m[moduleId]
+	return moduleInstance, ok
+}
+
 // TODO(jwetzell): can/should this be split into different "components"?
 type Router struct {
 	contextCancel context.CancelFunc
 	Context       context.Context
 	// TODO(jwetzell): do these need to be guarded against concurrency?
-	ModuleInstances map[string]common.Module
+	ModuleInstances moduleManager
 	// TODO(jwetzell): change to something easier to lookup
 	RouteInstances      []common.Route
 	ConfigChange        chan config.Config
@@ -110,7 +117,7 @@ func NewRouter(routerConfig config.Config) (*Router, []config.ModuleError, []con
 	routerConfig = config.CleanConfig(routerConfig)
 
 	router := Router{
-		ModuleInstances: make(map[string]common.Module),
+		ModuleInstances: make(moduleManager),
 		RouteInstances:  []common.Route{},
 		ConfigChange:    make(chan config.Config, 1),
 		logger:          slog.Default().With("component", "router"),
@@ -209,12 +216,10 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 				routeFound.Store(true)
 
 				_, err := routeInstance.ProcessPayload(ctx, common.WrappedPayload{
-					Payload:      payload,
-					Source:       sourceId,
-					Modules:      r.ModuleInstances,
-					InputHandler: r.HandleInput,
-					End:          false,
-				})
+					Payload: payload,
+					Source:  sourceId,
+					End:     false,
+				}, r.ModuleInstances, r.HandleInput)
 				if err != nil {
 					if routeIOErrors == nil {
 						routeIOErrors = []common.RouteIOError{}

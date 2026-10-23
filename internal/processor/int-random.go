@@ -60,7 +60,7 @@ type IntRandom struct {
 	config config.ProcessorConfig
 }
 
-func (ir *IntRandom) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (ir *IntRandom) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
 	payloadInt := rand.IntN(ir.Max-ir.Min+1) + ir.Min
 	wrappedPayload.Payload = payloadInt
 	return wrappedPayload, nil

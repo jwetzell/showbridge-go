@@ -36,7 +36,7 @@ func TestGoodHTTPGet(t *testing.T) {
 				t.Fatalf("http.get failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("http.get processing failed: %s", err)
 			}
@@ -125,7 +125,7 @@ func TestBadHTTPGet(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("http.get expected to fail but succeeded, got: %v", got)

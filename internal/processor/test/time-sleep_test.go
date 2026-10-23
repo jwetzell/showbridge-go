@@ -39,7 +39,7 @@ func TestGoodTimeSleep(t *testing.T) {
 			}
 
 			synctest.Test(t, func(t *testing.T) {
-				got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+				got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 
 				if err != nil {
 					t.Fatalf("time.sleep processing failed: %s", err)
@@ -97,7 +97,7 @@ func TestBadTimeSleep(t *testing.T) {
 			}
 
 			synctest.Test(t, func(t *testing.T) {
-				got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+				got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 
 				if err == nil {
 					t.Fatalf("time.sleep expected to fail but succeeded, got: %v", got)

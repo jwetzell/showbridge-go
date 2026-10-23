@@ -49,15 +49,15 @@ type ModuleOutput struct {
 	module   common.OutputModule
 }
 
-func (mo *ModuleOutput) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (mo *ModuleOutput) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
 
 	if mo.module == nil {
-		if wrappedPayload.Modules == nil {
+		if moduleManager == nil {
 			wrappedPayload.End = true
-			return wrappedPayload, errors.New("module.output wrapped payload has no modules")
+			return wrappedPayload, errors.New("module.output module manager is nil")
 		}
 
-		module, ok := wrappedPayload.Modules[mo.ModuleId]
+		module, ok := moduleManager.GetModule(mo.ModuleId)
 		if !ok {
 			wrappedPayload.End = true
 			return wrappedPayload, fmt.Errorf("module.output unable to find module with id: %s", mo.ModuleId)

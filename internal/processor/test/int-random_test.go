@@ -8,41 +8,6 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/processor"
 )
 
-func TestIntRandomGoodConfig(t *testing.T) {
-	registration, ok := processor.GetProcessorRegistration("int.random")
-	if !ok {
-		t.Fatalf("int.random processor not registered")
-	}
-
-	processorInstance, err := registration.New(config.ProcessorConfig{
-		Type: "int.random",
-		Params: map[string]any{
-			"min": 1,
-			"max": 10,
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("int.random should have created processor but got error: %s", err)
-	}
-
-	payload := "12345"
-
-	got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: payload})
-	if err != nil {
-		t.Fatalf("int.random processing failed: %s", err)
-	}
-
-	gotInt, ok := got.Payload.(int)
-	if !ok {
-		t.Fatalf("int.random returned a %T payload: %+v", got, got)
-	}
-
-	if gotInt < 1 || gotInt > 10 {
-		t.Fatalf("int.random got %d, expected between %d and %d", gotInt, 1, 10)
-	}
-}
-
 func TestGoodIntRandom(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -75,7 +40,7 @@ func TestGoodIntRandom(t *testing.T) {
 				t.Fatalf("int.random failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("int.random processing failed: %s", err)
 			}
@@ -160,7 +125,7 @@ func TestBadIntRandom(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("int.random expected to fail but got payload: %+v", got)

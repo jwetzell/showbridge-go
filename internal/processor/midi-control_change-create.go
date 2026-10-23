@@ -94,7 +94,7 @@ type MIDIControlChangeCreate struct {
 	Value   *template.Template
 }
 
-func (mccc *MIDIControlChangeCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (mccc *MIDIControlChangeCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
 	templateData := wrappedPayload
 
 	var channelBuffer bytes.Buffer

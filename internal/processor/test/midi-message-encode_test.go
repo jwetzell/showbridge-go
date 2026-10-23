@@ -27,7 +27,7 @@ func TestGoodMIDIMessageEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := midiMessageEncoder.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := midiMessageEncoder.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("midi.message.encode processing failed: %s", err)
 			}
@@ -60,7 +60,7 @@ func TestBadMIDIMessageEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := midiMessageEncoder.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := midiMessageEncoder.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("midi.message.encode expected to fail but got payload: %+v", got)

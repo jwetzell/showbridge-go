@@ -44,7 +44,7 @@ func TestGoodIntScale(t *testing.T) {
 				t.Fatalf("int.scale failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("int.scale processing failed: %s", err)
 			}
@@ -132,7 +132,7 @@ func TestBadIntScale(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("int.scale expected to fail but got payload: %+v", got)

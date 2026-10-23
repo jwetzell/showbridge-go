@@ -36,7 +36,7 @@ func TestGoodHTTPResponseCreate(t *testing.T) {
 				t.Fatalf("http.response failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("http.response processing failed: %s", err)
 			}
@@ -119,7 +119,7 @@ func TestBadHTTPResponseCreate(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("http.response expected to fail but succeeded, got: %v", got)

@@ -24,7 +24,7 @@ func init() {
 	})
 }
 
-func (ome *OSCMessageEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (ome *OSCMessageEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadMessage, ok := common.GetAnyAs[*osc.Message](payload)
 

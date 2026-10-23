@@ -79,7 +79,7 @@ type HTTPGet struct {
 	Headers map[string]string
 }
 
-func (hrd *HTTPGet) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (hrd *HTTPGet) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
 
 	templateData := wrappedPayload
 

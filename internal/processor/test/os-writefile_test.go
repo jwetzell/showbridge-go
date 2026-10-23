@@ -34,7 +34,7 @@ func TestGoodOsWriteFile(t *testing.T) {
 				t.Fatalf("os.writefile failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: testCase.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: testCase.payload}, nil, nil)
 
 			if err != nil {
 				t.Fatalf("os.writefile processing failed: %s", err)
@@ -103,7 +103,7 @@ func TestBadOsWriteFile(t *testing.T) {
 				}
 				return
 			}
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("os.writefile expected to fail but succeeded, got: %v", got)

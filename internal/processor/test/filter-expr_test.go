@@ -64,7 +64,7 @@ func TestGoodFilterExpr(t *testing.T) {
 				t.Fatalf("filter.expr failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: testCase.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: testCase.payload}, nil, nil)
 
 			if err != nil {
 				t.Fatalf("filter.expr processing failed: %s", err)
@@ -138,7 +138,7 @@ func TestBadFilterExpr(t *testing.T) {
 				}
 				return
 			}
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("filter.expr expected to fail but succeeded, got: %v", got)

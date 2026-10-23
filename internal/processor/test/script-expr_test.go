@@ -55,7 +55,7 @@ func TestGoodScriptExpr(t *testing.T) {
 				t.Fatalf("script.expr failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err != nil {
 				t.Fatalf("script.expr processing failed: %s", err)
@@ -113,7 +113,7 @@ func TestBadScriptExpr(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("script.expr expected to fail but succeeded, got: %v", got)

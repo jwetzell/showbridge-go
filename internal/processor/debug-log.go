@@ -25,7 +25,7 @@ type DebugLog struct {
 }
 
 // TODO(jwetzell): maybe make a more useful logging processor
-func (dl *DebugLog) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (dl *DebugLog) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadString := fmt.Sprintf("%+v", payload)
 	payloadType := fmt.Sprintf("%T", payload)

@@ -36,7 +36,7 @@ func TestGoodModuleOutput(t *testing.T) {
 				t.Fatalf("module.output failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: testCase.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: testCase.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("module.output processing failed: %s", err)
 			}
@@ -50,36 +50,45 @@ func TestGoodModuleOutput(t *testing.T) {
 
 func TestBadModuleOutput(t *testing.T) {
 	testCases := []struct {
-		name        string
-		params      map[string]any
-		payload     any
-		modules     map[string]common.Module
-		errorString string
+		name          string
+		params        map[string]any
+		payload       any
+		moduleManager common.ModuleManager
+		errorString   string
 	}{
 		{
-			name:        "no module param",
-			params:      map[string]any{},
-			payload:     "test",
-			modules:     map[string]common.Module{"test": test.NewTestModule("test")},
-			errorString: "module.output module error: not found",
+			name:          "no module param",
+			params:        map[string]any{},
+			payload:       "test",
+			moduleManager: testModuleManager(map[string]common.Module{"test": test.NewTestModule("test")}),
+			errorString:   "module.output module error: not found",
 		},
 		{
 			name: "non-string module",
 			params: map[string]any{
 				"module": 123,
 			},
-			payload:     "test",
-			modules:     map[string]common.Module{"test": test.NewTestModule("test")},
-			errorString: "module.output module error: not a string",
+			payload:       "test",
+			moduleManager: testModuleManager(map[string]common.Module{"test": test.NewTestModule("test")}),
+			errorString:   "module.output module error: not a string",
 		},
 		{
-			name: "modules not found in context",
+			name: "modules does not exist",
 			params: map[string]any{
 				"module": "test",
 			},
-			payload:     "test",
-			modules:     nil,
-			errorString: "module.output wrapped payload has no modules",
+			payload:       "test",
+			moduleManager: nil,
+			errorString:   "module.output module manager is nil",
+		},
+		{
+			name: "module not found",
+			params: map[string]any{
+				"module": "test",
+			},
+			payload:       "test",
+			moduleManager: testModuleManager(map[string]common.Module{}),
+			errorString:   "module.output unable to find module with id: test",
 		},
 	}
 
@@ -103,7 +112,7 @@ func TestBadModuleOutput(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Modules: testCase.modules, Payload: testCase.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: testCase.payload}, testCase.moduleManager, nil)
 
 			if err == nil {
 				t.Fatalf("module.output expected to fail but succeeded, got: %v", got)

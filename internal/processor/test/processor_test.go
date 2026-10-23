@@ -9,6 +9,13 @@ import (
 	"github.com/jwetzell/showbridge-go/internal/test"
 )
 
+type testModuleManager map[string]common.Module
+
+func (m testModuleManager) GetModule(name string) (common.Module, bool) {
+	mod, ok := m[name]
+	return mod, ok
+}
+
 func TestProcessorBadRegistrationNoType(t *testing.T) {
 	defer func() {
 		r := recover()

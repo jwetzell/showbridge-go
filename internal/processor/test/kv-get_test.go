@@ -49,11 +49,10 @@ func TestGoodKvGet(t *testing.T) {
 			}
 
 			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
-				Modules: map[string]common.Module{
-					"test": test.NewTestKVModule("test", testCase.presetValues),
-				},
 				Payload: testCase.payload,
-			})
+			}, testModuleManager(map[string]common.Module{
+				"test": test.NewTestKVModule("test", testCase.presetValues),
+			}), nil)
 
 			if err != nil {
 				t.Fatalf("kv.get processing failed: %s", err)
@@ -68,11 +67,11 @@ func TestGoodKvGet(t *testing.T) {
 
 func TestBadKvGet(t *testing.T) {
 	tests := []struct {
-		name                  string
-		params                map[string]any
-		payload               any
-		wrappedPayloadModules map[string]common.Module
-		errorString           string
+		name          string
+		params        map[string]any
+		payload       any
+		moduleManager common.ModuleManager
+		errorString   string
 	}{
 		{
 			name:    "no module param",
@@ -80,9 +79,9 @@ func TestBadKvGet(t *testing.T) {
 			params: map[string]any{
 				"key": "test",
 			},
-			wrappedPayloadModules: map[string]common.Module{
+			moduleManager: testModuleManager(map[string]common.Module{
 				"test": test.NewTestKVModule("test", nil),
-			},
+			}),
 			errorString: "kv.get module error: not found",
 		},
 		{
@@ -92,9 +91,9 @@ func TestBadKvGet(t *testing.T) {
 				"module": 1,
 				"key":    "test",
 			},
-			wrappedPayloadModules: map[string]common.Module{
+			moduleManager: testModuleManager(map[string]common.Module{
 				"test": test.NewTestKVModule("test", nil),
-			},
+			}),
 			errorString: "kv.get module error: not a string",
 		},
 		{
@@ -103,9 +102,9 @@ func TestBadKvGet(t *testing.T) {
 			params: map[string]any{
 				"module": "test",
 			},
-			wrappedPayloadModules: map[string]common.Module{
+			moduleManager: testModuleManager(map[string]common.Module{
 				"test": test.NewTestKVModule("test", nil),
-			},
+			}),
 			errorString: "kv.get key error: not found",
 		},
 		{
@@ -115,30 +114,30 @@ func TestBadKvGet(t *testing.T) {
 				"module": "test",
 				"key":    1,
 			},
-			wrappedPayloadModules: map[string]common.Module{
+			moduleManager: testModuleManager(map[string]common.Module{
 				"test": test.NewTestKVModule("test", nil),
-			},
+			}),
 			errorString: "kv.get key error: not a string",
 		},
 		{
-			name:    "no modules in context",
+			name:    "no modules",
 			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"key":    "test",
 			},
-			wrappedPayloadModules: nil,
-			errorString:           "kv.get wrapped payload has no modules",
+			moduleManager: nil,
+			errorString:   "kv.get module manager is nil",
 		},
 		{
-			name:    "module not found in context",
+			name:    "module not found",
 			payload: test.TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"key":    "test",
 			},
-			wrappedPayloadModules: map[string]common.Module{},
-			errorString:           "kv.get unable to find module with id: test",
+			moduleManager: testModuleManager(map[string]common.Module{}),
+			errorString:   "kv.get unable to find module with id: test",
 		},
 		{
 			name:    "module not a kv module",
@@ -147,9 +146,9 @@ func TestBadKvGet(t *testing.T) {
 				"module": "test",
 				"key":    "test",
 			},
-			wrappedPayloadModules: map[string]common.Module{
+			moduleManager: testModuleManager(map[string]common.Module{
 				"test": test.NewTestDBModule("test"),
-			},
+			}),
 			errorString: "kv.get module with id test is not a KeyValueModule",
 		},
 	}
@@ -174,7 +173,7 @@ func TestBadKvGet(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Modules: test.wrappedPayloadModules, Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, test.moduleManager, nil)
 
 			if err == nil {
 				t.Fatalf("kv.get expected to fail but got payload: %+v", got)

@@ -23,7 +23,7 @@ type YamlEncode struct {
 	config config.ProcessorConfig
 }
 
-func (je *YamlEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (je *YamlEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 
 	payloadBytes, err := yaml.Marshal(payload)

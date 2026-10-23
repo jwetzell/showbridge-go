@@ -44,7 +44,7 @@ type FilterRate struct {
 	limiter *rate.Limiter
 }
 
-func (fc *FilterRate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (fc *FilterRate) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
 	err := fc.limiter.Wait(ctx)
 	if err != nil {
 		wrappedPayload.End = true

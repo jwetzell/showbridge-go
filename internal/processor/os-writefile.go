@@ -55,7 +55,7 @@ type OsWriteFile struct {
 	config       config.ProcessorConfig
 }
 
-func (owf *OsWriteFile) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (owf *OsWriteFile) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
 	templateData := wrappedPayload
 
 	var pathBuffer bytes.Buffer

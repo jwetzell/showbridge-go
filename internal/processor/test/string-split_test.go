@@ -40,7 +40,7 @@ func TestGoodStringSplit(t *testing.T) {
 				t.Fatalf("string.split failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("string.split processing failed: %s", err)
 			}
@@ -103,7 +103,7 @@ func TestBadStringSplit(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("string.split expected error but got none, payload: %+v", got)

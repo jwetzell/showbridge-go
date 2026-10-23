@@ -210,7 +210,7 @@ type FreeDCreate struct {
 	FocusTemplate *template.Template
 }
 
-func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
 
 	templateData := wrappedPayload
 

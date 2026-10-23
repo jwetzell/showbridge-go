@@ -50,7 +50,7 @@ type FloatParse struct {
 	config  config.ProcessorConfig
 }
 
-func (fp *FloatParse) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (fp *FloatParse) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadString, ok := common.GetAnyAs[string](payload)
 

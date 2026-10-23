@@ -23,7 +23,7 @@ type ArtNetPacketEncode struct {
 	config config.ProcessorConfig
 }
 
-func (ape *ArtNetPacketEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (ape *ArtNetPacketEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadPacket, ok := common.GetAnyAs[artnet.ArtNetPacket](payload)
 

@@ -22,7 +22,7 @@ type StringDecode struct {
 	config config.ProcessorConfig
 }
 
-func (sd *StringDecode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (sd *StringDecode) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 
 	// payload is already a string, return it as is

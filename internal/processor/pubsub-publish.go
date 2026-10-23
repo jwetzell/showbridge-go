@@ -66,25 +66,25 @@ type PubSubPublish struct {
 	module   common.PubSubModule
 }
 
-func (psp *PubSubPublish) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (psp *PubSubPublish) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
 	if psp.module == nil {
-		if wrappedPayload.Modules == nil {
+		if moduleManager == nil {
 			wrappedPayload.End = true
-			return wrappedPayload, errors.New("pubsub.publish wrapped payload has no modules")
+			return wrappedPayload, errors.New("pubsub.publish module manager is nil")
 		}
 
-		module, ok := wrappedPayload.Modules[psp.ModuleId]
+		module, ok := moduleManager.GetModule(psp.ModuleId)
 		if !ok {
 			wrappedPayload.End = true
 			return wrappedPayload, fmt.Errorf("pubsub.publish unable to find module with id: %s", psp.ModuleId)
 		}
 
-		dbModule, ok := module.(common.PubSubModule)
+		pubSubModule, ok := module.(common.PubSubModule)
 		if !ok {
 			wrappedPayload.End = true
-			return wrappedPayload, fmt.Errorf("pubsub.publish module with id %s is not an OutputModule", psp.ModuleId)
+			return wrappedPayload, fmt.Errorf("pubsub.publish module with id %s is not a PubSubModule", psp.ModuleId)
 		}
-		psp.module = dbModule
+		psp.module = pubSubModule
 	}
 
 	var topicBuffer bytes.Buffer

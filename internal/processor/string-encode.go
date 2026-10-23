@@ -22,7 +22,7 @@ type StringEncode struct {
 	config config.ProcessorConfig
 }
 
-func (se *StringEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload) (common.WrappedPayload, error) {
+func (se *StringEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadString, ok := common.GetAnyAs[string](payload)
 

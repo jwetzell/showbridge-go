@@ -48,7 +48,7 @@ func TestGoodFloatRandom(t *testing.T) {
 				t.Fatalf("float.random failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("float.random processing failed: %s", err)
 			}
@@ -149,7 +149,7 @@ func TestBadFloatRandom(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload})
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("float.random expected to fail but got payload: %+v", got)

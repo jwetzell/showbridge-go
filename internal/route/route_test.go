@@ -17,6 +17,13 @@ func (mr *MockRouter) HandleInput(ctx context.Context, sourceId string, payload 
 	return false, []common.RouteIOError{}
 }
 
+type mockModuleManager map[string]common.Module
+
+func (m mockModuleManager) GetModule(moduleId string) (common.Module, bool) {
+	moduleInstance, ok := m[moduleId]
+	return moduleInstance, ok
+}
+
 func TestGoodRouteHandleInput(t *testing.T) {
 	routeConfig := config.RouteConfig{
 		Input: "input",
@@ -39,10 +46,8 @@ func TestGoodRouteHandleInput(t *testing.T) {
 	inputData := "test input data"
 	testRouter := test.GetNewTestRouter()
 	payload, err := testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
-		InputHandler: testRouter.HandleInput,
-		Modules:      map[string]common.Module{"output": &test.TestOutputModule{}},
-		Payload:      inputData,
-	})
+		Payload: inputData,
+	}, mockModuleManager{"output": &test.TestOutputModule{}}, testRouter.HandleInput)
 	if err != nil {
 		t.Fatalf("route ProcessPayload returned error: %v", err)
 	}
@@ -79,10 +84,8 @@ func TestRouteHandleInputWithProcessorError(t *testing.T) {
 	inputData := "test input data"
 	testRouter := test.GetNewTestRouter()
 	_, err = testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
-		InputHandler: testRouter.HandleInput,
-		Modules:      map[string]common.Module{"output": &test.TestOutputModule{}},
-		Payload:      inputData,
-	})
+		Payload: inputData,
+	}, mockModuleManager{"output": &test.TestOutputModule{}}, testRouter.HandleInput)
 	if err == nil {
 		t.Fatalf("route did not return error for bad processor")
 	}
@@ -109,10 +112,8 @@ func TestRouteHandleNilPayload(t *testing.T) {
 
 	testRouter := test.GetNewTestRouter()
 	payload, err := testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
-		InputHandler: testRouter.HandleInput,
-		Modules:      map[string]common.Module{"output": &test.TestOutputModule{}},
-		Payload:      nil,
-	})
+		Payload: nil,
+	}, mockModuleManager{"output": &test.TestOutputModule{}}, testRouter.HandleInput)
 	if err != nil {
 		t.Fatalf("route ProcessPayload returned error: %v", err)
 	}
@@ -142,10 +143,8 @@ func TestRouteHandleNilPayloadFromProcessor(t *testing.T) {
 
 	testRouter := test.GetNewTestRouter()
 	_, err = testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
-		InputHandler: testRouter.HandleInput,
-		Modules:      map[string]common.Module{"output": &test.TestOutputModule{}},
-		Payload:      "test",
-	})
+		Payload: "test",
+	}, mockModuleManager{"output": &test.TestOutputModule{}}, testRouter.HandleInput)
 	if err != nil {
 		t.Fatalf("route returned error for nil payload: %v", err)
 	}

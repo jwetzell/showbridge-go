@@ -10,6 +10,10 @@ type Module interface {
 	Stop()
 }
 
+type ModuleManager interface {
+	GetModule(string) (Module, bool)
+}
+
 type OutputModule interface {
 	Output(context.Context, any) error
 }
