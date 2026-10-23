@@ -1,0 +1,68 @@
+package module
+
+import (
+	"fmt"
+	"log/slog"
+	"sync"
+
+	"github.com/google/jsonschema-go/jsonschema"
+	"github.com/jwetzell/showbridge-go/common"
+	"github.com/jwetzell/showbridge-go/config"
+)
+
+type ModuleRegistration struct {
+	Type         string             `json:"type"`
+	Title        string             `json:"title,omitempty"`
+	Description  string             `json:"description,omitempty"`
+	ParamsSchema *jsonschema.Schema `json:"paramsSchema,omitempty"`
+	New          func(config.ModuleConfig) (common.Module, error)
+}
+
+func RegisterModule(mod ModuleRegistration) {
+
+	if mod.Type == "" {
+		panic("module type is missing")
+	}
+	if mod.New == nil {
+		panic("missing ModuleInfo.New")
+	}
+
+	moduleRegistryMu.Lock()
+	defer moduleRegistryMu.Unlock()
+
+	_, exists := moduleRegistry[string(mod.Type)]
+	if exists {
+		panic(fmt.Sprintf("module already registered: %s", mod.Type))
+	}
+	moduleRegistry[string(mod.Type)] = mod
+}
+
+type ModuleRegistry map[string]ModuleRegistration
+
+func GetModuleRegistration(moduleType string) (ModuleRegistration, bool) {
+	moduleRegistryMu.RLock()
+	defer moduleRegistryMu.RUnlock()
+
+	mod, ok := moduleRegistry[moduleType]
+	return mod, ok
+}
+
+func GetModuleRegistrations() []ModuleRegistration {
+	moduleRegistryMu.RLock()
+	defer moduleRegistryMu.RUnlock()
+
+	registrations := make([]ModuleRegistration, 0, len(moduleRegistry))
+	for _, mod := range moduleRegistry {
+		registrations = append(registrations, mod)
+	}
+	return registrations
+}
+
+var (
+	moduleRegistryMu sync.RWMutex
+	moduleRegistry   = make(ModuleRegistry)
+)
+
+func CreateLogger(config config.ModuleConfig) *slog.Logger {
+	return slog.Default().With("component", "module", "id", config.Id, "type", config.Type)
+}

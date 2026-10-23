@@ -3,8 +3,8 @@ package test
 import (
 	"context"
 
+	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/internal/common"
 )
 
 type TestProcessor struct {

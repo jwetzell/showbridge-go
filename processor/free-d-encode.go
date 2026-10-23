@@ -1,0 +1,39 @@
+package processor
+
+import (
+	"context"
+	"errors"
+
+	freeD "github.com/jwetzell/free-d-go"
+	"github.com/jwetzell/showbridge-go/common"
+	"github.com/jwetzell/showbridge-go/config"
+)
+
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "freed.encode",
+		Title: "Encode FreeD",
+		New: func(config config.ProcessorConfig) (common.Processor, error) {
+			return &FreeDEncode{config: config}, nil
+		},
+	})
+}
+
+type FreeDEncode struct {
+	config config.ProcessorConfig
+}
+
+func (fe *FreeDEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
+	payload := wrappedPayload.Payload
+	payloadPosition, ok := common.GetAnyAs[freeD.FreeDPosition](payload)
+
+	if !ok {
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("freed.encode processor only accepts a FreeDPosition")
+	}
+
+	payloadBytes := freeD.Encode(payloadPosition)
+
+	wrappedPayload.Payload = payloadBytes
+	return wrappedPayload, nil
+}

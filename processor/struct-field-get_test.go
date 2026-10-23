@@ -1,0 +1,160 @@
+package processor_test
+
+import (
+	"reflect"
+	"testing"
+
+	"github.com/jwetzell/showbridge-go/common"
+	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/internal/test"
+	"github.com/jwetzell/showbridge-go/processor"
+)
+
+func TestGoodStructFieldGet(t *testing.T) {
+
+	tests := []struct {
+		name     string
+		params   map[string]any
+		payload  any
+		expected any
+	}{
+		{
+			name:     "string field",
+			params:   map[string]any{"name": "String"},
+			payload:  test.TestStruct{String: "hello"},
+			expected: "hello",
+		},
+		{
+			name:     "int field",
+			params:   map[string]any{"name": "Int"},
+			payload:  test.TestStruct{Int: 42},
+			expected: 42,
+		},
+		{
+			name:     "float field",
+			params:   map[string]any{"name": "Float"},
+			payload:  test.TestStruct{Float: 3.14},
+			expected: 3.14,
+		},
+		{
+			name:     "bool field",
+			params:   map[string]any{"name": "Bool"},
+			payload:  test.TestStruct{Bool: true},
+			expected: true,
+		},
+		{
+			name:     "pointer to struct payload",
+			params:   map[string]any{"name": "Data"},
+			payload:  &test.TestStruct{Data: "hello"},
+			expected: "hello",
+		},
+		{
+			name: "int slice",
+			params: map[string]any{
+				"name": "IntSlice",
+			},
+			payload:  test.TestStruct{IntSlice: []int{1, 2, 3}},
+			expected: []int{1, 2, 3},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			registration, ok := processor.GetProcessorRegistration("struct.field.get")
+			if !ok {
+				t.Fatalf("struct.field.get processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "struct.field.get",
+				Params: test.params,
+			})
+
+			if err != nil {
+				t.Fatalf("struct.field.get failed to create processor: %s", err)
+			}
+
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+
+			if err != nil {
+				t.Fatalf("struct.field.get processing failed: %s", err)
+			}
+
+			if !reflect.DeepEqual(got.Payload, test.expected) {
+				t.Fatalf("struct.field.get got %+v, expected %s", got, test.expected)
+			}
+		})
+	}
+}
+
+func TestBadStructFieldGet(t *testing.T) {
+	tests := []struct {
+		name        string
+		params      map[string]any
+		payload     any
+		errorString string
+	}{
+		{
+			name:        "no name param",
+			payload:     test.TestStruct{Data: "hello"},
+			params:      map[string]any{},
+			errorString: "struct.field.get name error: not found",
+		},
+		{
+			name:    "non string name",
+			payload: test.TestStruct{Data: "hello"},
+			params: map[string]any{
+				"name": 1,
+			},
+			errorString: "struct.field.get name error: not a string",
+		},
+		{
+			name:    "missing field",
+			payload: test.TestStruct{String: "hello"},
+			params: map[string]any{
+				"name": "NonExistentField",
+			},
+			errorString: "struct.field.get field 'NonExistentField' does not exist",
+		},
+		{
+			name:    "not a struct payload",
+			payload: "not a struct",
+			params: map[string]any{
+				"name": "NonExistentField",
+			},
+			errorString: "struct.field.get processor only accepts a struct payload",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+
+			registration, ok := processor.GetProcessorRegistration("struct.field.get")
+			if !ok {
+				t.Fatalf("struct.field.get processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "struct.field.get",
+				Params: test.params,
+			})
+
+			if err != nil {
+				if test.errorString != err.Error() {
+					t.Fatalf("struct.field.get got error '%s', expected '%s'", err.Error(), test.errorString)
+				}
+				return
+			}
+
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+
+			if err == nil {
+				t.Fatalf("struct.field.get expected to fail but got payload: %+v", got)
+			}
+
+			if err.Error() != test.errorString {
+				t.Fatalf("struct.field.get got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+		})
+	}
+}

@@ -1,0 +1,50 @@
+package processor
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/google/jsonschema-go/jsonschema"
+	"github.com/jwetzell/showbridge-go/common"
+	"github.com/jwetzell/showbridge-go/config"
+)
+
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "time.sleep",
+		Title: "Sleep",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"duration": {
+					Title:       "Duration",
+					Description: "time to sleep in milliseconds",
+					Type:        "integer",
+				},
+			},
+			Required:             []string{"duration"},
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
+		},
+		New: func(config config.ProcessorConfig) (common.Processor, error) {
+			params := config.Params
+
+			durationNum, err := params.GetInt("duration")
+			if err != nil {
+				return nil, fmt.Errorf("time.sleep duration error: %w", err)
+			}
+
+			return &TimeSleep{config: config, Duration: time.Millisecond * time.Duration(durationNum)}, nil
+		},
+	})
+}
+
+type TimeSleep struct {
+	config   config.ProcessorConfig
+	Duration time.Duration
+}
+
+func (ts *TimeSleep) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
+	time.Sleep(ts.Duration)
+	return wrappedPayload, nil
+}

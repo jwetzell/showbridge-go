@@ -1,0 +1,69 @@
+package processor
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"log/slog"
+
+	"github.com/google/jsonschema-go/jsonschema"
+	"github.com/jwetzell/showbridge-go/common"
+	"github.com/jwetzell/showbridge-go/config"
+)
+
+func init() {
+	RegisterProcessor(ProcessorRegistration{
+		Type:  "router.input",
+		Title: "Router Input",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"source": {
+					Title:       "Source",
+					Description: "source to report as to the router",
+					Type:        "string",
+				},
+			},
+			Required:             []string{"source"},
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
+		},
+		New: func(config config.ProcessorConfig) (common.Processor, error) {
+
+			params := config.Params
+
+			sourceId, err := params.GetString("source")
+
+			if err != nil {
+				return nil, fmt.Errorf("router.input source error: %w", err)
+			}
+
+			return &RouterInput{config: config, SourceId: sourceId, logger: slog.Default().With("component", "processor", "type", config.Type)}, nil
+		},
+	})
+}
+
+type RouterInput struct {
+	config   config.ProcessorConfig
+	SourceId string
+	logger   *slog.Logger
+}
+
+func (ri *RouterInput) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
+
+	payload := wrappedPayload.Payload
+	if inputHandler == nil {
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("router.input no input handler found")
+	}
+
+	_, err := inputHandler(ctx, ri.SourceId, payload)
+
+	if err != nil {
+		wrappedPayload.End = true
+		return wrappedPayload, errors.New("router.input failed to send input")
+	}
+
+	wrappedPayload.Payload = payload
+
+	return wrappedPayload, nil
+}

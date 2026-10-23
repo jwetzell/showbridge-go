@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/jwetzell/showbridge-go"
+	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/internal/common"
-	"github.com/jwetzell/showbridge-go/internal/module"
+	"github.com/jwetzell/showbridge-go/module"
 )
 
 func init() {

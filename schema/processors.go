@@ -5,7 +5,7 @@ import (
 	"slices"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/internal/processor"
+	"github.com/jwetzell/showbridge-go/processor"
 )
 
 func GetProcessorsSchema() *jsonschema.Schema {

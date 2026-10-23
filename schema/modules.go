@@ -5,7 +5,7 @@ import (
 	"slices"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/internal/module"
+	"github.com/jwetzell/showbridge-go/module"
 )
 
 func GetModulesSchema() *jsonschema.Schema {

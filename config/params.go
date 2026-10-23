@@ -3,7 +3,7 @@ package config
 import (
 	"errors"
 
-	"github.com/jwetzell/showbridge-go/internal/common"
+	"github.com/jwetzell/showbridge-go/common"
 )
 
 type Params map[string]any

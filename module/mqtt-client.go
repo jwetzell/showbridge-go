@@ -1,0 +1,191 @@
+package module
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"log/slog"
+	"sync"
+
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/google/jsonschema-go/jsonschema"
+	"github.com/jwetzell/showbridge-go/common"
+	"github.com/jwetzell/showbridge-go/config"
+)
+
+func init() {
+	RegisterModule(ModuleRegistration{
+		Type:  "mqtt.client",
+		Title: "MQTT Client",
+		ParamsSchema: &jsonschema.Schema{
+			Type: "object",
+			Properties: map[string]*jsonschema.Schema{
+				"broker": {
+					Title:       "Broker URL",
+					Description: "the URL of the MQTT broker to connect to",
+					Type:        "string",
+				},
+				"topic": {
+					Title:       "Topic",
+					Description: "an MQTT topic to subscribe to",
+					Type:        "string",
+				},
+				"clientId": {
+					Title:       "Client ID",
+					Description: "the client ID to use when connecting to the MQTT broker",
+					Type:        "string",
+				},
+				"qos": {
+					Title:       "QoS",
+					Description: "the QoS level to use when publishing messages",
+					Type:        "integer",
+					Minimum:     jsonschema.Ptr[float64](0),
+					Maximum:     jsonschema.Ptr[float64](2),
+					Default:     json.RawMessage(`0`),
+				},
+				"retained": {
+					Title:       "Retained",
+					Description: "whether to set the retained flag when publishing messages",
+					Type:        "boolean",
+					Default:     json.RawMessage(`false`),
+				},
+			},
+			Required:             []string{"broker", "topic", "clientId"},
+			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
+		},
+		New: func(moduleConfig config.ModuleConfig) (common.Module, error) {
+			params := moduleConfig.Params
+			brokerString, err := params.GetString("broker")
+
+			if err != nil {
+				return nil, fmt.Errorf("mqtt.client broker error: %w", err)
+			}
+
+			topicString, err := params.GetString("topic")
+
+			if err != nil {
+				return nil, fmt.Errorf("mqtt.client topic error: %w", err)
+			}
+
+			clientIdString, err := params.GetString("clientId")
+
+			if err != nil {
+				return nil, fmt.Errorf("mqtt.client clientId error: %w", err)
+			}
+
+			qosString, err := params.GetInt("qos")
+
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					qosString = 0
+				} else {
+					return nil, fmt.Errorf("mqtt.client qos error: %w", err)
+				}
+			}
+
+			retainedBool, err := params.GetBool("retained")
+
+			if err != nil {
+				if errors.Is(err, config.ErrParamNotFound) {
+					retainedBool = false
+				} else {
+					return nil, fmt.Errorf("mqtt.client retained error: %w", err)
+				}
+			}
+
+			return &MQTTClient{config: moduleConfig, Broker: brokerString, Topic: topicString, ClientID: clientIdString, QoS: byte(qosString), Retained: retainedBool, logger: CreateLogger(moduleConfig)}, nil
+		},
+	})
+}
+
+type MQTTClient struct {
+	config       config.ModuleConfig
+	ctx          context.Context
+	inputHandler common.InputHandler
+	Broker       string
+	ClientID     string
+	Topic        string
+	QoS          byte
+	Retained     bool
+	client       mqtt.Client
+	logger       *slog.Logger
+	cancel       context.CancelFunc
+	clientMu     sync.Mutex
+}
+
+func (mc *MQTTClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
+	mc.logger.Debug("running")
+	mc.inputHandler = inputHandler
+	moduleContext, cancel := context.WithCancel(ctx)
+	mc.ctx = moduleContext
+	mc.cancel = cancel
+
+	opts := mqtt.NewClientOptions()
+	opts.AddBroker(mc.Broker)
+	opts.SetClientID(mc.ClientID)
+	opts.SetAutoReconnect(true)
+	opts.SetCleanSession(false)
+
+	opts.OnConnect = func(c mqtt.Client) {
+		token := mc.client.Subscribe(mc.Topic, 1, func(c mqtt.Client, m mqtt.Message) {
+			if mc.inputHandler != nil {
+				mc.inputHandler(mc.ctx, mc.config.Id, m)
+			}
+		})
+		token.Wait()
+	}
+
+	mc.clientMu.Lock()
+	mc.client = mqtt.NewClient(opts)
+
+	token := mc.client.Connect()
+	mc.clientMu.Unlock()
+
+	token.Wait()
+	err := token.Error()
+	if err != nil {
+		return err
+	}
+
+	<-mc.ctx.Done()
+	mc.logger.Debug("done")
+	return nil
+}
+
+func (mc *MQTTClient) Publish(ctx context.Context, topic string, payload any) error {
+	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
+
+	if !ok {
+		payloadString, ok := common.GetAnyAs[string](payload)
+		if !ok {
+			return errors.New("mqtt.client is only able to publish bytes or string")
+		}
+		payloadBytes = []byte(payloadString)
+	}
+
+	if mc.client == nil {
+		return errors.New("mqtt.client client is not setup")
+	}
+
+	if !mc.client.IsConnected() {
+		return errors.New("mqtt.client is not connected")
+	}
+
+	token := mc.client.Publish(topic, mc.QoS, mc.Retained, payloadBytes)
+
+	token.Wait()
+
+	return token.Error()
+}
+
+func (mc *MQTTClient) Stop() {
+	if mc.cancel != nil {
+		mc.cancel()
+	}
+	mc.clientMu.Lock()
+	defer mc.clientMu.Unlock()
+	if mc.client != nil {
+		mc.client.Disconnect(250)
+	}
+}

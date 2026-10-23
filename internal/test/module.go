@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/jwetzell/showbridge-go/internal/common"
+	"github.com/jwetzell/showbridge-go/common"
 	_ "modernc.org/sqlite"
 )
 

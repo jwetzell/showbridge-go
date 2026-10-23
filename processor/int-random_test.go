@@ -1,0 +1,139 @@
+package processor_test
+
+import (
+	"testing"
+
+	"github.com/jwetzell/showbridge-go/common"
+	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/processor"
+)
+
+func TestGoodIntRandom(t *testing.T) {
+	tests := []struct {
+		name    string
+		payload any
+		params  map[string]any
+	}{
+		{
+			name: "1-10",
+			params: map[string]any{
+				"min": 1,
+				"max": 10,
+			},
+			payload: "12345",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			registration, ok := processor.GetProcessorRegistration("int.random")
+			if !ok {
+				t.Fatalf("int.random processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "int.random",
+				Params: test.params,
+			})
+
+			if err != nil {
+				t.Fatalf("int.random failed to create processor: %s", err)
+			}
+
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+			if err != nil {
+				t.Fatalf("int.random processing failed: %s", err)
+			}
+
+			gotInt, ok := got.Payload.(int)
+			if !ok {
+				t.Fatalf("int.random returned a %T payload: %+v", got, got)
+			}
+
+			minNum, ok := test.params["min"].(int)
+			if !ok {
+				t.Fatalf("int.random test min param is not a number: %s", test.params["min"])
+			}
+			maxNum, ok := test.params["max"].(int)
+			if !ok {
+				t.Fatalf("int.random test max param is not a number: %s", test.params["max"])
+			}
+
+			if gotInt < int(minNum) || gotInt > int(maxNum) {
+				t.Fatalf("int.random got %d, expected between %d and %d", gotInt, int(minNum), int(maxNum))
+			}
+		})
+	}
+}
+
+func TestBadIntRandom(t *testing.T) {
+	tests := []struct {
+		name        string
+		params      map[string]any
+		payload     any
+		errorString string
+	}{
+		{
+			name:        "no min param",
+			payload:     "hello",
+			params:      map[string]any{"max": 10},
+			errorString: "int.random min error: not found",
+		},
+		{
+			name:        "no max param",
+			payload:     "hello",
+			params:      map[string]any{"min": 1},
+			errorString: "int.random max error: not found",
+		},
+		{
+			name:        "min param not a number",
+			payload:     "hello",
+			params:      map[string]any{"min": "1", "max": 10},
+			errorString: "int.random min error: not a number",
+		},
+		{
+			name:        "max param not a number",
+			payload:     "hello",
+			params:      map[string]any{"min": 1, "max": "10"},
+			errorString: "int.random max error: not a number",
+		},
+		{
+			name:        "max less than min",
+			payload:     "hello",
+			params:      map[string]any{"min": 1, "max": 0},
+			errorString: "int.random max must be greater than min",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+
+			registration, ok := processor.GetProcessorRegistration("int.random")
+			if !ok {
+				t.Fatalf("int.random processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "int.random",
+				Params: test.params,
+			})
+
+			if err != nil {
+				if test.errorString != err.Error() {
+					t.Fatalf("int.random got error '%s', expected '%s'", err.Error(), test.errorString)
+				}
+				return
+			}
+
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+
+			if err == nil {
+				t.Fatalf("int.random expected to fail but got payload: %+v", got)
+			}
+
+			if err.Error() != test.errorString {
+				t.Fatalf("int.random got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+		})
+	}
+}

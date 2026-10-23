@@ -1,0 +1,116 @@
+package processor_test
+
+import (
+	"slices"
+	"testing"
+
+	"github.com/jwetzell/showbridge-go/common"
+	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/processor"
+)
+
+func TestGoodStringSplit(t *testing.T) {
+	tests := []struct {
+		name     string
+		params   map[string]any
+		payload  any
+		expected []string
+	}{
+		{
+			name:     "comma separated",
+			params:   map[string]any{"separator": ","},
+			payload:  "part1,part2,part3",
+			expected: []string{"part1", "part2", "part3"},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			registration, ok := processor.GetProcessorRegistration("string.split")
+			if !ok {
+				t.Fatalf("string.split processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "string.split",
+				Params: test.params,
+			})
+
+			if err != nil {
+				t.Fatalf("string.split failed to create processor: %s", err)
+			}
+
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+			if err != nil {
+				t.Fatalf("string.split processing failed: %s", err)
+			}
+
+			gotStrings, ok := got.Payload.([]string)
+			if !ok {
+				t.Fatalf("string.split returned a %T payload: %+v", got, got)
+			}
+
+			if !slices.Equal(gotStrings, test.expected) {
+				t.Fatalf("string.split got %+v, expected %+v", gotStrings, test.expected)
+			}
+		})
+	}
+}
+
+func TestBadStringSplit(t *testing.T) {
+	tests := []struct {
+		name        string
+		payload     any
+		params      map[string]any
+		errorString string
+	}{
+		{
+			name:        "non-string input",
+			payload:     []byte{0x68, 0x65, 0x6c, 0x6c, 0x6f},
+			params:      map[string]any{"separator": ","},
+			errorString: "string.split only accepts a string",
+		},
+		{
+			name:        "missing separator param",
+			payload:     "part1,part2,part3",
+			params:      map[string]any{},
+			errorString: "string.split separator error: not found",
+		},
+		{
+			name:        "non-string separator param",
+			payload:     "part1,part2,part3",
+			params:      map[string]any{"separator": 123},
+			errorString: "string.split separator error: not a string",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			registration, ok := processor.GetProcessorRegistration("string.split")
+			if !ok {
+				t.Fatalf("string.split processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "string.split",
+				Params: test.params,
+			})
+
+			if err != nil {
+				if test.errorString != err.Error() {
+					t.Fatalf("string.split got error '%s', expected '%s'", err.Error(), test.errorString)
+				}
+				return
+			}
+
+			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+
+			if err == nil {
+				t.Fatalf("string.split expected error but got none, payload: %+v", got)
+			}
+			if err.Error() != test.errorString {
+				t.Fatalf("string.split got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+		})
+	}
+}
