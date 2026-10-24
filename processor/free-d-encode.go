@@ -7,6 +7,7 @@ import (
 	freeD "github.com/jwetzell/free-d-go"
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/payload"
 )
 
 func init() {
@@ -23,7 +24,7 @@ type FreeDEncode struct {
 	config config.ProcessorConfig
 }
 
-func (fe *FreeDEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
+func (fe *FreeDEncode) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadPosition, ok := common.GetAnyAs[freeD.FreeDPosition](payload)
 

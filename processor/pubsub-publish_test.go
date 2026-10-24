@@ -7,6 +7,7 @@ import (
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/test"
+	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 	_ "modernc.org/sqlite"
 )
@@ -45,7 +46,7 @@ func TestGoodPubSubPublish(t *testing.T) {
 				t.Fatalf("pubsub.publish failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
+			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{
 				Payload: testCase.payload,
 			}, testModuleManager(map[string]common.Module{
 				"test": test.NewTestPubSubModule("test"),
@@ -138,7 +139,7 @@ func TestBadPubSubPublish(t *testing.T) {
 			moduleManager: testModuleManager(map[string]common.Module{
 				"test": test.NewTestPubSubModule("test"),
 			}),
-			errorString: "template: topic:1:2: executing \"topic\" at <.Data>: can't evaluate field Data in type common.WrappedPayload",
+			errorString: "template: topic:1:2: executing \"topic\" at <.Data>: can't evaluate field Data in type payload.WrappedPayload",
 		},
 		{
 			name:    "no modules",
@@ -194,7 +195,7 @@ func TestBadPubSubPublish(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
+			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{
 				Payload: test.payload,
 			}, test.moduleManager, nil)
 

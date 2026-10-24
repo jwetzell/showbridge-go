@@ -7,6 +7,7 @@ import (
 
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/payload"
 )
 
 func init() {
@@ -23,7 +24,7 @@ type JsonEncode struct {
 	config config.ProcessorConfig
 }
 
-func (je *JsonEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
+func (je *JsonEncode) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	var payloadBuffer bytes.Buffer
 

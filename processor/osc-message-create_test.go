@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/jwetzell/osc-go"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
 
@@ -134,7 +134,7 @@ func TestGoodOSCMessageCreate(t *testing.T) {
 				t.Fatalf("osc.message.create failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err != nil {
 				t.Fatalf("osc.message.create processing failed: %s", err)
@@ -256,7 +256,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 				"address": "/test/{{.missing}}",
 			},
 			payload:     "test",
-			errorString: "template: address:1:8: executing \"address\" at <.missing>: can't evaluate field missing in type common.WrappedPayload",
+			errorString: "template: address:1:8: executing \"address\" at <.missing>: can't evaluate field missing in type payload.WrappedPayload",
 		},
 		{
 			name: "address doesn't start with slash",
@@ -273,7 +273,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 				"args":    []map[string]any{{"value": "{{.missing}}", "type": "s"}},
 			},
 			payload:     "test",
-			errorString: "template: arg:1:2: executing \"arg\" at <.missing>: can't evaluate field missing in type common.WrappedPayload",
+			errorString: "template: arg:1:2: executing \"arg\" at <.missing>: can't evaluate field missing in type payload.WrappedPayload",
 		},
 		{
 			name: "wrong arg type for int arg",
@@ -341,7 +341,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("osc.message.create expected to fail but succeeded, got: %v", got)

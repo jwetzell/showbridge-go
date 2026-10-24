@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/common"
+	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
 
@@ -35,7 +35,7 @@ func TestGoodJsonDecode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := jsonDecoder.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := jsonDecoder.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("json.decode processing failed: %s", err)
 			}
@@ -73,7 +73,7 @@ func TestBadJsonDecode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := stringEncoder.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := stringEncoder.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("json.decode expected to fail but got payload: %+v", got)

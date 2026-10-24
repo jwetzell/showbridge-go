@@ -1,4 +1,4 @@
-package common
+package payload
 
 type WrappedPayload struct {
 	Payload any

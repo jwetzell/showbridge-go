@@ -4,9 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/test"
+	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
 
@@ -34,7 +34,7 @@ func TestGoodOsExec(t *testing.T) {
 				t.Fatalf("os.exec failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: testCase.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: testCase.payload}, nil, nil)
 
 			if err != nil {
 				t.Fatalf("os.exec processing failed: %s", err)
@@ -82,7 +82,7 @@ func TestBadOsExec(t *testing.T) {
 				"command": "{{.NonExistentField}}",
 			},
 			payload:     test.TestStruct{},
-			errorString: "template: command:1:2: executing \"command\" at <.NonExistentField>: can't evaluate field NonExistentField in type common.WrappedPayload",
+			errorString: "template: command:1:2: executing \"command\" at <.NonExistentField>: can't evaluate field NonExistentField in type payload.WrappedPayload",
 		},
 		{
 			name: "non-string in args",
@@ -109,7 +109,7 @@ func TestBadOsExec(t *testing.T) {
 				"args":    []any{"{{.Unknown}}"},
 			},
 			payload:     test.TestStruct{},
-			errorString: "template: arg-0:1:2: executing \"arg-0\" at <.Unknown>: can't evaluate field Unknown in type common.WrappedPayload",
+			errorString: "template: arg-0:1:2: executing \"arg-0\" at <.Unknown>: can't evaluate field Unknown in type payload.WrappedPayload",
 		},
 	}
 
@@ -130,7 +130,7 @@ func TestBadOsExec(t *testing.T) {
 				}
 				return
 			}
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("os.exec expected to fail but succeeded, got: %v", got)

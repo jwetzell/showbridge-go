@@ -8,6 +8,7 @@ import (
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/test"
+	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/route"
 )
 
@@ -45,7 +46,7 @@ func TestGoodRouteHandleInput(t *testing.T) {
 
 	inputData := "test input data"
 	testRouter := test.GetNewTestRouter()
-	payload, err := testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
+	payload, err := testRoute.ProcessPayload(t.Context(), payload.WrappedPayload{
 		Payload: inputData,
 	}, mockModuleManager{"output": &test.TestOutputModule{}}, testRouter.HandleInput)
 	if err != nil {
@@ -83,7 +84,7 @@ func TestRouteHandleInputWithProcessorError(t *testing.T) {
 
 	inputData := "test input data"
 	testRouter := test.GetNewTestRouter()
-	_, err = testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
+	_, err = testRoute.ProcessPayload(t.Context(), payload.WrappedPayload{
 		Payload: inputData,
 	}, mockModuleManager{"output": &test.TestOutputModule{}}, testRouter.HandleInput)
 	if err == nil {
@@ -111,7 +112,7 @@ func TestRouteHandleNilPayload(t *testing.T) {
 	}
 
 	testRouter := test.GetNewTestRouter()
-	payload, err := testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
+	payload, err := testRoute.ProcessPayload(t.Context(), payload.WrappedPayload{
 		Payload: nil,
 	}, mockModuleManager{"output": &test.TestOutputModule{}}, testRouter.HandleInput)
 	if err != nil {
@@ -142,7 +143,7 @@ func TestRouteHandleNilPayloadFromProcessor(t *testing.T) {
 	}
 
 	testRouter := test.GetNewTestRouter()
-	_, err = testRoute.ProcessPayload(t.Context(), common.WrappedPayload{
+	_, err = testRoute.ProcessPayload(t.Context(), payload.WrappedPayload{
 		Payload: "test",
 	}, mockModuleManager{"output": &test.TestOutputModule{}}, testRouter.HandleInput)
 	if err != nil {

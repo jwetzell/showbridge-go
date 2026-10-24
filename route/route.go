@@ -6,6 +6,7 @@ import (
 
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
 
@@ -41,7 +42,7 @@ func (r *route) Matches(source string) bool {
 	return r.input == source
 }
 
-func (r *route) ProcessPayload(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (any, error) {
+func (r *route) ProcessPayload(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (any, error) {
 	for processorIndex, processor := range r.processors {
 		processedPayload, err := processor.Process(ctx, wrappedPayload, moduleManager, inputHandler)
 		if err != nil {

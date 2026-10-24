@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
 
@@ -36,7 +36,7 @@ func TestGoodHTTPResponseCreate(t *testing.T) {
 				t.Fatalf("http.response failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("http.response processing failed: %s", err)
 			}
@@ -83,7 +83,7 @@ func TestBadHTTPResponseCreate(t *testing.T) {
 			name:        "bodyTemplate template error",
 			params:      map[string]any{"status": 200, "bodyTemplate": "{{.MissingField}}"},
 			payload:     nil,
-			errorString: "template: body:1:2: executing \"body\" at <.MissingField>: can't evaluate field MissingField in type common.WrappedPayload",
+			errorString: "template: body:1:2: executing \"body\" at <.MissingField>: can't evaluate field MissingField in type payload.WrappedPayload",
 		},
 		{
 			name:        "bodyTemplate template syntax error",
@@ -119,7 +119,7 @@ func TestBadHTTPResponseCreate(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("http.response expected to fail but succeeded, got: %v", got)

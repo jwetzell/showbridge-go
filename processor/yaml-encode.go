@@ -7,6 +7,7 @@ import (
 
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/payload"
 )
 
 func init() {
@@ -23,7 +24,7 @@ type YamlEncode struct {
 	config config.ProcessorConfig
 }
 
-func (je *YamlEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
+func (je *YamlEncode) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 
 	payloadBytes, err := yaml.Marshal(payload)

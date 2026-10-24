@@ -3,9 +3,9 @@ package processor_test
 import (
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/test"
+	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
 
@@ -64,7 +64,7 @@ func TestGoodFilterExpr(t *testing.T) {
 				t.Fatalf("filter.expr failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: testCase.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: testCase.payload}, nil, nil)
 
 			if err != nil {
 				t.Fatalf("filter.expr processing failed: %s", err)
@@ -138,7 +138,7 @@ func TestBadFilterExpr(t *testing.T) {
 				}
 				return
 			}
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("filter.expr expected to fail but succeeded, got: %v", got)

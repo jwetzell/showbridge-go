@@ -7,6 +7,7 @@ import (
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/test"
+	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
 
@@ -36,7 +37,7 @@ func TestGoodRouterInput(t *testing.T) {
 				t.Fatalf("router.input failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: testCase.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: testCase.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("router.input processing failed: %s", err)
 			}
@@ -104,7 +105,7 @@ func TestBadRouterInput(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: testCase.payload}, nil, testCase.inputHandler)
+			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: testCase.payload}, nil, testCase.inputHandler)
 
 			if err == nil {
 				t.Fatalf("router.input expected to fail but succeeded, got: %v", got)

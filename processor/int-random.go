@@ -9,6 +9,7 @@ import (
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/payload"
 )
 
 func init() {
@@ -60,7 +61,7 @@ type IntRandom struct {
 	config config.ProcessorConfig
 }
 
-func (ir *IntRandom) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
+func (ir *IntRandom) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
 	payloadInt := rand.IntN(ir.Max-ir.Min+1) + ir.Min
 	wrappedPayload.Payload = payloadInt
 	return wrappedPayload, nil

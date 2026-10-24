@@ -7,6 +7,7 @@ import (
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/payload"
 	"golang.org/x/time/rate"
 )
 
@@ -44,7 +45,7 @@ type FilterRate struct {
 	limiter *rate.Limiter
 }
 
-func (fc *FilterRate) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
+func (fc *FilterRate) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
 	err := fc.limiter.Wait(ctx)
 	if err != nil {
 		wrappedPayload.End = true

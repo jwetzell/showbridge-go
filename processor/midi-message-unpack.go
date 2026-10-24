@@ -9,6 +9,7 @@ import (
 
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/payload"
 	"gitlab.com/gomidi/midi/v2"
 )
 
@@ -55,7 +56,7 @@ type MIDIPitchBend struct {
 	Absolute uint16
 }
 
-func (mmu *MIDIMessageUnpack) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
+func (mmu *MIDIMessageUnpack) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadMidi, ok := common.GetAnyAs[midi.Message](payload)
 

@@ -7,6 +7,7 @@ import (
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/payload"
 	"modernc.org/quickjs"
 )
 
@@ -63,7 +64,7 @@ type ScriptJS struct {
 	Program     string
 }
 
-func (sj *ScriptJS) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
+func (sj *ScriptJS) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
 
 	// NOTE(jwetzell): some weird conversion going on with these types
 	_, isUint8Slice := common.GetAnyAs[[]uint8](wrappedPayload.Payload)

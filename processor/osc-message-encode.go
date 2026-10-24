@@ -8,6 +8,7 @@ import (
 	osc "github.com/jwetzell/osc-go"
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/payload"
 )
 
 type OSCMessageEncode struct {
@@ -24,7 +25,7 @@ func init() {
 	})
 }
 
-func (ome *OSCMessageEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
+func (ome *OSCMessageEncode) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadMessage, ok := common.GetAnyAs[*osc.Message](payload)
 

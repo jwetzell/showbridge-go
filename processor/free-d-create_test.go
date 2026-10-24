@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	freeD "github.com/jwetzell/free-d-go"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
 
@@ -73,7 +73,7 @@ func TestGoodFreeDCreate(t *testing.T) {
 				t.Fatalf("freed.create failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("freed.create processing failed: %s", err)
 			}
@@ -520,7 +520,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				"zoom":  "66051",
 				"focus": "263430",
 			},
-			errorString: "template: id:1:2: executing \"id\" at <.Unknown>: can't evaluate field Unknown in type common.WrappedPayload",
+			errorString: "template: id:1:2: executing \"id\" at <.Unknown>: can't evaluate field Unknown in type payload.WrappedPayload",
 			payload:     nil,
 		},
 		{
@@ -536,7 +536,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				"zoom":  "66051",
 				"focus": "263430",
 			},
-			errorString: "template: pan:1:2: executing \"pan\" at <.Unknown>: can't evaluate field Unknown in type common.WrappedPayload",
+			errorString: "template: pan:1:2: executing \"pan\" at <.Unknown>: can't evaluate field Unknown in type payload.WrappedPayload",
 			payload:     nil,
 		},
 		{
@@ -552,7 +552,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				"zoom":  "66051",
 				"focus": "263430",
 			},
-			errorString: "template: tilt:1:2: executing \"tilt\" at <.Unknown>: can't evaluate field Unknown in type common.WrappedPayload",
+			errorString: "template: tilt:1:2: executing \"tilt\" at <.Unknown>: can't evaluate field Unknown in type payload.WrappedPayload",
 			payload:     nil,
 		},
 		{
@@ -568,7 +568,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				"zoom":  "66051",
 				"focus": "263430",
 			},
-			errorString: "template: roll:1:2: executing \"roll\" at <.Unknown>: can't evaluate field Unknown in type common.WrappedPayload",
+			errorString: "template: roll:1:2: executing \"roll\" at <.Unknown>: can't evaluate field Unknown in type payload.WrappedPayload",
 			payload:     nil,
 		},
 		{
@@ -584,7 +584,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				"zoom":  "66051",
 				"focus": "263430",
 			},
-			errorString: "template: posX:1:2: executing \"posX\" at <.Unknown>: can't evaluate field Unknown in type common.WrappedPayload",
+			errorString: "template: posX:1:2: executing \"posX\" at <.Unknown>: can't evaluate field Unknown in type payload.WrappedPayload",
 			payload:     nil,
 		},
 		{
@@ -600,7 +600,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				"zoom":  "66051",
 				"focus": "263430",
 			},
-			errorString: "template: posY:1:2: executing \"posY\" at <.Unknown>: can't evaluate field Unknown in type common.WrappedPayload",
+			errorString: "template: posY:1:2: executing \"posY\" at <.Unknown>: can't evaluate field Unknown in type payload.WrappedPayload",
 			payload:     nil,
 		},
 		{
@@ -616,7 +616,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				"zoom":  "66051",
 				"focus": "263430",
 			},
-			errorString: "template: posZ:1:2: executing \"posZ\" at <.Unknown>: can't evaluate field Unknown in type common.WrappedPayload",
+			errorString: "template: posZ:1:2: executing \"posZ\" at <.Unknown>: can't evaluate field Unknown in type payload.WrappedPayload",
 			payload:     nil,
 		},
 		{
@@ -632,7 +632,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				"zoom":  "{{.Unknown}}",
 				"focus": "263430",
 			},
-			errorString: "template: zoom:1:2: executing \"zoom\" at <.Unknown>: can't evaluate field Unknown in type common.WrappedPayload",
+			errorString: "template: zoom:1:2: executing \"zoom\" at <.Unknown>: can't evaluate field Unknown in type payload.WrappedPayload",
 			payload:     nil,
 		},
 		{
@@ -648,7 +648,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				"zoom":  "66051",
 				"focus": "{{.Unknown}}",
 			},
-			errorString: "template: focus:1:2: executing \"focus\" at <.Unknown>: can't evaluate field Unknown in type common.WrappedPayload",
+			errorString: "template: focus:1:2: executing \"focus\" at <.Unknown>: can't evaluate field Unknown in type payload.WrappedPayload",
 			payload:     nil,
 		},
 		{
@@ -835,7 +835,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("freed.create expected to fail but succeeded, got: %v", got)

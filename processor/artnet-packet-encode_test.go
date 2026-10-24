@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/jwetzell/artnet-go"
-	"github.com/jwetzell/showbridge-go/common"
+	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
 
@@ -33,7 +33,7 @@ func TestGoodArtnetPacketEncode(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			got, err := packetEncoder.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := packetEncoder.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err != nil {
 				t.Fatalf("artnet.packet.encode processing failed: %s", err)
@@ -64,7 +64,7 @@ func TestBadArtnetPacketEncode(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			got, err := packetEncoder.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := packetEncoder.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("artnet.packet.encode expected to fail but succeeded, got: %v", got)

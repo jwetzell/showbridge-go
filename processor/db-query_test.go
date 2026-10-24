@@ -7,6 +7,7 @@ import (
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/test"
+	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 	_ "modernc.org/sqlite"
 )
@@ -75,7 +76,7 @@ func TestGoodDbQuery(t *testing.T) {
 				t.Fatalf("db.query failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
+			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{
 				Payload: testCase.payload,
 			}, testModuleManager{
 				"test": test.NewTestDBModule("test"),
@@ -168,7 +169,7 @@ func TestBadDbQuery(t *testing.T) {
 			moduleManager: testModuleManager(map[string]common.Module{
 				"test": test.NewTestDBModule("test"),
 			}),
-			errorString: "template: query:1:16: executing \"query\" at <.Data>: can't evaluate field Data in type common.WrappedPayload",
+			errorString: "template: query:1:16: executing \"query\" at <.Data>: can't evaluate field Data in type payload.WrappedPayload",
 		},
 		{
 			name:    "query error",
@@ -236,7 +237,7 @@ func TestBadDbQuery(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
+			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{
 				Payload: test.payload,
 			}, test.moduleManager, nil)
 

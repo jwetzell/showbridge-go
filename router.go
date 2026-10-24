@@ -12,6 +12,7 @@ import (
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/events"
 	"github.com/jwetzell/showbridge-go/module"
+	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/route"
 )
 
@@ -190,7 +191,7 @@ func (r *Router) Stop() {
 	r.logger.Info("done")
 }
 
-func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) (bool, []common.RouteIOError) {
+func (r *Router) HandleInput(ctx context.Context, sourceId string, inputPayload any) (bool, []common.RouteIOError) {
 	r.runningConfigMu.RLock()
 	defer r.runningConfigMu.RUnlock()
 
@@ -216,8 +217,8 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 
 				routeFound.Store(true)
 
-				_, err := routeInstance.ProcessPayload(ctx, common.WrappedPayload{
-					Payload: payload,
+				_, err := routeInstance.ProcessPayload(ctx, payload.WrappedPayload{
+					Payload: inputPayload,
 					Source:  sourceId,
 					End:     false,
 				}, r.ModuleInstances, r.HandleInput)

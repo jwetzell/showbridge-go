@@ -8,6 +8,7 @@ import (
 
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/payload"
 	"gitlab.com/gomidi/midi/v2"
 )
 
@@ -25,7 +26,7 @@ type MIDIMessageEncode struct {
 	config config.ProcessorConfig
 }
 
-func (mme *MIDIMessageEncode) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
+func (mme *MIDIMessageEncode) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadMessage, ok := common.GetAnyAs[midi.Message](payload)
 

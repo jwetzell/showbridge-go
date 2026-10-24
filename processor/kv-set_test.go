@@ -7,6 +7,7 @@ import (
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/test"
+	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
 
@@ -44,7 +45,7 @@ func TestGoodKvSet(t *testing.T) {
 				t.Fatalf("kv.set failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{
+			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{
 				Payload: testCase.payload,
 			}, testModuleManager(map[string]common.Module{
 				"test": &test.TestKVModule{},
@@ -169,7 +170,7 @@ func TestBadKvSet(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), common.WrappedPayload{Payload: testCase.payload}, testCase.moduleManager, nil)
+			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: testCase.payload}, testCase.moduleManager, nil)
 
 			if err == nil {
 				t.Fatalf("kv.set expected to fail but got payload: %+v", got)

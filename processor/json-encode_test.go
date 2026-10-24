@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/jwetzell/osc-go"
-	"github.com/jwetzell/showbridge-go/common"
+	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
 
@@ -27,7 +27,7 @@ func TestGoodJsonEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := jsonEncoder.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := jsonEncoder.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("json.encode processing failed: %s", err)
 			}
@@ -60,7 +60,7 @@ func TestBadJsonEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := stringEncoder.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := stringEncoder.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("json.encode expected to fail but got payload: %+v", got)

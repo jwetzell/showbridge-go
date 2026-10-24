@@ -11,6 +11,7 @@ import (
 	"github.com/jwetzell/osc-go"
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/payload"
 )
 
 func init() {
@@ -124,7 +125,7 @@ type MessageCreate struct {
 	Types   []rune
 }
 
-func (omc *MessageCreate) Process(ctx context.Context, wrappedPayload common.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (common.WrappedPayload, error) {
+func (omc *MessageCreate) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
 
 	templateData := wrappedPayload
 

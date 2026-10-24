@@ -6,7 +6,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/common"
+	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 	"gitlab.com/gomidi/midi/v2"
 )
@@ -27,7 +27,7 @@ func TestGoodMIDIMessageEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := midiMessageEncoder.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := midiMessageEncoder.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("midi.message.encode processing failed: %s", err)
 			}
@@ -60,7 +60,7 @@ func TestBadMIDIMessageEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := midiMessageEncoder.Process(t.Context(), common.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := midiMessageEncoder.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("midi.message.encode expected to fail but got payload: %+v", got)
