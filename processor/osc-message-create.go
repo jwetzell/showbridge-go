@@ -55,7 +55,7 @@ func init() {
 			Required:             []string{"address"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(processorConfig config.ProcessorConfig) (common.Processor, error) {
+		New: func(processorConfig config.ProcessorConfig) (Processor, error) {
 			params := processorConfig.Params
 			addressString, err := params.GetString("address")
 			if err != nil {

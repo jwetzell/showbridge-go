@@ -14,7 +14,7 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "debug.log",
 		Title: "Debug Log",
-		New: func(config config.ProcessorConfig) (common.Processor, error) {
+		New: func(config config.ProcessorConfig) (Processor, error) {
 			return &DebugLog{config: config, logger: slog.Default().With("component", "processor", "type", config.Type)}, nil
 		},
 	})

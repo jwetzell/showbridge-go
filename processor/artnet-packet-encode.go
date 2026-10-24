@@ -14,7 +14,7 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "artnet.packet.encode",
 		Title: "Encode ArtNet Packet",
-		New: func(config config.ProcessorConfig) (common.Processor, error) {
+		New: func(config config.ProcessorConfig) (Processor, error) {
 			return &ArtNetPacketEncode{config: config}, nil
 		},
 	})

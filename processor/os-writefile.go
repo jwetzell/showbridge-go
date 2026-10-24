@@ -30,7 +30,7 @@ func init() {
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 			Required:             []string{"path"},
 		},
-		New: func(moduleConfig config.ProcessorConfig) (common.Processor, error) {
+		New: func(moduleConfig config.ProcessorConfig) (Processor, error) {
 			params := moduleConfig.Params
 
 			pathString, err := params.GetString("path")

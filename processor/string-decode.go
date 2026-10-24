@@ -13,7 +13,7 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "string.decode",
 		Title: "Decode String",
-		New: func(config config.ProcessorConfig) (common.Processor, error) {
+		New: func(config config.ProcessorConfig) (Processor, error) {
 			return &StringDecode{config: config}, nil
 		},
 	})

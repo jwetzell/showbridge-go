@@ -37,7 +37,7 @@ func init() {
 			},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(moduleConfig config.ProcessorConfig) (common.Processor, error) {
+		New: func(moduleConfig config.ProcessorConfig) (Processor, error) {
 			params := moduleConfig.Params
 
 			baseNum, err := params.GetInt("base")

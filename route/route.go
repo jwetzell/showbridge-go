@@ -13,11 +13,11 @@ import (
 type route struct {
 	id         string
 	input      string
-	processors []common.Processor
+	processors []processor.Processor
 }
 
 func NewRoute(config config.RouteConfig) (common.Route, error) {
-	processors := []common.Processor{}
+	processors := []processor.Processor{}
 
 	if len(config.Processors) > 0 {
 		for _, processorDecl := range config.Processors {
@@ -26,11 +26,11 @@ func NewRoute(config config.RouteConfig) (common.Route, error) {
 				return nil, fmt.Errorf("problem loading processor registration for processor type: %s", processorDecl.Type)
 			}
 
-			processor, err := processorInfo.New(processorDecl)
+			proc, err := processorInfo.New(processorDecl)
 			if err != nil {
 				return nil, err
 			}
-			processors = append(processors, processor)
+			processors = append(processors, proc)
 		}
 	}
 

@@ -42,7 +42,7 @@ func init() {
 			Required:             []string{"channel", "note", "velocity"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (common.Processor, error) {
+		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 
 			channelString, err := params.GetString("channel")

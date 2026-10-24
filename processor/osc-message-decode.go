@@ -15,7 +15,7 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "osc.message.decode",
 		Title: "Decode OSC Message",
-		New: func(config config.ProcessorConfig) (common.Processor, error) {
+		New: func(config config.ProcessorConfig) (Processor, error) {
 			return &OSCMessageDecode{config: config}, nil
 		},
 	})

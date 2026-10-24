@@ -13,7 +13,7 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "filter.change",
 		Title: "Filter On Change",
-		New: func(config config.ProcessorConfig) (common.Processor, error) {
+		New: func(config config.ProcessorConfig) (Processor, error) {
 			return &FilterChange{config: config}, nil
 		},
 	})

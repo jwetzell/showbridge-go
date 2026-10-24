@@ -1,20 +1,26 @@
 package processor
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/payload"
 )
+
+type Processor interface {
+	Process(context.Context, payload.WrappedPayload, common.ModuleManager, common.InputHandler) (payload.WrappedPayload, error)
+}
 
 type ProcessorRegistration struct {
 	Type         string             `json:"type"`
 	Title        string             `json:"title,omitempty"`
 	Description  string             `json:"description,omitempty"`
 	ParamsSchema *jsonschema.Schema `json:"paramsSchema,omitempty"`
-	New          func(config.ProcessorConfig) (common.Processor, error)
+	New          func(config.ProcessorConfig) (Processor, error)
 }
 
 func RegisterProcessor(processor ProcessorRegistration) {

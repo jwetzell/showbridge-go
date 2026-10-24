@@ -16,7 +16,7 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "midi.message.decode",
 		Title: "Decode MIDI Message",
-		New: func(config config.ProcessorConfig) (common.Processor, error) {
+		New: func(config config.ProcessorConfig) (Processor, error) {
 			return &MIDIMessageDecode{config: config}, nil
 		},
 	})

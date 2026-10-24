@@ -26,7 +26,7 @@ func TestProcessorBadRegistrationNoType(t *testing.T) {
 
 	processor.RegisterProcessor(processor.ProcessorRegistration{
 		Type: "",
-		New: func(config config.ProcessorConfig) (common.Processor, error) {
+		New: func(config config.ProcessorConfig) (processor.Processor, error) {
 			return &test.TestProcessor{}, nil
 		},
 	})
@@ -56,7 +56,7 @@ func TestProcessorBadRegistrationExistingType(t *testing.T) {
 
 	processor.RegisterProcessor(processor.ProcessorRegistration{
 		Type: "string.create",
-		New: func(config config.ProcessorConfig) (common.Processor, error) {
+		New: func(config config.ProcessorConfig) (processor.Processor, error) {
 			return &test.TestProcessor{}, nil
 		},
 	})

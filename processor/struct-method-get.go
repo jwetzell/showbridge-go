@@ -28,7 +28,7 @@ func init() {
 			Required:             []string{"name"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (common.Processor, error) {
+		New: func(config config.ProcessorConfig) (Processor, error) {
 			params := config.Params
 			nameString, err := params.GetString("name")
 			if err != nil {

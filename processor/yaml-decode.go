@@ -14,7 +14,7 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "yaml.decode",
 		Title: "Decode YAML",
-		New: func(config config.ProcessorConfig) (common.Processor, error) {
+		New: func(config config.ProcessorConfig) (Processor, error) {
 			return &YamlDecode{config: config}, nil
 		},
 	})
