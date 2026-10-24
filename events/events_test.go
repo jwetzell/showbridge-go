@@ -1,13 +1,13 @@
-package common_test
+package events_test
 
 import (
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/common"
+	"github.com/jwetzell/showbridge-go/events"
 )
 
 func TestEventToJson(t *testing.T) {
-	e := common.Event{
+	e := events.Event{
 		Type: "test.event",
 		Data: map[string]any{
 			"key": "value",

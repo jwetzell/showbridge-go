@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/websocket"
-	"github.com/jwetzell/showbridge-go/common"
+	"github.com/jwetzell/showbridge-go/events"
 )
 
 var upgrader = websocket.Upgrader{
@@ -18,7 +18,7 @@ type WebsocketEventDestination struct {
 	conn *websocket.Conn
 }
 
-func (d WebsocketEventDestination) Send(event common.Event) error {
+func (d WebsocketEventDestination) Send(event events.Event) error {
 	eventJSON, err := event.ToJSON()
 	if err != nil {
 		return err
@@ -26,7 +26,7 @@ func (d WebsocketEventDestination) Send(event common.Event) error {
 	return d.conn.WriteMessage(websocket.TextMessage, eventJSON)
 }
 
-func (d WebsocketEventDestination) Is(dest common.EventDestination) bool {
+func (d WebsocketEventDestination) Is(dest events.EventDestination) bool {
 	other, ok := dest.(WebsocketEventDestination)
 	if !ok {
 		return false
@@ -57,7 +57,7 @@ READ_LOOP:
 
 		switch messageType {
 		case websocket.TextMessage, websocket.BinaryMessage:
-			event := common.Event{}
+			event := events.Event{}
 			err = json.Unmarshal(message, &event)
 			if err != nil {
 				as.logger.Error("websocket message unmarshal error", "error", err)

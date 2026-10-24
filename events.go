@@ -3,13 +3,13 @@ package showbridge
 import (
 	"time"
 
-	"github.com/jwetzell/showbridge-go/common"
+	"github.com/jwetzell/showbridge-go/events"
 )
 
-func (r *Router) HandleEvent(event common.Event, sender common.EventDestination) {
+func (r *Router) HandleEvent(event events.Event, sender events.EventDestination) {
 	switch event.Type {
 	case "ping":
-		r.unicastEvent(common.Event{Type: "pong", Data: map[string]any{
+		r.unicastEvent(events.Event{Type: "pong", Data: map[string]any{
 			"timestamp": time.Now().UnixMilli(),
 		}}, sender)
 	default:
@@ -17,13 +17,13 @@ func (r *Router) HandleEvent(event common.Event, sender common.EventDestination)
 	}
 }
 
-func (r *Router) AddEventDestination(dest common.EventDestination) {
+func (r *Router) AddEventDestination(dest events.EventDestination) {
 	r.eventDestinationsMu.Lock()
 	defer r.eventDestinationsMu.Unlock()
 	r.eventDestinations = append(r.eventDestinations, dest)
 }
 
-func (r *Router) RemoveEventDestination(dest common.EventDestination) {
+func (r *Router) RemoveEventDestination(dest events.EventDestination) {
 	r.eventDestinationsMu.Lock()
 	defer r.eventDestinationsMu.Unlock()
 	for i, d := range r.eventDestinations {
@@ -34,14 +34,14 @@ func (r *Router) RemoveEventDestination(dest common.EventDestination) {
 	}
 }
 
-func (r *Router) unicastEvent(event common.Event, dest common.EventDestination) {
+func (r *Router) unicastEvent(event events.Event, dest events.EventDestination) {
 	err := dest.Send(event)
 	if err != nil {
 		r.logger.Error("failed to send event", "error", err)
 	}
 }
 
-func (r *Router) broadcastEvent(event common.Event) {
+func (r *Router) broadcastEvent(event events.Event) {
 	r.eventDestinationsMu.Lock()
 	defer r.eventDestinationsMu.Unlock()
 	for _, dest := range r.eventDestinations {

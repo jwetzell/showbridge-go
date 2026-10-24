@@ -11,8 +11,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/events"
 	"github.com/jwetzell/showbridge-go/schema"
 )
 
@@ -22,10 +22,10 @@ type ApiServer struct {
 	server             *http.Server
 	logger             *slog.Logger
 	configurableRouter config.Configurable
-	eventRouter        common.EventRouter
+	eventRouter        events.EventRouter
 }
 
-func NewApiServer(configurableRouter config.Configurable, eventRouter common.EventRouter) *ApiServer {
+func NewApiServer(configurableRouter config.Configurable, eventRouter events.EventRouter) *ApiServer {
 	return &ApiServer{
 		configurableRouter: configurableRouter,
 		eventRouter:        eventRouter,

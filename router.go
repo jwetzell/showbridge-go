@@ -10,6 +10,7 @@ import (
 	"github.com/jwetzell/showbridge-go/api"
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/events"
 	"github.com/jwetzell/showbridge-go/module"
 	"github.com/jwetzell/showbridge-go/route"
 )
@@ -35,7 +36,7 @@ type Router struct {
 	runningConfig       config.Config
 	runningConfigMu     sync.RWMutex
 	apiServer           *api.ApiServer
-	eventDestinations   []common.EventDestination
+	eventDestinations   []events.EventDestination
 	eventDestinationsMu sync.Mutex
 }
 
@@ -196,7 +197,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 	var routeIOErrors []common.RouteIOError
 	var routeFound atomic.Bool
 
-	r.broadcastEvent(common.Event{
+	r.broadcastEvent(events.Event{
 		Type: "input",
 		Data: map[string]any{
 			"source": sourceId,
@@ -229,7 +230,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 						Index:        routeIndex,
 						ProcessError: err,
 					})
-					r.broadcastEvent(common.Event{
+					r.broadcastEvent(events.Event{
 						Type: "route",
 						Data: map[string]any{
 							"index": routeIndex,
@@ -238,7 +239,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, payload any) 
 					})
 					return
 				}
-				r.broadcastEvent(common.Event{
+				r.broadcastEvent(events.Event{
 					Type: "route",
 					Data: map[string]any{
 						"index": routeIndex,
