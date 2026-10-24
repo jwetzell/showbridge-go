@@ -196,6 +196,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, inputPayload 
 	defer r.runningConfigMu.RUnlock()
 
 	var routeIOErrors []common.RouteIOError
+	var routeIOErrorsMu sync.Mutex
 	var routeFound atomic.Bool
 
 	r.broadcastEvent(events.Event{
@@ -227,10 +228,12 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, inputPayload 
 						routeIOErrors = []common.RouteIOError{}
 					}
 					r.logger.Error("unable to process input", "route", routeIndex, "source", sourceId, "error", err)
+					routeIOErrorsMu.Lock()
 					routeIOErrors = append(routeIOErrors, common.RouteIOError{
 						Index:        routeIndex,
 						ProcessError: err,
 					})
+					routeIOErrorsMu.Unlock()
 					r.broadcastEvent(events.Event{
 						Type: "route",
 						Data: map[string]any{

@@ -110,6 +110,8 @@ func (hrd *HTTPGet) Process(ctx context.Context, wrappedPayload payload.WrappedP
 		return wrappedPayload, err
 	}
 
+	defer response.Body.Close()
+
 	body, err := io.ReadAll(response.Body)
 
 	if err != nil {

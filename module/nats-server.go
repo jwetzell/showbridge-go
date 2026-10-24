@@ -105,6 +105,7 @@ func (ns *NATSServer) Start(ctx context.Context, inputHandler common.InputHandle
 	natsServer.Start()
 
 	if !natsServer.ReadyForConnections(5 * time.Second) {
+		ns.serverMu.Unlock()
 		return errors.New("nats.server failed to start")
 	}
 	ns.serverMu.Unlock()
