@@ -27,8 +27,8 @@ tasks:
       - task: webui:build
         vars:
           BASE_HREF: /ui/
-      - rm -rf internal/api/webui
-      - mv webui/dist/webui internal/api/webui
+      - rm -rf api/webui
+      - mv webui/dist/webui api/webui
       - go build -tags=embed_webui -o {{.OUTPUT}} -ldflags="-s -w -X main.version={{.VERSION}}" ./cmd/showbridge 
 
   test:all:
