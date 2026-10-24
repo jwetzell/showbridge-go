@@ -70,7 +70,7 @@ type IntParse struct {
 
 func (ip *IntParse) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
-	payloadString, ok := common.GetAnyAs[string](payload)
+	payloadString, ok := payload.(string)
 
 	if !ok {
 		wrappedPayload.End = true

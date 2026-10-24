@@ -6,11 +6,6 @@ import (
 	"reflect"
 )
 
-func GetAnyAs[T any](value any) (T, bool) {
-	typed, ok := value.(T)
-	return typed, ok
-}
-
 func GetAnyAsInt(value any) (int, bool) {
 
 	intValue, ok := value.(int)

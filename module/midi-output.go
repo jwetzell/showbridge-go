@@ -90,7 +90,7 @@ func (mo *MIDIOutput) Output(ctx context.Context, payload any) error {
 		return errors.New("midi.output output is not setup")
 	}
 
-	payloadMessage, ok := common.GetAnyAs[midi.Message](payload)
+	payloadMessage, ok := payload.(midi.Message)
 
 	if !ok {
 		return errors.New("midi.output can only output midi.Message")

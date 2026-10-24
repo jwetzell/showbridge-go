@@ -184,7 +184,7 @@ func (wc *WebSocketClient) Output(ctx context.Context, payload any) error {
 	if ok {
 		return wc.outputBytes(ctx, payloadBytes)
 	} else {
-		payloadString, ok := common.GetAnyAs[string](payload)
+		payloadString, ok := payload.(string)
 		if ok {
 			return wc.outputString(ctx, payloadString)
 		} else {

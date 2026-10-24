@@ -26,7 +26,7 @@ type ArtNetPacketEncode struct {
 
 func (ape *ArtNetPacketEncode) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
-	payloadPacket, ok := common.GetAnyAs[artnet.ArtNetPacket](payload)
+	payloadPacket, ok := payload.(artnet.ArtNetPacket)
 
 	if !ok {
 		wrappedPayload.End = true

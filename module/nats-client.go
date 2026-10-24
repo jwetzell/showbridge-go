@@ -105,7 +105,7 @@ func (nc *NATSClient) Publish(ctx context.Context, topic string, payload any) er
 	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 
 	if !ok {
-		payloadString, ok := common.GetAnyAs[string](payload)
+		payloadString, ok := payload.(string)
 		if !ok {
 			return errors.New("nats.client is only able to publish bytes or string")
 		}

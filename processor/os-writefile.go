@@ -72,7 +72,7 @@ func (owf *OsWriteFile) Process(ctx context.Context, wrappedPayload payload.Wrap
 	payloadBytes, ok := common.GetAnyAsByteSlice(wrappedPayload.Payload)
 
 	if !ok {
-		payloadString, ok := common.GetAnyAs[string](wrappedPayload.Payload)
+		payloadString, ok := wrappedPayload.Payload.(string)
 		if !ok {
 			wrappedPayload.End = true
 			return wrappedPayload, errors.New("os.writefile can only process a string or []byte")

@@ -58,7 +58,7 @@ type MIDIPitchBend struct {
 
 func (mmu *MIDIMessageUnpack) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
-	payloadMidi, ok := common.GetAnyAs[midi.Message](payload)
+	payloadMidi, ok := payload.(midi.Message)
 
 	if !ok {
 		wrappedPayload.End = true

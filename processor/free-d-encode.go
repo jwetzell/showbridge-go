@@ -26,7 +26,7 @@ type FreeDEncode struct {
 
 func (fe *FreeDEncode) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
-	payloadPosition, ok := common.GetAnyAs[freeD.FreeDPosition](payload)
+	payloadPosition, ok := payload.(freeD.FreeDPosition)
 
 	if !ok {
 		wrappedPayload.End = true

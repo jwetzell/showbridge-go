@@ -30,7 +30,7 @@ func (jd *JsonDecode) Process(ctx context.Context, wrappedPayload payload.Wrappe
 	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 
 	if !ok {
-		payloadString, ok := common.GetAnyAs[string](payload)
+		payloadString, ok := payload.(string)
 		if !ok {
 			wrappedPayload.End = true
 			return wrappedPayload, errors.New("json.decode can only process a string or []byte")

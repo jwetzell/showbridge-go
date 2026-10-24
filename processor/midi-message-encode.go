@@ -28,7 +28,7 @@ type MIDIMessageEncode struct {
 
 func (mme *MIDIMessageEncode) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
-	payloadMessage, ok := common.GetAnyAs[midi.Message](payload)
+	payloadMessage, ok := payload.(midi.Message)
 
 	if !ok {
 		wrappedPayload.End = true

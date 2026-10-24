@@ -88,7 +88,7 @@ type IntScale struct {
 
 func (is *IntScale) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
-	payloadInt, ok := common.GetAnyAs[int](payload)
+	payloadInt, ok := common.GetAnyAsInt(payload)
 	if !ok {
 		wrappedPayload.End = true
 		return wrappedPayload, errors.New("int.scale can only process an int")
