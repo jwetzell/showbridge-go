@@ -66,28 +66,24 @@ type UDPClient struct {
 	inputHandler common.InputHandler
 	logger       *slog.Logger
 	cancel       context.CancelFunc
-	connMu       sync.Mutex
-}
-
-func (uc *UDPClient) SetupConn() error {
-	uc.connMu.Lock()
-	defer uc.connMu.Unlock()
-	client, err := net.DialUDP("udp", nil, uc.Addr)
-	uc.conn = client
-	return err
+	mu           sync.Mutex
 }
 
 func (uc *UDPClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
 	uc.logger.Debug("running")
+	uc.mu.Lock()
 	uc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	uc.ctx = moduleContext
 	uc.cancel = cancel
 
-	err := uc.SetupConn()
+	client, err := net.DialUDP("udp", nil, uc.Addr)
 	if err != nil {
+		uc.mu.Unlock()
 		return err
 	}
+	uc.conn = client
+	uc.mu.Unlock()
 
 	<-uc.ctx.Done()
 	uc.logger.Debug("done")
@@ -95,8 +91,8 @@ func (uc *UDPClient) Start(ctx context.Context, inputHandler common.InputHandler
 }
 
 func (uc *UDPClient) Output(ctx context.Context, payload any) error {
-	uc.connMu.Lock()
-	defer uc.connMu.Unlock()
+	uc.mu.Lock()
+	defer uc.mu.Unlock()
 	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
 	if !ok {
 		return errors.New("net.udp.client is only able to output bytes")
@@ -114,11 +110,11 @@ func (uc *UDPClient) Output(ctx context.Context, payload any) error {
 }
 
 func (uc *UDPClient) Stop() {
+	uc.mu.Lock()
+	defer uc.mu.Unlock()
 	if uc.cancel != nil {
 		defer uc.cancel()
 	}
-	uc.connMu.Lock()
-	defer uc.connMu.Unlock()
 	if uc.conn != nil {
 		uc.conn.Close()
 	}
