@@ -60,6 +60,21 @@ func TestBadNewRoute(t *testing.T) {
 			},
 			expectedError: "problem loading processor registration for processor type: dsafsdf;lkj",
 		},
+		{
+			name: "bad processor config",
+			route: config.RouteConfig{
+				Input: "source1",
+				Processors: []config.ProcessorConfig{
+					{
+						Type: "float.parse",
+						Params: params.Params{
+							"bitSize": "asdf",
+						},
+					},
+				},
+			},
+			expectedError: "float.parse bitSize error: not a number",
+		},
 	}
 
 	for _, tc := range testCases {
