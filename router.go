@@ -3,7 +3,6 @@ package showbridge
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 	"sync"
 	"sync/atomic"
@@ -12,7 +11,6 @@ import (
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/events"
 	"github.com/jwetzell/showbridge-go/module"
-	"github.com/jwetzell/showbridge-go/processor"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
@@ -100,23 +98,10 @@ func (r *Router) stopModule(moduleId string) error {
 // TODO(jwetzell): support removing route
 func (r *Router) addRoute(routeDecl config.RouteConfig) error {
 
-	processors := []routing.Processor{}
-
-	if len(routeDecl.Processors) > 0 {
-		for _, processorDecl := range routeDecl.Processors {
-			processorInfo, ok := processor.GetProcessorRegistration(processorDecl.Type)
-			if !ok {
-				return fmt.Errorf("problem loading processor registration for processor type: %s", processorDecl.Type)
-			}
-
-			proc, err := processorInfo.New(processorDecl)
-			if err != nil {
-				return err
-			}
-			processors = append(processors, proc)
-		}
+	routeInstance, err := NewRoute(routeDecl)
+	if err != nil {
+		return err
 	}
-	routeInstance := &route{id: routeDecl.Id, input: routeDecl.Input, processors: processors}
 	r.RouteInstances = append(r.RouteInstances, routeInstance)
 	return nil
 }
