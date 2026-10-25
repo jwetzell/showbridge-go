@@ -10,16 +10,8 @@ import (
 	"github.com/jwetzell/showbridge-go/api"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/events"
-	"github.com/jwetzell/showbridge-go/module"
 	"github.com/jwetzell/showbridge-go/routing"
 )
-
-type moduleManager map[string]routing.Module
-
-func (m moduleManager) GetModule(moduleId string) (routing.Module, bool) {
-	moduleInstance, ok := m[moduleId]
-	return moduleInstance, ok
-}
 
 // TODO(jwetzell): can/should this be split into different "components"?
 type Router struct {
@@ -40,20 +32,12 @@ type Router struct {
 }
 
 func (r *Router) addModule(moduleDecl config.ModuleConfig) error {
-	if moduleDecl.Id == "" {
-		return errors.New("module id cannot be empty")
-	}
-	moduleRegistration, ok := module.GetModuleRegistration(moduleDecl.Type)
-	if !ok {
-		return errors.New("module type not defined")
-	}
-
-	_, ok = r.ModuleInstances[moduleDecl.Id]
+	_, ok := r.ModuleInstances[moduleDecl.Id]
 	if ok {
 		return errors.New("module id already exists")
 	}
 
-	moduleInstance, err := moduleRegistration.New(moduleDecl)
+	moduleInstance, err := NewModule(moduleDecl)
 	if err != nil {
 		return err
 	}
