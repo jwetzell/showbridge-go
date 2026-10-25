@@ -1,12 +1,12 @@
 package processor_test
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/internal/test"
 	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
@@ -50,7 +50,6 @@ func TestGoodRouterInput(t *testing.T) {
 }
 
 func TestBadRouterInput(t *testing.T) {
-	router := test.GetNewTestRouter()
 	testCases := []struct {
 		name         string
 		params       map[string]any
@@ -59,20 +58,24 @@ func TestBadRouterInput(t *testing.T) {
 		errorString  string
 	}{
 		{
-			name:         "no source param",
-			params:       map[string]any{},
-			payload:      "test",
-			inputHandler: router.HandleInput,
-			errorString:  "router.input source error: not found",
+			name:    "no source param",
+			params:  map[string]any{},
+			payload: "test",
+			inputHandler: func(ctx context.Context, sourceId string, payload any) (bool, []common.RouteIOError) {
+				return false, nil
+			},
+			errorString: "router.input source error: not found",
 		},
 		{
 			name: "non-string source",
 			params: map[string]any{
 				"source": 123,
 			},
-			payload:      "test",
-			inputHandler: router.HandleInput,
-			errorString:  "router.input source error: not a string",
+			payload: "test",
+			inputHandler: func(ctx context.Context, sourceId string, payload any) (bool, []common.RouteIOError) {
+				return false, nil
+			},
+			errorString: "router.input source error: not a string",
 		},
 		{
 			name: "router not found in context",

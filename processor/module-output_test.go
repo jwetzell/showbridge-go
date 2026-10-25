@@ -1,15 +1,32 @@
 package processor_test
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/internal/test"
 	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
+
+func NewTestModule(id string) *TestModule {
+	return &TestModule{
+		id: id,
+	}
+}
+
+type TestModule struct {
+	id string
+}
+
+func (m *TestModule) Start(ctx context.Context, inputHandler common.InputHandler) error {
+	<-ctx.Done()
+	return nil
+}
+
+func (m *TestModule) Stop() {}
 
 func TestGoodModuleOutput(t *testing.T) {
 
@@ -61,7 +78,7 @@ func TestBadModuleOutput(t *testing.T) {
 			name:          "no module param",
 			params:        map[string]any{},
 			payload:       "test",
-			moduleManager: testModuleManager(map[string]common.Module{"test": test.NewTestModule("test")}),
+			moduleManager: testModuleManager(map[string]common.Module{"test": NewTestModule("test")}),
 			errorString:   "module.output module error: not found",
 		},
 		{
@@ -70,7 +87,7 @@ func TestBadModuleOutput(t *testing.T) {
 				"module": 123,
 			},
 			payload:       "test",
-			moduleManager: testModuleManager(map[string]common.Module{"test": test.NewTestModule("test")}),
+			moduleManager: testModuleManager(map[string]common.Module{"test": NewTestModule("test")}),
 			errorString:   "module.output module error: not a string",
 		},
 		{

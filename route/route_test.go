@@ -7,7 +7,6 @@ import (
 
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/internal/test"
 	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/route"
 )
@@ -66,7 +65,7 @@ func TestGoodRouteHandleInput(t *testing.T) {
 	}
 
 	inputData := "test input data"
-	testRouter := test.GetNewTestRouter()
+	testRouter := &MockRouter{}
 	payload, err := testRoute.ProcessPayload(t.Context(), payload.WrappedPayload{
 		Payload: inputData,
 	}, mockModuleManager{"output": &TestOutputModule{}}, testRouter.HandleInput)
@@ -104,7 +103,7 @@ func TestRouteHandleInputWithProcessorError(t *testing.T) {
 	}
 
 	inputData := "test input data"
-	testRouter := test.GetNewTestRouter()
+	testRouter := &MockRouter{}
 	_, err = testRoute.ProcessPayload(t.Context(), payload.WrappedPayload{
 		Payload: inputData,
 	}, mockModuleManager{"output": &TestOutputModule{}}, testRouter.HandleInput)
@@ -132,7 +131,7 @@ func TestRouteHandleNilPayload(t *testing.T) {
 		return
 	}
 
-	testRouter := test.GetNewTestRouter()
+	testRouter := &MockRouter{}
 	payload, err := testRoute.ProcessPayload(t.Context(), payload.WrappedPayload{
 		Payload: nil,
 	}, mockModuleManager{"output": &TestOutputModule{}}, testRouter.HandleInput)
@@ -163,7 +162,7 @@ func TestRouteHandleNilPayloadFromProcessor(t *testing.T) {
 		t.Fatalf("route failed to create: %v", err)
 	}
 
-	testRouter := test.GetNewTestRouter()
+	testRouter := &MockRouter{}
 	_, err = testRoute.ProcessPayload(t.Context(), payload.WrappedPayload{
 		Payload: "test",
 	}, mockModuleManager{"output": &TestOutputModule{}}, testRouter.HandleInput)
