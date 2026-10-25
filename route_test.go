@@ -10,6 +10,66 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestGoodNewRoute(t *testing.T) {
+	testCases := []struct {
+		name  string
+		route config.RouteConfig
+	}{
+		{
+			name: "basic route",
+			route: config.RouteConfig{
+				Input: "source1",
+			},
+		},
+		{
+			name: "route with processor",
+			route: config.RouteConfig{
+				Input: "source1",
+				Processors: []config.ProcessorConfig{
+					{
+						Type: "float.parse",
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := showbridge.NewRoute(tc.route)
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestBadNewRoute(t *testing.T) {
+	testCases := []struct {
+		name          string
+		route         config.RouteConfig
+		expectedError string
+	}{
+		{
+			name: "bad processor type",
+			route: config.RouteConfig{
+				Input: "source1",
+				Processors: []config.ProcessorConfig{
+					{
+						Type: "dsafsdf;lkj",
+					},
+				},
+			},
+			expectedError: "problem loading processor registration for processor type: dsafsdf;lkj",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := showbridge.NewRoute(tc.route)
+			require.EqualError(t, err, tc.expectedError)
+		})
+	}
+}
+
 func TestRouteMatches(t *testing.T) {
 
 	testCases := []struct {
