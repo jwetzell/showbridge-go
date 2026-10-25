@@ -8,15 +8,15 @@ import (
 	"time"
 
 	"github.com/jwetzell/psn-go"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
 	RegisterModule(ModuleRegistration{
 		Type:  "psn.client",
 		Title: "PosiStageNet Client",
-		New: func(config config.ModuleConfig) (common.Module, error) {
+		New: func(config config.ModuleConfig) (routing.Module, error) {
 			return &PSNClient{config: config, decoder: psn.NewDecoder(), logger: CreateLogger(config)}, nil
 		},
 	})
@@ -26,14 +26,14 @@ type PSNClient struct {
 	config       config.ModuleConfig
 	conn         *net.UDPConn
 	ctx          context.Context
-	inputHandler common.InputHandler
+	inputHandler routing.InputHandler
 	decoder      *psn.Decoder
 	logger       *slog.Logger
 	cancel       context.CancelFunc
 	connMu       sync.Mutex
 }
 
-func (pc *PSNClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (pc *PSNClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	pc.logger.Debug("running")
 	pc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)

@@ -9,9 +9,8 @@ import (
 
 	"github.com/google/jsonschema-go/jsonschema"
 	freeD "github.com/jwetzell/free-d-go"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -80,11 +79,11 @@ func init() {
 			},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 
 			// TODO(jwetzell): make some params optional
-			params := config.Params
-			idString, err := params.GetString("id")
+			processorParams := config.Params
+			idString, err := processorParams.GetString("id")
 			if err != nil {
 				return nil, fmt.Errorf("freed.create id error: %w", err)
 			}
@@ -95,7 +94,7 @@ func init() {
 				return nil, err
 			}
 
-			panString, err := params.GetString("pan")
+			panString, err := processorParams.GetString("pan")
 			if err != nil {
 				return nil, fmt.Errorf("freed.create pan error: %w", err)
 			}
@@ -106,7 +105,7 @@ func init() {
 				return nil, err
 			}
 
-			tiltString, err := params.GetString("tilt")
+			tiltString, err := processorParams.GetString("tilt")
 			if err != nil {
 				return nil, fmt.Errorf("freed.create tilt error: %w", err)
 			}
@@ -117,7 +116,7 @@ func init() {
 				return nil, err
 			}
 
-			rollString, err := params.GetString("roll")
+			rollString, err := processorParams.GetString("roll")
 			if err != nil {
 				return nil, fmt.Errorf("freed.create roll error: %w", err)
 			}
@@ -128,7 +127,7 @@ func init() {
 				return nil, err
 			}
 
-			posXString, err := params.GetString("posX")
+			posXString, err := processorParams.GetString("posX")
 			if err != nil {
 				return nil, fmt.Errorf("freed.create posX error: %w", err)
 			}
@@ -139,7 +138,7 @@ func init() {
 				return nil, err
 			}
 
-			posYString, err := params.GetString("posY")
+			posYString, err := processorParams.GetString("posY")
 			if err != nil {
 				return nil, fmt.Errorf("freed.create posY error: %w", err)
 			}
@@ -150,7 +149,7 @@ func init() {
 				return nil, err
 			}
 
-			posZString, err := params.GetString("posZ")
+			posZString, err := processorParams.GetString("posZ")
 			if err != nil {
 				return nil, fmt.Errorf("freed.create posZ error: %w", err)
 			}
@@ -161,7 +160,7 @@ func init() {
 				return nil, err
 			}
 
-			zoomString, err := params.GetString("zoom")
+			zoomString, err := processorParams.GetString("zoom")
 			if err != nil {
 				return nil, fmt.Errorf("freed.create zoom error: %w", err)
 			}
@@ -172,7 +171,7 @@ func init() {
 				return nil, err
 			}
 
-			focusString, err := params.GetString("focus")
+			focusString, err := processorParams.GetString("focus")
 			if err != nil {
 				return nil, fmt.Errorf("freed.create focus error: %w", err)
 			}
@@ -211,7 +210,7 @@ type FreeDCreate struct {
 	FocusTemplate *template.Template
 }
 
-func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 
 	templateData := wrappedPayload
 

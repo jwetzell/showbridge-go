@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/module"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func NewTestModule(id string) *TestModule {
@@ -19,7 +19,7 @@ type TestModule struct {
 	id string
 }
 
-func (m *TestModule) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (m *TestModule) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	<-ctx.Done()
 	return nil
 }
@@ -36,7 +36,7 @@ func TestModuleBadRegistrationNoType(t *testing.T) {
 
 	module.RegisterModule(module.ModuleRegistration{
 		Type: "",
-		New: func(config config.ModuleConfig) (common.Module, error) {
+		New: func(config config.ModuleConfig) (routing.Module, error) {
 			return NewTestModule("test"), nil
 		},
 	})
@@ -66,14 +66,14 @@ func TestModuleBadRegistrationExistingType(t *testing.T) {
 
 	module.RegisterModule(module.ModuleRegistration{
 		Type: "module.test",
-		New: func(config config.ModuleConfig) (common.Module, error) {
+		New: func(config config.ModuleConfig) (routing.Module, error) {
 			return NewTestModule("test"), nil
 		},
 	})
 
 	module.RegisterModule(module.ModuleRegistration{
 		Type: "module.test",
-		New: func(config config.ModuleConfig) (common.Module, error) {
+		New: func(config config.ModuleConfig) (routing.Module, error) {
 			return NewTestModule("test"), nil
 		},
 	})

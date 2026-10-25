@@ -7,8 +7,9 @@ import (
 	"sync"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 	"github.com/nats-io/nats.go"
 )
 
@@ -33,14 +34,14 @@ func init() {
 			Required:             []string{"url", "subject"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ModuleConfig) (common.Module, error) {
-			params := config.Params
-			urlString, err := params.GetString("url")
+		New: func(config config.ModuleConfig) (routing.Module, error) {
+			moduleParams := config.Params
+			urlString, err := moduleParams.GetString("url")
 			if err != nil {
 				return nil, errors.New("nats.client url error: " + err.Error())
 			}
 
-			subjectString, err := params.GetString("subject")
+			subjectString, err := moduleParams.GetString("subject")
 
 			if err != nil {
 				return nil, errors.New("nats.client subject error: " + err.Error())
@@ -54,7 +55,7 @@ func init() {
 type NATSClient struct {
 	config       config.ModuleConfig
 	ctx          context.Context
-	inputHandler common.InputHandler
+	inputHandler routing.InputHandler
 	URL          string
 	Subject      string
 	client       *nats.Conn
@@ -65,7 +66,7 @@ type NATSClient struct {
 	clientMu     sync.Mutex
 }
 
-func (nc *NATSClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (nc *NATSClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	nc.logger.Debug("running")
 	nc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
@@ -102,7 +103,7 @@ func (nc *NATSClient) Start(ctx context.Context, inputHandler common.InputHandle
 
 func (nc *NATSClient) Publish(ctx context.Context, topic string, payload any) error {
 
-	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
 
 	if !ok {
 		payloadString, ok := payload.(string)

@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/routing"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -32,10 +32,10 @@ func init() {
 			Required:             []string{"dsn"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ModuleConfig) (common.Module, error) {
-			params := config.Params
+		New: func(config config.ModuleConfig) (routing.Module, error) {
+			moduleParams := config.Params
 
-			dsnString, err := params.GetString("dsn")
+			dsnString, err := moduleParams.GetString("dsn")
 			if err != nil {
 				return nil, fmt.Errorf("mysql.client dsn error: %w", err)
 			}
@@ -49,14 +49,14 @@ type MySQLClient struct {
 	config       config.ModuleConfig
 	Dsn          string
 	ctx          context.Context
-	inputHandler common.InputHandler
+	inputHandler routing.InputHandler
 	db           *sql.DB
 	logger       *slog.Logger
 	dbMu         sync.Mutex
 	cancel       context.CancelFunc
 }
 
-func (mc *MySQLClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (mc *MySQLClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	mc.logger.Debug("running")
 	mc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)

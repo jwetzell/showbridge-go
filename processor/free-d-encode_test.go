@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	freeD "github.com/jwetzell/free-d-go"
-	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func TestGoodFreeDEncode(t *testing.T) {
@@ -39,7 +39,7 @@ func TestGoodFreeDEncode(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			got, err := packetEncoder.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := packetEncoder.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err != nil {
 				t.Fatalf("freed.encode processing failed: %s", err)
@@ -70,7 +70,7 @@ func TestBadFreeDEncode(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			got, err := packetEncoder.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := packetEncoder.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("freed.encode expected to fail but succeeded, got: %v", got)

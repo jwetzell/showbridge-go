@@ -5,10 +5,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func NewTestModule(id string) *TestModule {
@@ -21,7 +20,7 @@ type TestModule struct {
 	id string
 }
 
-func (m *TestModule) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (m *TestModule) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	<-ctx.Done()
 	return nil
 }
@@ -54,7 +53,7 @@ func TestGoodModuleOutput(t *testing.T) {
 				t.Fatalf("module.output failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: testCase.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("module.output processing failed: %s", err)
 			}
@@ -71,14 +70,14 @@ func TestBadModuleOutput(t *testing.T) {
 		name          string
 		params        map[string]any
 		payload       any
-		moduleManager common.ModuleManager
+		moduleManager routing.ModuleManager
 		errorString   string
 	}{
 		{
 			name:          "no module param",
 			params:        map[string]any{},
 			payload:       "test",
-			moduleManager: testModuleManager(map[string]common.Module{"test": NewTestModule("test")}),
+			moduleManager: testModuleManager(map[string]routing.Module{"test": NewTestModule("test")}),
 			errorString:   "module.output module error: not found",
 		},
 		{
@@ -87,7 +86,7 @@ func TestBadModuleOutput(t *testing.T) {
 				"module": 123,
 			},
 			payload:       "test",
-			moduleManager: testModuleManager(map[string]common.Module{"test": NewTestModule("test")}),
+			moduleManager: testModuleManager(map[string]routing.Module{"test": NewTestModule("test")}),
 			errorString:   "module.output module error: not a string",
 		},
 		{
@@ -105,7 +104,7 @@ func TestBadModuleOutput(t *testing.T) {
 				"module": "test",
 			},
 			payload:       "test",
-			moduleManager: testModuleManager(map[string]common.Module{}),
+			moduleManager: testModuleManager(map[string]routing.Module{}),
 			errorString:   "module.output unable to find module with id: test",
 		},
 	}
@@ -130,7 +129,7 @@ func TestBadModuleOutput(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: testCase.payload}, testCase.moduleManager, nil)
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: testCase.payload}, testCase.moduleManager, nil)
 
 			if err == nil {
 				t.Fatalf("module.output expected to fail but succeeded, got: %v", got)

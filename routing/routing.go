@@ -1,9 +1,7 @@
-package common
+package routing
 
 import (
 	"context"
-
-	"github.com/jwetzell/showbridge-go/payload"
 )
 
 type InputHandler func(ctx context.Context, sourceId string, payload any) (bool, []RouteIOError)
@@ -14,6 +12,6 @@ type RouteIOError struct {
 }
 
 type Route interface {
-	ProcessPayload(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager ModuleManager, inputHandler InputHandler) (any, error)
+	ProcessPayload(ctx context.Context, wrappedPayload WrappedPayload, moduleManager ModuleManager, inputHandler InputHandler) (any, error)
 	Matches(source string) bool
 }

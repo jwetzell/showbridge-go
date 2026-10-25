@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -33,9 +33,9 @@ func init() {
 			Required:             []string{"port"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ModuleConfig) (common.Module, error) {
-			params := config.Params
-			portNum, err := params.GetInt("port")
+		New: func(config config.ModuleConfig) (routing.Module, error) {
+			moduleParams := config.Params
+			portNum, err := moduleParams.GetInt("port")
 			if err != nil {
 				return nil, fmt.Errorf("http.server port error: %w", err)
 			}
@@ -48,7 +48,7 @@ type HTTPServer struct {
 	config       config.ModuleConfig
 	Port         uint16
 	ctx          context.Context
-	inputHandler common.InputHandler
+	inputHandler routing.InputHandler
 	logger       *slog.Logger
 	cancel       context.CancelFunc
 	server       *http.Server
@@ -67,14 +67,14 @@ type IOResponseData struct {
 }
 
 func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	responseWriter := common.NewHTTPServerResponseWriter(w)
+	responseWriter := routing.NewHTTPServerResponseWriter(w)
 
 	response := IOResponseData{
 		Message: "routing successful",
 		Status:  "ok",
 	}
 	if hs.inputHandler != nil {
-		inputContext := context.WithValue(hs.ctx, common.HttpServerResponseContextKey, responseWriter)
+		inputContext := context.WithValue(hs.ctx, routing.HttpServerResponseContextKey, responseWriter)
 		aRouteFound, routingErrors := hs.inputHandler(inputContext, hs.config.Id, r)
 		if !responseWriter.Done() {
 			if aRouteFound {
@@ -122,7 +122,7 @@ func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (hs *HTTPServer) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (hs *HTTPServer) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	hs.logger.Debug("running")
 	hs.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)

@@ -10,9 +10,8 @@ import (
 	"text/template"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 	"gitlab.com/gomidi/midi/v2"
 )
 
@@ -42,10 +41,10 @@ func init() {
 			Required:             []string{"channel", "note", "velocity"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := config.Params
 
-			channelString, err := params.GetString("channel")
+			channelString, err := processorParams.GetString("channel")
 			if err != nil {
 				return nil, fmt.Errorf("midi.note_off.create channel error: %w", err)
 			}
@@ -56,7 +55,7 @@ func init() {
 				return nil, err
 			}
 
-			noteString, err := params.GetString("note")
+			noteString, err := processorParams.GetString("note")
 			if err != nil {
 				return nil, fmt.Errorf("midi.note_off.create note error: %w", err)
 			}
@@ -67,7 +66,7 @@ func init() {
 				return nil, err
 			}
 
-			velocityString, err := params.GetString("velocity")
+			velocityString, err := processorParams.GetString("velocity")
 			if err != nil {
 				return nil, fmt.Errorf("midi.note_off.create velocity error: %w", err)
 			}
@@ -94,7 +93,7 @@ type MIDINoteOffCreate struct {
 	Velocity *template.Template
 }
 
-func (mnoc *MIDINoteOffCreate) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (mnoc *MIDINoteOffCreate) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	templateData := wrappedPayload
 
 	var channelBuffer bytes.Buffer

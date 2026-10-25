@@ -5,16 +5,15 @@ import (
 	"fmt"
 
 	"github.com/jwetzell/artnet-go"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "artnet.packet.encode",
 		Title: "Encode ArtNet Packet",
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &ArtNetPacketEncode{config: config}, nil
 		},
 	})
@@ -24,7 +23,7 @@ type ArtNetPacketEncode struct {
 	config config.ProcessorConfig
 }
 
-func (ape *ArtNetPacketEncode) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (ape *ArtNetPacketEncode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadPacket, ok := payload.(artnet.ArtNetPacket)
 

@@ -11,8 +11,9 @@ import (
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/gorilla/websocket"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -31,9 +32,9 @@ func init() {
 			Required:             []string{"url"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ModuleConfig) (common.Module, error) {
-			params := config.Params
-			urlString, err := params.GetString("url")
+		New: func(config config.ModuleConfig) (routing.Module, error) {
+			moduleParams := config.Params
+			urlString, err := moduleParams.GetString("url")
 			if err != nil {
 				return nil, fmt.Errorf("websocket.client url error: %w", err)
 			}
@@ -57,7 +58,7 @@ type WebSocketClient struct {
 	URL          url.URL
 	ctx          context.Context
 	conn         *websocket.Conn
-	inputHandler common.InputHandler
+	inputHandler routing.InputHandler
 	logger       *slog.Logger
 	cancel       context.CancelFunc
 	connMu       sync.Mutex
@@ -94,7 +95,7 @@ func (wc *WebSocketClient) SetupConn() error {
 	return err
 }
 
-func (wc *WebSocketClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (wc *WebSocketClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	wc.logger.Debug("running")
 	wc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
@@ -180,7 +181,7 @@ func (wc *WebSocketClient) outputString(ctx context.Context, payload string) err
 func (wc *WebSocketClient) Output(ctx context.Context, payload any) error {
 	wc.connMu.Lock()
 	defer wc.connMu.Unlock()
-	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
 	if ok {
 		return wc.outputBytes(ctx, payloadBytes)
 	} else {

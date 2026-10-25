@@ -13,9 +13,10 @@ import (
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/framer"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -48,14 +49,14 @@ func init() {
 			Required:             []string{"port", "framing"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(moduleConfig config.ModuleConfig) (common.Module, error) {
-			params := moduleConfig.Params
-			portNum, err := params.GetInt("port")
+		New: func(moduleConfig config.ModuleConfig) (routing.Module, error) {
+			moduleParams := moduleConfig.Params
+			portNum, err := moduleParams.GetInt("port")
 			if err != nil {
 				return nil, fmt.Errorf("net.tcp.server port error: %w", err)
 			}
 
-			framingMethodString, err := params.GetString("framing")
+			framingMethodString, err := moduleParams.GetString("framing")
 			if err != nil {
 				return nil, fmt.Errorf("net.tcp.server framing error: %w", err)
 			}
@@ -68,9 +69,9 @@ func init() {
 
 			outFramer := framer.GetFramer(framingMethodString)
 
-			ipString, err := params.GetString("ip")
+			ipString, err := moduleParams.GetString("ip")
 			if err != nil {
-				if errors.Is(err, config.ErrParamNotFound) {
+				if errors.Is(err, params.ErrParamNotFound) {
 					ipString = "0.0.0.0"
 				} else {
 					return nil, fmt.Errorf("net.tcp.server ip error: %w", err)
@@ -98,7 +99,7 @@ type TCPServer struct {
 	outFramer             framer.Framer
 	framerType            string
 	ctx                   context.Context
-	inputHandler          common.InputHandler
+	inputHandler          routing.InputHandler
 	wg                    sync.WaitGroup
 	connections           []tcpConnection
 	connectionsMu         sync.RWMutex
@@ -157,7 +158,7 @@ func (ts *TCPServer) handleClient(client *net.TCPConn) {
 	}
 }
 
-func (ts *TCPServer) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (ts *TCPServer) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	ts.logger.Debug("running")
 	ts.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
@@ -203,7 +204,7 @@ AcceptLoop:
 }
 
 func (ts *TCPServer) Output(ctx context.Context, payload any) error {
-	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
 
 	if !ok {
 		return errors.New("net.tcp.server is only able to output bytes")

@@ -8,9 +8,9 @@ import (
 	"strconv"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -30,18 +30,18 @@ func init() {
 			},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(moduleConfig config.ProcessorConfig) (Processor, error) {
-			params := moduleConfig.Params
+		New: func(processorConfig config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := processorConfig.Params
 
-			bitSizeNum, err := params.GetInt("bitSize")
+			bitSizeNum, err := processorParams.GetInt("bitSize")
 			if err != nil {
-				if errors.Is(err, config.ErrParamNotFound) {
+				if errors.Is(err, params.ErrParamNotFound) {
 					bitSizeNum = 64
 				} else {
 					return nil, fmt.Errorf("float.parse bitSize error: %w", err)
 				}
 			}
-			return &FloatParse{config: moduleConfig, BitSize: bitSizeNum}, nil
+			return &FloatParse{config: processorConfig, BitSize: bitSizeNum}, nil
 		},
 	})
 }
@@ -51,7 +51,7 @@ type FloatParse struct {
 	config  config.ProcessorConfig
 }
 
-func (fp *FloatParse) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (fp *FloatParse) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadString, ok := payload.(string)
 

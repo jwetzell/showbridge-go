@@ -8,9 +8,8 @@ import (
 	"text/template"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -35,15 +34,15 @@ func init() {
 			Required:             []string{"status", "bodyTemplate"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := config.Params
 
-			statusNum, err := params.GetInt("status")
+			statusNum, err := processorParams.GetInt("status")
 			if err != nil {
 				return nil, fmt.Errorf("http.response status error: %w", err)
 			}
 
-			bodyTemplateString, err := params.GetString("bodyTemplate")
+			bodyTemplateString, err := processorParams.GetString("bodyTemplate")
 			if err != nil {
 				return nil, fmt.Errorf("http.response bodyTemplate error: %w", err)
 			}
@@ -73,7 +72,7 @@ type httpResponse struct {
 	Body       []byte
 }
 
-func (hrc *HTTPResponse) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (hrc *HTTPResponse) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	templateData := wrappedPayload
 
 	var bodyBuffer bytes.Buffer
@@ -84,7 +83,7 @@ func (hrc *HTTPResponse) Process(ctx context.Context, wrappedPayload payload.Wra
 		return wrappedPayload, err
 	}
 
-	responseWriter, ok := ctx.Value(common.HttpServerResponseContextKey).(*common.HTTPServerResponseWriter)
+	responseWriter, ok := ctx.Value(routing.HttpServerResponseContextKey).(*routing.HTTPServerResponseWriter)
 
 	if !ok {
 		wrappedPayload.End = true

@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 	"sigs.k8s.io/yaml"
 )
 
@@ -14,7 +14,7 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "yaml.decode",
 		Title: "Decode YAML",
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &YamlDecode{config: config}, nil
 		},
 	})
@@ -24,10 +24,10 @@ type YamlDecode struct {
 	config config.ProcessorConfig
 }
 
-func (jd *YamlDecode) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (jd *YamlDecode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 
-	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
 
 	if !ok {
 		payloadString, ok := payload.(string)

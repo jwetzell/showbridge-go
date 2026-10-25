@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -27,10 +27,10 @@ func init() {
 			Required:             []string{"duration"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ModuleConfig) (common.Module, error) {
-			params := config.Params
+		New: func(config config.ModuleConfig) (routing.Module, error) {
+			moduleParams := config.Params
 
-			durationNum, err := params.GetInt("duration")
+			durationNum, err := moduleParams.GetInt("duration")
 			if err != nil {
 				return nil, fmt.Errorf("time.timer duration error: %w", err)
 			}
@@ -44,13 +44,13 @@ type TimeTimer struct {
 	config       config.ModuleConfig
 	Duration     uint32
 	ctx          context.Context
-	inputHandler common.InputHandler
+	inputHandler routing.InputHandler
 	timer        *time.Timer
 	logger       *slog.Logger
 	cancel       context.CancelFunc
 }
 
-func (t *TimeTimer) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (t *TimeTimer) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	t.logger.Debug("running")
 	t.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)

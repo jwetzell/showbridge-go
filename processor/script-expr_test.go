@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func TestGoodScriptExpr(t *testing.T) {
@@ -55,7 +55,7 @@ func TestGoodScriptExpr(t *testing.T) {
 				t.Fatalf("script.expr failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err != nil {
 				t.Fatalf("script.expr processing failed: %s", err)
@@ -113,7 +113,7 @@ func TestBadScriptExpr(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("script.expr expected to fail but succeeded, got: %v", got)

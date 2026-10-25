@@ -9,15 +9,16 @@ import (
 	"time"
 
 	"github.com/jwetzell/showbridge-go"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/module"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
 	module.RegisterModule(module.ModuleRegistration{
 		Type: "mock.counter",
-		New: func(config config.ModuleConfig) (common.Module, error) {
+		New: func(config config.ModuleConfig) (routing.Module, error) {
 			return &MockCounterModule{config: config, logger: slog.Default()}, nil
 		},
 	})
@@ -27,7 +28,7 @@ type MockCounterModule struct {
 	config       config.ModuleConfig
 	ctx          context.Context
 	outputCount  int
-	inputHandler common.InputHandler
+	inputHandler routing.InputHandler
 	logger       *slog.Logger
 	cancel       context.CancelFunc
 }
@@ -37,7 +38,7 @@ func (mcm *MockCounterModule) Output(context.Context, any) error {
 	return nil
 }
 
-func (mcm *MockCounterModule) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (mcm *MockCounterModule) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	mcm.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
 	mcm.ctx = moduleContext
@@ -197,7 +198,7 @@ func TestRouterInputUnknownDestinationModule(t *testing.T) {
 				Processors: []config.ProcessorConfig{
 					{
 						Type: "module.output",
-						Params: config.Params{
+						Params: params.Params{
 							"module": "test",
 						},
 					},
@@ -251,7 +252,7 @@ func TestRouterInputNoMatchingRoute(t *testing.T) {
 				Processors: []config.ProcessorConfig{
 					{
 						Type: "module.output",
-						Params: config.Params{
+						Params: params.Params{
 							"module": "mock",
 						},
 					},
@@ -297,7 +298,7 @@ func TestRouterInputSingleRoute(t *testing.T) {
 				Processors: []config.ProcessorConfig{
 					{
 						Type: "module.output",
-						Params: config.Params{
+						Params: params.Params{
 							"module": "mock",
 						},
 					},
@@ -361,7 +362,7 @@ func TestRouterInputMultipleRoutes(t *testing.T) {
 				Processors: []config.ProcessorConfig{
 					{
 						Type: "module.output",
-						Params: config.Params{
+						Params: params.Params{
 							"module": "mock",
 						},
 					},
@@ -372,7 +373,7 @@ func TestRouterInputMultipleRoutes(t *testing.T) {
 				Processors: []config.ProcessorConfig{
 					{
 						Type: "module.output",
-						Params: config.Params{
+						Params: params.Params{
 							"module": "mock",
 						},
 					},
@@ -383,7 +384,7 @@ func TestRouterInputMultipleRoutes(t *testing.T) {
 				Processors: []config.ProcessorConfig{
 					{
 						Type: "module.output",
-						Params: config.Params{
+						Params: params.Params{
 							"module": "mock",
 						},
 					},

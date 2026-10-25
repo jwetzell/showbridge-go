@@ -3,8 +3,8 @@ package processor_test
 import (
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func TestGoodStringDecode(t *testing.T) {
@@ -23,7 +23,7 @@ func TestGoodStringDecode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := stringDecoder.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := stringDecoder.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("string.decode processing failed: %s", err)
 			}
@@ -56,7 +56,7 @@ func TestBadStringDecode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := stringDecoder.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := stringDecoder.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("string.decode expected to fail but got payload: %+v", got)

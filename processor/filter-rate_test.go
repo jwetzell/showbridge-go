@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func TestGoodFilterRate(t *testing.T) {
@@ -32,7 +32,7 @@ func TestGoodFilterRate(t *testing.T) {
 				t.Fatalf("filter.rate failed to create processor: %s", err)
 			}
 
-			_, err = processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: testCase.payload}, nil, nil)
+			_, err = processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, nil)
 			// TODO(jwetzell): figure out how to test the rate limiting behavior
 		})
 	}
@@ -80,7 +80,7 @@ func TestBadFilterRate(t *testing.T) {
 				}
 				return
 			}
-			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("filter.rate expected to fail but succeeded, got: %v", got)

@@ -11,8 +11,9 @@ import (
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -47,16 +48,16 @@ func init() {
 			Required:             []string{"port"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(moduleConfig config.ModuleConfig) (common.Module, error) {
-			params := moduleConfig.Params
-			portNum, err := params.GetInt("port")
+		New: func(moduleConfig config.ModuleConfig) (routing.Module, error) {
+			moduleParams := moduleConfig.Params
+			portNum, err := moduleParams.GetInt("port")
 			if err != nil {
 				return nil, fmt.Errorf("net.udp.server port error: %w", err)
 			}
 
-			ipString, err := params.GetString("ip")
+			ipString, err := moduleParams.GetString("ip")
 			if err != nil {
-				if errors.Is(err, config.ErrParamNotFound) {
+				if errors.Is(err, params.ErrParamNotFound) {
 					ipString = "0.0.0.0"
 				} else {
 					return nil, fmt.Errorf("net.udp.server ip error: %w", err)
@@ -68,9 +69,9 @@ func init() {
 				return nil, err
 			}
 
-			bufferSizeNum, err := params.GetInt("bufferSize")
+			bufferSizeNum, err := moduleParams.GetInt("bufferSize")
 			if err != nil {
-				if errors.Is(err, config.ErrParamNotFound) {
+				if errors.Is(err, params.ErrParamNotFound) {
 					bufferSizeNum = 2048
 				} else {
 					return nil, fmt.Errorf("net.udp.server bufferSize error: %w", err)
@@ -86,14 +87,14 @@ type UDPServer struct {
 	BufferSize   int
 	config       config.ModuleConfig
 	ctx          context.Context
-	inputHandler common.InputHandler
+	inputHandler routing.InputHandler
 	logger       *slog.Logger
 	cancel       context.CancelFunc
 	listener     *net.UDPConn
 	listenerMu   sync.Mutex
 }
 
-func (us *UDPServer) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (us *UDPServer) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	us.logger.Debug("running")
 	us.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)

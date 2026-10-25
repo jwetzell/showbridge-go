@@ -11,8 +11,9 @@ import (
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 	"github.com/nats-io/nats-server/v2/server"
 )
 
@@ -41,20 +42,20 @@ func init() {
 			Required:             []string{},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(moduleConfig config.ModuleConfig) (common.Module, error) {
-			params := moduleConfig.Params
-			portNum, err := params.GetInt("port")
+		New: func(moduleConfig config.ModuleConfig) (routing.Module, error) {
+			moduleParams := moduleConfig.Params
+			portNum, err := moduleParams.GetInt("port")
 			if err != nil {
-				if errors.Is(err, config.ErrParamNotFound) {
+				if errors.Is(err, params.ErrParamNotFound) {
 					portNum = 4222
 				} else {
 					return nil, fmt.Errorf("nats.server port error: %w", err)
 				}
 			}
 
-			ipString, err := params.GetString("ip")
+			ipString, err := moduleParams.GetString("ip")
 			if err != nil {
-				if errors.Is(err, config.ErrParamNotFound) {
+				if errors.Is(err, params.ErrParamNotFound) {
 					ipString = "0.0.0.0"
 				} else {
 					return nil, fmt.Errorf("nats.server ip error: %w", err)
@@ -75,14 +76,14 @@ type NATSServer struct {
 	ctx          context.Context
 	Ip           string
 	Port         int
-	inputHandler common.InputHandler
+	inputHandler routing.InputHandler
 	server       *server.Server
 	logger       *slog.Logger
 	cancel       context.CancelFunc
 	serverMu     sync.Mutex
 }
 
-func (ns *NATSServer) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (ns *NATSServer) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	ns.logger.Debug("running")
 	ns.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)

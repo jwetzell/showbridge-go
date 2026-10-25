@@ -7,9 +7,8 @@ import (
 	"log/slog"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -33,16 +32,16 @@ func init() {
 			Required:             []string{"module", "key"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 
-			params := config.Params
+			processorParams := config.Params
 
-			moduleIdString, err := params.GetString("module")
+			moduleIdString, err := processorParams.GetString("module")
 			if err != nil {
 				return nil, fmt.Errorf("kv.get module error: %w", err)
 			}
 
-			keyString, err := params.GetString("key")
+			keyString, err := processorParams.GetString("key")
 			if err != nil {
 				return nil, fmt.Errorf("kv.get key error: %w", err)
 			}
@@ -56,10 +55,10 @@ type KVGet struct {
 	ModuleId string
 	Key      string
 	logger   *slog.Logger
-	module   common.KeyValueModule
+	module   routing.KeyValueModule
 }
 
-func (kvg *KVGet) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (kvg *KVGet) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	if kvg.module == nil {
 		if moduleManager == nil {
 			wrappedPayload.End = true
@@ -72,7 +71,7 @@ func (kvg *KVGet) Process(ctx context.Context, wrappedPayload payload.WrappedPay
 			return wrappedPayload, fmt.Errorf("kv.get unable to find module with id: %s", kvg.ModuleId)
 		}
 
-		kvModule, ok := module.(common.KeyValueModule)
+		kvModule, ok := module.(routing.KeyValueModule)
 		if !ok {
 			wrappedPayload.End = true
 			return wrappedPayload, fmt.Errorf("kv.get module with id %s is not a KeyValueModule", kvg.ModuleId)

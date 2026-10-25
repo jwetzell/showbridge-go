@@ -1,4 +1,4 @@
-package payload
+package routing
 
 type WrappedPayload struct {
 	Payload any

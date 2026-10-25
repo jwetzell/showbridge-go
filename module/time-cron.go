@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/routing"
 	"github.com/robfig/cron/v3"
 )
 
@@ -28,10 +28,10 @@ func init() {
 			Required:             []string{"cron"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ModuleConfig) (common.Module, error) {
-			params := config.Params
+		New: func(config config.ModuleConfig) (routing.Module, error) {
+			moduleParams := config.Params
 
-			cronString, err := params.GetString("cron")
+			cronString, err := moduleParams.GetString("cron")
 			if err != nil {
 				return nil, fmt.Errorf("time.cron cron error: %w", err)
 			}
@@ -45,13 +45,13 @@ type TimeCron struct {
 	config       config.ModuleConfig
 	CronString   string
 	ctx          context.Context
-	inputHandler common.InputHandler
+	inputHandler routing.InputHandler
 	logger       *slog.Logger
 	cancel       context.CancelFunc
 	cron         *cron.Cron
 }
 
-func (t *TimeCron) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (t *TimeCron) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	t.logger.Debug("running")
 	t.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)

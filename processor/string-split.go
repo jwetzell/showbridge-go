@@ -7,9 +7,8 @@ import (
 	"strings"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -28,10 +27,10 @@ func init() {
 			Required:             []string{"separator"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := config.Params
 
-			separatorString, err := params.GetString("separator")
+			separatorString, err := processorParams.GetString("separator")
 			if err != nil {
 				return nil, fmt.Errorf("string.split separator error: %w", err)
 			}
@@ -46,7 +45,7 @@ type StringSplit struct {
 	Separator string
 }
 
-func (ss *StringSplit) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (ss *StringSplit) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadString, ok := payload.(string)
 

@@ -7,9 +7,8 @@ import (
 	"log/slog"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -28,11 +27,11 @@ func init() {
 			Required:             []string{"module"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 
-			params := config.Params
+			processorParams := config.Params
 
-			moduleId, err := params.GetString("module")
+			moduleId, err := processorParams.GetString("module")
 
 			if err != nil {
 				return nil, fmt.Errorf("module.output module error: %w", err)
@@ -47,10 +46,10 @@ type ModuleOutput struct {
 	config   config.ProcessorConfig
 	ModuleId string
 	logger   *slog.Logger
-	module   common.OutputModule
+	module   routing.OutputModule
 }
 
-func (mo *ModuleOutput) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (mo *ModuleOutput) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 
 	if mo.module == nil {
 		if moduleManager == nil {
@@ -64,7 +63,7 @@ func (mo *ModuleOutput) Process(ctx context.Context, wrappedPayload payload.Wrap
 			return wrappedPayload, fmt.Errorf("module.output unable to find module with id: %s", mo.ModuleId)
 		}
 
-		outputModule, ok := module.(common.OutputModule)
+		outputModule, ok := module.(routing.OutputModule)
 		if !ok {
 			wrappedPayload.End = true
 			return wrappedPayload, fmt.Errorf("module.output module with id %s is not an OutputModule", mo.ModuleId)

@@ -6,16 +6,16 @@ import (
 	"fmt"
 
 	osc "github.com/jwetzell/osc-go"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "osc.message.decode",
 		Title: "Decode OSC Message",
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &OSCMessageDecode{config: config}, nil
 		},
 	})
@@ -25,9 +25,9 @@ type OSCMessageDecode struct {
 	config config.ProcessorConfig
 }
 
-func (omd *OSCMessageDecode) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (omd *OSCMessageDecode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
-	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
 
 	if !ok {
 		wrappedPayload.End = true

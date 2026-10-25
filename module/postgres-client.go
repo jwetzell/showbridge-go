@@ -8,8 +8,8 @@ import (
 	"sync"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/routing"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -31,10 +31,10 @@ func init() {
 			Required:             []string{"url"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ModuleConfig) (common.Module, error) {
-			params := config.Params
+		New: func(config config.ModuleConfig) (routing.Module, error) {
+			moduleParams := config.Params
 
-			urlString, err := params.GetString("url")
+			urlString, err := moduleParams.GetString("url")
 			if err != nil {
 				return nil, fmt.Errorf("postgres.client url error: %w", err)
 			}
@@ -48,14 +48,14 @@ type PostgresClient struct {
 	config       config.ModuleConfig
 	Url          string
 	ctx          context.Context
-	inputHandler common.InputHandler
+	inputHandler routing.InputHandler
 	db           *sql.DB
 	logger       *slog.Logger
 	dbMu         sync.Mutex
 	cancel       context.CancelFunc
 }
 
-func (pc *PostgresClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (pc *PostgresClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	pc.logger.Debug("running")
 	pc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)

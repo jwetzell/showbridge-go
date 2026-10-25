@@ -4,10 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func TestGoodKvSet(t *testing.T) {
@@ -44,9 +43,9 @@ func TestGoodKvSet(t *testing.T) {
 				t.Fatalf("kv.set failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{
 				Payload: testCase.payload,
-			}, testModuleManager(map[string]common.Module{
+			}, testModuleManager(map[string]routing.Module{
 				"test": &TestKVModule{},
 			}), nil)
 
@@ -66,7 +65,7 @@ func TestBadKvSet(t *testing.T) {
 		name          string
 		params        map[string]any
 		payload       any
-		moduleManager common.ModuleManager
+		moduleManager routing.ModuleManager
 		errorString   string
 	}{
 		{
@@ -75,7 +74,7 @@ func TestBadKvSet(t *testing.T) {
 			params: map[string]any{
 				"key": "test",
 			},
-			moduleManager: testModuleManager(map[string]common.Module{
+			moduleManager: testModuleManager(map[string]routing.Module{
 				"test": &TestKVModule{},
 			}),
 			errorString: "kv.set module error: not found",
@@ -87,7 +86,7 @@ func TestBadKvSet(t *testing.T) {
 				"module": 1,
 				"key":    "test",
 			},
-			moduleManager: testModuleManager(map[string]common.Module{
+			moduleManager: testModuleManager(map[string]routing.Module{
 				"test": &TestKVModule{},
 			}),
 			errorString: "kv.set module error: not a string",
@@ -98,7 +97,7 @@ func TestBadKvSet(t *testing.T) {
 			params: map[string]any{
 				"module": "test",
 			},
-			moduleManager: testModuleManager(map[string]common.Module{
+			moduleManager: testModuleManager(map[string]routing.Module{
 				"test": &TestKVModule{},
 			}),
 			errorString: "kv.set key error: not found",
@@ -110,7 +109,7 @@ func TestBadKvSet(t *testing.T) {
 				"module": "test",
 				"key":    1,
 			},
-			moduleManager: testModuleManager(map[string]common.Module{
+			moduleManager: testModuleManager(map[string]routing.Module{
 				"test": &TestKVModule{},
 			}),
 			errorString: "kv.set key error: not a string",
@@ -132,7 +131,7 @@ func TestBadKvSet(t *testing.T) {
 				"module": "test",
 				"key":    "test",
 			},
-			moduleManager: testModuleManager(map[string]common.Module{}),
+			moduleManager: testModuleManager(map[string]routing.Module{}),
 			errorString:   "kv.set unable to find module with id: test",
 		},
 		{
@@ -142,7 +141,7 @@ func TestBadKvSet(t *testing.T) {
 				"module": "test",
 				"key":    "test",
 			},
-			moduleManager: testModuleManager(map[string]common.Module{
+			moduleManager: testModuleManager(map[string]routing.Module{
 				"test": NewTestDBModule("test"),
 			}),
 			errorString: "kv.set module with id test is not a KeyValueModule",
@@ -169,7 +168,7 @@ func TestBadKvSet(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: testCase.payload}, testCase.moduleManager, nil)
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: testCase.payload}, testCase.moduleManager, nil)
 
 			if err == nil {
 				t.Fatalf("kv.set expected to fail but got payload: %+v", got)

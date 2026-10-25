@@ -6,9 +6,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 	"gitlab.com/gomidi/midi/v2"
 )
 
@@ -16,7 +15,7 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "midi.message.encode",
 		Title: "Encode MIDI Message",
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &MIDIMessageEncode{config: config}, nil
 		},
 	})
@@ -26,7 +25,7 @@ type MIDIMessageEncode struct {
 	config config.ProcessorConfig
 }
 
-func (mme *MIDIMessageEncode) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (mme *MIDIMessageEncode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadMessage, ok := payload.(midi.Message)
 

@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 // TODO(jwetzell): figure out how to test this
@@ -36,7 +36,7 @@ func TestGoodHTTPGet(t *testing.T) {
 				t.Fatalf("http.get failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("http.get processing failed: %s", err)
 			}
@@ -75,7 +75,7 @@ func TestBadHTTPGet(t *testing.T) {
 				"url": "http://example.com/{{.Unknown}}",
 			},
 			payload:     nil,
-			errorString: "template: url:1:21: executing \"url\" at <.Unknown>: can't evaluate field Unknown in type payload.WrappedPayload",
+			errorString: "template: url:1:21: executing \"url\" at <.Unknown>: can't evaluate field Unknown in type routing.WrappedPayload",
 		},
 		{
 			name: "url template syntax error",
@@ -125,7 +125,7 @@ func TestBadHTTPGet(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("http.get expected to fail but succeeded, got: %v", got)

@@ -8,9 +8,9 @@ import (
 	"math/rand/v2"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -41,12 +41,12 @@ func init() {
 			Required:             []string{"min", "max"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(processorConfig config.ProcessorConfig) (Processor, error) {
-			params := processorConfig.Params
+		New: func(processorConfig config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := processorConfig.Params
 
-			bitSizeInt, err := params.GetInt("bitSize")
+			bitSizeInt, err := processorParams.GetInt("bitSize")
 			if err != nil {
-				if errors.Is(err, config.ErrParamNotFound) {
+				if errors.Is(err, params.ErrParamNotFound) {
 					bitSizeInt = 32
 				} else {
 					return nil, fmt.Errorf("float.random bitSize error: %w", err)
@@ -57,12 +57,12 @@ func init() {
 				return nil, errors.New("float.random bitSize error: must be 32 or 64")
 			}
 
-			minFloat, err := params.GetFloat64("min")
+			minFloat, err := processorParams.GetFloat64("min")
 			if err != nil {
 				return nil, fmt.Errorf("float.random min error: %w", err)
 			}
 
-			maxFloat, err := params.GetFloat64("max")
+			maxFloat, err := processorParams.GetFloat64("max")
 			if err != nil {
 				return nil, fmt.Errorf("float.random max error: %w", err)
 			}
@@ -83,7 +83,7 @@ type FloatRandom struct {
 	config  config.ProcessorConfig
 }
 
-func (fr *FloatRandom) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (fr *FloatRandom) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	if fr.BitSize == 32 {
 		payloadFloat := rand.Float32()*(float32(fr.Max)-float32(fr.Min)) + float32(fr.Min)
 		wrappedPayload.Payload = payloadFloat

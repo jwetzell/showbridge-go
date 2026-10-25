@@ -9,9 +9,9 @@ import (
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/osc-go"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -55,9 +55,9 @@ func init() {
 			Required:             []string{"address"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(processorConfig config.ProcessorConfig) (Processor, error) {
-			params := processorConfig.Params
-			addressString, err := params.GetString("address")
+		New: func(processorConfig config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := processorConfig.Params
+			addressString, err := processorParams.GetString("address")
 			if err != nil {
 				return nil, fmt.Errorf("osc.message.create address error: %w", err)
 			}
@@ -68,9 +68,9 @@ func init() {
 				return nil, err
 			}
 
-			argObjects, err := params.GetMapSlice("args")
+			argObjects, err := processorParams.GetMapSlice("args")
 			if err != nil {
-				if errors.Is(err, config.ErrParamNotFound) {
+				if errors.Is(err, params.ErrParamNotFound) {
 					return &MessageCreate{config: processorConfig, Address: addressTemplate}, nil
 				} else {
 					return nil, fmt.Errorf("osc.message.create args error: %w", err)
@@ -125,7 +125,7 @@ type MessageCreate struct {
 	Types   []rune
 }
 
-func (omc *MessageCreate) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (omc *MessageCreate) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 
 	templateData := wrappedPayload
 

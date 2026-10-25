@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -43,10 +43,10 @@ func init() {
 			Required:             []string{"url"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(processorConfig config.ProcessorConfig) (Processor, error) {
-			params := processorConfig.Params
+		New: func(processorConfig config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := processorConfig.Params
 
-			urlString, err := params.GetString("url")
+			urlString, err := processorParams.GetString("url")
 			if err != nil {
 				return nil, fmt.Errorf("http.get url error: %w", err)
 			}
@@ -60,9 +60,9 @@ func init() {
 				Timeout: 10 * time.Second,
 			}
 
-			headers, err := params.GetStringMap("headers")
+			headers, err := processorParams.GetStringMap("headers")
 			if err != nil {
-				if errors.Is(err, config.ErrParamNotFound) {
+				if errors.Is(err, params.ErrParamNotFound) {
 					headers = map[string]string{}
 				} else {
 					return nil, fmt.Errorf("http.get headers error: %w", err)
@@ -80,7 +80,7 @@ type HTTPGet struct {
 	Headers map[string]string
 }
 
-func (hrd *HTTPGet) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (hrd *HTTPGet) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 
 	templateData := wrappedPayload
 

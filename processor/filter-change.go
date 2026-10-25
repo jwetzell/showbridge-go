@@ -4,16 +4,15 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "filter.change",
 		Title: "Filter On Change",
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &FilterChange{config: config}, nil
 		},
 	})
@@ -24,7 +23,7 @@ type FilterChange struct {
 	previous any
 }
 
-func (fc *FilterChange) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (fc *FilterChange) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 
 	if reflect.DeepEqual(payload, fc.previous) {

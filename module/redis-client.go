@@ -8,8 +8,8 @@ import (
 	"sync"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/routing"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -36,14 +36,14 @@ func init() {
 			Required:             []string{"host", "port"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ModuleConfig) (common.Module, error) {
-			params := config.Params
-			hostString, err := params.GetString("host")
+		New: func(config config.ModuleConfig) (routing.Module, error) {
+			moduleParams := config.Params
+			hostString, err := moduleParams.GetString("host")
 			if err != nil {
 				return nil, errors.New("redis.client host error: " + err.Error())
 			}
 
-			portInt, err := params.GetInt("port")
+			portInt, err := moduleParams.GetInt("port")
 
 			if err != nil {
 				return nil, errors.New("redis.client port error: " + err.Error())
@@ -57,7 +57,7 @@ func init() {
 type RedisClient struct {
 	config       config.ModuleConfig
 	ctx          context.Context
-	inputHandler common.InputHandler
+	inputHandler routing.InputHandler
 	Host         string
 	Port         uint16
 	client       *redis.Client
@@ -71,7 +71,7 @@ func (rc *RedisClient) Printf(ctx context.Context, format string, v ...any) {
 	rc.logger.Debug(msg)
 }
 
-func (rc *RedisClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (rc *RedisClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	redis.SetLogger(rc)
 	rc.logger.Debug("running")
 	rc.inputHandler = inputHandler

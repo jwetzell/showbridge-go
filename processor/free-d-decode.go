@@ -5,16 +5,16 @@ import (
 	"errors"
 
 	freeD "github.com/jwetzell/free-d-go"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "freed.decode",
 		Title: "Decode FreeD",
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &FreeDDecode{config: config}, nil
 		},
 	})
@@ -25,9 +25,9 @@ type FreeDDecode struct {
 	buf    [29]byte
 }
 
-func (fd *FreeDDecode) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (fd *FreeDDecode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
-	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
 
 	if !ok {
 		wrappedPayload.End = true

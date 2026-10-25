@@ -4,8 +4,8 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func (r *Router) GetRunningConfig() config.Config {
@@ -39,8 +39,8 @@ func (r *Router) UpdateConfig(newConfig config.Config, triggerChangeChan bool) (
 	r.logger.Debug("waiting for modules to exit")
 	r.moduleWait.Wait()
 
-	r.ModuleInstances = make(map[string]common.Module)
-	r.RouteInstances = []common.Route{}
+	r.ModuleInstances = make(map[string]routing.Module)
+	r.RouteInstances = []routing.Route{}
 
 	var moduleErrors []config.ModuleError
 

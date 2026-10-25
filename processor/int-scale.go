@@ -6,9 +6,9 @@ import (
 	"fmt"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -42,15 +42,15 @@ func init() {
 			Required:             []string{"inMin", "inMax", "outMin", "outMax"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := config.Params
 
-			inMinInt, err := params.GetInt("inMin")
+			inMinInt, err := processorParams.GetInt("inMin")
 			if err != nil {
 				return nil, fmt.Errorf("int.scale inMin error: %w", err)
 			}
 
-			inMaxInt, err := params.GetInt("inMax")
+			inMaxInt, err := processorParams.GetInt("inMax")
 			if err != nil {
 				return nil, fmt.Errorf("int.scale inMax error: %w", err)
 			}
@@ -59,12 +59,12 @@ func init() {
 				return nil, errors.New("int.scale inMax must be greater than inMin")
 			}
 
-			outMinInt, err := params.GetInt("outMin")
+			outMinInt, err := processorParams.GetInt("outMin")
 			if err != nil {
 				return nil, fmt.Errorf("int.scale outMin error: %w", err)
 			}
 
-			outMaxInt, err := params.GetInt("outMax")
+			outMaxInt, err := processorParams.GetInt("outMax")
 			if err != nil {
 				return nil, fmt.Errorf("int.scale outMax error: %w", err)
 			}
@@ -86,9 +86,9 @@ type IntScale struct {
 	config config.ProcessorConfig
 }
 
-func (is *IntScale) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (is *IntScale) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
-	payloadInt, ok := common.GetAnyAsInt(payload)
+	payloadInt, ok := params.GetAnyAsInt(payload)
 	if !ok {
 		wrappedPayload.End = true
 		return wrappedPayload, errors.New("int.scale can only process an int")

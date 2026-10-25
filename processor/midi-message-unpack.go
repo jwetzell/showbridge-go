@@ -7,9 +7,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 	"gitlab.com/gomidi/midi/v2"
 )
 
@@ -17,7 +16,7 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "midi.message.unpack",
 		Title: "Unpack MIDI Message",
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &MIDIMessageUnpack{config: config}, nil
 		},
 	})
@@ -56,7 +55,7 @@ type MIDIPitchBend struct {
 	Absolute uint16
 }
 
-func (mmu *MIDIMessageUnpack) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (mmu *MIDIMessageUnpack) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadMidi, ok := payload.(midi.Message)
 

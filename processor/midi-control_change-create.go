@@ -10,9 +10,8 @@ import (
 	"text/template"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 	"gitlab.com/gomidi/midi/v2"
 )
 
@@ -42,11 +41,11 @@ func init() {
 			Required:             []string{"channel", "control", "value"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 
-			params := config.Params
+			processorParams := config.Params
 
-			channelString, err := params.GetString("channel")
+			channelString, err := processorParams.GetString("channel")
 			if err != nil {
 				return nil, fmt.Errorf("midi.control_change.create channel error: %w", err)
 			}
@@ -57,7 +56,7 @@ func init() {
 				return nil, err
 			}
 
-			controlString, err := params.GetString("control")
+			controlString, err := processorParams.GetString("control")
 			if err != nil {
 				return nil, fmt.Errorf("midi.control_change.create control error: %w", err)
 			}
@@ -68,7 +67,7 @@ func init() {
 				return nil, err
 			}
 
-			valueString, err := params.GetString("value")
+			valueString, err := processorParams.GetString("value")
 			if err != nil {
 				return nil, fmt.Errorf("midi.control_change.create value error: %w", err)
 			}
@@ -95,7 +94,7 @@ type MIDIControlChangeCreate struct {
 	Value   *template.Template
 }
 
-func (mccc *MIDIControlChangeCreate) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (mccc *MIDIControlChangeCreate) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	templateData := wrappedPayload
 
 	var channelBuffer bytes.Buffer

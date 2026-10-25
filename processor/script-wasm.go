@@ -9,9 +9,9 @@ import (
 
 	extism "github.com/extism/go-sdk"
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -42,26 +42,26 @@ func init() {
 			Required:             []string{"path"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(processorConfig config.ProcessorConfig) (Processor, error) {
-			params := processorConfig.Params
+		New: func(processorConfig config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := processorConfig.Params
 
-			pathString, err := params.GetString("path")
+			pathString, err := processorParams.GetString("path")
 			if err != nil {
 				return nil, fmt.Errorf("script.wasm path error: %w", err)
 			}
 
-			functionString, err := params.GetString("function")
+			functionString, err := processorParams.GetString("function")
 			if err != nil {
-				if errors.Is(err, config.ErrParamNotFound) {
+				if errors.Is(err, params.ErrParamNotFound) {
 					functionString = "process"
 				} else {
 					return nil, fmt.Errorf("script.wasm function error: %w", err)
 				}
 			}
 
-			enableWasiBool, err := params.GetBool("enableWasi")
+			enableWasiBool, err := processorParams.GetBool("enableWasi")
 			if err != nil {
-				if errors.Is(err, config.ErrParamNotFound) {
+				if errors.Is(err, params.ErrParamNotFound) {
 					enableWasiBool = false
 				} else {
 					return nil, fmt.Errorf("script.wasm enableWasi error: %w", err)
@@ -104,10 +104,10 @@ type ScriptWASM struct {
 	Function string
 }
 
-func (sw *ScriptWASM) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (sw *ScriptWASM) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 
 	payload := wrappedPayload.Payload
-	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
 
 	if !ok {
 		wrappedPayload.End = true

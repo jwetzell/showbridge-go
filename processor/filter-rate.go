@@ -5,9 +5,8 @@ import (
 	"fmt"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 	"golang.org/x/time/rate"
 )
 
@@ -26,9 +25,9 @@ func init() {
 			},
 			Required: []string{"rate"},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
-			rateInt, err := params.GetInt("rate")
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := config.Params
+			rateInt, err := processorParams.GetInt("rate")
 			if err != nil {
 				return nil, fmt.Errorf("filter.rate rate error: %w", err)
 			}
@@ -45,7 +44,7 @@ type FilterRate struct {
 	limiter *rate.Limiter
 }
 
-func (fc *FilterRate) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (fc *FilterRate) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	err := fc.limiter.Wait(ctx)
 	if err != nil {
 		wrappedPayload.End = true

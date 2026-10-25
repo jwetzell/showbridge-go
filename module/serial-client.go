@@ -11,9 +11,10 @@ import (
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/framer"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 	"go.bug.st/serial"
 )
 
@@ -44,14 +45,14 @@ func init() {
 			Required:             []string{"port", "baudRate", "framing"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ModuleConfig) (common.Module, error) {
-			params := config.Params
-			portString, err := params.GetString("port")
+		New: func(config config.ModuleConfig) (routing.Module, error) {
+			moduleParams := config.Params
+			portString, err := moduleParams.GetString("port")
 			if err != nil {
 				return nil, fmt.Errorf("serial.client port error: %w", err)
 			}
 
-			framingMethodString, err := params.GetString("framing")
+			framingMethodString, err := moduleParams.GetString("framing")
 			if err != nil {
 				return nil, fmt.Errorf("serial.client framing error: %w", err)
 			}
@@ -64,7 +65,7 @@ func init() {
 
 			outFramer := framer.GetFramer(framingMethodString)
 
-			baudRateInt, err := params.GetInt("baudRate")
+			baudRateInt, err := moduleParams.GetInt("baudRate")
 			if err != nil {
 				return nil, fmt.Errorf("serial.client baudRate error: %w", err)
 			}
@@ -81,7 +82,7 @@ func init() {
 type SerialClient struct {
 	config       config.ModuleConfig
 	ctx          context.Context
-	inputHandler common.InputHandler
+	inputHandler routing.InputHandler
 	Port         string
 	inFramer     framer.Framer
 	outFramer    framer.Framer
@@ -105,7 +106,7 @@ func (sc *SerialClient) SetupPort() error {
 	return nil
 }
 
-func (sc *SerialClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (sc *SerialClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	sc.logger.Debug("running")
 	sc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
@@ -164,7 +165,7 @@ func (sc *SerialClient) Start(ctx context.Context, inputHandler common.InputHand
 
 func (sc *SerialClient) Output(ctx context.Context, payload any) error {
 
-	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
 
 	if !ok {
 		return errors.New("serial.client can only output bytes")

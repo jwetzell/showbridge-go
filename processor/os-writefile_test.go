@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func TestGoodOsWriteFile(t *testing.T) {
@@ -33,7 +33,7 @@ func TestGoodOsWriteFile(t *testing.T) {
 				t.Fatalf("os.writefile failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: testCase.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, nil)
 
 			if err != nil {
 				t.Fatalf("os.writefile processing failed: %s", err)
@@ -81,7 +81,7 @@ func TestBadOsWriteFile(t *testing.T) {
 				"path": "{{.NonExistentField}}",
 			},
 			payload:     TestStruct{},
-			errorString: "template: path:1:2: executing \"path\" at <.NonExistentField>: can't evaluate field NonExistentField in type payload.WrappedPayload",
+			errorString: "template: path:1:2: executing \"path\" at <.NonExistentField>: can't evaluate field NonExistentField in type routing.WrappedPayload",
 		},
 	}
 
@@ -102,7 +102,7 @@ func TestBadOsWriteFile(t *testing.T) {
 				}
 				return
 			}
-			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("os.writefile expected to fail but succeeded, got: %v", got)

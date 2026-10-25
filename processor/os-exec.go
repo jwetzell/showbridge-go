@@ -9,9 +9,9 @@ import (
 	"text/template"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -38,12 +38,12 @@ func init() {
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 			Required:             []string{"command"},
 		},
-		New: func(moduleConfig config.ProcessorConfig) (Processor, error) {
-			params := moduleConfig.Params
+		New: func(processorConfig config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := processorConfig.Params
 
-			commandString, err := params.GetString("command")
+			commandString, err := processorParams.GetString("command")
 			if err != nil {
-				if errors.Is(err, config.ErrParamNotFound) {
+				if errors.Is(err, params.ErrParamNotFound) {
 					return nil, fmt.Errorf("os.exec command error: not found")
 				} else {
 					return nil, fmt.Errorf("os.exec command error: %w", err)
@@ -55,9 +55,9 @@ func init() {
 				return nil, err
 			}
 
-			argStrings, err := params.GetStringSlice("args")
+			argStrings, err := processorParams.GetStringSlice("args")
 			if err != nil {
-				if errors.Is(err, config.ErrParamNotFound) {
+				if errors.Is(err, params.ErrParamNotFound) {
 					argStrings = []string{}
 				} else {
 					return nil, fmt.Errorf("os.exec args error: %w", err)
@@ -72,7 +72,7 @@ func init() {
 				}
 				argTemplates[i] = argTemplate
 			}
-			return &OsExec{config: moduleConfig, CommandTemplate: commandTemplate, Args: argTemplates}, nil
+			return &OsExec{config: processorConfig, CommandTemplate: commandTemplate, Args: argTemplates}, nil
 		},
 	})
 }
@@ -83,7 +83,7 @@ type OsExec struct {
 	Args            []*template.Template
 }
 
-func (oe *OsExec) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (oe *OsExec) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	templateData := wrappedPayload
 
 	var commandBuffer bytes.Buffer

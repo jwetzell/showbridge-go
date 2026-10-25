@@ -10,9 +10,8 @@ import (
 	"text/template"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 	"gitlab.com/gomidi/midi/v2"
 )
 
@@ -37,10 +36,10 @@ func init() {
 			Required:             []string{"type", "channel", "program"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := config.Params
 
-			channelString, err := params.GetString("channel")
+			channelString, err := processorParams.GetString("channel")
 			if err != nil {
 				return nil, fmt.Errorf("midi.program_change.create channel error: %w", err)
 			}
@@ -51,7 +50,7 @@ func init() {
 				return nil, err
 			}
 
-			programString, err := params.GetString("program")
+			programString, err := processorParams.GetString("program")
 			if err != nil {
 				return nil, fmt.Errorf("midi.program_change.create program error: %w", err)
 			}
@@ -76,7 +75,7 @@ type MIDIProgramChangeCreate struct {
 	Program *template.Template
 }
 
-func (mpcc *MIDIProgramChangeCreate) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (mpcc *MIDIProgramChangeCreate) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	templateData := wrappedPayload
 
 	var channelBuffer bytes.Buffer

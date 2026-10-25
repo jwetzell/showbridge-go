@@ -9,8 +9,9 @@ import (
 	"sync"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -36,14 +37,14 @@ func init() {
 			Required:             []string{"host", "port"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ModuleConfig) (common.Module, error) {
-			params := config.Params
-			hostString, err := params.GetString("host")
+		New: func(config config.ModuleConfig) (routing.Module, error) {
+			moduleParams := config.Params
+			hostString, err := moduleParams.GetString("host")
 			if err != nil {
 				return nil, fmt.Errorf("net.udp.client host error: %w", err)
 			}
 
-			portNum, err := params.GetInt("port")
+			portNum, err := moduleParams.GetInt("port")
 			if err != nil {
 				return nil, fmt.Errorf("net.udp.client port error: %w", err)
 			}
@@ -63,13 +64,13 @@ type UDPClient struct {
 	Port         uint16
 	conn         *net.UDPConn
 	ctx          context.Context
-	inputHandler common.InputHandler
+	inputHandler routing.InputHandler
 	logger       *slog.Logger
 	cancel       context.CancelFunc
 	mu           sync.Mutex
 }
 
-func (uc *UDPClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (uc *UDPClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	uc.logger.Debug("running")
 	uc.mu.Lock()
 	uc.inputHandler = inputHandler
@@ -93,7 +94,7 @@ func (uc *UDPClient) Start(ctx context.Context, inputHandler common.InputHandler
 func (uc *UDPClient) Output(ctx context.Context, payload any) error {
 	uc.mu.Lock()
 	defer uc.mu.Unlock()
-	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
 	if !ok {
 		return errors.New("net.udp.client is only able to output bytes")
 	}

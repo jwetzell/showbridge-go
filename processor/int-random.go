@@ -7,9 +7,8 @@ import (
 	"math/rand/v2"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -33,15 +32,15 @@ func init() {
 			Required:             []string{"min", "max"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := config.Params
 
-			minInt, err := params.GetInt("min")
+			minInt, err := processorParams.GetInt("min")
 			if err != nil {
 				return nil, fmt.Errorf("int.random min error: %w", err)
 			}
 
-			maxInt, err := params.GetInt("max")
+			maxInt, err := processorParams.GetInt("max")
 			if err != nil {
 				return nil, fmt.Errorf("int.random max error: %w", err)
 			}
@@ -61,7 +60,7 @@ type IntRandom struct {
 	config config.ProcessorConfig
 }
 
-func (ir *IntRandom) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (ir *IntRandom) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	payloadInt := rand.IntN(ir.Max-ir.Min+1) + ir.Min
 	wrappedPayload.Payload = payloadInt
 	return wrappedPayload, nil

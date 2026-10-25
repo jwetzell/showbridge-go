@@ -10,9 +10,10 @@ import (
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/framer"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -44,14 +45,14 @@ func init() {
 			Required:             []string{"host", "port", "framing"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ModuleConfig) (common.Module, error) {
-			params := config.Params
-			hostString, err := params.GetString("host")
+		New: func(config config.ModuleConfig) (routing.Module, error) {
+			moduleParams := config.Params
+			hostString, err := moduleParams.GetString("host")
 			if err != nil {
 				return nil, fmt.Errorf("net.tcp.client host error: %w", err)
 			}
 
-			portNum, err := params.GetInt("port")
+			portNum, err := moduleParams.GetInt("port")
 			if err != nil {
 				return nil, fmt.Errorf("net.tcp.client port error: %w", err)
 			}
@@ -61,7 +62,7 @@ func init() {
 				return nil, err
 			}
 
-			framingMethodString, err := params.GetString("framing")
+			framingMethodString, err := moduleParams.GetString("framing")
 			if err != nil {
 				return nil, fmt.Errorf("net.tcp.client framing error: %w", err)
 			}
@@ -84,14 +85,14 @@ type TCPClient struct {
 	outFramer    framer.Framer
 	conn         *net.TCPConn
 	ctx          context.Context
-	inputHandler common.InputHandler
+	inputHandler routing.InputHandler
 	Addr         *net.TCPAddr
 	logger       *slog.Logger
 	cancel       context.CancelFunc
 	connMu       sync.Mutex
 }
 
-func (tc *TCPClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (tc *TCPClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	tc.logger.Debug("running")
 	tc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
@@ -164,7 +165,7 @@ func (tc *TCPClient) Output(ctx context.Context, payload any) error {
 	if tc.conn == nil {
 		return errors.New("net.tcp.client client is not setup")
 	}
-	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
 	if !ok {
 		return errors.New("net.tcp.client is only able to output bytes")
 	}

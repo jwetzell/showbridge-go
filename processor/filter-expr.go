@@ -7,9 +7,8 @@ import (
 	"github.com/expr-lang/expr"
 	"github.com/expr-lang/expr/vm"
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -28,10 +27,10 @@ func init() {
 			Required:             []string{"expression"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := config.Params
 
-			expressionString, err := params.GetString("expression")
+			expressionString, err := processorParams.GetString("expression")
 			if err != nil {
 				return nil, fmt.Errorf("filter.expr expression error: %w", err)
 			}
@@ -52,7 +51,7 @@ type FilterExpr struct {
 	Program *vm.Program
 }
 
-func (fe *FilterExpr) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (fe *FilterExpr) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 
 	exprEnv := wrappedPayload
 

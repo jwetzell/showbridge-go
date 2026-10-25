@@ -5,8 +5,8 @@ import (
 	"testing/synctest"
 
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func TestGoodTimeSleep(t *testing.T) {
@@ -39,7 +39,7 @@ func TestGoodTimeSleep(t *testing.T) {
 			}
 
 			synctest.Test(t, func(t *testing.T) {
-				got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
+				got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 				if err != nil {
 					t.Fatalf("time.sleep processing failed: %s", err)
@@ -97,7 +97,7 @@ func TestBadTimeSleep(t *testing.T) {
 			}
 
 			synctest.Test(t, func(t *testing.T) {
-				got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
+				got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 				if err == nil {
 					t.Fatalf("time.sleep expected to fail but succeeded, got: %v", got)

@@ -7,9 +7,8 @@ import (
 	"reflect"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -28,9 +27,9 @@ func init() {
 			Required:             []string{"name"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
-			nameString, err := params.GetString("name")
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := config.Params
+			nameString, err := processorParams.GetString("name")
 			if err != nil {
 				return nil, fmt.Errorf("struct.field.get name error: %w", err)
 			}
@@ -45,7 +44,7 @@ type StructFieldGet struct {
 	Name   string
 }
 
-func (sfg *StructFieldGet) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (sfg *StructFieldGet) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	s := reflect.ValueOf(payload)
 

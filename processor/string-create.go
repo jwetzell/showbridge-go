@@ -7,9 +7,8 @@ import (
 	"text/template"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -28,9 +27,9 @@ func init() {
 			Required:             []string{"template"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
-			templateString, err := params.GetString("template")
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := config.Params
+			templateString, err := processorParams.GetString("template")
 			if err != nil {
 				return nil, fmt.Errorf("string.create template error: %w", err)
 			}
@@ -50,7 +49,7 @@ type StringCreate struct {
 	Template *template.Template
 }
 
-func (sc *StringCreate) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (sc *StringCreate) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	templateData := wrappedPayload
 
 	var templateBuffer bytes.Buffer

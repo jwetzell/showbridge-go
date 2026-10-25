@@ -5,10 +5,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
+	"github.com/jwetzell/showbridge-go/routing"
 	_ "modernc.org/sqlite"
 )
 
@@ -22,7 +21,7 @@ type TestPubSubModule struct {
 	id string
 }
 
-func (m *TestPubSubModule) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (m *TestPubSubModule) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	<-ctx.Done()
 	return nil
 }
@@ -67,9 +66,9 @@ func TestGoodPubSubPublish(t *testing.T) {
 				t.Fatalf("pubsub.publish failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{
 				Payload: testCase.payload,
-			}, testModuleManager(map[string]common.Module{
+			}, testModuleManager(map[string]routing.Module{
 				"test": NewTestPubSubModule("test"),
 			}), nil)
 
@@ -89,7 +88,7 @@ func TestBadPubSubPublish(t *testing.T) {
 		name          string
 		params        map[string]any
 		payload       any
-		moduleManager common.ModuleManager
+		moduleManager routing.ModuleManager
 		errorString   string
 	}{
 		{
@@ -98,7 +97,7 @@ func TestBadPubSubPublish(t *testing.T) {
 			params: map[string]any{
 				"topic": "test",
 			},
-			moduleManager: testModuleManager(map[string]common.Module{
+			moduleManager: testModuleManager(map[string]routing.Module{
 				"test": NewTestPubSubModule("test"),
 			}),
 			errorString: "pubsub.publish module error: not found",
@@ -110,7 +109,7 @@ func TestBadPubSubPublish(t *testing.T) {
 				"module": 1,
 				"topic":  "test",
 			},
-			moduleManager: testModuleManager(map[string]common.Module{
+			moduleManager: testModuleManager(map[string]routing.Module{
 				"test": NewTestPubSubModule("test"),
 			}),
 			errorString: "pubsub.publish module error: not a string",
@@ -121,7 +120,7 @@ func TestBadPubSubPublish(t *testing.T) {
 			params: map[string]any{
 				"module": "test",
 			},
-			moduleManager: testModuleManager(map[string]common.Module{
+			moduleManager: testModuleManager(map[string]routing.Module{
 				"test": NewTestPubSubModule("test"),
 			}),
 			errorString: "pubsub.publish topic error: not found",
@@ -133,7 +132,7 @@ func TestBadPubSubPublish(t *testing.T) {
 				"module": "test",
 				"topic":  1,
 			},
-			moduleManager: testModuleManager(map[string]common.Module{
+			moduleManager: testModuleManager(map[string]routing.Module{
 				"test": NewTestPubSubModule("test"),
 			}),
 			errorString: "pubsub.publish topic error: not a string",
@@ -145,7 +144,7 @@ func TestBadPubSubPublish(t *testing.T) {
 				"module": "test",
 				"topic":  "{{",
 			},
-			moduleManager: testModuleManager(map[string]common.Module{
+			moduleManager: testModuleManager(map[string]routing.Module{
 				"test": NewTestPubSubModule("test"),
 			}),
 			errorString: "template: topic:1: unclosed action",
@@ -157,10 +156,10 @@ func TestBadPubSubPublish(t *testing.T) {
 				"module": "test",
 				"topic":  "{{.Data}}",
 			},
-			moduleManager: testModuleManager(map[string]common.Module{
+			moduleManager: testModuleManager(map[string]routing.Module{
 				"test": NewTestPubSubModule("test"),
 			}),
-			errorString: "template: topic:1:2: executing \"topic\" at <.Data>: can't evaluate field Data in type payload.WrappedPayload",
+			errorString: "template: topic:1:2: executing \"topic\" at <.Data>: can't evaluate field Data in type routing.WrappedPayload",
 		},
 		{
 			name:    "no modules",
@@ -179,7 +178,7 @@ func TestBadPubSubPublish(t *testing.T) {
 				"module": "test",
 				"topic":  "test",
 			},
-			moduleManager: testModuleManager(map[string]common.Module{}),
+			moduleManager: testModuleManager(map[string]routing.Module{}),
 			errorString:   "pubsub.publish unable to find module with id: test",
 		},
 		{
@@ -189,7 +188,7 @@ func TestBadPubSubPublish(t *testing.T) {
 				"module": "test",
 				"topic":  "test",
 			},
-			moduleManager: testModuleManager(map[string]common.Module{
+			moduleManager: testModuleManager(map[string]routing.Module{
 				"test": NewTestKVModule("test", nil),
 			}),
 			errorString: "pubsub.publish module with id test is not a PubSubModule",
@@ -216,7 +215,7 @@ func TestBadPubSubPublish(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{
 				Payload: test.payload,
 			}, test.moduleManager, nil)
 

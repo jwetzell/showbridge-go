@@ -6,9 +6,8 @@ import (
 	"fmt"
 
 	osc "github.com/jwetzell/osc-go"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 type OSCMessageEncode struct {
@@ -19,13 +18,13 @@ func init() {
 	RegisterProcessor(ProcessorRegistration{
 		Type:  "osc.message.encode",
 		Title: "Encode OSC Message",
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &OSCMessageEncode{config: config}, nil
 		},
 	})
 }
 
-func (ome *OSCMessageEncode) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (ome *OSCMessageEncode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadMessage, ok := payload.(*osc.Message)
 

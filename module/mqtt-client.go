@@ -10,8 +10,9 @@ import (
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -54,47 +55,47 @@ func init() {
 			Required:             []string{"broker", "topic", "clientId"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(moduleConfig config.ModuleConfig) (common.Module, error) {
-			params := moduleConfig.Params
-			brokerString, err := params.GetString("broker")
+		New: func(moduleConfig config.ModuleConfig) (routing.Module, error) {
+			moduleParams := moduleConfig.Params
+			brokerString, err := moduleParams.GetString("broker")
 
 			if err != nil {
 				return nil, fmt.Errorf("mqtt.client broker error: %w", err)
 			}
 
-			topicString, err := params.GetString("topic")
+			topicString, err := moduleParams.GetString("topic")
 
 			if err != nil {
 				return nil, fmt.Errorf("mqtt.client topic error: %w", err)
 			}
 
-			clientIdString, err := params.GetString("clientId")
+			clientIdString, err := moduleParams.GetString("clientId")
 
 			if err != nil {
 				return nil, fmt.Errorf("mqtt.client clientId error: %w", err)
 			}
 
-			qosString, err := params.GetInt("qos")
+			qosInt, err := moduleParams.GetInt("qos")
 
 			if err != nil {
-				if errors.Is(err, config.ErrParamNotFound) {
-					qosString = 0
+				if errors.Is(err, params.ErrParamNotFound) {
+					qosInt = 0
 				} else {
 					return nil, fmt.Errorf("mqtt.client qos error: %w", err)
 				}
 			}
 
-			retainedBool, err := params.GetBool("retained")
+			retainedBool, err := moduleParams.GetBool("retained")
 
 			if err != nil {
-				if errors.Is(err, config.ErrParamNotFound) {
+				if errors.Is(err, params.ErrParamNotFound) {
 					retainedBool = false
 				} else {
 					return nil, fmt.Errorf("mqtt.client retained error: %w", err)
 				}
 			}
 
-			return &MQTTClient{config: moduleConfig, Broker: brokerString, Topic: topicString, ClientID: clientIdString, QoS: byte(qosString), Retained: retainedBool, logger: CreateLogger(moduleConfig)}, nil
+			return &MQTTClient{config: moduleConfig, Broker: brokerString, Topic: topicString, ClientID: clientIdString, QoS: byte(qosInt), Retained: retainedBool, logger: CreateLogger(moduleConfig)}, nil
 		},
 	})
 }
@@ -102,7 +103,7 @@ func init() {
 type MQTTClient struct {
 	config       config.ModuleConfig
 	ctx          context.Context
-	inputHandler common.InputHandler
+	inputHandler routing.InputHandler
 	Broker       string
 	ClientID     string
 	Topic        string
@@ -114,7 +115,7 @@ type MQTTClient struct {
 	clientMu     sync.Mutex
 }
 
-func (mc *MQTTClient) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (mc *MQTTClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	mc.logger.Debug("running")
 	mc.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
@@ -154,7 +155,7 @@ func (mc *MQTTClient) Start(ctx context.Context, inputHandler common.InputHandle
 }
 
 func (mc *MQTTClient) Publish(ctx context.Context, topic string, payload any) error {
-	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
 
 	if !ok {
 		payloadString, ok := payload.(string)

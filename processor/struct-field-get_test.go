@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func TestGoodStructFieldGet(t *testing.T) {
@@ -73,7 +73,7 @@ func TestGoodStructFieldGet(t *testing.T) {
 				t.Fatalf("struct.field.get failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err != nil {
 				t.Fatalf("struct.field.get processing failed: %s", err)
@@ -145,7 +145,7 @@ func TestBadStructFieldGet(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("struct.field.get expected to fail but got payload: %+v", got)

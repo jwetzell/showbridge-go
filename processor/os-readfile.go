@@ -9,9 +9,9 @@ import (
 	"text/template"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -30,12 +30,12 @@ func init() {
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 			Required:             []string{"path"},
 		},
-		New: func(moduleConfig config.ProcessorConfig) (Processor, error) {
-			params := moduleConfig.Params
+		New: func(processorConfig config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := processorConfig.Params
 
-			pathString, err := params.GetString("path")
+			pathString, err := processorParams.GetString("path")
 			if err != nil {
-				if errors.Is(err, config.ErrParamNotFound) {
+				if errors.Is(err, params.ErrParamNotFound) {
 					return nil, fmt.Errorf("os.readfile path error: not found")
 				} else {
 					return nil, fmt.Errorf("os.readfile path error: %w", err)
@@ -46,7 +46,7 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			return &OsReadFile{config: moduleConfig, PathTemplate: pathTemplate}, nil
+			return &OsReadFile{config: processorConfig, PathTemplate: pathTemplate}, nil
 		},
 	})
 }
@@ -56,7 +56,7 @@ type OsReadFile struct {
 	config       config.ProcessorConfig
 }
 
-func (orf *OsReadFile) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (orf *OsReadFile) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	templateData := wrappedPayload
 
 	var pathBuffer bytes.Buffer

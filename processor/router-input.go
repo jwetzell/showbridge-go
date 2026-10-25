@@ -7,9 +7,8 @@ import (
 	"log/slog"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -28,11 +27,11 @@ func init() {
 			Required:             []string{"source"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 
-			params := config.Params
+			processorParams := config.Params
 
-			sourceId, err := params.GetString("source")
+			sourceId, err := processorParams.GetString("source")
 
 			if err != nil {
 				return nil, fmt.Errorf("router.input source error: %w", err)
@@ -49,7 +48,7 @@ type RouterInput struct {
 	logger   *slog.Logger
 }
 
-func (ri *RouterInput) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (ri *RouterInput) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 
 	payload := wrappedPayload.Payload
 	if inputHandler == nil {

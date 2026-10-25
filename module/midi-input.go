@@ -8,8 +8,8 @@ import (
 	"log/slog"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/routing"
 	"gitlab.com/gomidi/midi/v2"
 	_ "gitlab.com/gomidi/midi/v2/drivers/rtmididrv"
 )
@@ -30,9 +30,9 @@ func init() {
 			Required:             []string{"port"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ModuleConfig) (common.Module, error) {
-			params := config.Params
-			portString, err := params.GetString("port")
+		New: func(config config.ModuleConfig) (routing.Module, error) {
+			moduleParams := config.Params
+			portString, err := moduleParams.GetString("port")
 			if err != nil {
 				return nil, fmt.Errorf("midi.input port error: %w", err)
 			}
@@ -45,14 +45,14 @@ func init() {
 type MIDIInput struct {
 	config       config.ModuleConfig
 	ctx          context.Context
-	inputHandler common.InputHandler
+	inputHandler routing.InputHandler
 	Port         string
 	logger       *slog.Logger
 	cancel       context.CancelFunc
 	stop         func()
 }
 
-func (mi *MIDIInput) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (mi *MIDIInput) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	mi.logger.Debug("running")
 	mi.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)

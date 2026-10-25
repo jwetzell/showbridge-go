@@ -8,9 +8,9 @@ import (
 	"strconv"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -37,27 +37,27 @@ func init() {
 			},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(moduleConfig config.ProcessorConfig) (Processor, error) {
-			params := moduleConfig.Params
+		New: func(processorConfig config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := processorConfig.Params
 
-			baseNum, err := params.GetInt("base")
+			baseNum, err := processorParams.GetInt("base")
 			if err != nil {
-				if errors.Is(err, config.ErrParamNotFound) {
+				if errors.Is(err, params.ErrParamNotFound) {
 					baseNum = 10
 				} else {
 					return nil, fmt.Errorf("int.parse base error: %w", err)
 				}
 			}
 
-			bitSizeNum, err := params.GetInt("bitSize")
+			bitSizeNum, err := processorParams.GetInt("bitSize")
 			if err != nil {
-				if errors.Is(err, config.ErrParamNotFound) {
+				if errors.Is(err, params.ErrParamNotFound) {
 					bitSizeNum = 64
 				} else {
 					return nil, fmt.Errorf("int.parse bitSize error: %w", err)
 				}
 			}
-			return &IntParse{config: moduleConfig, Base: baseNum, BitSize: bitSizeNum}, nil
+			return &IntParse{config: processorConfig, Base: baseNum, BitSize: bitSizeNum}, nil
 		},
 	})
 }
@@ -68,7 +68,7 @@ type IntParse struct {
 	config  config.ProcessorConfig
 }
 
-func (ip *IntParse) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (ip *IntParse) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadString, ok := payload.(string)
 

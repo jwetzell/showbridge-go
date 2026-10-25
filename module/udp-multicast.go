@@ -10,8 +10,9 @@ import (
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -37,14 +38,14 @@ func init() {
 			Required:             []string{"ip", "port"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(moduleConfig config.ModuleConfig) (common.Module, error) {
-			params := moduleConfig.Params
-			ipString, err := params.GetString("ip")
+		New: func(moduleConfig config.ModuleConfig) (routing.Module, error) {
+			moduleParams := moduleConfig.Params
+			ipString, err := moduleParams.GetString("ip")
 			if err != nil {
 				return nil, fmt.Errorf("net.udp.multicast ip error: %w", err)
 			}
 
-			portNum, err := params.GetInt("port")
+			portNum, err := moduleParams.GetInt("port")
 			if err != nil {
 				return nil, fmt.Errorf("net.udp.multicast port error: %w", err)
 			}
@@ -62,14 +63,14 @@ type UDPMulticast struct {
 	config       config.ModuleConfig
 	conn         *net.UDPConn
 	ctx          context.Context
-	inputHandler common.InputHandler
+	inputHandler routing.InputHandler
 	Addr         *net.UDPAddr
 	logger       *slog.Logger
 	cancel       context.CancelFunc
 	connMu       sync.Mutex
 }
 
-func (um *UDPMulticast) Start(ctx context.Context, inputHandler common.InputHandler) error {
+func (um *UDPMulticast) Start(ctx context.Context, inputHandler routing.InputHandler) error {
 	um.logger.Debug("running")
 	um.inputHandler = inputHandler
 	moduleContext, cancel := context.WithCancel(ctx)
@@ -120,7 +121,7 @@ func (um *UDPMulticast) Start(ctx context.Context, inputHandler common.InputHand
 
 func (um *UDPMulticast) Output(ctx context.Context, payload any) error {
 
-	payloadBytes, ok := common.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
 	if !ok {
 		return errors.New("net.udp.multicast can only output bytes")
 	}

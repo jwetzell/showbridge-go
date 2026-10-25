@@ -3,22 +3,22 @@ package showbridge
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"sync"
 	"sync/atomic"
 
 	"github.com/jwetzell/showbridge-go/api"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/events"
 	"github.com/jwetzell/showbridge-go/module"
-	"github.com/jwetzell/showbridge-go/payload"
-	"github.com/jwetzell/showbridge-go/route"
+	"github.com/jwetzell/showbridge-go/processor"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
-type moduleManager map[string]common.Module
+type moduleManager map[string]routing.Module
 
-func (m moduleManager) GetModule(moduleId string) (common.Module, bool) {
+func (m moduleManager) GetModule(moduleId string) (routing.Module, bool) {
 	moduleInstance, ok := m[moduleId]
 	return moduleInstance, ok
 }
@@ -30,7 +30,7 @@ type Router struct {
 	// TODO(jwetzell): do these need to be guarded against concurrency?
 	ModuleInstances moduleManager
 	// TODO(jwetzell): change to something easier to lookup
-	RouteInstances      []common.Route
+	RouteInstances      []routing.Route
 	ConfigChange        chan config.Config
 	moduleWait          sync.WaitGroup
 	logger              *slog.Logger
@@ -99,15 +99,29 @@ func (r *Router) stopModule(moduleId string) error {
 
 // TODO(jwetzell): support removing route
 func (r *Router) addRoute(routeDecl config.RouteConfig) error {
-	routeInstance, err := route.NewRoute(routeDecl)
-	if err != nil {
-		return err
+
+	processors := []routing.Processor{}
+
+	if len(routeDecl.Processors) > 0 {
+		for _, processorDecl := range routeDecl.Processors {
+			processorInfo, ok := processor.GetProcessorRegistration(processorDecl.Type)
+			if !ok {
+				return fmt.Errorf("problem loading processor registration for processor type: %s", processorDecl.Type)
+			}
+
+			proc, err := processorInfo.New(processorDecl)
+			if err != nil {
+				return err
+			}
+			processors = append(processors, proc)
+		}
 	}
+	routeInstance := &route{id: routeDecl.Id, input: routeDecl.Input, processors: processors}
 	r.RouteInstances = append(r.RouteInstances, routeInstance)
 	return nil
 }
 
-func (r *Router) getModule(moduleId string) common.Module {
+func (r *Router) getModule(moduleId string) routing.Module {
 	moduleInstance, ok := r.ModuleInstances[moduleId]
 	if !ok {
 		return nil
@@ -120,7 +134,7 @@ func NewRouter(routerConfig config.Config) (*Router, []config.ModuleError, []con
 
 	router := Router{
 		ModuleInstances: make(moduleManager),
-		RouteInstances:  []common.Route{},
+		RouteInstances:  []routing.Route{},
 		ConfigChange:    make(chan config.Config, 1),
 		logger:          slog.Default().With("component", "router"),
 		runningConfig:   routerConfig,
@@ -191,11 +205,11 @@ func (r *Router) Stop() {
 	r.logger.Info("done")
 }
 
-func (r *Router) HandleInput(ctx context.Context, sourceId string, inputPayload any) (bool, []common.RouteIOError) {
+func (r *Router) HandleInput(ctx context.Context, sourceId string, inputPayload any) (bool, []routing.RouteIOError) {
 	r.runningConfigMu.RLock()
 	defer r.runningConfigMu.RUnlock()
 
-	var routeIOErrors []common.RouteIOError
+	var routeIOErrors []routing.RouteIOError
 	var routeIOErrorsMu sync.Mutex
 	var routeFound atomic.Bool
 
@@ -218,18 +232,18 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, inputPayload 
 
 				routeFound.Store(true)
 
-				_, err := routeInstance.ProcessPayload(ctx, payload.WrappedPayload{
+				_, err := routeInstance.ProcessPayload(ctx, routing.WrappedPayload{
 					Payload: inputPayload,
 					Source:  sourceId,
 					End:     false,
 				}, r.ModuleInstances, r.HandleInput)
 				if err != nil {
 					if routeIOErrors == nil {
-						routeIOErrors = []common.RouteIOError{}
+						routeIOErrors = []routing.RouteIOError{}
 					}
 					r.logger.Error("unable to process input", "route", routeIndex, "source", sourceId, "error", err)
 					routeIOErrorsMu.Lock()
-					routeIOErrors = append(routeIOErrors, common.RouteIOError{
+					routeIOErrors = append(routeIOErrors, routing.RouteIOError{
 						Index:        routeIndex,
 						ProcessError: err,
 					})

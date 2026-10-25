@@ -9,9 +9,8 @@ import (
 	"text/template"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -35,16 +34,16 @@ func init() {
 			Required:             []string{"module", "topic"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 
-			params := config.Params
+			processorParams := config.Params
 
-			moduleIdString, err := params.GetString("module")
+			moduleIdString, err := processorParams.GetString("module")
 			if err != nil {
 				return nil, fmt.Errorf("pubsub.publish module error: %w", err)
 			}
 
-			topicString, err := params.GetString("topic")
+			topicString, err := processorParams.GetString("topic")
 			if err != nil {
 				return nil, fmt.Errorf("pubsub.publish topic error: %w", err)
 			}
@@ -64,10 +63,10 @@ type PubSubPublish struct {
 	ModuleId string
 	Topic    *template.Template
 	logger   *slog.Logger
-	module   common.PubSubModule
+	module   routing.PubSubModule
 }
 
-func (psp *PubSubPublish) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (psp *PubSubPublish) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	if psp.module == nil {
 		if moduleManager == nil {
 			wrappedPayload.End = true
@@ -80,7 +79,7 @@ func (psp *PubSubPublish) Process(ctx context.Context, wrappedPayload payload.Wr
 			return wrappedPayload, fmt.Errorf("pubsub.publish unable to find module with id: %s", psp.ModuleId)
 		}
 
-		pubSubModule, ok := module.(common.PubSubModule)
+		pubSubModule, ok := module.(routing.PubSubModule)
 		if !ok {
 			wrappedPayload.End = true
 			return wrappedPayload, fmt.Errorf("pubsub.publish module with id %s is not a PubSubModule", psp.ModuleId)

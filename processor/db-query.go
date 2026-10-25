@@ -9,9 +9,8 @@ import (
 	"text/template"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -35,16 +34,16 @@ func init() {
 			Required:             []string{"module", "query"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 
-			params := config.Params
+			processorParams := config.Params
 
-			moduleIdString, err := params.GetString("module")
+			moduleIdString, err := processorParams.GetString("module")
 			if err != nil {
 				return nil, fmt.Errorf("db.query module error: %w", err)
 			}
 
-			queryString, err := params.GetString("query")
+			queryString, err := processorParams.GetString("query")
 			if err != nil {
 				return nil, fmt.Errorf("db.query query error: %w", err)
 			}
@@ -64,10 +63,10 @@ type DbQuery struct {
 	ModuleId string
 	Query    *template.Template
 	logger   *slog.Logger
-	module   common.DatabaseModule
+	module   routing.DatabaseModule
 }
 
-func (dq *DbQuery) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (dq *DbQuery) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	if dq.module == nil {
 		if moduleManager == nil {
 			wrappedPayload.End = true
@@ -80,7 +79,7 @@ func (dq *DbQuery) Process(ctx context.Context, wrappedPayload payload.WrappedPa
 			return wrappedPayload, fmt.Errorf("db.query unable to find module with id: %s", dq.ModuleId)
 		}
 
-		dbModule, ok := module.(common.DatabaseModule)
+		dbModule, ok := module.(routing.DatabaseModule)
 		if !ok {
 			wrappedPayload.End = true
 			return wrappedPayload, fmt.Errorf("db.query module with id %s is not a DatabaseModule", dq.ModuleId)

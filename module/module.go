@@ -6,8 +6,8 @@ import (
 	"sync"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 type ModuleRegistration struct {
@@ -15,7 +15,7 @@ type ModuleRegistration struct {
 	Title        string             `json:"title,omitempty"`
 	Description  string             `json:"description,omitempty"`
 	ParamsSchema *jsonschema.Schema `json:"paramsSchema,omitempty"`
-	New          func(config.ModuleConfig) (common.Module, error)
+	New          func(config.ModuleConfig) (routing.Module, error)
 }
 
 func RegisterModule(mod ModuleRegistration) {

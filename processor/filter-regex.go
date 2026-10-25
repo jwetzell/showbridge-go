@@ -7,9 +7,8 @@ import (
 	"regexp"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func init() {
@@ -28,10 +27,10 @@ func init() {
 			Required:             []string{"pattern"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
-		New: func(config config.ProcessorConfig) (Processor, error) {
-			params := config.Params
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
+			processorParams := config.Params
 
-			patternString, err := params.GetString("pattern")
+			patternString, err := processorParams.GetString("pattern")
 			if err != nil {
 				return nil, fmt.Errorf("filter.regex pattern error: %w", err)
 			}
@@ -52,7 +51,7 @@ type FilterRegex struct {
 	Pattern *regexp.Regexp
 }
 
-func (fr *FilterRegex) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (fr *FilterRegex) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadString, ok := payload.(string)
 

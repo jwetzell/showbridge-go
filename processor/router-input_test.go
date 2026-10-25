@@ -5,10 +5,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func TestGoodRouterInput(t *testing.T) {
@@ -37,7 +36,7 @@ func TestGoodRouterInput(t *testing.T) {
 				t.Fatalf("router.input failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: testCase.payload}, nil, nil)
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("router.input processing failed: %s", err)
 			}
@@ -54,14 +53,14 @@ func TestBadRouterInput(t *testing.T) {
 		name         string
 		params       map[string]any
 		payload      any
-		inputHandler common.InputHandler
+		inputHandler routing.InputHandler
 		errorString  string
 	}{
 		{
 			name:    "no source param",
 			params:  map[string]any{},
 			payload: "test",
-			inputHandler: func(ctx context.Context, sourceId string, payload any) (bool, []common.RouteIOError) {
+			inputHandler: func(ctx context.Context, sourceId string, payload any) (bool, []routing.RouteIOError) {
 				return false, nil
 			},
 			errorString: "router.input source error: not found",
@@ -72,7 +71,7 @@ func TestBadRouterInput(t *testing.T) {
 				"source": 123,
 			},
 			payload: "test",
-			inputHandler: func(ctx context.Context, sourceId string, payload any) (bool, []common.RouteIOError) {
+			inputHandler: func(ctx context.Context, sourceId string, payload any) (bool, []routing.RouteIOError) {
 				return false, nil
 			},
 			errorString: "router.input source error: not a string",
@@ -108,7 +107,7 @@ func TestBadRouterInput(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{Payload: testCase.payload}, nil, testCase.inputHandler)
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, testCase.inputHandler)
 
 			if err == nil {
 				t.Fatalf("router.input expected to fail but succeeded, got: %v", got)

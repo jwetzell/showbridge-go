@@ -4,15 +4,14 @@ import (
 	"context"
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
+	"github.com/jwetzell/showbridge-go/routing"
 )
 
-type testModuleManager map[string]common.Module
+type testModuleManager map[string]routing.Module
 
-func (m testModuleManager) GetModule(name string) (common.Module, bool) {
+func (m testModuleManager) GetModule(name string) (routing.Module, bool) {
 	mod, ok := m[name]
 	return mod, ok
 }
@@ -21,7 +20,7 @@ type TestProcessor struct {
 	Config config.ProcessorConfig
 }
 
-func (p *TestProcessor) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
+func (p *TestProcessor) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
 	return wrappedPayload, nil
 }
 
@@ -74,7 +73,7 @@ func TestProcessorBadRegistrationNoType(t *testing.T) {
 
 	processor.RegisterProcessor(processor.ProcessorRegistration{
 		Type: "",
-		New: func(config config.ProcessorConfig) (processor.Processor, error) {
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &TestProcessor{}, nil
 		},
 	})
@@ -104,7 +103,7 @@ func TestProcessorBadRegistrationExistingType(t *testing.T) {
 
 	processor.RegisterProcessor(processor.ProcessorRegistration{
 		Type: "string.create",
-		New: func(config config.ProcessorConfig) (processor.Processor, error) {
+		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &TestProcessor{}, nil
 		},
 	})
