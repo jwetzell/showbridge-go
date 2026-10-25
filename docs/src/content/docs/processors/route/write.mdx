@@ -1,0 +1,19 @@
+---
+title: Write to Route
+sidebar:
+  label: Write
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+This processor will write the incoming payload to the current route's writer if there is one. 
+These would be present on modules like `net.tcp.server` with the writer being set to the connection that generated the input.
+
+<SchemaInfo type="processor" id="route.write"/>
+
+### Example
+
+```yaml
+- id: write
+  type: route.write
+```

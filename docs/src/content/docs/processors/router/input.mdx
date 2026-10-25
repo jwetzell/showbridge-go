@@ -1,0 +1,21 @@
+---
+title: Pipe to Router Input
+sidebar:
+  label: Input
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+This processor will send the current payload to the router as the specified source. 
+Effectively allow to "call" a specific route. Might be useful for some common set of actions that would get "called" by multiple output.
+
+<SchemaInfo type="processor" id="router.input"/>
+
+### Example
+
+```yaml
+- id: input
+  type: router.input
+  params:
+    source: test
+```

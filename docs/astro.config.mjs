@@ -244,6 +244,16 @@ export default defineConfig({
               items: [{ autogenerate: { directory: "processors/pubsub" } }],
             },
             {
+              label: "Route",
+              collapsed: true,
+              items: [{ autogenerate: { directory: "processors/route" } }],
+            },
+            {
+              label: "Router",
+              collapsed: true,
+              items: [{ autogenerate: { directory: "processors/router" } }],
+            },
+            {
               label: "Script",
               collapsed: true,
               items: [{ autogenerate: { directory: "processors/script" } }],
