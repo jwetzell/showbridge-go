@@ -22,7 +22,7 @@ require (
 	gitlab.com/gomidi/midi/v2 v2.3.24
 	go.bug.st/serial v1.8.0
 	golang.org/x/time v0.16.0
-	modernc.org/quickjs v0.25.0
+	modernc.org/quickjs v0.27.0
 	modernc.org/sqlite v1.61.0
 	sigs.k8s.io/yaml v1.6.0
 )
@@ -61,7 +61,7 @@ require (
 	golang.org/x/text v0.42.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	modernc.org/libc v1.79.0 // indirect
-	modernc.org/libquickjs v0.13.1 // indirect
+	modernc.org/libquickjs v0.14.0 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.12.1 // indirect
 )
