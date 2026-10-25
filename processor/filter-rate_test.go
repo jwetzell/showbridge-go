@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/internal/test"
 	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
@@ -51,7 +50,7 @@ func TestBadFilterRate(t *testing.T) {
 			params: map[string]any{
 				// no rate parameter
 			},
-			payload:     test.TestStruct{},
+			payload:     TestStruct{},
 			errorString: "filter.rate rate error: not found",
 		},
 		{
@@ -59,7 +58,7 @@ func TestBadFilterRate(t *testing.T) {
 			params: map[string]any{
 				"rate": "12345",
 			},
-			payload:     test.TestStruct{},
+			payload:     TestStruct{},
 			errorString: "filter.rate rate error: not a number",
 		},
 	}

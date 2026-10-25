@@ -1,16 +1,58 @@
 package processor_test
 
 import (
+	"context"
+	"database/sql"
 	"reflect"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/internal/test"
 	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 	_ "modernc.org/sqlite"
 )
+
+func NewTestDBModule(id string) *TestDBModule {
+	return &TestDBModule{
+		id: id,
+	}
+}
+
+type TestDBModule struct {
+	id string
+	db *sql.DB
+}
+
+func (m *TestDBModule) Start(ctx context.Context, inputHandler common.InputHandler) error {
+	<-ctx.Done()
+	return nil
+}
+
+func (m *TestDBModule) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
+	if m.db == nil {
+		db, err := sql.Open("sqlite", ":memory:")
+		if err != nil {
+			return nil, err
+		}
+
+		_, err = db.Exec(`
+		CREATE TABLE test (
+			id INTEGER PRIMARY KEY,
+			value TEXT
+		);
+		INSERT INTO test (id, value) VALUES (1, 'test-1'), (2, 'test-2');
+		
+		`)
+		if err != nil {
+			return nil, err
+		}
+		m.db = db
+	}
+	return m.db.QueryContext(ctx, query, args...)
+}
+
+func (m *TestDBModule) Stop() {}
 
 func TestGoodDbQuery(t *testing.T) {
 
@@ -79,7 +121,7 @@ func TestGoodDbQuery(t *testing.T) {
 			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{
 				Payload: testCase.payload,
 			}, testModuleManager{
-				"test": test.NewTestDBModule("test"),
+				"test": NewTestDBModule("test"),
 			}, nil)
 
 			if err != nil {
@@ -103,89 +145,89 @@ func TestBadDbQuery(t *testing.T) {
 	}{
 		{
 			name:    "no module param",
-			payload: test.TestStruct{Data: "hello"},
+			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"query": "SELECT sqlite_version();",
 			},
 			moduleManager: testModuleManager(map[string]common.Module{
-				"test": test.NewTestDBModule("test"),
+				"test": NewTestDBModule("test"),
 			}),
 			errorString: "db.query module error: not found",
 		},
 		{
 			name:    "non string module",
-			payload: test.TestStruct{Data: "hello"},
+			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": 1,
 				"query":  "SELECT sqlite_version();",
 			},
 			moduleManager: testModuleManager(map[string]common.Module{
-				"test": test.NewTestDBModule("test"),
+				"test": NewTestDBModule("test"),
 			}),
 			errorString: "db.query module error: not a string",
 		},
 		{
 			name:    "no query param",
-			payload: test.TestStruct{Data: "hello"},
+			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 			},
 			moduleManager: testModuleManager(map[string]common.Module{
-				"test": test.NewTestDBModule("test"),
+				"test": NewTestDBModule("test"),
 			}),
 			errorString: "db.query query error: not found",
 		},
 		{
 			name:    "non string query",
-			payload: test.TestStruct{Data: "hello"},
+			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"query":  1,
 			},
 			moduleManager: testModuleManager(map[string]common.Module{
-				"test": test.NewTestDBModule("test"),
+				"test": NewTestDBModule("test"),
 			}),
 			errorString: "db.query query error: not a string",
 		},
 		{
 			name:    "query template syntax error",
-			payload: test.TestStruct{Data: "hello"},
+			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"query":  "select * from {{",
 			},
 			moduleManager: testModuleManager(map[string]common.Module{
-				"test": test.NewTestDBModule("test"),
+				"test": NewTestDBModule("test"),
 			}),
 			errorString: "template: query:1: unclosed action",
 		},
 		{
 			name:    "query template error",
-			payload: test.TestStruct{Data: "hello"},
+			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"query":  "select * from {{.Data}}",
 			},
 			moduleManager: testModuleManager(map[string]common.Module{
-				"test": test.NewTestDBModule("test"),
+				"test": NewTestDBModule("test"),
 			}),
 			errorString: "template: query:1:16: executing \"query\" at <.Data>: can't evaluate field Data in type payload.WrappedPayload",
 		},
 		{
 			name:    "query error",
-			payload: test.TestStruct{Data: "hello"},
+			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"query":  "select * from asdf;",
 			},
 			moduleManager: testModuleManager(map[string]common.Module{
-				"test": test.NewTestDBModule("test"),
+				"test": NewTestDBModule("test"),
 			}),
 			errorString: "db.query error executing query: SQL logic error: no such table: asdf (1)",
 		},
 		{
 			name:    "no modules",
-			payload: test.TestStruct{Data: "hello"},
+			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"query":  "select * from test;",
@@ -195,7 +237,7 @@ func TestBadDbQuery(t *testing.T) {
 		},
 		{
 			name:    "module not found",
-			payload: test.TestStruct{Data: "hello"},
+			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"query":  "select * from test;",
@@ -205,13 +247,13 @@ func TestBadDbQuery(t *testing.T) {
 		},
 		{
 			name:    "module not a DatabaseModule",
-			payload: test.TestStruct{Data: "hello"},
+			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"query":  "select * from test;",
 			},
 			moduleManager: testModuleManager(map[string]common.Module{
-				"test": test.NewTestKVModule("test", nil),
+				"test": NewTestKVModule("test", nil),
 			}),
 			errorString: "db.query module with id test is not a DatabaseModule",
 		},

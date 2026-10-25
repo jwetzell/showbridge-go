@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/internal/test"
 	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
@@ -21,31 +20,31 @@ func TestGoodStructFieldGet(t *testing.T) {
 		{
 			name:     "string field",
 			params:   map[string]any{"name": "String"},
-			payload:  test.TestStruct{String: "hello"},
+			payload:  TestStruct{String: "hello"},
 			expected: "hello",
 		},
 		{
 			name:     "int field",
 			params:   map[string]any{"name": "Int"},
-			payload:  test.TestStruct{Int: 42},
+			payload:  TestStruct{Int: 42},
 			expected: 42,
 		},
 		{
 			name:     "float field",
 			params:   map[string]any{"name": "Float"},
-			payload:  test.TestStruct{Float: 3.14},
+			payload:  TestStruct{Float: 3.14},
 			expected: 3.14,
 		},
 		{
 			name:     "bool field",
 			params:   map[string]any{"name": "Bool"},
-			payload:  test.TestStruct{Bool: true},
+			payload:  TestStruct{Bool: true},
 			expected: true,
 		},
 		{
 			name:     "pointer to struct payload",
 			params:   map[string]any{"name": "Data"},
-			payload:  &test.TestStruct{Data: "hello"},
+			payload:  &TestStruct{Data: "hello"},
 			expected: "hello",
 		},
 		{
@@ -53,7 +52,7 @@ func TestGoodStructFieldGet(t *testing.T) {
 			params: map[string]any{
 				"name": "IntSlice",
 			},
-			payload:  test.TestStruct{IntSlice: []int{1, 2, 3}},
+			payload:  TestStruct{IntSlice: []int{1, 2, 3}},
 			expected: []int{1, 2, 3},
 		},
 	}
@@ -96,13 +95,13 @@ func TestBadStructFieldGet(t *testing.T) {
 	}{
 		{
 			name:        "no name param",
-			payload:     test.TestStruct{Data: "hello"},
+			payload:     TestStruct{Data: "hello"},
 			params:      map[string]any{},
 			errorString: "struct.field.get name error: not found",
 		},
 		{
 			name:    "non string name",
-			payload: test.TestStruct{Data: "hello"},
+			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"name": 1,
 			},
@@ -110,7 +109,7 @@ func TestBadStructFieldGet(t *testing.T) {
 		},
 		{
 			name:    "missing field",
-			payload: test.TestStruct{String: "hello"},
+			payload: TestStruct{String: "hello"},
 			params: map[string]any{
 				"name": "NonExistentField",
 			},

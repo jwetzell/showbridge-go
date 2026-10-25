@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/internal/test"
 	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
@@ -21,7 +20,7 @@ func TestGoodFilterExpr(t *testing.T) {
 			params: map[string]any{
 				"expression": "Payload.Int > 0",
 			},
-			payload: test.TestStruct{
+			payload: TestStruct{
 				Int: 1,
 			},
 			match: true,
@@ -31,7 +30,7 @@ func TestGoodFilterExpr(t *testing.T) {
 			params: map[string]any{
 				"expression": "Payload.String == 'hello'",
 			},
-			payload: test.TestStruct{
+			payload: TestStruct{
 				String: "hello",
 			},
 			match: true,
@@ -41,7 +40,7 @@ func TestGoodFilterExpr(t *testing.T) {
 			params: map[string]any{
 				"expression": "Payload.Int > 0",
 			},
-			payload: test.TestStruct{
+			payload: TestStruct{
 				Int: 0,
 			},
 			match: false,
@@ -90,7 +89,7 @@ func TestBadFilterExpr(t *testing.T) {
 			params: map[string]any{
 				// no expression parameter
 			},
-			payload:     test.TestStruct{},
+			payload:     TestStruct{},
 			errorString: "filter.expr expression error: not found",
 		},
 		{
@@ -98,7 +97,7 @@ func TestBadFilterExpr(t *testing.T) {
 			params: map[string]any{
 				"expression": 12345,
 			},
-			payload:     test.TestStruct{},
+			payload:     TestStruct{},
 			errorString: "filter.expr expression error: not a string",
 		},
 		{
@@ -106,7 +105,7 @@ func TestBadFilterExpr(t *testing.T) {
 			params: map[string]any{
 				"expression": "foo +",
 			},
-			payload:     test.TestStruct{},
+			payload:     TestStruct{},
 			errorString: "unexpected token EOF (1:5)\n | foo +\n | ....^",
 		},
 		{

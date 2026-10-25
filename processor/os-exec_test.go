@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/internal/test"
 	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
@@ -57,7 +56,7 @@ func TestBadOsExec(t *testing.T) {
 		{
 			name:        "no command parameter",
 			params:      map[string]any{},
-			payload:     test.TestStruct{},
+			payload:     TestStruct{},
 			errorString: "os.exec command error: not found",
 		},
 		{
@@ -65,7 +64,7 @@ func TestBadOsExec(t *testing.T) {
 			params: map[string]any{
 				"command": 12345,
 			},
-			payload:     test.TestStruct{},
+			payload:     TestStruct{},
 			errorString: "os.exec command error: not a string",
 		},
 		{
@@ -73,7 +72,7 @@ func TestBadOsExec(t *testing.T) {
 			params: map[string]any{
 				"command": "{{",
 			},
-			payload:     test.TestStruct{},
+			payload:     TestStruct{},
 			errorString: "template: command:1: unclosed action",
 		},
 		{
@@ -81,7 +80,7 @@ func TestBadOsExec(t *testing.T) {
 			params: map[string]any{
 				"command": "{{.NonExistentField}}",
 			},
-			payload:     test.TestStruct{},
+			payload:     TestStruct{},
 			errorString: "template: command:1:2: executing \"command\" at <.NonExistentField>: can't evaluate field NonExistentField in type payload.WrappedPayload",
 		},
 		{
@@ -90,7 +89,7 @@ func TestBadOsExec(t *testing.T) {
 				"command": "echo",
 				"args":    []any{12345},
 			},
-			payload:     test.TestStruct{},
+			payload:     TestStruct{},
 			errorString: "os.exec args error: not a string slice",
 		},
 		{
@@ -99,7 +98,7 @@ func TestBadOsExec(t *testing.T) {
 				"command": "echo",
 				"args":    []any{"{{"},
 			},
-			payload:     test.TestStruct{},
+			payload:     TestStruct{},
 			errorString: "template: arg-0:1: unclosed action",
 		},
 		{
@@ -108,7 +107,7 @@ func TestBadOsExec(t *testing.T) {
 				"command": "echo",
 				"args":    []any{"{{.Unknown}}"},
 			},
-			payload:     test.TestStruct{},
+			payload:     TestStruct{},
 			errorString: "template: arg-0:1:2: executing \"arg-0\" at <.Unknown>: can't evaluate field Unknown in type payload.WrappedPayload",
 		},
 	}

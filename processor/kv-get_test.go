@@ -1,15 +1,53 @@
 package processor_test
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/common"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/internal/test"
 	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
+
+func NewTestKVModule(id string, presetValues map[string]any) *TestKVModule {
+	return &TestKVModule{
+		id:     id,
+		kvData: presetValues,
+	}
+}
+
+type TestKVModule struct {
+	id     string
+	kvData map[string]any
+}
+
+func (m *TestKVModule) Start(ctx context.Context, inputHandler common.InputHandler) error {
+	<-ctx.Done()
+	return nil
+}
+
+func (m *TestKVModule) Stop() {}
+
+func (m *TestKVModule) Get(ctx context.Context, key string) (any, error) {
+	if m.kvData == nil {
+		return nil, nil
+	}
+	value, ok := m.kvData[key]
+	if !ok {
+		return nil, nil
+	}
+	return value, nil
+}
+
+func (m *TestKVModule) Set(ctx context.Context, key string, value any) error {
+	if m.kvData == nil {
+		m.kvData = make(map[string]any)
+	}
+	m.kvData[key] = value
+	return nil
+}
 
 func TestGoodKvGet(t *testing.T) {
 
@@ -52,7 +90,7 @@ func TestGoodKvGet(t *testing.T) {
 			got, err := processorInstance.Process(t.Context(), payload.WrappedPayload{
 				Payload: testCase.payload,
 			}, testModuleManager(map[string]common.Module{
-				"test": test.NewTestKVModule("test", testCase.presetValues),
+				"test": NewTestKVModule("test", testCase.presetValues),
 			}), nil)
 
 			if err != nil {
@@ -76,53 +114,53 @@ func TestBadKvGet(t *testing.T) {
 	}{
 		{
 			name:    "no module param",
-			payload: test.TestStruct{Data: "hello"},
+			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"key": "test",
 			},
 			moduleManager: testModuleManager(map[string]common.Module{
-				"test": test.NewTestKVModule("test", nil),
+				"test": NewTestKVModule("test", nil),
 			}),
 			errorString: "kv.get module error: not found",
 		},
 		{
 			name:    "non string module",
-			payload: test.TestStruct{Data: "hello"},
+			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": 1,
 				"key":    "test",
 			},
 			moduleManager: testModuleManager(map[string]common.Module{
-				"test": test.NewTestKVModule("test", nil),
+				"test": NewTestKVModule("test", nil),
 			}),
 			errorString: "kv.get module error: not a string",
 		},
 		{
 			name:    "no key param",
-			payload: test.TestStruct{Data: "hello"},
+			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 			},
 			moduleManager: testModuleManager(map[string]common.Module{
-				"test": test.NewTestKVModule("test", nil),
+				"test": NewTestKVModule("test", nil),
 			}),
 			errorString: "kv.get key error: not found",
 		},
 		{
 			name:    "non string key",
-			payload: test.TestStruct{Data: "hello"},
+			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"key":    1,
 			},
 			moduleManager: testModuleManager(map[string]common.Module{
-				"test": test.NewTestKVModule("test", nil),
+				"test": NewTestKVModule("test", nil),
 			}),
 			errorString: "kv.get key error: not a string",
 		},
 		{
 			name:    "no modules",
-			payload: test.TestStruct{Data: "hello"},
+			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"key":    "test",
@@ -132,7 +170,7 @@ func TestBadKvGet(t *testing.T) {
 		},
 		{
 			name:    "module not found",
-			payload: test.TestStruct{Data: "hello"},
+			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"key":    "test",
@@ -142,13 +180,13 @@ func TestBadKvGet(t *testing.T) {
 		},
 		{
 			name:    "module not a kv module",
-			payload: test.TestStruct{Data: "hello"},
+			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",
 				"key":    "test",
 			},
 			moduleManager: testModuleManager(map[string]common.Module{
-				"test": test.NewTestDBModule("test"),
+				"test": NewTestDBModule("test"),
 			}),
 			errorString: "kv.get module with id test is not a KeyValueModule",
 		},

@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/internal/test"
 	"github.com/jwetzell/showbridge-go/payload"
 	"github.com/jwetzell/showbridge-go/processor"
 )
@@ -57,7 +56,7 @@ func TestBadOsReadFile(t *testing.T) {
 		{
 			name:        "no path parameter",
 			params:      map[string]any{},
-			payload:     test.TestStruct{},
+			payload:     TestStruct{},
 			errorString: "os.readfile path error: not found",
 		},
 		{
@@ -65,7 +64,7 @@ func TestBadOsReadFile(t *testing.T) {
 			params: map[string]any{
 				"path": 12345,
 			},
-			payload:     test.TestStruct{},
+			payload:     TestStruct{},
 			errorString: "os.readfile path error: not a string",
 		},
 		{
@@ -73,7 +72,7 @@ func TestBadOsReadFile(t *testing.T) {
 			params: map[string]any{
 				"path": "{{",
 			},
-			payload:     test.TestStruct{},
+			payload:     TestStruct{},
 			errorString: "template: path:1: unclosed action",
 		},
 		{
@@ -81,7 +80,7 @@ func TestBadOsReadFile(t *testing.T) {
 			params: map[string]any{
 				"path": "{{.NonExistentField}}",
 			},
-			payload:     test.TestStruct{},
+			payload:     TestStruct{},
 			errorString: "template: path:1:2: executing \"path\" at <.NonExistentField>: can't evaluate field NonExistentField in type payload.WrappedPayload",
 		},
 	}
