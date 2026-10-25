@@ -1143,6 +1143,19 @@
                   "properties": {
                     "type": {
                       "description": "OSC type of the argument",
+                      "enum": [
+                        "s",
+                        "i",
+                        "f",
+                        "b",
+                        "T",
+                        "F",
+                        "N",
+                        "I",
+                        "h",
+                        "d",
+                        "t"
+                      ],
                       "maxLength": 1,
                       "minLength": 1,
                       "title": "Type",
@@ -1253,6 +1266,25 @@
           "params"
         ],
         "title": "Publish to Pub/Sub Topic",
+        "type": "object"
+      },
+      {
+        "$id": "route.write",
+        "additionalProperties": false,
+        "description": "Write to the current route writer if there is one",
+        "properties": {
+          "id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": {
+            "const": "route.write"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "title": "Route Write",
         "type": "object"
       },
       {
