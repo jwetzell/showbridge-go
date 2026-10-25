@@ -368,7 +368,7 @@ func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload payload.Wrapp
 		return wrappedPayload, err
 	}
 
-	payloadMessage := freeD.FreeDPosition{
+	payloadMessage := freeD.Position{
 		ID:    uint8(idNum),
 		Pan:   float32(panNum),
 		Tilt:  float32(tiltNum),

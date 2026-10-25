@@ -14,7 +14,7 @@ func TestGoodFreeDCreate(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		expected freeD.FreeDPosition
+		expected freeD.Position
 		params   map[string]any
 		payload  any
 	}{
@@ -42,7 +42,7 @@ func TestGoodFreeDCreate(t *testing.T) {
 				"zoom":  "66051",
 				"focus": "263430",
 			},
-			expected: freeD.FreeDPosition{
+			expected: freeD.Position{
 				ID:    1,
 				Pan:   180,
 				Tilt:  90,
