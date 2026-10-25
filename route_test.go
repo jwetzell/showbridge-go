@@ -68,6 +68,50 @@ func TestGoodRouteProcessPayload(t *testing.T) {
 			moduleManager: nil,
 			inputHandler:  nil,
 		},
+		{
+			name: "single processor run to end",
+			route: config.RouteConfig{
+				Input: "source1",
+				Processors: []config.ProcessorConfig{
+					{
+						Type:   "float.parse",
+						Params: params.Params{},
+					},
+				},
+			},
+			wrappedPayload: routing.WrappedPayload{
+				Payload: "123.45",
+				Source:  "source1",
+				End:     false,
+			},
+			moduleManager: nil,
+			inputHandler:  nil,
+		},
+		{
+			name: "single processor stop early",
+			route: config.RouteConfig{
+				Input: "source1",
+				Processors: []config.ProcessorConfig{
+					{
+						Type: "filter.expr",
+						Params: params.Params{
+							"expression": "Payload != \"123.45\"",
+						},
+					},
+					{
+						Type:   "float.parse",
+						Params: params.Params{},
+					},
+				},
+			},
+			wrappedPayload: routing.WrappedPayload{
+				Payload: "123.45",
+				Source:  "source1",
+				End:     false,
+			},
+			moduleManager: nil,
+			inputHandler:  nil,
+		},
 	}
 
 	for _, tc := range testCases {
