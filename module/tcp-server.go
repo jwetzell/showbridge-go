@@ -67,8 +67,6 @@ func init() {
 				return nil, fmt.Errorf("net.tcp.server unknown framing method: %s", framingMethodString)
 			}
 
-			outFramer := framer.GetFramer(framingMethodString)
-
 			ipString, err := moduleParams.GetString("ip")
 			if err != nil {
 				if errors.Is(err, params.ErrParamNotFound) {
@@ -82,21 +80,20 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			return &TCPServer{inFramer: inFramer, outFramer: outFramer, framerType: framingMethodString, Addr: addr, config: moduleConfig, logger: CreateLogger(moduleConfig)}, nil
+			return &TCPServer{inFramer: inFramer, framerType: framingMethodString, Addr: addr, config: moduleConfig, logger: CreateLogger(moduleConfig)}, nil
 		},
 	})
 }
 
 type tcpConnection struct {
-	conn   *net.TCPConn
-	framer framer.Framer
+	conn         *net.TCPConn
+	framedWriter *framer.FramedWriter
 }
 
 type TCPServer struct {
 	config                config.ModuleConfig
 	Addr                  *net.TCPAddr
 	inFramer              framer.Framer
-	outFramer             framer.Framer
 	framerType            string
 	ctx                   context.Context
 	router                routing.Router
@@ -113,7 +110,8 @@ type TCPServer struct {
 
 func (ts *TCPServer) handleClient(client *net.TCPConn) {
 	ts.connectionsMu.Lock()
-	ts.connections = append(ts.connections, tcpConnection{conn: client, framer: framer.GetFramer(ts.framerType)})
+	tc := tcpConnection{conn: client, framedWriter: framer.NewFramedWrite(client, framer.GetFramer(ts.framerType))}
+	ts.connections = append(ts.connections, tc)
 	ts.connectionsMu.Unlock()
 	ts.logger.Debug("connection accepted", "remoteAddr", client.RemoteAddr().String())
 	defer func() {
@@ -148,7 +146,9 @@ func (ts *TCPServer) handleClient(client *net.TCPConn) {
 				messages := ts.inFramer.Decode(buffer[0:byteCount])
 				for _, message := range messages {
 					if ts.router != nil {
-						ts.router.HandleInput(ts.ctx, ts.config.Id, message)
+						contextWriter := routing.NewContextWriter(tc.framedWriter)
+						contextWithWriter := context.WithValue(ts.ctx, routing.WriterContextKey, contextWriter)
+						ts.router.HandleInput(contextWithWriter, ts.config.Id, message)
 					} else {
 						ts.logger.Error("input received but no input handler is configured")
 					}
@@ -213,14 +213,8 @@ func (ts *TCPServer) Output(ctx context.Context, payload any) error {
 	defer ts.connectionsMu.Unlock()
 	var errorString strings.Builder
 
-	if ts.outFramer == nil {
-		return errors.New("no output framer configured")
-	}
-
-	outputBytes := ts.outFramer.Encode(payloadBytes)
-
 	for _, connection := range ts.connections {
-		_, err := connection.conn.Write(outputBytes)
+		_, err := connection.framedWriter.Write(payloadBytes)
 		if err != nil {
 			fmt.Fprintf(&errorString, "%s\n", err.Error())
 		}

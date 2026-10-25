@@ -1,5 +1,7 @@
 package framer
 
+import "io"
+
 type Framer interface {
 	Decode([]byte) [][]byte
 	Encode([]byte) []byte
@@ -22,4 +24,21 @@ func GetFramer(framingType string) Framer {
 	default:
 		return nil
 	}
+}
+
+type FramedWriter struct {
+	writer io.Writer
+	framer Framer
+}
+
+func NewFramedWrite(writer io.Writer, framer Framer) *FramedWriter {
+	return &FramedWriter{
+		writer: writer,
+		framer: framer,
+	}
+}
+
+func (fw *FramedWriter) Write(data []byte) (int, error) {
+	encoded := fw.framer.Encode(data)
+	return fw.writer.Write(encoded)
 }
