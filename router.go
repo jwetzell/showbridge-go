@@ -217,7 +217,7 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, inputPayload 
 
 				routeFound.Store(true)
 
-				_, err := routeInstance.ProcessPayload(ctx, routing.WrappedPayload{
+				err := routeInstance.ProcessPayload(ctx, routing.WrappedPayload{
 					Payload: inputPayload,
 					Source:  sourceId,
 					End:     false,

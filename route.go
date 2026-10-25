@@ -20,20 +20,20 @@ func (r *Route) Matches(source string) bool {
 	return r.input == source
 }
 
-func (r *Route) ProcessPayload(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (any, error) {
+func (r *Route) ProcessPayload(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) error {
 	for processorIndex, processor := range r.processors {
 		processedPayload, err := processor.Process(ctx, wrappedPayload, moduleManager, inputHandler)
 		if err != nil {
-			return nil, fmt.Errorf("processor[%d] error: %w", processorIndex, err)
+			return fmt.Errorf("processor[%d] error: %w", processorIndex, err)
 		}
 		// NOTE(jwetzell) payload has been marked as an end without error
 		if processedPayload.End {
-			return processedPayload.Payload, nil
+			return nil
 		}
 		wrappedPayload = processedPayload
 	}
 
-	return wrappedPayload.Payload, nil
+	return nil
 }
 
 func NewRoute(routeDecl config.RouteConfig) (*Route, error) {

@@ -5,6 +5,8 @@ import (
 
 	"github.com/jwetzell/showbridge-go"
 	"github.com/jwetzell/showbridge-go/config"
+	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/routing"
 	"github.com/stretchr/testify/require"
 )
 
@@ -40,6 +42,92 @@ func TestRouteMatches(t *testing.T) {
 			require.NoError(t, err)
 
 			require.Equal(t, tc.expected, route.Matches(tc.source))
+		})
+	}
+}
+
+func TestGoodRouteProcessPayload(t *testing.T) {
+	testCases := []struct {
+		name           string
+		route          config.RouteConfig
+		wrappedPayload routing.WrappedPayload
+		moduleManager  routing.ModuleManager
+		inputHandler   routing.InputHandler
+	}{
+		{
+			name: "no processors",
+			route: config.RouteConfig{
+				Input:      "source1",
+				Processors: []config.ProcessorConfig{},
+			},
+			wrappedPayload: routing.WrappedPayload{
+				Payload: "test",
+				Source:  "source1",
+				End:     false,
+			},
+			moduleManager: nil,
+			inputHandler:  nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			route, err := showbridge.NewRoute(tc.route)
+			require.NoError(t, err)
+
+			err = route.ProcessPayload(
+				t.Context(),
+				tc.wrappedPayload,
+				tc.moduleManager,
+				tc.inputHandler,
+			)
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestBadRouteProcessPayload(t *testing.T) {
+	testCases := []struct {
+		name           string
+		route          config.RouteConfig
+		wrappedPayload routing.WrappedPayload
+		moduleManager  routing.ModuleManager
+		inputHandler   routing.InputHandler
+		expectedError  string
+	}{
+		{
+			name: "processor error",
+			route: config.RouteConfig{
+				Processors: []config.ProcessorConfig{
+					{
+						Type:   "float.parse",
+						Params: params.Params{},
+					},
+				},
+			},
+			wrappedPayload: routing.WrappedPayload{
+				Payload: "test",
+				Source:  "source1",
+				End:     false,
+			},
+			moduleManager: nil,
+			inputHandler:  nil,
+			expectedError: "processor[0] error: strconv.ParseFloat: parsing \"test\": invalid syntax",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			route, err := showbridge.NewRoute(tc.route)
+			require.NoError(t, err)
+
+			err = route.ProcessPayload(
+				t.Context(),
+				tc.wrappedPayload,
+				tc.moduleManager,
+				tc.inputHandler,
+			)
+			require.EqualError(t, err, tc.expectedError)
 		})
 	}
 }

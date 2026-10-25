@@ -12,6 +12,6 @@ type RouteIOError struct {
 }
 
 type Route interface {
-	ProcessPayload(ctx context.Context, wrappedPayload WrappedPayload, moduleManager ModuleManager, inputHandler InputHandler) (any, error)
+	ProcessPayload(ctx context.Context, wrappedPayload WrappedPayload, moduleManager ModuleManager, inputHandler InputHandler) error
 	Matches(source string) bool
 }
