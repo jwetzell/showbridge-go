@@ -49,8 +49,8 @@ github.com/jackc/puddle/v2 v2.2.2 h1:PR8nw+E/1w0GLuRFSmiioY6UooMp6KJv0/61nB7icHo
 github.com/jackc/puddle/v2 v2.2.2/go.mod h1:vriiEXHvEE654aYKXXjOvZM39qJ0q+azkZFrfEOc3H4=
 github.com/jwetzell/artnet-go v0.4.0 h1:qsW6pxgECZTFUd1Znym9YFqLPkcOocJojg5vWDSnZN0=
 github.com/jwetzell/artnet-go v0.4.0/go.mod h1:vuEhrw0u0N5aOCSY3YdLZ3QOyB5HrtUD5Uq/GwsK9g4=
-github.com/jwetzell/free-d-go v0.2.0 h1:8WQW4du8Sf3d18aUzk9n5jZtHE6WdDQHDFjkFffvycc=
-github.com/jwetzell/free-d-go v0.2.0/go.mod h1:yHuRy51NeDfN26eJ6wzZgys8qyQiS7hkYILw8yF+UJ4=
+github.com/jwetzell/free-d-go v0.3.0 h1:QG6JISVO5ukI+/4JbHsE/cRvYYt/JO9dnzRiC7AokrY=
+github.com/jwetzell/free-d-go v0.3.0/go.mod h1:lyHg3nUsggj+KaiLyy2L/i3jpgcddR7AwGr3msU9reA=
 github.com/jwetzell/osc-go v0.7.0 h1:gxw6cc0vRCsYFDHCmYSR4WGM+XPPFMZSoEwjGZlF0k0=
 github.com/jwetzell/osc-go v0.7.0/go.mod h1:20C+7NX52uPlrOV79ZS4r51hsFoxEehwmRl5A1esUic=
 github.com/jwetzell/psn-go v0.3.0 h1:WVpCEmExYE8a+I5hQak5jNJJp2x35VdGX/VuMUKPmhY=

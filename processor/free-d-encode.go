@@ -26,14 +26,14 @@ type FreeDEncode struct {
 
 func (fe *FreeDEncode) Process(ctx context.Context, wrappedPayload payload.WrappedPayload, moduleManager common.ModuleManager, inputHandler common.InputHandler) (payload.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
-	payloadPosition, ok := payload.(freeD.FreeDPosition)
+	payloadPosition, ok := payload.(freeD.Position)
 
 	if !ok {
 		wrappedPayload.End = true
-		return wrappedPayload, errors.New("freed.encode processor only accepts a FreeDPosition")
+		return wrappedPayload, errors.New("freed.encode processor only accepts a FreeD Position")
 	}
 
-	payloadBytes := freeD.Encode(payloadPosition)
+	payloadBytes := payloadPosition.Encode()
 
 	wrappedPayload.Payload = payloadBytes
 	return wrappedPayload, nil
