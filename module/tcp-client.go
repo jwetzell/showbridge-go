@@ -73,23 +73,23 @@ func init() {
 				return nil, fmt.Errorf("net.tcp.client unknown framing method: %s", framingMethodString)
 			}
 
-			outFramer := framer.GetFramer(framingMethodString)
-			return &TCPClient{inFramer: inFramer, outFramer: outFramer, Addr: addr, config: config, logger: CreateLogger(config)}, nil
+			return &TCPClient{inFramer: inFramer, framerType: framingMethodString, Addr: addr, config: config, logger: CreateLogger(config)}, nil
 		},
 	})
 }
 
 type TCPClient struct {
-	config    config.ModuleConfig
-	inFramer  framer.Framer
-	outFramer framer.Framer
-	conn      *net.TCPConn
-	ctx       context.Context
-	router    routing.Router
-	Addr      *net.TCPAddr
-	logger    *slog.Logger
-	cancel    context.CancelFunc
-	connMu    sync.Mutex
+	config          config.ModuleConfig
+	framerType      string
+	inFramer        framer.Framer
+	outFramedWriter *framer.FramedWriter
+	conn            *net.TCPConn
+	ctx             context.Context
+	router          routing.Router
+	Addr            *net.TCPAddr
+	logger          *slog.Logger
+	cancel          context.CancelFunc
+	connMu          sync.Mutex
 }
 
 func (tc *TCPClient) Start(ctx context.Context, router routing.Router) error {
@@ -137,7 +137,9 @@ CONNECT_RETRY:
 					messages := tc.inFramer.Decode(buffer[0:byteCount])
 					for _, message := range messages {
 						if tc.router != nil {
-							tc.router.HandleInput(tc.ctx, tc.config.Id, message)
+							contextWriter := routing.NewContextWriter(tc.outFramedWriter)
+							contextWithWriter := context.WithValue(tc.ctx, routing.WriterContextKey, contextWriter)
+							tc.router.HandleInput(contextWithWriter, tc.config.Id, message)
 						} else {
 							tc.logger.Error("input received but no input handler is configured")
 						}
@@ -156,6 +158,7 @@ func (tc *TCPClient) SetupConn() error {
 	defer tc.connMu.Unlock()
 	client, err := net.DialTCP("tcp", nil, tc.Addr)
 	tc.conn = client
+	tc.outFramedWriter = framer.NewFramedWrite(client, framer.GetFramer(tc.framerType))
 	return err
 }
 
@@ -169,7 +172,7 @@ func (tc *TCPClient) Output(ctx context.Context, payload any) error {
 	if !ok {
 		return errors.New("net.tcp.client is only able to output bytes")
 	}
-	_, err := tc.conn.Write(tc.inFramer.Encode(payloadBytes))
+	_, err := tc.outFramedWriter.Write(payloadBytes)
 	return err
 }
 
@@ -185,9 +188,5 @@ func (tc *TCPClient) Stop() {
 
 	if tc.inFramer != nil {
 		tc.inFramer.Clear()
-	}
-
-	if tc.outFramer != nil {
-		tc.outFramer.Clear()
 	}
 }

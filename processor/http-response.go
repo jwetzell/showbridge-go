@@ -90,13 +90,6 @@ func (hrc *HTTPResponse) Process(ctx context.Context, wrappedPayload routing.Wra
 		return wrappedPayload, errors.New("http.response input must come from a http.server")
 	}
 
-	locked := responseWriter.TryLock()
-	if !locked {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("http.response could not acquire lock on response writer")
-	}
-	defer responseWriter.Unlock()
-
 	if responseWriter.Done() {
 		wrappedPayload.End = true
 		return wrappedPayload, errors.New("http.response response writer has already been written to")
