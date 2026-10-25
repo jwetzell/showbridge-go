@@ -66,7 +66,7 @@ type PubSubPublish struct {
 	module   routing.PubSubModule
 }
 
-func (psp *PubSubPublish) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
+func (psp *PubSubPublish) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	if psp.module == nil {
 		if moduleManager == nil {
 			wrappedPayload.End = true

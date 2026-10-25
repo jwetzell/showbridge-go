@@ -24,7 +24,7 @@ type ArtNetPacketDecode struct {
 	config config.ProcessorConfig
 }
 
-func (apd *ArtNetPacketDecode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
+func (apd *ArtNetPacketDecode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
 

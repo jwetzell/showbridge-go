@@ -60,19 +60,19 @@ func init() {
 }
 
 type UDPMulticast struct {
-	config       config.ModuleConfig
-	conn         *net.UDPConn
-	ctx          context.Context
-	inputHandler routing.InputHandler
-	Addr         *net.UDPAddr
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	connMu       sync.Mutex
+	config config.ModuleConfig
+	conn   *net.UDPConn
+	ctx    context.Context
+	router routing.Router
+	Addr   *net.UDPAddr
+	logger *slog.Logger
+	cancel context.CancelFunc
+	connMu sync.Mutex
 }
 
-func (um *UDPMulticast) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (um *UDPMulticast) Start(ctx context.Context, router routing.Router) error {
 	um.logger.Debug("running")
-	um.inputHandler = inputHandler
+	um.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	um.ctx = moduleContext
 	um.cancel = cancel
@@ -107,8 +107,8 @@ func (um *UDPMulticast) Start(ctx context.Context, inputHandler routing.InputHan
 		if numBytes > 0 {
 			message := buffer[:numBytes]
 
-			if um.inputHandler != nil {
-				um.inputHandler(um.ctx, um.config.Id, message)
+			if um.router != nil {
+				um.router.HandleInput(um.ctx, um.config.Id, message)
 			} else {
 				um.logger.Error("input received but no input handler is configured")
 			}

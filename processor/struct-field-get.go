@@ -44,7 +44,7 @@ type StructFieldGet struct {
 	Name   string
 }
 
-func (sfg *StructFieldGet) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
+func (sfg *StructFieldGet) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	s := reflect.ValueOf(payload)
 

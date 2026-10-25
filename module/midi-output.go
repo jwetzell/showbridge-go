@@ -46,19 +46,19 @@ func init() {
 }
 
 type MIDIOutput struct {
-	config       config.ModuleConfig
-	ctx          context.Context
-	inputHandler routing.InputHandler
-	Port         string
-	sendFunc     func(midi.Message) error
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	sendFuncMu   sync.Mutex
+	config     config.ModuleConfig
+	ctx        context.Context
+	router     routing.Router
+	Port       string
+	sendFunc   func(midi.Message) error
+	logger     *slog.Logger
+	cancel     context.CancelFunc
+	sendFuncMu sync.Mutex
 }
 
-func (mo *MIDIOutput) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (mo *MIDIOutput) Start(ctx context.Context, router routing.Router) error {
 	mo.logger.Debug("running")
-	mo.inputHandler = inputHandler
+	mo.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	mo.ctx = moduleContext
 	mo.cancel = cancel

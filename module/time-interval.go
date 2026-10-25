@@ -40,18 +40,18 @@ func init() {
 }
 
 type TimeInterval struct {
-	config       config.ModuleConfig
-	Duration     uint32
-	ctx          context.Context
-	inputHandler routing.InputHandler
-	ticker       *time.Ticker
-	logger       *slog.Logger
-	cancel       context.CancelFunc
+	config   config.ModuleConfig
+	Duration uint32
+	ctx      context.Context
+	router   routing.Router
+	ticker   *time.Ticker
+	logger   *slog.Logger
+	cancel   context.CancelFunc
 }
 
-func (i *TimeInterval) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (i *TimeInterval) Start(ctx context.Context, router routing.Router) error {
 	i.logger.Debug("running")
-	i.inputHandler = inputHandler
+	i.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	i.ctx = moduleContext
 	i.cancel = cancel
@@ -62,8 +62,8 @@ func (i *TimeInterval) Start(ctx context.Context, inputHandler routing.InputHand
 	for i.ctx.Err() == nil {
 		select {
 		case <-ticker.C:
-			if i.inputHandler != nil {
-				i.inputHandler(i.ctx, i.config.Id, time.Now())
+			if i.router != nil {
+				i.router.HandleInput(i.ctx, i.config.Id, time.Now())
 			}
 		default:
 			continue

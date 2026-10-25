@@ -46,19 +46,19 @@ func init() {
 }
 
 type MySQLClient struct {
-	config       config.ModuleConfig
-	Dsn          string
-	ctx          context.Context
-	inputHandler routing.InputHandler
-	db           *sql.DB
-	logger       *slog.Logger
-	dbMu         sync.Mutex
-	cancel       context.CancelFunc
+	config config.ModuleConfig
+	Dsn    string
+	ctx    context.Context
+	router routing.Router
+	db     *sql.DB
+	logger *slog.Logger
+	dbMu   sync.Mutex
+	cancel context.CancelFunc
 }
 
-func (mc *MySQLClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (mc *MySQLClient) Start(ctx context.Context, router routing.Router) error {
 	mc.logger.Debug("running")
-	mc.inputHandler = inputHandler
+	mc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	mc.ctx = moduleContext
 	mc.cancel = cancel

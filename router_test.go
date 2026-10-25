@@ -25,12 +25,12 @@ func init() {
 }
 
 type MockCounterModule struct {
-	config       config.ModuleConfig
-	ctx          context.Context
-	outputCount  int
-	inputHandler routing.InputHandler
-	logger       *slog.Logger
-	cancel       context.CancelFunc
+	config      config.ModuleConfig
+	ctx         context.Context
+	outputCount int
+	router      routing.Router
+	logger      *slog.Logger
+	cancel      context.CancelFunc
 }
 
 func (mcm *MockCounterModule) Output(context.Context, any) error {
@@ -38,8 +38,8 @@ func (mcm *MockCounterModule) Output(context.Context, any) error {
 	return nil
 }
 
-func (mcm *MockCounterModule) Start(ctx context.Context, inputHandler routing.InputHandler) error {
-	mcm.inputHandler = inputHandler
+func (mcm *MockCounterModule) Start(ctx context.Context, router routing.Router) error {
+	mcm.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	mcm.ctx = moduleContext
 	mcm.cancel = cancel

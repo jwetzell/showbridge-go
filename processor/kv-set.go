@@ -59,7 +59,7 @@ type KVSet struct {
 	module   routing.KeyValueModule
 }
 
-func (kvs *KVSet) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
+func (kvs *KVSet) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	if kvs.module == nil {
 		if moduleManager == nil {
 			wrappedPayload.End = true

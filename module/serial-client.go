@@ -80,17 +80,17 @@ func init() {
 }
 
 type SerialClient struct {
-	config       config.ModuleConfig
-	ctx          context.Context
-	inputHandler routing.InputHandler
-	Port         string
-	inFramer     framer.Framer
-	outFramer    framer.Framer
-	Mode         *serial.Mode
-	port         serial.Port
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	portMu       sync.Mutex
+	config    config.ModuleConfig
+	ctx       context.Context
+	router    routing.Router
+	Port      string
+	inFramer  framer.Framer
+	outFramer framer.Framer
+	Mode      *serial.Mode
+	port      serial.Port
+	logger    *slog.Logger
+	cancel    context.CancelFunc
+	portMu    sync.Mutex
 }
 
 func (sc *SerialClient) SetupPort() error {
@@ -106,9 +106,9 @@ func (sc *SerialClient) SetupPort() error {
 	return nil
 }
 
-func (sc *SerialClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (sc *SerialClient) Start(ctx context.Context, router routing.Router) error {
 	sc.logger.Debug("running")
-	sc.inputHandler = inputHandler
+	sc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	sc.ctx = moduleContext
 	sc.cancel = cancel
@@ -146,8 +146,8 @@ func (sc *SerialClient) Start(ctx context.Context, inputHandler routing.InputHan
 						if byteCount > 0 {
 							messages := sc.inFramer.Decode(buffer[0:byteCount])
 							for _, message := range messages {
-								if sc.inputHandler != nil {
-									sc.inputHandler(sc.ctx, sc.config.Id, message)
+								if sc.router != nil {
+									sc.router.HandleInput(sc.ctx, sc.config.Id, message)
 								} else {
 									sc.logger.Error("input received but no router is configured")
 								}

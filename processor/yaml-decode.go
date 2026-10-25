@@ -24,7 +24,7 @@ type YamlDecode struct {
 	config config.ProcessorConfig
 }
 
-func (jd *YamlDecode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
+func (jd *YamlDecode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 
 	payloadBytes, ok := params.GetAnyAsByteSlice(payload)

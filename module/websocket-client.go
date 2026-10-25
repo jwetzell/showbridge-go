@@ -54,14 +54,14 @@ func init() {
 }
 
 type WebSocketClient struct {
-	config       config.ModuleConfig
-	URL          url.URL
-	ctx          context.Context
-	conn         *websocket.Conn
-	inputHandler routing.InputHandler
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	connMu       sync.Mutex
+	config config.ModuleConfig
+	URL    url.URL
+	ctx    context.Context
+	conn   *websocket.Conn
+	router routing.Router
+	logger *slog.Logger
+	cancel context.CancelFunc
+	connMu sync.Mutex
 }
 
 func (wc *WebSocketClient) SetupConn() error {
@@ -95,9 +95,9 @@ func (wc *WebSocketClient) SetupConn() error {
 	return err
 }
 
-func (wc *WebSocketClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (wc *WebSocketClient) Start(ctx context.Context, router routing.Router) error {
 	wc.logger.Debug("running")
-	wc.inputHandler = inputHandler
+	wc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	wc.ctx = moduleContext
 	wc.cancel = cancel
@@ -130,7 +130,7 @@ func (wc *WebSocketClient) readLoop() {
 		if err != nil {
 			return
 		}
-		if wc.inputHandler != nil {
+		if wc.router != nil {
 			switch messageType {
 			case websocket.CloseMessage:
 				return
@@ -141,9 +141,9 @@ func (wc *WebSocketClient) readLoop() {
 					return
 				}
 			case websocket.TextMessage:
-				wc.inputHandler(wc.ctx, wc.config.Id, string(message))
+				wc.router.HandleInput(wc.ctx, wc.config.Id, string(message))
 			case websocket.BinaryMessage:
-				wc.inputHandler(wc.ctx, wc.config.Id, message)
+				wc.router.HandleInput(wc.ctx, wc.config.Id, message)
 			default:
 				wc.logger.Warn("unsupported message type received", "messageType", messageType)
 			}

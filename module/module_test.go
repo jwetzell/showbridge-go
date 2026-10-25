@@ -19,7 +19,7 @@ type TestModule struct {
 	id string
 }
 
-func (m *TestModule) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (m *TestModule) Start(ctx context.Context, router routing.Router) error {
 	<-ctx.Done()
 	return nil
 }

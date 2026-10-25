@@ -45,19 +45,19 @@ func init() {
 }
 
 type PostgresClient struct {
-	config       config.ModuleConfig
-	Url          string
-	ctx          context.Context
-	inputHandler routing.InputHandler
-	db           *sql.DB
-	logger       *slog.Logger
-	dbMu         sync.Mutex
-	cancel       context.CancelFunc
+	config config.ModuleConfig
+	Url    string
+	ctx    context.Context
+	router routing.Router
+	db     *sql.DB
+	logger *slog.Logger
+	dbMu   sync.Mutex
+	cancel context.CancelFunc
 }
 
-func (pc *PostgresClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (pc *PostgresClient) Start(ctx context.Context, router routing.Router) error {
 	pc.logger.Debug("running")
-	pc.inputHandler = inputHandler
+	pc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	pc.ctx = moduleContext
 	pc.cancel = cancel

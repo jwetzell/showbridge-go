@@ -5,5 +5,5 @@ import (
 )
 
 type Processor interface {
-	Process(context.Context, WrappedPayload, ModuleManager, InputHandler) (WrappedPayload, error)
+	Process(context.Context, WrappedPayload, ModuleManager, Router) (WrappedPayload, error)
 }

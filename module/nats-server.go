@@ -72,20 +72,20 @@ func init() {
 }
 
 type NATSServer struct {
-	config       config.ModuleConfig
-	ctx          context.Context
-	Ip           string
-	Port         int
-	inputHandler routing.InputHandler
-	server       *server.Server
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	serverMu     sync.Mutex
+	config   config.ModuleConfig
+	ctx      context.Context
+	Ip       string
+	Port     int
+	router   routing.Router
+	server   *server.Server
+	logger   *slog.Logger
+	cancel   context.CancelFunc
+	serverMu sync.Mutex
 }
 
-func (ns *NATSServer) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (ns *NATSServer) Start(ctx context.Context, router routing.Router) error {
 	ns.logger.Debug("running")
-	ns.inputHandler = inputHandler
+	ns.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	ns.ctx = moduleContext
 	ns.cancel = cancel

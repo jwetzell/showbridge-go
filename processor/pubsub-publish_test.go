@@ -21,7 +21,7 @@ type TestPubSubModule struct {
 	id string
 }
 
-func (m *TestPubSubModule) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (m *TestPubSubModule) Start(ctx context.Context, router routing.Router) error {
 	<-ctx.Done()
 	return nil
 }

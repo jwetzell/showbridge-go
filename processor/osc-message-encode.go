@@ -24,7 +24,7 @@ func init() {
 	})
 }
 
-func (ome *OSCMessageEncode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
+func (ome *OSCMessageEncode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadMessage, ok := payload.(*osc.Message)
 

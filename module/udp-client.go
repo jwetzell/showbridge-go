@@ -59,21 +59,21 @@ func init() {
 }
 
 type UDPClient struct {
-	config       config.ModuleConfig
-	Addr         *net.UDPAddr
-	Port         uint16
-	conn         *net.UDPConn
-	ctx          context.Context
-	inputHandler routing.InputHandler
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	mu           sync.Mutex
+	config config.ModuleConfig
+	Addr   *net.UDPAddr
+	Port   uint16
+	conn   *net.UDPConn
+	ctx    context.Context
+	router routing.Router
+	logger *slog.Logger
+	cancel context.CancelFunc
+	mu     sync.Mutex
 }
 
-func (uc *UDPClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (uc *UDPClient) Start(ctx context.Context, router routing.Router) error {
 	uc.logger.Debug("running")
 	uc.mu.Lock()
-	uc.inputHandler = inputHandler
+	uc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	uc.ctx = moduleContext
 	uc.cancel = cancel

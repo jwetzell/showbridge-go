@@ -56,7 +56,7 @@ type OsReadFile struct {
 	config       config.ProcessorConfig
 }
 
-func (orf *OsReadFile) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
+func (orf *OsReadFile) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	templateData := wrappedPayload
 
 	var pathBuffer bytes.Buffer

@@ -93,7 +93,7 @@ type MIDINoteOnCreate struct {
 	Velocity *template.Template
 }
 
-func (mnoc *MIDINoteOnCreate) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
+func (mnoc *MIDINoteOnCreate) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	templateData := wrappedPayload
 
 	var channelBuffer bytes.Buffer

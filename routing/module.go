@@ -6,7 +6,7 @@ import (
 )
 
 type Module interface {
-	Start(context.Context, InputHandler) error
+	Start(context.Context, Router) error
 	Stop()
 }
 

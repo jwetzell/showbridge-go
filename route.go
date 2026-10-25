@@ -20,9 +20,9 @@ func (r *Route) Matches(source string) bool {
 	return r.input == source
 }
 
-func (r *Route) ProcessPayload(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) error {
+func (r *Route) ProcessPayload(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) error {
 	for processorIndex, processor := range r.processors {
-		processedPayload, err := processor.Process(ctx, wrappedPayload, moduleManager, inputHandler)
+		processedPayload, err := processor.Process(ctx, wrappedPayload, moduleManager, router)
 		if err != nil {
 			return fmt.Errorf("processor[%d] error: %w", processorIndex, err)
 		}

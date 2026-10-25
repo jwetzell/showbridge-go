@@ -49,7 +49,7 @@ type ModuleOutput struct {
 	module   routing.OutputModule
 }
 
-func (mo *ModuleOutput) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
+func (mo *ModuleOutput) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
 	if mo.module == nil {
 		if moduleManager == nil {

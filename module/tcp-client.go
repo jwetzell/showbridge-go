@@ -80,21 +80,21 @@ func init() {
 }
 
 type TCPClient struct {
-	config       config.ModuleConfig
-	inFramer     framer.Framer
-	outFramer    framer.Framer
-	conn         *net.TCPConn
-	ctx          context.Context
-	inputHandler routing.InputHandler
-	Addr         *net.TCPAddr
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	connMu       sync.Mutex
+	config    config.ModuleConfig
+	inFramer  framer.Framer
+	outFramer framer.Framer
+	conn      *net.TCPConn
+	ctx       context.Context
+	router    routing.Router
+	Addr      *net.TCPAddr
+	logger    *slog.Logger
+	cancel    context.CancelFunc
+	connMu    sync.Mutex
 }
 
-func (tc *TCPClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (tc *TCPClient) Start(ctx context.Context, router routing.Router) error {
 	tc.logger.Debug("running")
-	tc.inputHandler = inputHandler
+	tc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	tc.ctx = moduleContext
 	tc.cancel = cancel
@@ -136,8 +136,8 @@ CONNECT_RETRY:
 				if byteCount > 0 {
 					messages := tc.inFramer.Decode(buffer[0:byteCount])
 					for _, message := range messages {
-						if tc.inputHandler != nil {
-							tc.inputHandler(tc.ctx, tc.config.Id, message)
+						if tc.router != nil {
+							tc.router.HandleInput(tc.ctx, tc.config.Id, message)
 						} else {
 							tc.logger.Error("input received but no input handler is configured")
 						}

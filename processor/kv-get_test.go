@@ -22,7 +22,7 @@ type TestKVModule struct {
 	kvData map[string]any
 }
 
-func (m *TestKVModule) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (m *TestKVModule) Start(ctx context.Context, router routing.Router) error {
 	<-ctx.Done()
 	return nil
 }

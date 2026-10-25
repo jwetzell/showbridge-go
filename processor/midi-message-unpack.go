@@ -55,7 +55,7 @@ type MIDIPitchBend struct {
 	Absolute uint16
 }
 
-func (mmu *MIDIMessageUnpack) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
+func (mmu *MIDIMessageUnpack) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadMidi, ok := payload.(midi.Message)
 

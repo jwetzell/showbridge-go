@@ -53,22 +53,22 @@ func init() {
 }
 
 type NATSClient struct {
-	config       config.ModuleConfig
-	ctx          context.Context
-	inputHandler routing.InputHandler
-	URL          string
-	Subject      string
-	client       *nats.Conn
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	sub          *nats.Subscription
-	subMu        sync.Mutex
-	clientMu     sync.Mutex
+	config   config.ModuleConfig
+	ctx      context.Context
+	router   routing.Router
+	URL      string
+	Subject  string
+	client   *nats.Conn
+	logger   *slog.Logger
+	cancel   context.CancelFunc
+	sub      *nats.Subscription
+	subMu    sync.Mutex
+	clientMu sync.Mutex
 }
 
-func (nc *NATSClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (nc *NATSClient) Start(ctx context.Context, router routing.Router) error {
 	nc.logger.Debug("running")
-	nc.inputHandler = inputHandler
+	nc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	nc.ctx = moduleContext
 	nc.cancel = cancel
@@ -84,8 +84,8 @@ func (nc *NATSClient) Start(ctx context.Context, inputHandler routing.InputHandl
 	nc.clientMu.Unlock()
 
 	sub, err := nc.client.Subscribe(nc.Subject, func(msg *nats.Msg) {
-		if nc.inputHandler != nil {
-			nc.inputHandler(nc.ctx, nc.config.Id, msg)
+		if nc.router != nil {
+			nc.router.HandleInput(nc.ctx, nc.config.Id, msg)
 		}
 	})
 

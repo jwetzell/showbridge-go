@@ -23,7 +23,7 @@ type FilterChange struct {
 	previous any
 }
 
-func (fc *FilterChange) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
+func (fc *FilterChange) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 
 	if reflect.DeepEqual(payload, fc.previous) {

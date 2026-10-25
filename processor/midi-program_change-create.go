@@ -75,7 +75,7 @@ type MIDIProgramChangeCreate struct {
 	Program *template.Template
 }
 
-func (mpcc *MIDIProgramChangeCreate) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
+func (mpcc *MIDIProgramChangeCreate) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	templateData := wrappedPayload
 
 	var channelBuffer bytes.Buffer

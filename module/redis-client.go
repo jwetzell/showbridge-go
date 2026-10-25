@@ -55,15 +55,15 @@ func init() {
 }
 
 type RedisClient struct {
-	config       config.ModuleConfig
-	ctx          context.Context
-	inputHandler routing.InputHandler
-	Host         string
-	Port         uint16
-	client       *redis.Client
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	clientMu     sync.Mutex
+	config   config.ModuleConfig
+	ctx      context.Context
+	router   routing.Router
+	Host     string
+	Port     uint16
+	client   *redis.Client
+	logger   *slog.Logger
+	cancel   context.CancelFunc
+	clientMu sync.Mutex
 }
 
 func (rc *RedisClient) Printf(ctx context.Context, format string, v ...any) {
@@ -71,10 +71,10 @@ func (rc *RedisClient) Printf(ctx context.Context, format string, v ...any) {
 	rc.logger.Debug(msg)
 }
 
-func (rc *RedisClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (rc *RedisClient) Start(ctx context.Context, router routing.Router) error {
 	redis.SetLogger(rc)
 	rc.logger.Debug("running")
-	rc.inputHandler = inputHandler
+	rc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	rc.ctx = moduleContext
 	rc.cancel = cancel

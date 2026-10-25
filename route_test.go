@@ -127,7 +127,7 @@ func TestGoodRouteProcessPayload(t *testing.T) {
 		route          config.RouteConfig
 		wrappedPayload routing.WrappedPayload
 		moduleManager  routing.ModuleManager
-		inputHandler   routing.InputHandler
+		router         routing.Router
 	}{
 		{
 			name: "no processors",
@@ -141,7 +141,7 @@ func TestGoodRouteProcessPayload(t *testing.T) {
 				End:     false,
 			},
 			moduleManager: nil,
-			inputHandler:  nil,
+			router:        nil,
 		},
 		{
 			name: "single processor run to end",
@@ -160,7 +160,7 @@ func TestGoodRouteProcessPayload(t *testing.T) {
 				End:     false,
 			},
 			moduleManager: nil,
-			inputHandler:  nil,
+			router:        nil,
 		},
 		{
 			name: "single processor stop early",
@@ -185,7 +185,7 @@ func TestGoodRouteProcessPayload(t *testing.T) {
 				End:     false,
 			},
 			moduleManager: nil,
-			inputHandler:  nil,
+			router:        nil,
 		},
 	}
 
@@ -198,7 +198,7 @@ func TestGoodRouteProcessPayload(t *testing.T) {
 				t.Context(),
 				tc.wrappedPayload,
 				tc.moduleManager,
-				tc.inputHandler,
+				tc.router,
 			)
 			require.NoError(t, err)
 		})
@@ -211,7 +211,7 @@ func TestBadRouteProcessPayload(t *testing.T) {
 		route          config.RouteConfig
 		wrappedPayload routing.WrappedPayload
 		moduleManager  routing.ModuleManager
-		inputHandler   routing.InputHandler
+		router         routing.Router
 		expectedError  string
 	}{
 		{
@@ -230,7 +230,7 @@ func TestBadRouteProcessPayload(t *testing.T) {
 				End:     false,
 			},
 			moduleManager: nil,
-			inputHandler:  nil,
+			router:        nil,
 			expectedError: "processor[0] error: strconv.ParseFloat: parsing \"test\": invalid syntax",
 		},
 	}
@@ -244,7 +244,7 @@ func TestBadRouteProcessPayload(t *testing.T) {
 				t.Context(),
 				tc.wrappedPayload,
 				tc.moduleManager,
-				tc.inputHandler,
+				tc.router,
 			)
 			require.EqualError(t, err, tc.expectedError)
 		})

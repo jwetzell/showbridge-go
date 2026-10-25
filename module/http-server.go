@@ -45,14 +45,14 @@ func init() {
 }
 
 type HTTPServer struct {
-	config       config.ModuleConfig
-	Port         uint16
-	ctx          context.Context
-	inputHandler routing.InputHandler
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	server       *http.Server
-	serverMu     sync.Mutex
+	config   config.ModuleConfig
+	Port     uint16
+	ctx      context.Context
+	router   routing.Router
+	logger   *slog.Logger
+	cancel   context.CancelFunc
+	server   *http.Server
+	serverMu sync.Mutex
 }
 
 type ResponseIOError struct {
@@ -73,9 +73,9 @@ func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Message: "routing successful",
 		Status:  "ok",
 	}
-	if hs.inputHandler != nil {
+	if hs.router != nil {
 		inputContext := context.WithValue(hs.ctx, routing.HttpServerResponseContextKey, responseWriter)
-		aRouteFound, routingErrors := hs.inputHandler(inputContext, hs.config.Id, r)
+		aRouteFound, routingErrors := hs.router.HandleInput(inputContext, hs.config.Id, r)
 		if !responseWriter.Done() {
 			if aRouteFound {
 				if routingErrors != nil {
@@ -122,9 +122,9 @@ func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (hs *HTTPServer) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (hs *HTTPServer) Start(ctx context.Context, router routing.Router) error {
 	hs.logger.Debug("running")
-	hs.inputHandler = inputHandler
+	hs.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	hs.ctx = moduleContext
 	hs.cancel = cancel

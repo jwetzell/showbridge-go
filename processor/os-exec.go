@@ -83,7 +83,7 @@ type OsExec struct {
 	Args            []*template.Template
 }
 
-func (oe *OsExec) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
+func (oe *OsExec) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	templateData := wrappedPayload
 
 	var commandBuffer bytes.Buffer

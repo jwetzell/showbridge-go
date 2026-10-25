@@ -50,19 +50,19 @@ func TestGoodRouterInput(t *testing.T) {
 
 func TestBadRouterInput(t *testing.T) {
 	testCases := []struct {
-		name         string
-		params       map[string]any
-		payload      any
-		inputHandler routing.InputHandler
-		errorString  string
+		name        string
+		params      map[string]any
+		payload     any
+		router      routing.Router
+		errorString string
 	}{
 		{
 			name:    "no source param",
 			params:  map[string]any{},
 			payload: "test",
-			inputHandler: func(ctx context.Context, sourceId string, payload any) (bool, []routing.RouteIOError) {
+			router: NewTestRouter(func(ctx context.Context, sourceId string, payload any) (bool, []routing.RouteIOError) {
 				return false, nil
-			},
+			}),
 			errorString: "router.input source error: not found",
 		},
 		{
@@ -71,9 +71,9 @@ func TestBadRouterInput(t *testing.T) {
 				"source": 123,
 			},
 			payload: "test",
-			inputHandler: func(ctx context.Context, sourceId string, payload any) (bool, []routing.RouteIOError) {
+			router: NewTestRouter(func(ctx context.Context, sourceId string, payload any) (bool, []routing.RouteIOError) {
 				return false, nil
-			},
+			}),
 			errorString: "router.input source error: not a string",
 		},
 		{
@@ -81,9 +81,9 @@ func TestBadRouterInput(t *testing.T) {
 			params: map[string]any{
 				"source": "test",
 			},
-			payload:      "test",
-			inputHandler: nil,
-			errorString:  "router.input no input handler found",
+			payload:     "test",
+			router:      nil,
+			errorString: "router.input no input handler found",
 		},
 	}
 
@@ -107,7 +107,7 @@ func TestBadRouterInput(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, testCase.inputHandler)
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, testCase.router)
 
 			if err == nil {
 				t.Fatalf("router.input expected to fail but succeeded, got: %v", got)

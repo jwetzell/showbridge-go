@@ -49,7 +49,7 @@ type StringCreate struct {
 	Template *template.Template
 }
 
-func (sc *StringCreate) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
+func (sc *StringCreate) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	templateData := wrappedPayload
 
 	var templateBuffer bytes.Buffer

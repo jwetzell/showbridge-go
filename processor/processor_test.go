@@ -20,7 +20,7 @@ type TestProcessor struct {
 	Config config.ProcessorConfig
 }
 
-func (p *TestProcessor) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
+func (p *TestProcessor) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	return wrappedPayload, nil
 }
 
@@ -61,6 +61,20 @@ func (t TestStruct) Void() {}
 
 func (t TestStruct) MultipleReturnValues() (string, int) {
 	return t.String, t.Int
+}
+
+type TestRouter struct {
+	handler func(ctx context.Context, sourceId string, payload any) (bool, []routing.RouteIOError)
+}
+
+func (r *TestRouter) HandleInput(ctx context.Context, sourceId string, payload any) (bool, []routing.RouteIOError) {
+	return r.handler(ctx, sourceId, payload)
+}
+
+func NewTestRouter(handler func(ctx context.Context, sourceId string, payload any) (bool, []routing.RouteIOError)) *TestRouter {
+	return &TestRouter{
+		handler: handler,
+	}
 }
 
 func TestProcessorBadRegistrationNoType(t *testing.T) {

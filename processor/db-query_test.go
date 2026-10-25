@@ -23,7 +23,7 @@ type TestDBModule struct {
 	db *sql.DB
 }
 
-func (m *TestDBModule) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (m *TestDBModule) Start(ctx context.Context, router routing.Router) error {
 	<-ctx.Done()
 	return nil
 }

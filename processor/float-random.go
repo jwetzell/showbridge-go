@@ -83,7 +83,7 @@ type FloatRandom struct {
 	config  config.ProcessorConfig
 }
 
-func (fr *FloatRandom) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
+func (fr *FloatRandom) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	if fr.BitSize == 32 {
 		payloadFloat := rand.Float32()*(float32(fr.Max)-float32(fr.Min)) + float32(fr.Min)
 		wrappedPayload.Payload = payloadFloat

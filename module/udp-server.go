@@ -83,20 +83,20 @@ func init() {
 }
 
 type UDPServer struct {
-	Addr         *net.UDPAddr
-	BufferSize   int
-	config       config.ModuleConfig
-	ctx          context.Context
-	inputHandler routing.InputHandler
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	listener     *net.UDPConn
-	listenerMu   sync.Mutex
+	Addr       *net.UDPAddr
+	BufferSize int
+	config     config.ModuleConfig
+	ctx        context.Context
+	router     routing.Router
+	logger     *slog.Logger
+	cancel     context.CancelFunc
+	listener   *net.UDPConn
+	listenerMu sync.Mutex
 }
 
-func (us *UDPServer) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (us *UDPServer) Start(ctx context.Context, router routing.Router) error {
 	us.logger.Debug("running")
-	us.inputHandler = inputHandler
+	us.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	us.ctx = moduleContext
 	us.cancel = cancel
@@ -123,8 +123,8 @@ func (us *UDPServer) Start(ctx context.Context, inputHandler routing.InputHandle
 			break
 		}
 		message := buffer[:numBytes]
-		if us.inputHandler != nil {
-			us.inputHandler(us.ctx, us.config.Id, message)
+		if us.router != nil {
+			us.router.HandleInput(us.ctx, us.config.Id, message)
 		} else {
 			us.logger.Error("input received but no input handler is configured")
 		}

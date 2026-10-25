@@ -42,18 +42,18 @@ func init() {
 }
 
 type TimeCron struct {
-	config       config.ModuleConfig
-	CronString   string
-	ctx          context.Context
-	inputHandler routing.InputHandler
-	logger       *slog.Logger
-	cancel       context.CancelFunc
-	cron         *cron.Cron
+	config     config.ModuleConfig
+	CronString string
+	ctx        context.Context
+	router     routing.Router
+	logger     *slog.Logger
+	cancel     context.CancelFunc
+	cron       *cron.Cron
 }
 
-func (t *TimeCron) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (t *TimeCron) Start(ctx context.Context, router routing.Router) error {
 	t.logger.Debug("running")
-	t.inputHandler = inputHandler
+	t.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	t.ctx = moduleContext
 	t.cancel = cancel
@@ -61,8 +61,8 @@ func (t *TimeCron) Start(ctx context.Context, inputHandler routing.InputHandler)
 	t.cron = cron.New()
 
 	t.cron.AddFunc(t.CronString, func() {
-		if t.inputHandler != nil {
-			t.inputHandler(t.ctx, t.config.Id, time.Now())
+		if t.router != nil {
+			t.router.HandleInput(t.ctx, t.config.Id, time.Now())
 		}
 	})
 	t.cron.Start()

@@ -45,19 +45,19 @@ func init() {
 }
 
 type SqliteClient struct {
-	config       config.ModuleConfig
-	Dsn          string
-	ctx          context.Context
-	inputHandler routing.InputHandler
-	db           *sql.DB
-	logger       *slog.Logger
-	dbMu         sync.Mutex
-	cancel       context.CancelFunc
+	config config.ModuleConfig
+	Dsn    string
+	ctx    context.Context
+	router routing.Router
+	db     *sql.DB
+	logger *slog.Logger
+	dbMu   sync.Mutex
+	cancel context.CancelFunc
 }
 
-func (sc *SqliteClient) Start(ctx context.Context, inputHandler routing.InputHandler) error {
+func (sc *SqliteClient) Start(ctx context.Context, router routing.Router) error {
 	sc.logger.Debug("running")
-	sc.inputHandler = inputHandler
+	sc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	sc.ctx = moduleContext
 	sc.cancel = cancel

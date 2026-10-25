@@ -58,7 +58,7 @@ type KVGet struct {
 	module   routing.KeyValueModule
 }
 
-func (kvg *KVGet) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, inputHandler routing.InputHandler) (routing.WrappedPayload, error) {
+func (kvg *KVGet) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	if kvg.module == nil {
 		if moduleManager == nil {
 			wrappedPayload.End = true
