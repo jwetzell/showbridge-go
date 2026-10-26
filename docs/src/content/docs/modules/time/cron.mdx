@@ -1,0 +1,21 @@
+---
+title: Cron
+sidebar:
+  label: Cron
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+Triggers events based on the specified cron schedule
+
+<SchemaInfo type="module" id="time.cron"/>
+
+### Example
+
+Trigger at the top of every hour
+
+```yaml
+- id: cronJob
+  type: time.cron
+  params:
+    cron: "0 * * * *"
+```
