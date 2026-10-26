@@ -89,7 +89,10 @@ func (mc *MySQLClient) Stop() {
 	mc.dbMu.Lock()
 	defer mc.dbMu.Unlock()
 	if mc.db != nil {
-		mc.db.Close()
+		err := mc.db.Close()
+		if err != nil {
+			mc.logger.Error("mysql.client close error", "error", err)
+		}
 	}
 }
 

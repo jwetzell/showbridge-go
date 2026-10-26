@@ -116,7 +116,11 @@ CONNECT_RETRY:
 
 	READ:
 		for tc.ctx.Err() == nil {
-			tc.conn.SetReadDeadline(time.Now().Add(time.Millisecond * 200))
+			err := tc.conn.SetReadDeadline(time.Now().Add(time.Millisecond * 200))
+			if err != nil {
+				tc.logger.Error("tcp client set read deadline error", "error", err)
+				continue
+			}
 			byteCount, err := tc.conn.Read(buffer)
 
 			if err != nil {
@@ -184,7 +188,10 @@ func (tc *TCPClient) Stop() {
 	tc.connMu.Lock()
 	defer tc.connMu.Unlock()
 	if tc.conn != nil {
-		tc.conn.Close()
+		err := tc.conn.Close()
+		if err != nil {
+			tc.logger.Error("tcp client close error", "error", err)
+		}
 	}
 
 	if tc.inFramer != nil {

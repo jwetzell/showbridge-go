@@ -118,6 +118,9 @@ func (uc *UDPClient) Stop() {
 		defer uc.cancel()
 	}
 	if uc.conn != nil {
-		uc.conn.Close()
+		err := uc.conn.Close()
+		if err != nil {
+			uc.logger.Error("udp client close error", "error", err)
+		}
 	}
 }

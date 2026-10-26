@@ -137,13 +137,19 @@ func (nc *NATSClient) Stop() {
 	nc.subMu.Lock()
 	defer nc.subMu.Unlock()
 	if nc.sub != nil {
-		nc.sub.Unsubscribe()
+		err := nc.sub.Unsubscribe()
+		if err != nil {
+			nc.logger.Error("nats client unsubscribe error", "error", err)
+		}
 	}
 
 	nc.clientMu.Lock()
 	defer nc.clientMu.Unlock()
 	if nc.client != nil {
-		nc.client.Drain()
+		err := nc.client.Drain()
+		if err != nil {
+			nc.logger.Error("nats client drain error", "error", err)
+		}
 		// TODO(jwetzell): setup closed callback to get when client is fully closed
 		nc.client.Close()
 	}

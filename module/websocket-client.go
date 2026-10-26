@@ -69,7 +69,10 @@ func (wc *WebSocketClient) SetupConn() error {
 	wc.connMu.Lock()
 	defer wc.connMu.Unlock()
 	if wc.conn != nil {
-		wc.conn.Close()
+		err := wc.conn.Close()
+		if err != nil {
+			wc.logger.Error("websocket client close error", "error", err)
+		}
 	}
 	conn, _, err := websocket.DefaultDialer.Dial(wc.URL.String(), nil)
 
@@ -87,7 +90,10 @@ func (wc *WebSocketClient) SetupConn() error {
 		wc.connMu.Lock()
 		defer wc.connMu.Unlock()
 		if wc.conn != nil {
-			wc.conn.Close()
+			err := wc.conn.Close()
+			if err != nil {
+				wc.logger.Error("websocket client close error", "error", err)
+			}
 		}
 		return err
 	})
@@ -126,7 +132,11 @@ func (wc *WebSocketClient) readLoop() {
 			return
 		}
 		// TODO(jwetzell): other ways to timeout?
-		wc.conn.SetReadDeadline(time.Now().Add(5 * time.Second))
+		err := wc.conn.SetReadDeadline(time.Now().Add(5 * time.Second))
+		if err != nil {
+			wc.logger.Error("websocket set read deadline error", "error", err)
+			return
+		}
 		messageType, message, err := wc.conn.ReadMessage()
 		if err != nil {
 			return
@@ -206,6 +216,9 @@ func (wc *WebSocketClient) Stop() {
 		if err != nil {
 			wc.logger.Error("websocket close error", "error", err)
 		}
-		wc.conn.Close()
+		err = wc.conn.Close()
+		if err != nil {
+			wc.logger.Error("websocket close error", "error", err)
+		}
 	}
 }

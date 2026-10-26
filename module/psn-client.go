@@ -62,7 +62,11 @@ func (pc *PSNClient) Start(ctx context.Context, router routing.Router) error {
 			return nil
 		default:
 			pc.connMu.Lock()
-			pc.conn.SetDeadline(time.Now().Add(time.Millisecond * 200))
+			err := pc.conn.SetDeadline(time.Now().Add(time.Millisecond * 200))
+			if err != nil {
+				pc.logger.Error("psn client set deadline error", "error", err)
+				continue
+			}
 
 			numBytes, _, err := pc.conn.ReadFromUDP(buffer)
 			pc.connMu.Unlock()
@@ -105,6 +109,9 @@ func (pc *PSNClient) Stop() {
 	pc.connMu.Lock()
 	defer pc.connMu.Unlock()
 	if pc.conn != nil {
-		pc.conn.Close()
+		err := pc.conn.Close()
+		if err != nil {
+			pc.logger.Error("psn client close error", "error", err)
+		}
 	}
 }

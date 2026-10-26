@@ -17,26 +17,31 @@ func main() {
 		return
 	}
 	schemaType := os.Args[1]
+	var err error
 	switch schemaType {
 	case "processors":
-		outputSchema(os.Stdout, schema.GetProcessorsSchema())
+		err = outputSchema(os.Stdout, schema.GetProcessorsSchema())
 	case "modules":
-		outputSchema(os.Stdout, schema.GetModulesSchema())
+		err = outputSchema(os.Stdout, schema.GetModulesSchema())
 	case "config":
-		outputSchema(os.Stdout, &schema.ConfigSchema)
+		err = outputSchema(os.Stdout, &schema.ConfigSchema)
 	case "routes":
-		outputSchema(os.Stdout, &schema.RoutesConfigSchema)
+		err = outputSchema(os.Stdout, &schema.RoutesConfigSchema)
 	case "api":
-		outputSchema(os.Stdout, &schema.ApiConfigSchema)
+		err = outputSchema(os.Stdout, &schema.ApiConfigSchema)
 	default:
 	}
 
+	if err != nil {
+		panic(err)
+	}
 }
 
-func outputSchema(writer io.Writer, jsonSchema *jsonschema.Schema) {
+func outputSchema(writer io.Writer, jsonSchema *jsonschema.Schema) error {
 	schemaJSON, err := json.Marshal(jsonSchema)
 	if err != nil {
 		panic(err)
 	}
-	writer.Write(schemaJSON)
+	_, err = writer.Write(schemaJSON)
+	return err
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/processor"
 	"github.com/jwetzell/showbridge-go/routing"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGoodFilterRate(t *testing.T) {
@@ -33,6 +34,7 @@ func TestGoodFilterRate(t *testing.T) {
 			}
 
 			_, err = processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, nil)
+			require.NoError(t, err)
 			// TODO(jwetzell): figure out how to test the rate limiting behavior
 		})
 	}

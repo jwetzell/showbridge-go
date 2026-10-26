@@ -98,19 +98,28 @@ func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						response.IOErrors = append(response.IOErrors, errorToAdd)
 
 					}
-					json.NewEncoder(w).Encode(response)
+					err := json.NewEncoder(w).Encode(response)
+					if err != nil {
+						hs.logger.Error("http server encode response error", "error", err)
+					}
 					return
 				} else {
 					w.WriteHeader(http.StatusOK)
 					response.Message = "routing successful"
-					json.NewEncoder(w).Encode(response)
+					err := json.NewEncoder(w).Encode(response)
+					if err != nil {
+						hs.logger.Error("http server encode response error", "error", err)
+					}
 					return
 				}
 			} else {
 				w.WriteHeader(http.StatusNotFound)
 				response.Status = "error"
 				response.Message = "no matching routes found"
-				json.NewEncoder(w).Encode(response)
+				err := json.NewEncoder(w).Encode(response)
+				if err != nil {
+					hs.logger.Error("http server encode response error", "error", err)
+				}
 				return
 			}
 		}
@@ -118,7 +127,10 @@ func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		response.Message = "no router registered"
 		response.Status = "error"
-		json.NewEncoder(w).Encode(response)
+		err := json.NewEncoder(w).Encode(response)
+		if err != nil {
+			hs.logger.Error("http server encode response error", "error", err)
+		}
 		return
 	}
 }
@@ -161,7 +173,10 @@ func (hs *HTTPServer) Stop() {
 	defer hs.serverMu.Unlock()
 	if hs.server != nil {
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
-		hs.server.Shutdown(shutdownCtx)
+		err := hs.server.Shutdown(shutdownCtx)
+		if err != nil {
+			hs.logger.Error("http server shutdown error", "error", err)
+		}
 		shutdownCancel()
 		<-shutdownCtx.Done()
 	}

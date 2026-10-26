@@ -102,7 +102,10 @@ func (rc *RedisClient) Stop() {
 	rc.clientMu.Lock()
 	defer rc.clientMu.Unlock()
 	if rc.client != nil {
-		rc.client.Close()
+		err := rc.client.Close()
+		if err != nil {
+			rc.logger.Error("redis client close error", "error", err)
+		}
 	}
 }
 

@@ -8,6 +8,7 @@ import (
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/processor"
 	"github.com/jwetzell/showbridge-go/routing"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGoodYamlEncode(t *testing.T) {
@@ -36,10 +37,9 @@ func TestGoodYamlEncode(t *testing.T) {
 				Type:   "yaml.encode",
 				Params: nil,
 			})
+			require.NoError(t, err)
 			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
-			if err != nil {
-				t.Fatalf("yaml.encode processing failed: %s", err)
-			}
+			require.NoError(t, err)
 
 			gotBytes, ok := got.Payload.([]byte)
 			if !ok {

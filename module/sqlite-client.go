@@ -82,7 +82,10 @@ func (sc *SqliteClient) Stop() {
 	sc.dbMu.Lock()
 	defer sc.dbMu.Unlock()
 	if sc.db != nil {
-		sc.db.Close()
+		err := sc.db.Close()
+		if err != nil {
+			sc.logger.Error("sqlite client close error", "error", err)
+		}
 	}
 }
 

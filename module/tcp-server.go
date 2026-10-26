@@ -116,7 +116,10 @@ func (ts *TCPServer) handleClient(client *net.TCPConn) {
 	ts.connectionsMu.Unlock()
 	ts.logger.Debug("connection accepted", "remoteAddr", client.RemoteAddr().String())
 	defer func() {
-		client.Close()
+		err := client.Close()
+		if err != nil {
+			ts.logger.Error("tcp server client close error", "error", err)
+		}
 		ts.connectionsMu.Lock()
 		for i := 0; i < len(ts.connections); i++ {
 			if ts.connections[i].conn == client {
@@ -130,7 +133,11 @@ func (ts *TCPServer) handleClient(client *net.TCPConn) {
 
 	buffer := make([]byte, 1024)
 	for ts.ctx.Err() == nil && ts.connectionShutdownCtx.Err() == nil {
-		client.SetDeadline(time.Now().Add(time.Millisecond * 200))
+		err := client.SetDeadline(time.Now().Add(time.Millisecond * 200))
+		if err != nil {
+			ts.logger.Error("tcp server set deadline error", "error", err)
+			continue
+		}
 		byteCount, err := client.Read(buffer)
 		if err != nil {
 			opErr, ok := err.(*net.OpError)
@@ -238,7 +245,10 @@ func (ts *TCPServer) Stop() {
 	ts.listenerMu.Lock()
 	defer ts.listenerMu.Unlock()
 	if ts.listener != nil {
-		ts.listener.Close()
+		err := ts.listener.Close()
+		if err != nil {
+			ts.logger.Error("tcp server close error", "error", err)
+		}
 	}
 	ts.logger.Debug("waiting for connections to close")
 	ts.wg.Wait()

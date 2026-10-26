@@ -61,11 +61,14 @@ func (t *TimeCron) Start(ctx context.Context, router routing.Router) error {
 
 	t.cron = cron.New()
 
-	t.cron.AddFunc(t.CronString, func() {
+	_, err := t.cron.AddFunc(t.CronString, func() {
 		if t.router != nil {
 			t.router.HandleInput(t.ctx, t.config.Id, time.Now())
 		}
 	})
+	if err != nil {
+		return err
+	}
 	t.cron.Start()
 
 	<-t.ctx.Done()

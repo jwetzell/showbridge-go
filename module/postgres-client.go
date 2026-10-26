@@ -82,7 +82,10 @@ func (pc *PostgresClient) Stop() {
 	pc.dbMu.Lock()
 	defer pc.dbMu.Unlock()
 	if pc.db != nil {
-		pc.db.Close()
+		err := pc.db.Close()
+		if err != nil {
+			pc.logger.Error("postgres.client close error", "error", err)
+		}
 	}
 }
 

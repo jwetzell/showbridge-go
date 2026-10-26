@@ -46,15 +46,6 @@ func (r *Router) addModule(moduleDecl config.ModuleConfig) error {
 	return nil
 }
 
-func (r *Router) removeModule(moduleId string) error {
-	err := r.stopModule(moduleId)
-	if err != nil {
-		return err
-	}
-	delete(r.ModuleInstances, moduleId)
-	return nil
-}
-
 func (r *Router) startModule(ctx context.Context, moduleId string) error {
 	moduleInstance := r.getModule(moduleId)
 	if moduleInstance == nil {

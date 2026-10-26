@@ -7,6 +7,7 @@ import (
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/processor"
 	"github.com/jwetzell/showbridge-go/routing"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGoodYamlDecode(t *testing.T) {
@@ -44,10 +45,9 @@ func TestGoodYamlDecode(t *testing.T) {
 				Type:   "yaml.decode",
 				Params: nil,
 			})
+			require.NoError(t, err)
 			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
-			if err != nil {
-				t.Fatalf("yaml.decode processing failed: %s", err)
-			}
+			require.NoError(t, err)
 
 			gotMap, ok := got.Payload.(map[string]any)
 			if !ok {

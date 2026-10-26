@@ -112,7 +112,11 @@ func (us *UDPServer) Start(ctx context.Context, router routing.Router) error {
 
 	buffer := make([]byte, us.BufferSize)
 	for us.ctx.Err() == nil {
-		listener.SetDeadline(time.Now().Add(time.Millisecond * 200))
+		err := listener.SetDeadline(time.Now().Add(time.Millisecond * 200))
+		if err != nil {
+			us.logger.Error("udp set deadline error", "error", err)
+			continue
+		}
 
 		numBytes, _, err := listener.ReadFromUDP(buffer)
 		if err != nil {
@@ -146,6 +150,9 @@ func (us *UDPServer) Stop() {
 	us.listenerMu.Lock()
 	defer us.listenerMu.Unlock()
 	if us.listener != nil {
-		us.listener.Close()
+		err := us.listener.Close()
+		if err != nil {
+			us.logger.Error("udp server close error", "error", err)
+		}
 	}
 }

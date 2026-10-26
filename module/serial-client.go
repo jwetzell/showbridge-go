@@ -183,7 +183,10 @@ func (sc *SerialClient) Stop() {
 	sc.portMu.Lock()
 	defer sc.portMu.Unlock()
 	if sc.port != nil {
-		sc.port.Close()
+		err := sc.port.Close()
+		if err != nil {
+			sc.logger.Error("serial client close error", "error", err)
+		}
 	}
 
 	if sc.inFramer != nil {

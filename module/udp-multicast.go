@@ -90,7 +90,11 @@ func (um *UDPMulticast) Start(ctx context.Context, router routing.Router) error 
 
 	buffer := make([]byte, 2048)
 	for um.ctx.Err() == nil {
-		um.conn.SetDeadline(time.Now().Add(time.Millisecond * 200))
+		err := um.conn.SetDeadline(time.Now().Add(time.Millisecond * 200))
+		if err != nil {
+			um.logger.Error("udp multicast set deadline error", "error", err)
+			continue
+		}
 
 		numBytes, _, err := um.conn.ReadFromUDP(buffer)
 		if err != nil {
@@ -142,6 +146,9 @@ func (um *UDPMulticast) Stop() {
 	um.connMu.Lock()
 	defer um.connMu.Unlock()
 	if um.conn != nil {
-		um.conn.Close()
+		err := um.conn.Close()
+		if err != nil {
+			um.logger.Error("udp multicast close error", "error", err)
+		}
 	}
 }
