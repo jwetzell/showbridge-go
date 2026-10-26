@@ -102,9 +102,5 @@ func (hrc *HTTPResponse) Process(ctx context.Context, wrappedPayload routing.Wra
 		return wrappedPayload, err
 	}
 
-	// wrappedPayload.Payload = httpResponse{
-	// 	Status: hrc.Status,
-	// 	Body:   bodyBuffer.Bytes(),
-	// }
 	return wrappedPayload, nil
 }
