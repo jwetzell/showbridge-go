@@ -34,7 +34,7 @@ tasks:
   test:all:
     desc: Run the test suite for the showbridge project
     cmds:
-      - go test ./...
+      - go test . ./api ./config ./events ./framer ./module ./params ./processor ./routing ./schema -count=1 -coverprofile coverage.out
 
   webui:dev:
     desc: Run the development server for the web UI

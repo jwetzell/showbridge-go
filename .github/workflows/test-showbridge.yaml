@@ -27,14 +27,19 @@ jobs:
         run: sudo apt-get install -y libasound2-dev
 
       - uses: actions/checkout@v7
+      
       - uses: actions/setup-go@v7
         with:
           go-version-file: "go.mod"
+      
+      - name: Install Task
+        uses: go-task/setup-task@v2
+
       - name: mod tidy
         run: go mod tidy
 
       - name: run tests
-        run: go test ./... -count=1 -coverpkg "github.com/jwetzell/showbridge-go/..." -coverprofile coverage.out
+        run: task test:all
 
       - name: clean up coverage report
         run: cat coverage.out | grep -v "github.com/jwetzell/showbridge-go/cmd" > coverage.nocmd.out
