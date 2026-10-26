@@ -9,3 +9,14 @@ import SchemaInfo from '../../../../components/SchemaInfo.astro';
 Filters payloads based on a rate limit
 
 <SchemaInfo type="processor" id="filter.rate"/>
+
+### Example
+
+Limit inputs through this processor to 10 per second
+
+```yaml
+- id: filter
+  type: filter.change
+  params:
+    rate: 10
+```
