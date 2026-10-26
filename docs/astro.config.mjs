@@ -9,6 +9,7 @@ export default defineConfig({
       title: "showbridge",
       tableOfContents: false,
       favicon: "/favicon.ico",
+      defaultLocale: 'en',
       editLink: {
         baseUrl: "https://github.com/jwetzell/showbridge-docs/edit/main/",
       },
