@@ -31,12 +31,7 @@ func (jd *JsonDecode) Process(ctx context.Context, wrappedPayload routing.Wrappe
 	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
 
 	if !ok {
-		payloadString, ok := payload.(string)
-		if !ok {
-			wrappedPayload.End = true
-			return wrappedPayload, errors.New("json.decode can only process a string or []byte")
-		}
-		payloadBytes = []byte(payloadString)
+		return wrappedPayload, errors.New("json.decode can only process a string or []byte")
 	}
 
 	payloadJson := make(map[string]any)

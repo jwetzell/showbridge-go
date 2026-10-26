@@ -4,12 +4,13 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/processor"
 	"github.com/jwetzell/showbridge-go/routing"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGoodJsonDecode(t *testing.T) {
-	jsonDecoder := processor.JsonDecode{}
 	tests := []struct {
 		name     string
 		payload  string
@@ -35,10 +36,18 @@ func TestGoodJsonDecode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := jsonDecoder.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
-			if err != nil {
-				t.Fatalf("json.decode processing failed: %s", err)
+			registration, ok := processor.GetProcessorRegistration("json.decode")
+			if !ok {
+				t.Fatalf("json.decode processor not registered")
 			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "json.decode",
+				Params: nil,
+			})
+			require.NoError(t, err)
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			require.NoError(t, err)
 
 			gotMap, ok := got.Payload.(map[string]any)
 			if !ok {
@@ -53,7 +62,6 @@ func TestGoodJsonDecode(t *testing.T) {
 }
 
 func TestBadJsonDecode(t *testing.T) {
-	stringEncoder := processor.JsonDecode{}
 	tests := []struct {
 		name        string
 		payload     any
@@ -73,7 +81,22 @@ func TestBadJsonDecode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := stringEncoder.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			registration, ok := processor.GetProcessorRegistration("json.decode")
+			if !ok {
+				t.Fatalf("json.decode processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "json.decode",
+				Params: nil,
+			})
+			if err != nil {
+				if err.Error() == test.errorString {
+					return
+				}
+				t.Fatalf("json.decode got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("json.decode expected to fail but got payload: %+v", got)

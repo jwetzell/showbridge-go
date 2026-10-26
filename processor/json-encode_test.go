@@ -5,12 +5,13 @@ import (
 	"testing"
 
 	"github.com/jwetzell/osc-go"
+	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/processor"
 	"github.com/jwetzell/showbridge-go/routing"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGoodJsonEncode(t *testing.T) {
-	jsonEncoder := processor.JsonEncode{}
 	tests := []struct {
 		name     string
 		payload  any
@@ -27,7 +28,17 @@ func TestGoodJsonEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := jsonEncoder.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			registration, ok := processor.GetProcessorRegistration("json.encode")
+			if !ok {
+				t.Fatalf("json.encode processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "json.encode",
+				Params: nil,
+			})
+			require.NoError(t, err)
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("json.encode processing failed: %s", err)
 			}
@@ -45,7 +56,6 @@ func TestGoodJsonEncode(t *testing.T) {
 }
 
 func TestBadJsonEncode(t *testing.T) {
-	stringEncoder := processor.JsonEncode{}
 	tests := []struct {
 		name        string
 		payload     any
@@ -60,7 +70,22 @@ func TestBadJsonEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := stringEncoder.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			registration, ok := processor.GetProcessorRegistration("json.encode")
+			if !ok {
+				t.Fatalf("json.encode processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "json.encode",
+				Params: nil,
+			})
+			if err != nil {
+				if err.Error() == test.errorString {
+					return
+				}
+				t.Fatalf("json.encode got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("json.encode expected to fail but got payload: %+v", got)

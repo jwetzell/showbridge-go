@@ -31,12 +31,7 @@ func (jd *YamlDecode) Process(ctx context.Context, wrappedPayload routing.Wrappe
 	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
 
 	if !ok {
-		payloadString, ok := payload.(string)
-		if !ok {
-			wrappedPayload.End = true
-			return wrappedPayload, errors.New("yaml.decode can only process a string or []byte")
-		}
-		payloadBytes = []byte(payloadString)
+		return wrappedPayload, errors.New("yaml.decode can only process a string or []byte")
 	}
 
 	payloadYaml := make(map[string]any)

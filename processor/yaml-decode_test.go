@@ -4,12 +4,12 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/processor"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
 func TestGoodYamlDecode(t *testing.T) {
-	jsonDecoder := processor.YamlDecode{}
 	tests := []struct {
 		name     string
 		payload  string
@@ -35,7 +35,16 @@ func TestGoodYamlDecode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := jsonDecoder.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			registration, ok := processor.GetProcessorRegistration("yaml.decode")
+			if !ok {
+				t.Fatalf("yaml.decode processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "yaml.decode",
+				Params: nil,
+			})
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("yaml.decode processing failed: %s", err)
 			}
@@ -53,7 +62,6 @@ func TestGoodYamlDecode(t *testing.T) {
 }
 
 func TestBadYamlDecode(t *testing.T) {
-	stringEncoder := processor.YamlDecode{}
 	tests := []struct {
 		name        string
 		payload     any
@@ -73,7 +81,22 @@ func TestBadYamlDecode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := stringEncoder.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			registration, ok := processor.GetProcessorRegistration("yaml.decode")
+			if !ok {
+				t.Fatalf("yaml.decode processor not registered")
+			}
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type:   "yaml.decode",
+				Params: nil,
+			})
+			if err != nil {
+				if err.Error() == test.errorString {
+					return
+				}
+				t.Fatalf("yaml.decode got error '%s', expected '%s'", err.Error(), test.errorString)
+			}
+			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("yaml.decode expected to fail but got payload: %+v", got)
