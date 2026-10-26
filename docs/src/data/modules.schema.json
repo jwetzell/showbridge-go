@@ -8,6 +8,7 @@
       {
         "$id": "http.server",
         "additionalProperties": false,
+        "description": "Listens for incoming HTTP requests on the specified port",
         "properties": {
           "id": {
             "minLength": 1,
@@ -44,6 +45,7 @@
       {
         "$id": "midi.input",
         "additionalProperties": false,
+        "description": "Listens for incoming MIDI messages on the specified port",
         "properties": {
           "id": {
             "minLength": 1,
@@ -78,6 +80,7 @@
       {
         "$id": "midi.output",
         "additionalProperties": false,
+        "description": "Sends MIDI messages to the specified port",
         "properties": {
           "id": {
             "minLength": 1,
@@ -112,6 +115,7 @@
       {
         "$id": "mqtt.client",
         "additionalProperties": false,
+        "description": "Connects to the specified MQTT broker and subscribes to the specified topic",
         "properties": {
           "id": {
             "minLength": 1,
@@ -172,6 +176,7 @@
       {
         "$id": "mysql.client",
         "additionalProperties": false,
+        "description": "Connects to the specified MySQL database using the provided DSN",
         "properties": {
           "id": {
             "minLength": 1,
@@ -207,6 +212,7 @@
       {
         "$id": "nats.client",
         "additionalProperties": false,
+        "description": "Connects to the specified NATS server and subscribes to the specified subject",
         "properties": {
           "id": {
             "minLength": 1,
@@ -247,6 +253,7 @@
       {
         "$id": "nats.server",
         "additionalProperties": false,
+        "description": "Starts a NATS server on the specified IP and port",
         "properties": {
           "id": {
             "minLength": 1,
@@ -286,6 +293,7 @@
       {
         "$id": "net.tcp.client",
         "additionalProperties": false,
+        "description": "Connects to the specified TCP server using the provided host and port",
         "properties": {
           "id": {
             "minLength": 1,
@@ -341,6 +349,7 @@
       {
         "$id": "net.tcp.server",
         "additionalProperties": false,
+        "description": "Listens for incoming TCP connections on the specified IP and port",
         "properties": {
           "id": {
             "minLength": 1,
@@ -396,6 +405,7 @@
       {
         "$id": "net.udp.client",
         "additionalProperties": false,
+        "description": "Sends UDP packets to the specified server",
         "properties": {
           "id": {
             "minLength": 1,
@@ -438,6 +448,7 @@
       {
         "$id": "net.udp.multicast",
         "additionalProperties": false,
+        "description": "Listens for and sends UDP multicast packets on the specified IP and port",
         "properties": {
           "id": {
             "minLength": 1,
@@ -480,6 +491,7 @@
       {
         "$id": "net.udp.server",
         "additionalProperties": false,
+        "description": "Listens for incoming UDP packets on the specified IP and port",
         "properties": {
           "id": {
             "minLength": 1,
@@ -530,6 +542,7 @@
       {
         "$id": "postgres.client",
         "additionalProperties": false,
+        "description": "Connects to a PostgreSQL database using the specified connection URL",
         "properties": {
           "id": {
             "minLength": 1,
@@ -565,6 +578,7 @@
       {
         "$id": "psn.client",
         "additionalProperties": false,
+        "description": "Connects to the PosiStageNet network and listens for incoming messages",
         "properties": {
           "id": {
             "minLength": 1,
@@ -584,6 +598,7 @@
       {
         "$id": "redis.client",
         "additionalProperties": false,
+        "description": "Connects to the specified Redis server using the provided host and port",
         "properties": {
           "id": {
             "minLength": 1,
@@ -626,6 +641,7 @@
       {
         "$id": "serial.client",
         "additionalProperties": false,
+        "description": "Opens a serial port with the specified settings and handles framed messages",
         "properties": {
           "id": {
             "minLength": 1,
@@ -679,6 +695,7 @@
       {
         "$id": "sqlite.client",
         "additionalProperties": false,
+        "description": "Opens a SQLite database with the specified DSN",
         "properties": {
           "id": {
             "minLength": 1,
@@ -714,6 +731,7 @@
       {
         "$id": "time.cron",
         "additionalProperties": false,
+        "description": "Triggers events based on the specified cron schedule",
         "properties": {
           "id": {
             "minLength": 1,
@@ -748,6 +766,7 @@
       {
         "$id": "time.interval",
         "additionalProperties": false,
+        "description": "Emits events at the specified time interval",
         "properties": {
           "id": {
             "minLength": 1,
@@ -782,6 +801,7 @@
       {
         "$id": "time.timer",
         "additionalProperties": false,
+        "description": "Fires an event after the specified duration",
         "properties": {
           "id": {
             "minLength": 1,
@@ -816,6 +836,7 @@
       {
         "$id": "websocket.client",
         "additionalProperties": false,
+        "description": "Opens a WebSocket connection to the specified server",
         "properties": {
           "id": {
             "minLength": 1,

@@ -15,8 +15,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "int.parse",
-		Title: "Parse Int",
+		Type:        "int.parse",
+		Title:       "Parse Int",
+		Description: "Parses a string into an integer using the specified base and bit size",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

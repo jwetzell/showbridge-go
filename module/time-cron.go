@@ -14,8 +14,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "time.cron",
-		Title: "Cron",
+		Type:        "time.cron",
+		Title:       "Cron",
+		Description: "Triggers events based on the specified cron schedule",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

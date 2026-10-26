@@ -12,8 +12,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "filter.rate",
-		Title: "Filter by Rate",
+		Type:        "filter.rate",
+		Title:       "Filter by Rate",
+		Description: "Filters payloads based on a rate limit",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

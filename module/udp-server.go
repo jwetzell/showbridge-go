@@ -18,8 +18,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "net.udp.server",
-		Title: "UDP Server",
+		Type:        "net.udp.server",
+		Title:       "UDP Server",
+		Description: "Listens for incoming UDP packets on the specified IP and port",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

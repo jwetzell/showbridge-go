@@ -13,8 +13,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "osc.message.decode",
-		Title: "Decode OSC Message",
+		Type:        "osc.message.decode",
+		Title:       "Decode OSC Message",
+		Description: "Decodes bytes into an OSC message",
 		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &OSCMessageDecode{config: config}, nil
 		},

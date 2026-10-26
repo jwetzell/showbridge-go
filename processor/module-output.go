@@ -13,8 +13,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "module.output",
-		Title: "Module Output",
+		Type:        "module.output",
+		Title:       "Module Output",
+		Description: "Sends the incoming payload to the specified module output",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

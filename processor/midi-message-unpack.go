@@ -14,8 +14,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "midi.message.unpack",
-		Title: "Unpack MIDI Message",
+		Type:        "midi.message.unpack",
+		Title:       "Unpack MIDI Message",
+		Description: "Unpacks a general MIDI message into type specific structs",
 		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &MIDIMessageUnpack{config: config}, nil
 		},

@@ -12,8 +12,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "artnet.packet.decode",
-		Title: "Decode ArtNet Packet",
+		Type:        "artnet.packet.decode",
+		Title:       "Decode ArtNet Packet",
+		Description: "Decodes an ArtNet packet from a byte slice",
 		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &ArtNetPacketDecode{config: config}, nil
 		},

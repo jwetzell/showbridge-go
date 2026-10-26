@@ -8,6 +8,7 @@
       {
         "$id": "artnet.packet.decode",
         "additionalProperties": false,
+        "description": "Decodes an ArtNet packet from a byte slice",
         "properties": {
           "id": {
             "minLength": 1,
@@ -26,6 +27,7 @@
       {
         "$id": "artnet.packet.encode",
         "additionalProperties": false,
+        "description": "Encodes an ArtNet packet into a byte slice",
         "properties": {
           "id": {
             "minLength": 1,
@@ -44,6 +46,7 @@
       {
         "$id": "db.query",
         "additionalProperties": false,
+        "description": "Executes a SQL query against a specified database module",
         "properties": {
           "id": {
             "minLength": 1,
@@ -83,6 +86,7 @@
       {
         "$id": "debug.log",
         "additionalProperties": false,
+        "description": "Logs the payload for debugging purposes",
         "properties": {
           "id": {
             "minLength": 1,
@@ -101,6 +105,7 @@
       {
         "$id": "filter.change",
         "additionalProperties": false,
+        "description": "Filters out payloads that have not changed since the last one",
         "properties": {
           "id": {
             "minLength": 1,
@@ -119,6 +124,7 @@
       {
         "$id": "filter.expr",
         "additionalProperties": false,
+        "description": "Filters payloads based on an Expr expression",
         "properties": {
           "id": {
             "minLength": 1,
@@ -152,6 +158,7 @@
       {
         "$id": "filter.rate",
         "additionalProperties": false,
+        "description": "Filters payloads based on a rate limit",
         "properties": {
           "id": {
             "minLength": 1,
@@ -184,6 +191,7 @@
       {
         "$id": "filter.regex",
         "additionalProperties": false,
+        "description": "Filters payloads based on a regular expression",
         "properties": {
           "id": {
             "minLength": 1,
@@ -217,6 +225,7 @@
       {
         "$id": "float.parse",
         "additionalProperties": false,
+        "description": "Parses a string into a floating point number",
         "properties": {
           "id": {
             "minLength": 1,
@@ -251,6 +260,7 @@
       {
         "$id": "float.random",
         "additionalProperties": false,
+        "description": "Generates a random floating point number within a specified range [min, max)",
         "properties": {
           "id": {
             "minLength": 1,
@@ -300,6 +310,7 @@
       {
         "$id": "freed.create",
         "additionalProperties": false,
+        "description": "Creates a FreeD Position from the specified parameters",
         "properties": {
           "id": {
             "minLength": 1,
@@ -381,6 +392,7 @@
       {
         "$id": "freed.decode",
         "additionalProperties": false,
+        "description": "Decodes bytes into a FreeD Position",
         "properties": {
           "id": {
             "minLength": 1,
@@ -399,6 +411,7 @@
       {
         "$id": "freed.encode",
         "additionalProperties": false,
+        "description": "Encodes a FreeD Position into bytes",
         "properties": {
           "id": {
             "minLength": 1,
@@ -500,6 +513,7 @@
       {
         "$id": "int.parse",
         "additionalProperties": false,
+        "description": "Parses a string into an integer using the specified base and bit size",
         "properties": {
           "id": {
             "minLength": 1,
@@ -550,6 +564,7 @@
       {
         "$id": "int.random",
         "additionalProperties": false,
+        "description": "Generates a random integer within a specified range [min, max]",
         "properties": {
           "id": {
             "minLength": 1,
@@ -589,6 +604,7 @@
       {
         "$id": "int.scale",
         "additionalProperties": false,
+        "description": "Scales an integer from one range to another",
         "properties": {
           "id": {
             "minLength": 1,
@@ -640,6 +656,7 @@
       {
         "$id": "json.decode",
         "additionalProperties": false,
+        "description": "Decodes bytes into a JSON object",
         "properties": {
           "id": {
             "minLength": 1,
@@ -658,6 +675,7 @@
       {
         "$id": "json.encode",
         "additionalProperties": false,
+        "description": "Encodes a payload into JSON format",
         "properties": {
           "id": {
             "minLength": 1,
@@ -676,6 +694,7 @@
       {
         "$id": "kv.get",
         "additionalProperties": false,
+        "description": "Retrieves a value from the specified key-value module",
         "properties": {
           "id": {
             "minLength": 1,
@@ -715,6 +734,7 @@
       {
         "$id": "kv.set",
         "additionalProperties": false,
+        "description": "Sets a key-value pair in the specified module",
         "properties": {
           "id": {
             "minLength": 1,
@@ -754,6 +774,7 @@
       {
         "$id": "midi.control_change.create",
         "additionalProperties": false,
+        "description": "Creates a MIDI Control Change message",
         "properties": {
           "id": {
             "minLength": 1,
@@ -799,6 +820,7 @@
       {
         "$id": "midi.message.decode",
         "additionalProperties": false,
+        "description": "Decodes bytes into a MIDI message",
         "properties": {
           "id": {
             "minLength": 1,
@@ -817,6 +839,7 @@
       {
         "$id": "midi.message.encode",
         "additionalProperties": false,
+        "description": "Encodes a MIDI message into its byte representation",
         "properties": {
           "id": {
             "minLength": 1,
@@ -835,6 +858,7 @@
       {
         "$id": "midi.message.unpack",
         "additionalProperties": false,
+        "description": "Unpacks a general MIDI message into type specific structs",
         "properties": {
           "id": {
             "minLength": 1,
@@ -853,6 +877,7 @@
       {
         "$id": "midi.note_off.create",
         "additionalProperties": false,
+        "description": "Creates a MIDI Note Off message",
         "properties": {
           "id": {
             "minLength": 1,
@@ -898,6 +923,7 @@
       {
         "$id": "midi.note_on.create",
         "additionalProperties": false,
+        "description": "Creates a MIDI Note On message",
         "properties": {
           "id": {
             "minLength": 1,
@@ -943,6 +969,7 @@
       {
         "$id": "midi.program_change.create",
         "additionalProperties": false,
+        "description": "Creates a MIDI Program Change message",
         "properties": {
           "id": {
             "minLength": 1,
@@ -983,6 +1010,7 @@
       {
         "$id": "module.output",
         "additionalProperties": false,
+        "description": "Sends the incoming payload to the specified module output",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1016,6 +1044,7 @@
       {
         "$id": "os.exec",
         "additionalProperties": false,
+        "description": "Executes a specified command with optional arguments",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1057,6 +1086,7 @@
       {
         "$id": "os.readfile",
         "additionalProperties": false,
+        "description": "Reads the contents of a specified file path",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1090,6 +1120,7 @@
       {
         "$id": "os.writefile",
         "additionalProperties": false,
+        "description": "Writes the incoming payload to a specified file path",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1123,6 +1154,7 @@
       {
         "$id": "osc.message.create",
         "additionalProperties": false,
+        "description": "Creates an OSC message with the specified address and arguments",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1196,6 +1228,7 @@
       {
         "$id": "osc.message.decode",
         "additionalProperties": false,
+        "description": "Decodes bytes into an OSC message",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1214,6 +1247,7 @@
       {
         "$id": "osc.message.encode",
         "additionalProperties": false,
+        "description": "Encodes an OSC message into bytes",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1232,6 +1266,7 @@
       {
         "$id": "pubsub.publish",
         "additionalProperties": false,
+        "description": "Publishes the incoming payload to a specified topic",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1290,6 +1325,7 @@
       {
         "$id": "router.input",
         "additionalProperties": false,
+        "description": "Send an input to the router with the specified source",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1323,6 +1359,7 @@
       {
         "$id": "script.expr",
         "additionalProperties": false,
+        "description": "Evaluates an Expr expression with the given payload",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1356,6 +1393,7 @@
       {
         "$id": "script.js",
         "additionalProperties": false,
+        "description": "Runs a JavaScript program with access to the incoming payload",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1389,6 +1427,7 @@
       {
         "$id": "script.wasm",
         "additionalProperties": false,
+        "description": "Runs an Extism WASM plugin with the specified function and options",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1434,6 +1473,7 @@
       {
         "$id": "string.create",
         "additionalProperties": false,
+        "description": "Creates a string based on a Go template",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1467,6 +1507,7 @@
       {
         "$id": "string.decode",
         "additionalProperties": false,
+        "description": "Decodes bytes into a string",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1485,6 +1526,7 @@
       {
         "$id": "string.encode",
         "additionalProperties": false,
+        "description": "Encodes a string as bytes",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1503,6 +1545,7 @@
       {
         "$id": "string.split",
         "additionalProperties": false,
+        "description": "Splits a string by the specified separator",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1536,6 +1579,7 @@
       {
         "$id": "struct.field.get",
         "additionalProperties": false,
+        "description": "Extracts a field from a struct",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1569,6 +1613,7 @@
       {
         "$id": "struct.method.get",
         "additionalProperties": false,
+        "description": "Extracts and calls a method from a struct with no arguments",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1602,6 +1647,7 @@
       {
         "$id": "time.sleep",
         "additionalProperties": false,
+        "description": "Sleeps for the specified duration",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1635,6 +1681,7 @@
       {
         "$id": "yaml.decode",
         "additionalProperties": false,
+        "description": "Decodes incoming bytes as YAML",
         "properties": {
           "id": {
             "minLength": 1,
@@ -1653,6 +1700,7 @@
       {
         "$id": "yaml.encode",
         "additionalProperties": false,
+        "description": "Encodes the payload as YAML",
         "properties": {
           "id": {
             "minLength": 1,

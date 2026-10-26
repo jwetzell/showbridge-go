@@ -15,8 +15,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "redis.client",
-		Title: "Redis Client",
+		Type:        "redis.client",
+		Title:       "Redis Client",
+		Description: "Connects to the specified Redis server using the provided host and port",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

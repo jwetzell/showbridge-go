@@ -13,8 +13,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "struct.method.get",
-		Title: "Get Struct Method",
+		Type:        "struct.method.get",
+		Title:       "Get Struct Method",
+		Description: "Extracts and calls a method from a struct with no arguments",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

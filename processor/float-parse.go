@@ -15,8 +15,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "float.parse",
-		Title: "Parse Float",
+		Type:        "float.parse",
+		Title:       "Parse Float",
+		Description: "Parses a string into a floating point number",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

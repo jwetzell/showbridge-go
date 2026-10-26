@@ -19,8 +19,9 @@ type ScriptExpr struct {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "script.expr",
-		Title: "Evaluate Expr Expression",
+		Type:        "script.expr",
+		Title:       "Evaluate Expr Expression",
+		Description: "Evaluates an Expr expression with the given payload",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

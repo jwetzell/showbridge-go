@@ -11,8 +11,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "artnet.packet.encode",
-		Title: "Encode ArtNet Packet",
+		Type:        "artnet.packet.encode",
+		Title:       "Encode ArtNet Packet",
+		Description: "Encodes an ArtNet packet into a byte slice",
 		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &ArtNetPacketEncode{config: config}, nil
 		},

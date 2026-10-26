@@ -14,8 +14,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "psn.client",
-		Title: "PosiStageNet Client",
+		Type:        "psn.client",
+		Title:       "PosiStageNet Client",
+		Description: "Connects to the PosiStageNet network and listens for incoming messages",
 		New: func(config config.ModuleConfig) (routing.Module, error) {
 			return &PSNClient{config: config, decoder: psn.NewDecoder(), logger: CreateLogger(config)}, nil
 		},

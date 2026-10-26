@@ -12,8 +12,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "time.sleep",
-		Title: "Sleep",
+		Type:        "time.sleep",
+		Title:       "Sleep",
+		Description: "Sleeps for the specified duration",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

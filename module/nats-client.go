@@ -15,8 +15,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "nats.client",
-		Title: "NATS Client",
+		Type:        "nats.client",
+		Title:       "NATS Client",
+		Description: "Connects to the specified NATS server and subscribes to the specified subject",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

@@ -16,8 +16,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "sqlite.client",
-		Title: "SQLite Client",
+		Type:        "sqlite.client",
+		Title:       "SQLite Client",
+		Description: "Opens a SQLite database with the specified DSN",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

@@ -10,8 +10,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "string.encode",
-		Title: "Encode String",
+		Type:        "string.encode",
+		Title:       "Encode String",
+		Description: "Encodes a string as bytes",
 		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &StringEncode{config: config}, nil
 		},

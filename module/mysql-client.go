@@ -17,8 +17,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "mysql.client",
-		Title: "MySQL Client",
+		Type:        "mysql.client",
+		Title:       "MySQL Client",
+		Description: "Connects to the specified MySQL database using the provided DSN",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

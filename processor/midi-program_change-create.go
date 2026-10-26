@@ -17,8 +17,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "midi.program_change.create",
-		Title: "Create MIDI Prgoram Change Message",
+		Type:        "midi.program_change.create",
+		Title:       "Create MIDI Prgoram Change Message",
+		Description: "Creates a MIDI Program Change message",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

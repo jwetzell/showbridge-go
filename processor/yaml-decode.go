@@ -12,8 +12,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "yaml.decode",
-		Title: "Decode YAML",
+		Type:        "yaml.decode",
+		Title:       "Decode YAML",
+		Description: "Decodes incoming bytes as YAML",
 		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &YamlDecode{config: config}, nil
 		},

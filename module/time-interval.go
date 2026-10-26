@@ -13,8 +13,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "time.interval",
-		Title: "Interval",
+		Type:        "time.interval",
+		Title:       "Interval",
+		Description: "Emits events at the specified time interval",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

@@ -11,8 +11,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "string.decode",
-		Title: "Decode String",
+		Type:        "string.decode",
+		Title:       "Decode String",
+		Description: "Decodes bytes into a string",
 		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &StringDecode{config: config}, nil
 		},

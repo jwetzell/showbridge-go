@@ -16,8 +16,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "os.readfile",
-		Title: "Read File",
+		Type:        "os.readfile",
+		Title:       "Read File",
+		Description: "Reads the contents of a specified file path",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

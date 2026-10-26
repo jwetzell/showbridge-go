@@ -12,8 +12,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "freed.decode",
-		Title: "Decode FreeD",
+		Type:        "freed.decode",
+		Title:       "Decode FreeD",
+		Description: "Decodes bytes into a FreeD Position",
 		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &FreeDDecode{config: config}, nil
 		},

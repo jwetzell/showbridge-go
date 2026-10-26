@@ -13,8 +13,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "script.js",
-		Title: "Run JavaScript",
+		Type:        "script.js",
+		Title:       "Run JavaScript",
+		Description: "Runs a JavaScript program with access to the incoming payload",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

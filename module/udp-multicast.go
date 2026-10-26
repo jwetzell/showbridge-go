@@ -17,8 +17,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "net.udp.multicast",
-		Title: "UDP Multicast",
+		Type:        "net.udp.multicast",
+		Title:       "UDP Multicast",
+		Description: "Listens for and sends UDP multicast packets on the specified IP and port",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

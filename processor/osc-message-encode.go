@@ -16,8 +16,9 @@ type OSCMessageEncode struct {
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "osc.message.encode",
-		Title: "Encode OSC Message",
+		Type:        "osc.message.encode",
+		Title:       "Encode OSC Message",
+		Description: "Encodes an OSC message into bytes",
 		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &OSCMessageEncode{config: config}, nil
 		},

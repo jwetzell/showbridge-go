@@ -17,8 +17,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "midi.note_off.create",
-		Title: "Create MIDI Note Off Message",
+		Type:        "midi.note_off.create",
+		Title:       "Create MIDI Note Off Message",
+		Description: "Creates a MIDI Note Off message",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

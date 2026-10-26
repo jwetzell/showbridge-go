@@ -11,8 +11,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "yaml.encode",
-		Title: "Encode YAML",
+		Type:        "yaml.encode",
+		Title:       "Encode YAML",
+		Description: "Encodes the payload as YAML",
 		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &YamlEncode{config: config}, nil
 		},

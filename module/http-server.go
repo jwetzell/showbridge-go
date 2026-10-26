@@ -17,8 +17,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "http.server",
-		Title: "HTTP Server",
+		Type:        "http.server",
+		Title:       "HTTP Server",
+		Description: "Listens for incoming HTTP requests on the specified port",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

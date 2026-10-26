@@ -13,8 +13,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "struct.field.get",
-		Title: "Get Struct Field",
+		Type:        "struct.field.get",
+		Title:       "Get Struct Field",
+		Description: "Extracts a field from a struct",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

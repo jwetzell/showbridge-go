@@ -13,8 +13,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "int.scale",
-		Title: "Scale Int",
+		Type:        "int.scale",
+		Title:       "Scale Int",
+		Description: "Scales an integer from one range to another",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

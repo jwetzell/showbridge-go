@@ -15,8 +15,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "pubsub.publish",
-		Title: "Publish to Pub/Sub Topic",
+		Type:        "pubsub.publish",
+		Title:       "Publish to Pub/Sub Topic",
+		Description: "Publishes the incoming payload to a specified topic",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

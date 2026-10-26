@@ -18,8 +18,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "websocket.client",
-		Title: "WebSocket Client",
+		Type:        "websocket.client",
+		Title:       "WebSocket Client",
+		Description: "Opens a WebSocket connection to the specified server",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

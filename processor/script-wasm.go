@@ -16,8 +16,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "script.wasm",
-		Title: "Run WASM Plugin",
+		Type:        "script.wasm",
+		Title:       "Run WASM Plugin",
+		Description: "Runs an Extism WASM plugin with the specified function and options",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

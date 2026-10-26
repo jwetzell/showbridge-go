@@ -16,8 +16,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "midi.input",
-		Title: "MIDI Input",
+		Type:        "midi.input",
+		Title:       "MIDI Input",
+		Description: "Listens for incoming MIDI messages on the specified port",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

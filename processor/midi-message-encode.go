@@ -13,8 +13,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "midi.message.encode",
-		Title: "Encode MIDI Message",
+		Type:        "midi.message.encode",
+		Title:       "Encode MIDI Message",
+		Description: "Encodes a MIDI message into its byte representation",
 		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &MIDIMessageEncode{config: config}, nil
 		},

@@ -15,8 +15,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "float.random",
-		Title: "Random Float",
+		Type:        "float.random",
+		Title:       "Random Float",
+		Description: "Generates a random floating point number within a specified range [min, max)",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

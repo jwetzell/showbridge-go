@@ -17,8 +17,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "mqtt.client",
-		Title: "MQTT Client",
+		Type:        "mqtt.client",
+		Title:       "MQTT Client",
+		Description: "Connects to the specified MQTT broker and subscribes to the specified topic",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

@@ -18,8 +18,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "net.tcp.client",
-		Title: "TCP Client",
+		Type:        "net.tcp.client",
+		Title:       "TCP Client",
+		Description: "Connects to the specified TCP server using the provided host and port",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

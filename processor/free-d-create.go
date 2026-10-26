@@ -15,8 +15,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "freed.create",
-		Title: "Create FreeD",
+		Type:        "freed.create",
+		Title:       "Create FreeD",
+		Description: "Creates a FreeD Position from the specified parameters",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

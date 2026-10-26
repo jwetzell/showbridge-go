@@ -21,8 +21,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "net.tcp.server",
-		Title: "TCP Server",
+		Type:        "net.tcp.server",
+		Title:       "TCP Server",
+		Description: "Listens for incoming TCP connections on the specified IP and port",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

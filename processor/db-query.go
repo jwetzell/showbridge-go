@@ -15,8 +15,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "db.query",
-		Title: "Query Database",
+		Type:        "db.query",
+		Title:       "Query Database",
+		Description: "Executes a SQL query against a specified database module",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

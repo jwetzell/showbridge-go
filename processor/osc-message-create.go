@@ -16,8 +16,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "osc.message.create",
-		Title: "Create OSC Message",
+		Type:        "osc.message.create",
+		Title:       "Create OSC Message",
+		Description: "Creates an OSC message with the specified address and arguments",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

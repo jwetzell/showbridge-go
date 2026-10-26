@@ -13,8 +13,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "kv.set",
-		Title: "Set Key",
+		Type:        "kv.set",
+		Title:       "Set Key",
+		Description: "Sets a key-value pair in the specified module",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

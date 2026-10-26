@@ -13,8 +13,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "time.timer",
-		Title: "Timer",
+		Type:        "time.timer",
+		Title:       "Timer",
+		Description: "Fires an event after the specified duration",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

@@ -16,8 +16,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "net.udp.client",
-		Title: "UDP Client",
+		Type:        "net.udp.client",
+		Title:       "UDP Client",
+		Description: "Sends UDP packets to the specified server",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

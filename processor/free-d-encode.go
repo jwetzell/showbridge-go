@@ -11,8 +11,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "freed.encode",
-		Title: "Encode FreeD",
+		Type:        "freed.encode",
+		Title:       "Encode FreeD",
+		Description: "Encodes a FreeD Position into bytes",
 		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &FreeDEncode{config: config}, nil
 		},

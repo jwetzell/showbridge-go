@@ -16,8 +16,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "postgres.client",
-		Title: "PostgreSQL Client",
+		Type:        "postgres.client",
+		Title:       "PostgreSQL Client",
+		Description: "Connects to a PostgreSQL database using the specified connection URL",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

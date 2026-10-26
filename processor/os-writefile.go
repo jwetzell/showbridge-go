@@ -16,8 +16,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "os.writefile",
-		Title: "Write File",
+		Type:        "os.writefile",
+		Title:       "Write File",
+		Description: "Writes the incoming payload to a specified file path",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

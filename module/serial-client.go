@@ -20,8 +20,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "serial.client",
-		Title: "Serial Client",
+		Type:        "serial.client",
+		Title:       "Serial Client",
+		Description: "Opens a serial port with the specified settings and handles framed messages",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

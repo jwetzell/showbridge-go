@@ -11,8 +11,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "json.encode",
-		Title: "Encode JSON",
+		Type:        "json.encode",
+		Title:       "Encode JSON",
+		Description: "Encodes a payload into JSON format",
 		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &JsonEncode{config: config}, nil
 		},

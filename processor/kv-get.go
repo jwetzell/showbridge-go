@@ -13,8 +13,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "kv.get",
-		Title: "Get Key",
+		Type:        "kv.get",
+		Title:       "Get Key",
+		Description: "Retrieves a value from the specified key-value module",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

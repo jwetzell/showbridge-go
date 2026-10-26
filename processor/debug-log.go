@@ -11,8 +11,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "debug.log",
-		Title: "Debug Log",
+		Type:        "debug.log",
+		Title:       "Debug Log",
+		Description: "Logs the payload for debugging purposes",
 		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &DebugLog{config: config, logger: slog.Default().With("component", "processor", "type", config.Type)}, nil
 		},

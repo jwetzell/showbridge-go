@@ -13,8 +13,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "string.split",
-		Title: "Split String",
+		Type:        "string.split",
+		Title:       "Split String",
+		Description: "Splits a string by the specified separator",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

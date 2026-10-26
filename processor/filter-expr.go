@@ -13,8 +13,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "filter.expr",
-		Title: "Filter by Expr expression",
+		Type:        "filter.expr",
+		Title:       "Filter by Expr expression",
+		Description: "Filters payloads based on an Expr expression",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

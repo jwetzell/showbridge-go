@@ -10,8 +10,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "filter.change",
-		Title: "Filter On Change",
+		Type:        "filter.change",
+		Title:       "Filter On Change",
+		Description: "Filters out payloads that have not changed since the last one",
 		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			return &FilterChange{config: config}, nil
 		},

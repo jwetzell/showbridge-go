@@ -13,8 +13,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "filter.regex",
-		Title: "Filter by Regex",
+		Type:        "filter.regex",
+		Title:       "Filter by Regex",
+		Description: "Filters payloads based on a regular expression",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

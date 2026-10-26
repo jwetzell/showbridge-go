@@ -16,8 +16,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "os.exec",
-		Title: "Exec Command",
+		Type:        "os.exec",
+		Title:       "Exec Command",
+		Description: "Executes a specified command with optional arguments",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

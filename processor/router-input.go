@@ -13,8 +13,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "router.input",
-		Title: "Router Input",
+		Type:        "router.input",
+		Title:       "Router Input",
+		Description: "Send an input to the router with the specified source",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

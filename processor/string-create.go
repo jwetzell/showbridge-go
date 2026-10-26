@@ -13,8 +13,9 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:  "string.create",
-		Title: "Create String",
+		Type:        "string.create",
+		Title:       "Create String",
+		Description: "Creates a string based on a Go template",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{

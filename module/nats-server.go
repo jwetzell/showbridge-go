@@ -19,8 +19,9 @@ import (
 
 func init() {
 	RegisterModule(ModuleRegistration{
-		Type:  "nats.server",
-		Title: "NATS Server",
+		Type:        "nats.server",
+		Title:       "NATS Server",
+		Description: "Starts a NATS server on the specified IP and port",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
