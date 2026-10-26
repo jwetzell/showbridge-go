@@ -17,7 +17,9 @@ switch(type) {
 {
 schema !== undefined && 
 <div>
+    <h3>Schema</h3>
     <ul>
+        {schema.description !== "" && <li><strong>description</strong>:&nbsp;{schema.description}</li>}
         {schema.properties.type !== undefined && <li><strong>type</strong>:&nbsp;<code>{schema.properties.type.const}</code></li>}
         {schema.properties.params !== undefined && <li><strong>params</strong>:<Params schema={schema.properties.params}/></li>}
     </ul>
