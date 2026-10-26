@@ -120,7 +120,15 @@ export default defineConfig({
             {
               label: "ArtNet",
               collapsed: true,
-              items: [{ autogenerate: { directory: "processors/artnet" } }],
+              items: [
+                {
+                  label: "Packet",
+                  collapsed: true,
+                  items: [
+                    { autogenerate: { directory: "processors/artnet/packet" } },
+                  ],
+                },
+              ],
             },
             {
               label: "Database",
