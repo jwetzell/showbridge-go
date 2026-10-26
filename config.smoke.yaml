@@ -3,7 +3,7 @@ api:
   port: 8080
 modules:
   - id: sqlite
-    type: db.sqlite
+    type: sqlite.client
     params:
       dsn: ":memory:"
   - id: httpin
@@ -79,13 +79,12 @@ routes:
           module: udpout
   - input: ticker
     processors:
-      - type: http.request.do
+      - type: http.get
         params:
           url: "http://localhost:3000/echo"
-          method: "GET"
-      - type: struct.field.get
+      - type: script.expr
         params:
-          name: "Body"
+          expression: "Payload.Body"
       - type: string.decode
       - type: debug.log
   - input: tcpin
@@ -108,9 +107,9 @@ routes:
       - type: debug.log
   - input: natsin
     processors:
-      - type: struct.field.get
+      - type: script.expr
         params:
-          name: "Data"
+          expression: "Payload.Data"
       - type: string.decode
       - type: debug.log
   - input: httpin
