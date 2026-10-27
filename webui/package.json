@@ -52,7 +52,7 @@
     "@types/lodash-es": "4.17.12",
     "jsdom": "30.1.3",
     "playwright-ng-schematics": "22.1.3",
-    "postcss": "8.5.31",
+    "postcss": "8.5.32",
     "prettier": "3.9.10",
     "tailwindcss": "4.3.3",
     "typescript": "6.0.3",
