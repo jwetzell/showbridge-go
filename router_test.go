@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"reflect"
+	"sync"
 	"testing"
 	"time"
 
@@ -28,36 +29,36 @@ type MockCounterModule struct {
 	config      config.ModuleConfig
 	ctx         context.Context
 	outputCount int
+	mu          sync.Mutex
 	router      routing.Router
 	logger      *slog.Logger
 	cancel      context.CancelFunc
 }
 
 func (mcm *MockCounterModule) Output(context.Context, any) error {
+	mcm.mu.Lock()
+	defer mcm.mu.Unlock()
 	mcm.outputCount += 1
 	return nil
 }
 
 func (mcm *MockCounterModule) Start(ctx context.Context, router routing.Router) error {
+	mcm.mu.Lock()
 	mcm.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	mcm.ctx = moduleContext
 	mcm.cancel = cancel
+	mcm.mu.Unlock()
 	<-mcm.ctx.Done()
 	return nil
 }
 
-func (mcm *MockCounterModule) Get(key string) (any, error) {
-	if key == "count" {
-		return mcm.outputCount, nil
-	}
-	return nil, fmt.Errorf("mock.counter key not found")
-}
-
 func (mcm *MockCounterModule) Stop() {
+	mcm.mu.Lock()
 	if mcm.cancel != nil {
-		defer mcm.cancel()
+		mcm.cancel()
 	}
+	mcm.mu.Unlock()
 }
 
 func TestNewRouter(t *testing.T) {
