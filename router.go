@@ -198,11 +198,11 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, inputPayload 
 					End:     false,
 				}, r.ModuleInstances, r)
 				if err != nil {
+					routeIOErrorsMu.Lock()
 					if routeIOErrors == nil {
 						routeIOErrors = []routing.RouteIOError{}
 					}
 					r.logger.Error("unable to process input", "route", routeIndex, "source", sourceId, "error", err)
-					routeIOErrorsMu.Lock()
 					routeIOErrors = append(routeIOErrors, routing.RouteIOError{
 						Index:        routeIndex,
 						ProcessError: err,
