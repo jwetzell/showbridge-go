@@ -1,6 +1,6 @@
 ARG GO_VERSION=1.27.2
 
-FROM node:24-alpine AS webui-builder
+FROM node:26-alpine AS webui-builder
 WORKDIR /webui
 COPY webui .
 RUN npm ci && npm run build -- --base-href=/ui/
