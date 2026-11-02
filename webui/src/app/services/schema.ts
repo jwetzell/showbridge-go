@@ -8,6 +8,7 @@ import { Config, ModuleConfig, ProcessorConfig, RouteConfig } from '../models/co
 import { ObjectInfo } from '../models/form';
 import { EventsService } from './events';
 import { SettingsService } from './settings';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
   providedIn: 'root',
@@ -140,7 +141,7 @@ export class SchemaService {
 
   getSkeletonForRoute(): RouteConfig {
     const template: RouteConfig = {
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       processors: [],
     };
     return template;
@@ -148,7 +149,7 @@ export class SchemaService {
 
   getSkeletonForProcessor(processorType: string): ProcessorConfig {
     const template: ProcessorConfig = {
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       type: processorType,
     };
     const itemInfo = this.processorTypes.find((itemInfo) => itemInfo.type === processorType);
