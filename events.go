@@ -35,7 +35,7 @@ func (r *Router) RemoveEventDestination(dest events.EventDestination) {
 }
 
 func (r *Router) unicastEvent(event events.Event, dest events.EventDestination) {
-	err := dest.Send(event)
+	err := dest.Send(r.Context, event)
 	if err != nil {
 		r.logger.Error("failed to send event", "error", err)
 	}
@@ -45,7 +45,7 @@ func (r *Router) broadcastEvent(event events.Event) {
 	r.eventDestinationsMu.Lock()
 	defer r.eventDestinationsMu.Unlock()
 	for _, dest := range r.eventDestinations {
-		err := dest.Send(event)
+		err := dest.Send(r.Context, event)
 		if err != nil {
 			r.logger.Error("failed to send event", "error", err)
 		}
