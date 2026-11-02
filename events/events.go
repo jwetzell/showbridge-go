@@ -1,6 +1,7 @@
 package events
 
 import (
+	"context"
 	"encoding/json"
 )
 
@@ -15,7 +16,7 @@ func (e Event) ToJSON() ([]byte, error) {
 }
 
 type EventDestination interface {
-	Send(event Event) error
+	Send(ctx context.Context, event Event) error
 	Is(dest EventDestination) bool
 }
 
