@@ -24,7 +24,7 @@ require (
 	go.bug.st/serial v1.8.0
 	golang.org/x/time v0.16.0
 	modernc.org/quickjs v0.27.0
-	modernc.org/sqlite v1.61.0
+	modernc.org/sqlite v1.61.1
 	sigs.k8s.io/yaml v1.6.0
 )
 
