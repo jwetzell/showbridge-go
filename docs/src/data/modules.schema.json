@@ -251,46 +251,6 @@
         "type": "object"
       },
       {
-        "$id": "nats.server",
-        "additionalProperties": false,
-        "description": "Starts a NATS server on the specified IP and port",
-        "properties": {
-          "id": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "params": {
-            "additionalProperties": false,
-            "properties": {
-              "ip": {
-                "default": "0.0.0.0",
-                "description": "the IP address to bind the NATS server to",
-                "title": "IP",
-                "type": "string"
-              },
-              "port": {
-                "default": 4222,
-                "description": "the port for the NATS server to listen on",
-                "maximum": 65535,
-                "minimum": 1024,
-                "title": "Port",
-                "type": "integer"
-              }
-            },
-            "type": "object"
-          },
-          "type": {
-            "const": "nats.server"
-          }
-        },
-        "required": [
-          "id",
-          "type"
-        ],
-        "title": "NATS Server",
-        "type": "object"
-      },
-      {
         "$id": "net.tcp.client",
         "additionalProperties": false,
         "description": "Connects to the specified TCP server using the provided host and port",

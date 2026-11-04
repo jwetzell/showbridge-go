@@ -1425,52 +1425,6 @@
         "type": "object"
       },
       {
-        "$id": "script.wasm",
-        "additionalProperties": false,
-        "description": "Runs an Extism WASM plugin with the specified function and options",
-        "properties": {
-          "id": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "params": {
-            "additionalProperties": false,
-            "properties": {
-              "enableWasi": {
-                "default": false,
-                "description": "whether to enable WASI when running the WASM plugin",
-                "title": "Enable WASI",
-                "type": "boolean"
-              },
-              "function": {
-                "default": "process",
-                "description": "exported function to call on the WASM plugin",
-                "title": "Function",
-                "type": "string"
-              },
-              "path": {
-                "description": "path to the WASM plugin to load",
-                "title": "Path",
-                "type": "string"
-              }
-            },
-            "required": [
-              "path"
-            ],
-            "type": "object"
-          },
-          "type": {
-            "const": "script.wasm"
-          }
-        },
-        "required": [
-          "type",
-          "params"
-        ],
-        "title": "Run WASM Plugin",
-        "type": "object"
-      },
-      {
         "$id": "string.create",
         "additionalProperties": false,
         "description": "Creates a string based on a Go template",
