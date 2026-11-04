@@ -1,6 +1,6 @@
 module github.com/jwetzell/showbridge-go
 
-go 1.27.2
+go 1.27.3
 
 require (
 	github.com/coder/websocket v1.8.15
@@ -14,6 +14,7 @@ require (
 	github.com/jwetzell/free-d-go v0.3.0
 	github.com/jwetzell/osc-go v0.7.0
 	github.com/jwetzell/psn-go v0.3.0
+	github.com/jwetzell/slip-go v0.1.0
 	github.com/nats-io/nats-server/v2 v2.15.2
 	github.com/nats-io/nats.go v1.55.0
 	github.com/redis/go-redis/v9 v9.23.0
