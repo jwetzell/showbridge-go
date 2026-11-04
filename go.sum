@@ -57,8 +57,8 @@ github.com/jwetzell/osc-go v0.7.0 h1:gxw6cc0vRCsYFDHCmYSR4WGM+XPPFMZSoEwjGZlF0k0
 github.com/jwetzell/osc-go v0.7.0/go.mod h1:20C+7NX52uPlrOV79ZS4r51hsFoxEehwmRl5A1esUic=
 github.com/jwetzell/psn-go v0.3.0 h1:WVpCEmExYE8a+I5hQak5jNJJp2x35VdGX/VuMUKPmhY=
 github.com/jwetzell/psn-go v0.3.0/go.mod h1:bcEAeti4sQM375buujb3mIfmUstD4Aby18gq3ENb6+o=
-github.com/jwetzell/slip-go v0.1.0 h1:Dx98BngQTeuSzJUsG8OUDfj8mPYz09fwjiRj5j69kpY=
-github.com/jwetzell/slip-go v0.1.0/go.mod h1:Z8Iq/Y1g6aKuV3N8N0ziMHLz4Y5UJZMyrNK7ZUDiZHA=
+github.com/jwetzell/slip-go v0.2.0 h1:Fin3SFWZjlgh5Cpc0O2JKVoLQDLFXPtX7JKoXL8+zNw=
+github.com/jwetzell/slip-go v0.2.0/go.mod h1:Z8Iq/Y1g6aKuV3N8N0ziMHLz4Y5UJZMyrNK7ZUDiZHA=
 github.com/klauspost/compress v1.20.3 h1:zWNoFqq/lSuYQRim3dUXlXeA0IqwuZGicdG5ZTfY5j4=
 github.com/klauspost/compress v1.20.3/go.mod h1:LUdAzn7YLVvxLpc7y3V1m40wESHTgc1422pwwBSKYuI=
 github.com/klauspost/cpuid/v2 v2.4.0 h1:S6Hrbc7+ywsr0r+RLapfGBHfyefhCTwEh3A0tV913Dw=
