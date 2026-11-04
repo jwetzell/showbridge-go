@@ -1,4 +1,4 @@
-ARG GO_VERSION=1.27.2
+ARG GO_VERSION=1.27.3
 
 FROM node:26-alpine AS webui-builder
 WORKDIR /webui
