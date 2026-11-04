@@ -38,20 +38,6 @@ modules:
     type: websocket.client
     params:
       url: "wss://echo.websocket.org"
-  - id: natsserver
-    type: nats.server
-    params:
-      port: 4222
-  - id: natsout
-    type: nats.client
-    params:
-      url: "nats://localhost:4222"
-      subject: "hello"
-  - id: natsin
-    type: nats.client
-    params:
-      url: "nats://localhost:4222"
-      subject: "test"
 routes:
   - input: ticker
     processors:
@@ -105,25 +91,9 @@ routes:
           module: "sqlite"
           query: "SELECT 1;"
       - type: debug.log
-  - input: natsin
-    processors:
-      - type: script.expr
-        params:
-          expression: "Payload.Data"
-      - type: string.decode
-      - type: debug.log
   - input: httpin
     processors:
       - type: http.response
         params:
           status: 200
           bodyTemplate: "Hello, World!"
-  - input: ticker
-    processors:
-      - type: string.create
-        params:
-          template: "natsout: {{.Payload}}"
-      - type: pubsub.publish
-        params:
-          module: natsout
-          topic: "test"
