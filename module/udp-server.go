@@ -139,10 +139,6 @@ func (us *UDPServer) Start(ctx context.Context, router routing.Router) error {
 	return nil
 }
 
-func (us *UDPServer) Output(ctx context.Context, payload any) error {
-	return errors.New("net.udp.server output is not implemented")
-}
-
 func (us *UDPServer) Stop() {
 	if us.cancel != nil {
 		defer us.cancel()
