@@ -31,11 +31,12 @@ type PSNClient struct {
 	decoder *psn.Decoder
 	logger  *slog.Logger
 	cancel  context.CancelFunc
-	connMu  sync.Mutex
+	mu      sync.Mutex
 }
 
 func (pc *PSNClient) Start(ctx context.Context, router routing.Router) error {
 	pc.logger.Debug("running")
+	pc.mu.Lock()
 	pc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	pc.ctx = moduleContext
@@ -43,17 +44,18 @@ func (pc *PSNClient) Start(ctx context.Context, router routing.Router) error {
 
 	addr, err := net.ResolveUDPAddr("udp", "236.10.10.10:56565")
 	if err != nil {
+		pc.mu.Unlock()
 		return err
 	}
 
 	client, err := net.ListenMulticastUDP("udp", nil, addr)
 	if err != nil {
+		pc.mu.Unlock()
 		return err
 	}
 
-	pc.connMu.Lock()
 	pc.conn = client
-	pc.connMu.Unlock()
+	pc.mu.Unlock()
 
 	buffer := make([]byte, 2048)
 	for pc.ctx.Err() == nil {
@@ -61,7 +63,7 @@ func (pc *PSNClient) Start(ctx context.Context, router routing.Router) error {
 		case <-pc.ctx.Done():
 			return nil
 		default:
-			pc.connMu.Lock()
+			pc.mu.Lock()
 			err := pc.conn.SetDeadline(time.Now().Add(time.Millisecond * 200))
 			if err != nil {
 				pc.logger.Error("psn client set deadline error", "error", err)
@@ -69,7 +71,7 @@ func (pc *PSNClient) Start(ctx context.Context, router routing.Router) error {
 			}
 
 			numBytes, _, err := pc.conn.ReadFromUDP(buffer)
-			pc.connMu.Unlock()
+			pc.mu.Unlock()
 			if err != nil {
 				// NOTE(jwetzell) we hit deadline
 				opErr, ok := err.(*net.OpError)
@@ -106,8 +108,8 @@ func (pc *PSNClient) Stop() {
 	if pc.cancel != nil {
 		defer pc.cancel()
 	}
-	pc.connMu.Lock()
-	defer pc.connMu.Unlock()
+	pc.mu.Lock()
+	defer pc.mu.Unlock()
 	if pc.conn != nil {
 		err := pc.conn.Close()
 		if err != nil {

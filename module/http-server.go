@@ -46,14 +46,14 @@ func init() {
 }
 
 type HTTPServer struct {
-	config   config.ModuleConfig
-	Port     uint16
-	ctx      context.Context
-	router   routing.Router
-	logger   *slog.Logger
-	cancel   context.CancelFunc
-	server   *http.Server
-	serverMu sync.Mutex
+	config config.ModuleConfig
+	Port   uint16
+	ctx    context.Context
+	router routing.Router
+	logger *slog.Logger
+	cancel context.CancelFunc
+	server *http.Server
+	mu     sync.Mutex
 }
 
 type ResponseIOError struct {
@@ -137,6 +137,7 @@ func (hs *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (hs *HTTPServer) Start(ctx context.Context, router routing.Router) error {
 	hs.logger.Debug("running")
+	hs.mu.Lock()
 	hs.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	hs.ctx = moduleContext
@@ -148,9 +149,8 @@ func (hs *HTTPServer) Start(ctx context.Context, router routing.Router) error {
 		Handler:           hs,
 	}
 
-	hs.serverMu.Lock()
 	hs.server = httpServer
-	hs.serverMu.Unlock()
+	hs.mu.Unlock()
 
 	err := httpServer.ListenAndServe()
 	// TODO(jwetzell): handle server closed error differently
@@ -159,7 +159,7 @@ func (hs *HTTPServer) Start(ctx context.Context, router routing.Router) error {
 			return err
 		}
 	}
-
+	cancel()
 	<-hs.ctx.Done()
 	hs.logger.Debug("done")
 	return nil
@@ -169,15 +169,20 @@ func (hs *HTTPServer) Stop() {
 	if hs.cancel != nil {
 		defer hs.cancel()
 	}
-	hs.serverMu.Lock()
-	defer hs.serverMu.Unlock()
+	hs.mu.Lock()
+	defer hs.mu.Unlock()
 	if hs.server != nil {
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
 		err := hs.server.Shutdown(shutdownCtx)
 		if err != nil {
 			hs.logger.Error("http server shutdown error", "error", err)
 		}
+
+		select {
+		case <-hs.ctx.Done():
+		case <-shutdownCtx.Done():
+			hs.logger.Error("http server shutdown timed out")
+		}
 		shutdownCancel()
-		<-shutdownCtx.Done()
 	}
 }

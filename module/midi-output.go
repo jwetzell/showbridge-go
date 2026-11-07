@@ -47,18 +47,19 @@ func init() {
 }
 
 type MIDIOutput struct {
-	config     config.ModuleConfig
-	ctx        context.Context
-	router     routing.Router
-	Port       string
-	sendFunc   func(midi.Message) error
-	logger     *slog.Logger
-	cancel     context.CancelFunc
-	sendFuncMu sync.Mutex
+	config   config.ModuleConfig
+	ctx      context.Context
+	router   routing.Router
+	Port     string
+	sendFunc func(midi.Message) error
+	logger   *slog.Logger
+	cancel   context.CancelFunc
+	mu       sync.Mutex
 }
 
 func (mo *MIDIOutput) Start(ctx context.Context, router routing.Router) error {
 	mo.logger.Debug("running")
+	mo.mu.Lock()
 	mo.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	mo.ctx = moduleContext
@@ -67,17 +68,18 @@ func (mo *MIDIOutput) Start(ctx context.Context, router routing.Router) error {
 	out, err := midi.FindOutPort(mo.Port)
 
 	if err != nil {
+		mo.mu.Unlock()
 		return fmt.Errorf("midi.output can't find output port: %s", mo.Port)
 	}
 
 	send, err := midi.SendTo(out)
 	if err != nil {
-		return err
+		mo.mu.Unlock()
+		return fmt.Errorf("midi.output can't send to output port: %s", mo.Port)
 	}
 
-	mo.sendFuncMu.Lock()
 	mo.sendFunc = send
-	mo.sendFuncMu.Unlock()
+	mo.mu.Unlock()
 
 	<-mo.ctx.Done()
 	mo.logger.Debug("done")
@@ -85,8 +87,8 @@ func (mo *MIDIOutput) Start(ctx context.Context, router routing.Router) error {
 }
 
 func (mo *MIDIOutput) Output(ctx context.Context, payload any) error {
-	mo.sendFuncMu.Lock()
-	defer mo.sendFuncMu.Unlock()
+	mo.mu.Lock()
+	defer mo.mu.Unlock()
 	if mo.sendFunc == nil {
 		return errors.New("midi.output output is not setup")
 	}

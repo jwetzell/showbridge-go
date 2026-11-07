@@ -53,12 +53,13 @@ type MySQLClient struct {
 	router routing.Router
 	db     *sql.DB
 	logger *slog.Logger
-	dbMu   sync.Mutex
+	mu     sync.Mutex
 	cancel context.CancelFunc
 }
 
 func (mc *MySQLClient) Start(ctx context.Context, router routing.Router) error {
 	mc.logger.Debug("running")
+	mc.mu.Lock()
 	mc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	mc.ctx = moduleContext
@@ -66,6 +67,7 @@ func (mc *MySQLClient) Start(ctx context.Context, router routing.Router) error {
 
 	db, err := sql.Open("mysql", mc.Dsn)
 	if err != nil {
+		mc.mu.Unlock()
 		return fmt.Errorf("mysql.client error connecting to database: %w", err)
 	}
 
@@ -74,9 +76,8 @@ func (mc *MySQLClient) Start(ctx context.Context, router routing.Router) error {
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(10)
 
-	mc.dbMu.Lock()
 	mc.db = db
-	mc.dbMu.Unlock()
+	mc.mu.Unlock()
 	<-mc.ctx.Done()
 	mc.logger.Debug("done")
 	return nil
@@ -86,8 +87,8 @@ func (mc *MySQLClient) Stop() {
 	if mc.cancel != nil {
 		defer mc.cancel()
 	}
-	mc.dbMu.Lock()
-	defer mc.dbMu.Unlock()
+	mc.mu.Lock()
+	defer mc.mu.Unlock()
 	if mc.db != nil {
 		err := mc.db.Close()
 		if err != nil {
@@ -97,8 +98,8 @@ func (mc *MySQLClient) Stop() {
 }
 
 func (mc *MySQLClient) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
-	mc.dbMu.Lock()
-	defer mc.dbMu.Unlock()
+	mc.mu.Lock()
+	defer mc.mu.Unlock()
 	if mc.db == nil {
 		return nil, fmt.Errorf("database not initialized")
 	}

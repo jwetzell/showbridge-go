@@ -90,15 +90,17 @@ type TCPClient struct {
 	Addr            *net.TCPAddr
 	logger          *slog.Logger
 	cancel          context.CancelFunc
-	connMu          sync.Mutex
+	mu              sync.Mutex
 }
 
 func (tc *TCPClient) Start(ctx context.Context, router routing.Router) error {
 	tc.logger.Debug("running")
+	tc.mu.Lock()
 	tc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	tc.ctx = moduleContext
 	tc.cancel = cancel
+	tc.mu.Unlock()
 
 CONNECT_RETRY:
 	for tc.ctx.Err() == nil {
@@ -159,8 +161,8 @@ CONNECT_RETRY:
 }
 
 func (tc *TCPClient) SetupConn() error {
-	tc.connMu.Lock()
-	defer tc.connMu.Unlock()
+	tc.mu.Lock()
+	defer tc.mu.Unlock()
 	client, err := net.DialTCP("tcp", nil, tc.Addr)
 	tc.conn = client
 	tc.outFramedWriter = framer.NewFramedWrite(client, framer.GetFramer(tc.framerType))
@@ -168,8 +170,8 @@ func (tc *TCPClient) SetupConn() error {
 }
 
 func (tc *TCPClient) Output(ctx context.Context, payload any) error {
-	tc.connMu.Lock()
-	defer tc.connMu.Unlock()
+	tc.mu.Lock()
+	defer tc.mu.Unlock()
 	if tc.conn == nil {
 		return errors.New("net.tcp.client client is not setup")
 	}
@@ -185,8 +187,8 @@ func (tc *TCPClient) Stop() {
 	if tc.cancel != nil {
 		defer tc.cancel()
 	}
-	tc.connMu.Lock()
-	defer tc.connMu.Unlock()
+	tc.mu.Lock()
+	defer tc.mu.Unlock()
 	if tc.conn != nil {
 		err := tc.conn.Close()
 		if err != nil {

@@ -104,7 +104,7 @@ type TCPServer struct {
 	logger                *slog.Logger
 	cancel                context.CancelFunc
 	listener              *net.TCPListener
-	listenerMu            sync.Mutex
+	mu                    sync.Mutex
 	connectionShutdownCtx context.Context
 	connectionShutdown    context.CancelFunc
 }
@@ -168,6 +168,7 @@ func (ts *TCPServer) handleClient(client *net.TCPConn) {
 
 func (ts *TCPServer) Start(ctx context.Context, router routing.Router) error {
 	ts.logger.Debug("running")
+	ts.mu.Lock()
 	ts.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	ts.ctx = moduleContext
@@ -179,11 +180,11 @@ func (ts *TCPServer) Start(ctx context.Context, router routing.Router) error {
 
 	listener, err := net.ListenTCP("tcp", ts.Addr)
 	if err != nil {
+		ts.mu.Unlock()
 		return err
 	}
-	ts.listenerMu.Lock()
 	ts.listener = listener
-	ts.listenerMu.Unlock()
+	ts.mu.Unlock()
 	ts.wg.Add(1)
 
 AcceptLoop:
@@ -242,8 +243,8 @@ func (ts *TCPServer) Stop() {
 		ts.connectionShutdown()
 	}
 
-	ts.listenerMu.Lock()
-	defer ts.listenerMu.Unlock()
+	ts.mu.Lock()
+	defer ts.mu.Unlock()
 	if ts.listener != nil {
 		err := ts.listener.Close()
 		if err != nil {

@@ -91,12 +91,12 @@ type SerialClient struct {
 	port      serial.Port
 	logger    *slog.Logger
 	cancel    context.CancelFunc
-	portMu    sync.Mutex
+	mu        sync.Mutex
 }
 
 func (sc *SerialClient) SetupPort() error {
-	sc.portMu.Lock()
-	defer sc.portMu.Unlock()
+	sc.mu.Lock()
+	defer sc.mu.Unlock()
 	port, err := serial.Open(sc.Port, sc.Mode)
 	if err != nil {
 		return err
@@ -109,10 +109,12 @@ func (sc *SerialClient) SetupPort() error {
 
 func (sc *SerialClient) Start(ctx context.Context, router routing.Router) error {
 	sc.logger.Debug("running")
+	sc.mu.Lock()
 	sc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	sc.ctx = moduleContext
 	sc.cancel = cancel
+	sc.mu.Unlock()
 
 	for sc.ctx.Err() == nil {
 		err := sc.SetupPort()
@@ -180,8 +182,8 @@ func (sc *SerialClient) Stop() {
 	if sc.cancel != nil {
 		defer sc.cancel()
 	}
-	sc.portMu.Lock()
-	defer sc.portMu.Unlock()
+	sc.mu.Lock()
+	defer sc.mu.Unlock()
 	if sc.port != nil {
 		err := sc.port.Close()
 		if err != nil {

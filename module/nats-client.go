@@ -54,21 +54,21 @@ func init() {
 }
 
 type NATSClient struct {
-	config   config.ModuleConfig
-	ctx      context.Context
-	router   routing.Router
-	URL      string
-	Subject  string
-	client   *nats.Conn
-	logger   *slog.Logger
-	cancel   context.CancelFunc
-	sub      *nats.Subscription
-	subMu    sync.Mutex
-	clientMu sync.Mutex
+	config  config.ModuleConfig
+	ctx     context.Context
+	router  routing.Router
+	URL     string
+	Subject string
+	client  *nats.Conn
+	logger  *slog.Logger
+	cancel  context.CancelFunc
+	sub     *nats.Subscription
+	mu      sync.Mutex
 }
 
 func (nc *NATSClient) Start(ctx context.Context, router routing.Router) error {
 	nc.logger.Debug("running")
+	nc.mu.Lock()
 	nc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	nc.ctx = moduleContext
@@ -80,9 +80,7 @@ func (nc *NATSClient) Start(ctx context.Context, router routing.Router) error {
 		return err
 	}
 
-	nc.clientMu.Lock()
 	nc.client = client
-	nc.clientMu.Unlock()
 
 	sub, err := nc.client.Subscribe(nc.Subject, func(msg *nats.Msg) {
 		if nc.router != nil {
@@ -91,11 +89,11 @@ func (nc *NATSClient) Start(ctx context.Context, router routing.Router) error {
 	})
 
 	if err != nil {
+		nc.mu.Unlock()
 		return err
 	}
-	nc.subMu.Lock()
 	nc.sub = sub
-	nc.subMu.Unlock()
+	nc.mu.Unlock()
 
 	<-nc.ctx.Done()
 	nc.logger.Debug("done")
@@ -114,8 +112,8 @@ func (nc *NATSClient) Publish(ctx context.Context, topic string, payload any) er
 		payloadBytes = []byte(payloadString)
 	}
 
-	nc.clientMu.Lock()
-	defer nc.clientMu.Unlock()
+	nc.mu.Lock()
+	defer nc.mu.Unlock()
 
 	if nc.client == nil {
 		return errors.New("nats.client client is not setup")
@@ -134,8 +132,8 @@ func (nc *NATSClient) Stop() {
 	if nc.cancel != nil {
 		defer nc.cancel()
 	}
-	nc.subMu.Lock()
-	defer nc.subMu.Unlock()
+	nc.mu.Lock()
+	defer nc.mu.Unlock()
 	if nc.sub != nil {
 		err := nc.sub.Unsubscribe()
 		if err != nil {
@@ -143,8 +141,6 @@ func (nc *NATSClient) Stop() {
 		}
 	}
 
-	nc.clientMu.Lock()
-	defer nc.clientMu.Unlock()
 	if nc.client != nil {
 		err := nc.client.Drain()
 		if err != nil {

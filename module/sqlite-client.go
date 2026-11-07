@@ -52,12 +52,13 @@ type SqliteClient struct {
 	router routing.Router
 	db     *sql.DB
 	logger *slog.Logger
-	dbMu   sync.Mutex
+	mu     sync.Mutex
 	cancel context.CancelFunc
 }
 
 func (sc *SqliteClient) Start(ctx context.Context, router routing.Router) error {
 	sc.logger.Debug("running")
+	sc.mu.Lock()
 	sc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	sc.ctx = moduleContext
@@ -65,11 +66,11 @@ func (sc *SqliteClient) Start(ctx context.Context, router routing.Router) error 
 
 	db, err := sql.Open("sqlite", sc.Dsn)
 	if err != nil {
+		sc.mu.Unlock()
 		return fmt.Errorf("sqlite.client error opening database: %w", err)
 	}
-	sc.dbMu.Lock()
 	sc.db = db
-	sc.dbMu.Unlock()
+	sc.mu.Unlock()
 	<-sc.ctx.Done()
 	sc.logger.Debug("done")
 	return nil
@@ -79,8 +80,8 @@ func (sc *SqliteClient) Stop() {
 	if sc.cancel != nil {
 		defer sc.cancel()
 	}
-	sc.dbMu.Lock()
-	defer sc.dbMu.Unlock()
+	sc.mu.Lock()
+	defer sc.mu.Unlock()
 	if sc.db != nil {
 		err := sc.db.Close()
 		if err != nil {
@@ -90,8 +91,8 @@ func (sc *SqliteClient) Stop() {
 }
 
 func (sc *SqliteClient) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
-	sc.dbMu.Lock()
-	defer sc.dbMu.Unlock()
+	sc.mu.Lock()
+	defer sc.mu.Unlock()
 	if sc.db == nil {
 		return nil, fmt.Errorf("database not initialized")
 	}

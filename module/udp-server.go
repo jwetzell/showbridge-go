@@ -92,11 +92,12 @@ type UDPServer struct {
 	logger     *slog.Logger
 	cancel     context.CancelFunc
 	listener   *net.UDPConn
-	listenerMu sync.Mutex
+	mu         sync.Mutex
 }
 
 func (us *UDPServer) Start(ctx context.Context, router routing.Router) error {
 	us.logger.Debug("running")
+	us.mu.Lock()
 	us.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	us.ctx = moduleContext
@@ -104,11 +105,11 @@ func (us *UDPServer) Start(ctx context.Context, router routing.Router) error {
 
 	listener, err := net.ListenUDP("udp", us.Addr)
 	if err != nil {
+		us.mu.Unlock()
 		return err
 	}
-	us.listenerMu.Lock()
 	us.listener = listener
-	us.listenerMu.Unlock()
+	us.mu.Unlock()
 
 	buffer := make([]byte, us.BufferSize)
 	for us.ctx.Err() == nil {
@@ -143,8 +144,8 @@ func (us *UDPServer) Stop() {
 	if us.cancel != nil {
 		defer us.cancel()
 	}
-	us.listenerMu.Lock()
-	defer us.listenerMu.Unlock()
+	us.mu.Lock()
+	defer us.mu.Unlock()
 	if us.listener != nil {
 		err := us.listener.Close()
 		if err != nil {

@@ -56,15 +56,15 @@ func init() {
 }
 
 type RedisClient struct {
-	config   config.ModuleConfig
-	ctx      context.Context
-	router   routing.Router
-	Host     string
-	Port     uint16
-	client   *redis.Client
-	logger   *slog.Logger
-	cancel   context.CancelFunc
-	clientMu sync.Mutex
+	config config.ModuleConfig
+	ctx    context.Context
+	router routing.Router
+	Host   string
+	Port   uint16
+	client *redis.Client
+	logger *slog.Logger
+	cancel context.CancelFunc
+	mu     sync.Mutex
 }
 
 func (rc *RedisClient) Printf(ctx context.Context, format string, v ...any) {
@@ -73,8 +73,9 @@ func (rc *RedisClient) Printf(ctx context.Context, format string, v ...any) {
 }
 
 func (rc *RedisClient) Start(ctx context.Context, router routing.Router) error {
-	redis.SetLogger(rc)
 	rc.logger.Debug("running")
+	redis.SetLogger(rc)
+	rc.mu.Lock()
 	rc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	rc.ctx = moduleContext
@@ -86,9 +87,8 @@ func (rc *RedisClient) Start(ctx context.Context, router routing.Router) error {
 		DB:       0,
 	})
 
-	rc.clientMu.Lock()
 	rc.client = client
-	rc.clientMu.Unlock()
+	rc.mu.Unlock()
 
 	<-rc.ctx.Done()
 	rc.logger.Debug("done")
@@ -99,8 +99,8 @@ func (rc *RedisClient) Stop() {
 	if rc.cancel != nil {
 		defer rc.cancel()
 	}
-	rc.clientMu.Lock()
-	defer rc.clientMu.Unlock()
+	rc.mu.Lock()
+	defer rc.mu.Unlock()
 	if rc.client != nil {
 		err := rc.client.Close()
 		if err != nil {

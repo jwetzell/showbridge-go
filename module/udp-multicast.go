@@ -68,11 +68,12 @@ type UDPMulticast struct {
 	Addr   *net.UDPAddr
 	logger *slog.Logger
 	cancel context.CancelFunc
-	connMu sync.Mutex
+	mu     sync.Mutex
 }
 
 func (um *UDPMulticast) Start(ctx context.Context, router routing.Router) error {
 	um.logger.Debug("running")
+	um.mu.Lock()
 	um.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	um.ctx = moduleContext
@@ -80,13 +81,13 @@ func (um *UDPMulticast) Start(ctx context.Context, router routing.Router) error 
 
 	client, err := net.ListenMulticastUDP("udp", nil, um.Addr)
 	if err != nil {
+		um.mu.Unlock()
 		return err
 	}
 	defer client.Close()
 
-	um.connMu.Lock()
 	um.conn = client
-	um.connMu.Unlock()
+	um.mu.Unlock()
 
 	buffer := make([]byte, 2048)
 	for um.ctx.Err() == nil {
@@ -143,8 +144,8 @@ func (um *UDPMulticast) Stop() {
 	if um.cancel != nil {
 		defer um.cancel()
 	}
-	um.connMu.Lock()
-	defer um.connMu.Unlock()
+	um.mu.Lock()
+	defer um.mu.Unlock()
 	if um.conn != nil {
 		err := um.conn.Close()
 		if err != nil {

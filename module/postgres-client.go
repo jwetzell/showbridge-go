@@ -52,12 +52,13 @@ type PostgresClient struct {
 	router routing.Router
 	db     *sql.DB
 	logger *slog.Logger
-	dbMu   sync.Mutex
+	mu     sync.Mutex
 	cancel context.CancelFunc
 }
 
 func (pc *PostgresClient) Start(ctx context.Context, router routing.Router) error {
 	pc.logger.Debug("running")
+	pc.mu.Lock()
 	pc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	pc.ctx = moduleContext
@@ -65,11 +66,11 @@ func (pc *PostgresClient) Start(ctx context.Context, router routing.Router) erro
 
 	db, err := sql.Open("pgx", pc.Url)
 	if err != nil {
+		pc.mu.Unlock()
 		return fmt.Errorf("postgres.client error connecting to database: %w", err)
 	}
-	pc.dbMu.Lock()
 	pc.db = db
-	pc.dbMu.Unlock()
+	pc.mu.Unlock()
 	<-pc.ctx.Done()
 	pc.logger.Debug("done")
 	return nil
@@ -79,8 +80,8 @@ func (pc *PostgresClient) Stop() {
 	if pc.cancel != nil {
 		defer pc.cancel()
 	}
-	pc.dbMu.Lock()
-	defer pc.dbMu.Unlock()
+	pc.mu.Lock()
+	defer pc.mu.Unlock()
 	if pc.db != nil {
 		err := pc.db.Close()
 		if err != nil {
@@ -90,8 +91,8 @@ func (pc *PostgresClient) Stop() {
 }
 
 func (pc *PostgresClient) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
-	pc.dbMu.Lock()
-	defer pc.dbMu.Unlock()
+	pc.mu.Lock()
+	defer pc.mu.Unlock()
 	if pc.db == nil {
 		return nil, fmt.Errorf("database not initialized")
 	}

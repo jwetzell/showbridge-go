@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"sync"
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
@@ -48,10 +49,12 @@ type TimeInterval struct {
 	ticker   *time.Ticker
 	logger   *slog.Logger
 	cancel   context.CancelFunc
+	mu       sync.Mutex
 }
 
 func (i *TimeInterval) Start(ctx context.Context, router routing.Router) error {
 	i.logger.Debug("running")
+	i.mu.Lock()
 	i.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	i.ctx = moduleContext
@@ -59,6 +62,7 @@ func (i *TimeInterval) Start(ctx context.Context, router routing.Router) error {
 
 	ticker := time.NewTicker(time.Millisecond * time.Duration(i.Duration))
 	i.ticker = ticker
+	i.mu.Unlock()
 
 	for i.ctx.Err() == nil {
 		select {
@@ -76,6 +80,8 @@ func (i *TimeInterval) Start(ctx context.Context, router routing.Router) error {
 }
 
 func (i *TimeInterval) Stop() {
+	i.mu.Lock()
+	defer i.mu.Unlock()
 	if i.cancel != nil {
 		defer i.cancel()
 	}

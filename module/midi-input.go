@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"sync"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
@@ -51,10 +52,12 @@ type MIDIInput struct {
 	logger *slog.Logger
 	cancel context.CancelFunc
 	stop   func()
+	mu     sync.Mutex
 }
 
 func (mi *MIDIInput) Start(ctx context.Context, router routing.Router) error {
 	mi.logger.Debug("running")
+	mi.mu.Lock()
 	mi.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	mi.ctx = moduleContext
@@ -62,6 +65,7 @@ func (mi *MIDIInput) Start(ctx context.Context, router routing.Router) error {
 
 	in, err := midi.FindInPort(mi.Port)
 	if err != nil {
+		mi.mu.Unlock()
 		return fmt.Errorf("midi.input can't find input port: %s", mi.Port)
 	}
 
@@ -72,9 +76,11 @@ func (mi *MIDIInput) Start(ctx context.Context, router routing.Router) error {
 	}, midi.UseSysEx())
 
 	if err != nil {
+		mi.mu.Unlock()
 		return err
 	}
 	mi.stop = stop
+	mi.mu.Unlock()
 
 	<-mi.ctx.Done()
 	mi.logger.Debug("done")
@@ -82,6 +88,8 @@ func (mi *MIDIInput) Start(ctx context.Context, router routing.Router) error {
 }
 
 func (mi *MIDIInput) Stop() {
+	mi.mu.Lock()
+	defer mi.mu.Unlock()
 	if mi.cancel != nil {
 		defer mi.cancel()
 	}

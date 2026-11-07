@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"sync"
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
@@ -49,16 +50,19 @@ type TimeTimer struct {
 	timer    *time.Timer
 	logger   *slog.Logger
 	cancel   context.CancelFunc
+	mu       sync.Mutex
 }
 
 func (t *TimeTimer) Start(ctx context.Context, router routing.Router) error {
 	t.logger.Debug("running")
+	t.mu.Lock()
 	t.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	t.ctx = moduleContext
 	t.cancel = cancel
 
 	t.timer = time.NewTimer(time.Millisecond * time.Duration(t.Duration))
+	t.mu.Unlock()
 	for t.ctx.Err() == nil {
 		select {
 		case <-t.ctx.Done():
@@ -75,6 +79,8 @@ func (t *TimeTimer) Start(ctx context.Context, router routing.Router) error {
 }
 
 func (t *TimeTimer) Stop() {
+	t.mu.Lock()
+	defer t.mu.Unlock()
 	if t.cancel != nil {
 		defer t.cancel()
 	}

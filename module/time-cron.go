@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"sync"
 	"time"
 
 	"github.com/google/jsonschema-go/jsonschema"
@@ -50,10 +51,12 @@ type TimeCron struct {
 	logger     *slog.Logger
 	cancel     context.CancelFunc
 	cron       *cron.Cron
+	mu         sync.Mutex
 }
 
 func (t *TimeCron) Start(ctx context.Context, router routing.Router) error {
 	t.logger.Debug("running")
+	t.mu.Lock()
 	t.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	t.ctx = moduleContext
@@ -67,9 +70,11 @@ func (t *TimeCron) Start(ctx context.Context, router routing.Router) error {
 		}
 	})
 	if err != nil {
+		t.mu.Unlock()
 		return err
 	}
 	t.cron.Start()
+	t.mu.Unlock()
 
 	<-t.ctx.Done()
 	t.logger.Debug("done")
@@ -77,6 +82,8 @@ func (t *TimeCron) Start(ctx context.Context, router routing.Router) error {
 }
 
 func (t *TimeCron) Stop() {
+	t.mu.Lock()
+	defer t.mu.Unlock()
 	if t.cancel != nil {
 		defer t.cancel()
 	}

@@ -62,12 +62,12 @@ type WebSocketClient struct {
 	router routing.Router
 	logger *slog.Logger
 	cancel context.CancelFunc
-	connMu sync.Mutex
+	mu     sync.Mutex
 }
 
 func (wc *WebSocketClient) SetupConn() error {
-	wc.connMu.Lock()
-	defer wc.connMu.Unlock()
+	wc.mu.Lock()
+	defer wc.mu.Unlock()
 	if wc.conn != nil {
 		err := wc.conn.CloseNow()
 		if err != nil {
@@ -86,10 +86,12 @@ func (wc *WebSocketClient) SetupConn() error {
 
 func (wc *WebSocketClient) Start(ctx context.Context, router routing.Router) error {
 	wc.logger.Debug("running")
+	wc.mu.Lock()
 	wc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	wc.ctx = moduleContext
 	wc.cancel = cancel
+	wc.mu.Unlock()
 
 	for wc.ctx.Err() == nil {
 		err := wc.SetupConn()
@@ -160,8 +162,8 @@ func (wc *WebSocketClient) outputString(ctx context.Context, payload string) err
 }
 
 func (wc *WebSocketClient) Output(ctx context.Context, payload any) error {
-	wc.connMu.Lock()
-	defer wc.connMu.Unlock()
+	wc.mu.Lock()
+	defer wc.mu.Unlock()
 	payloadString, ok := payload.(string)
 	if ok {
 		return wc.outputString(ctx, payloadString)
@@ -177,8 +179,8 @@ func (wc *WebSocketClient) Stop() {
 	if wc.cancel != nil {
 		defer wc.cancel()
 	}
-	wc.connMu.Lock()
-	defer wc.connMu.Unlock()
+	wc.mu.Lock()
+	defer wc.mu.Unlock()
 	if wc.conn != nil {
 		err := wc.conn.Close(websocket.StatusNormalClosure, "")
 		if err != nil {

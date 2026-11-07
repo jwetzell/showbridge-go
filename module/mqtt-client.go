@@ -113,11 +113,12 @@ type MQTTClient struct {
 	client   mqtt.Client
 	logger   *slog.Logger
 	cancel   context.CancelFunc
-	clientMu sync.Mutex
+	mu       sync.Mutex
 }
 
 func (mc *MQTTClient) Start(ctx context.Context, router routing.Router) error {
 	mc.logger.Debug("running")
+	mc.mu.Lock()
 	mc.router = router
 	moduleContext, cancel := context.WithCancel(ctx)
 	mc.ctx = moduleContext
@@ -138,11 +139,10 @@ func (mc *MQTTClient) Start(ctx context.Context, router routing.Router) error {
 		token.Wait()
 	}
 
-	mc.clientMu.Lock()
 	mc.client = mqtt.NewClient(opts)
 
 	token := mc.client.Connect()
-	mc.clientMu.Unlock()
+	mc.mu.Unlock()
 
 	token.Wait()
 	err := token.Error()
@@ -185,8 +185,8 @@ func (mc *MQTTClient) Stop() {
 	if mc.cancel != nil {
 		mc.cancel()
 	}
-	mc.clientMu.Lock()
-	defer mc.clientMu.Unlock()
+	mc.mu.Lock()
+	defer mc.mu.Unlock()
 	if mc.client != nil {
 		mc.client.Disconnect(250)
 	}
