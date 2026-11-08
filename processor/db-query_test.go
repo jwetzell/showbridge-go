@@ -9,7 +9,7 @@ import (
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/processor"
 	"github.com/jwetzell/showbridge-go/routing"
-	_ "modernc.org/sqlite"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func NewTestDBModule(id string) *TestDBModule {
@@ -30,7 +30,7 @@ func (m *TestDBModule) Start(ctx context.Context, router routing.Router) error {
 
 func (m *TestDBModule) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
 	if m.db == nil {
-		db, err := sql.Open("sqlite", ":memory:")
+		db, err := sql.Open("sqlite3", ":memory:")
 		if err != nil {
 			return nil, err
 		}
@@ -222,7 +222,7 @@ func TestBadDbQuery(t *testing.T) {
 			moduleManager: testModuleManager(map[string]routing.Module{
 				"test": NewTestDBModule("test"),
 			}),
-			errorString: "db.query error executing query: SQL logic error: no such table: asdf (1)",
+			errorString: "db.query error executing query: no such table: asdf",
 		},
 		{
 			name:    "no modules",
