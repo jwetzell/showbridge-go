@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"sync"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
@@ -57,9 +58,13 @@ type KVGet struct {
 	Key      string
 	logger   *slog.Logger
 	module   routing.KeyValueModule
+	mu       sync.Mutex
 }
 
 func (kvg *KVGet) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+	kvg.mu.Lock()
+	defer kvg.mu.Unlock()
+
 	if kvg.module == nil {
 		if moduleManager == nil {
 			wrappedPayload.End = true

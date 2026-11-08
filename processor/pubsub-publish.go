@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"sync"
 	"text/template"
 
 	"github.com/google/jsonschema-go/jsonschema"
@@ -65,9 +66,14 @@ type PubSubPublish struct {
 	Topic    *template.Template
 	logger   *slog.Logger
 	module   routing.PubSubModule
+	mu       sync.Mutex
 }
 
 func (psp *PubSubPublish) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+
+	psp.mu.Lock()
+	defer psp.mu.Unlock()
+
 	if psp.module == nil {
 		if moduleManager == nil {
 			wrappedPayload.End = true
