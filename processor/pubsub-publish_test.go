@@ -8,7 +8,6 @@ import (
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/processor"
 	"github.com/jwetzell/showbridge-go/routing"
-	_ "modernc.org/sqlite"
 )
 
 func NewTestPubSubModule(id string) *TestPubSubModule {
