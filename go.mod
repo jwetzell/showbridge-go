@@ -14,6 +14,7 @@ require (
 	github.com/jwetzell/osc-go v0.7.0
 	github.com/jwetzell/psn-go v0.3.0
 	github.com/jwetzell/slip-go v0.2.0
+	github.com/mattn/go-sqlite3 v1.14.53
 	github.com/nats-io/nats.go v1.55.0
 	github.com/redis/go-redis/v9 v9.23.0
 	github.com/robfig/cron/v3 v3.0.1
@@ -23,7 +24,6 @@ require (
 	go.bug.st/serial v1.8.0
 	golang.org/x/time v0.16.0
 	modernc.org/quickjs v0.27.0
-	modernc.org/sqlite v1.62.0
 	sigs.k8s.io/yaml v1.6.0
 )
 

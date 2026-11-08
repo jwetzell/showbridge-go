@@ -11,7 +11,7 @@ import (
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/routing"
 
-	_ "modernc.org/sqlite"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func init() {
@@ -64,7 +64,7 @@ func (sc *SqliteClient) Start(ctx context.Context, router routing.Router) error 
 	sc.ctx = moduleContext
 	sc.cancel = cancel
 
-	db, err := sql.Open("sqlite", sc.Dsn)
+	db, err := sql.Open("sqlite3", sc.Dsn)
 	if err != nil {
 		sc.mu.Unlock()
 		return fmt.Errorf("sqlite.client error opening database: %w", err)
@@ -77,11 +77,11 @@ func (sc *SqliteClient) Start(ctx context.Context, router routing.Router) error 
 }
 
 func (sc *SqliteClient) Stop() {
+	sc.mu.Lock()
+	defer sc.mu.Unlock()
 	if sc.cancel != nil {
 		defer sc.cancel()
 	}
-	sc.mu.Lock()
-	defer sc.mu.Unlock()
 	if sc.db != nil {
 		err := sc.db.Close()
 		if err != nil {
