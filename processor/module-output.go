@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"sync"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
@@ -48,9 +49,13 @@ type ModuleOutput struct {
 	ModuleId string
 	logger   *slog.Logger
 	module   routing.OutputModule
+	mu       sync.Mutex
 }
 
 func (mo *ModuleOutput) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+
+	mo.mu.Lock()
+	defer mo.mu.Unlock()
 
 	if mo.module == nil {
 		if moduleManager == nil {
