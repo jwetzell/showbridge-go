@@ -7,7 +7,7 @@ import (
 	"errors"
 
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/internal/types"
 	"github.com/jwetzell/showbridge-go/routing"
 	"gitlab.com/gomidi/midi/v2"
 )
@@ -29,7 +29,7 @@ type MIDIMessageDecode struct {
 
 func (mmd *MIDIMessageDecode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
-	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
 
 	if !ok {
 		wrappedPayload.End = true

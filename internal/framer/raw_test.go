@@ -4,7 +4,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/framer"
+	"github.com/jwetzell/showbridge-go/internal/framer"
 )
 
 func TestGoodRawFramerDecode(t *testing.T) {

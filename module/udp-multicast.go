@@ -11,7 +11,7 @@ import (
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/internal/types"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
@@ -127,7 +127,7 @@ func (um *UDPMulticast) Start(ctx context.Context, router routing.Router) error 
 
 func (um *UDPMulticast) Output(ctx context.Context, payload any) error {
 
-	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
 	if !ok {
 		return errors.New("net.udp.multicast can only output bytes")
 	}

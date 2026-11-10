@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/internal/types"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
@@ -89,7 +89,7 @@ type IntScale struct {
 
 func (is *IntScale) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
-	payloadInt, ok := params.GetAnyAsInt(payload)
+	payloadInt, ok := types.GetAnyAsInt(payload)
 	if !ok {
 		wrappedPayload.End = true
 		return wrappedPayload, errors.New("int.scale can only process an int")

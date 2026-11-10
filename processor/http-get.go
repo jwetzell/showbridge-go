@@ -13,7 +13,6 @@ import (
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
@@ -62,7 +61,7 @@ func init() {
 
 			headers, err := processorParams.GetStringMap("headers")
 			if err != nil {
-				if errors.Is(err, params.ErrParamNotFound) {
+				if errors.Is(err, config.ErrParamNotFound) {
 					headers = map[string]string{}
 				} else {
 					return nil, fmt.Errorf("http.get headers error: %w", err)

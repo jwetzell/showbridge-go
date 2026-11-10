@@ -10,7 +10,6 @@ import (
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
@@ -36,7 +35,7 @@ func init() {
 
 			pathString, err := processorParams.GetString("path")
 			if err != nil {
-				if errors.Is(err, params.ErrParamNotFound) {
+				if errors.Is(err, config.ErrParamNotFound) {
 					return nil, fmt.Errorf("os.readfile path error: not found")
 				} else {
 					return nil, fmt.Errorf("os.readfile path error: %w", err)

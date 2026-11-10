@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/internal/types"
 	"github.com/jwetzell/showbridge-go/routing"
 	"sigs.k8s.io/yaml"
 )
@@ -28,7 +28,7 @@ type YamlDecode struct {
 func (jd *YamlDecode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 
-	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
 
 	if !ok {
 		return wrappedPayload, errors.New("yaml.decode can only process a string or []byte")

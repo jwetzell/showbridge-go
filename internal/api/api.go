@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/events"
+	"github.com/jwetzell/showbridge-go/internal/events"
 	"github.com/jwetzell/showbridge-go/schema"
 )
 

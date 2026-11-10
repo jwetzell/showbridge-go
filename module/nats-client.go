@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/internal/types"
 	"github.com/jwetzell/showbridge-go/routing"
 	"github.com/nats-io/nats.go"
 )
@@ -102,7 +102,7 @@ func (nc *NATSClient) Start(ctx context.Context, router routing.Router) error {
 
 func (nc *NATSClient) Publish(ctx context.Context, topic string, payload any) error {
 
-	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
 
 	if !ok {
 		payloadString, ok := payload.(string)

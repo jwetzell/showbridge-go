@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/internal/types"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
@@ -27,7 +27,7 @@ type RouteWrite struct {
 
 func (hrc *RouteWrite) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
-	bytes, ok := params.GetAnyAsByteSlice(wrappedPayload.Payload)
+	bytes, ok := types.GetAnyAsByteSlice(wrappedPayload.Payload)
 	if !ok {
 		wrappedPayload.End = true
 		return wrappedPayload, errors.New("route.write could not convert payload to byte slice")

@@ -9,7 +9,6 @@ import (
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
@@ -36,7 +35,7 @@ func init() {
 
 			bitSizeNum, err := processorParams.GetInt("bitSize")
 			if err != nil {
-				if errors.Is(err, params.ErrParamNotFound) {
+				if errors.Is(err, config.ErrParamNotFound) {
 					bitSizeNum = 64
 				} else {
 					return nil, fmt.Errorf("float.parse bitSize error: %w", err)

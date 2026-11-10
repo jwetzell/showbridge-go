@@ -10,7 +10,6 @@ import (
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/osc-go"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
@@ -71,7 +70,7 @@ func init() {
 
 			argObjects, err := processorParams.GetMapSlice("args")
 			if err != nil {
-				if errors.Is(err, params.ErrParamNotFound) {
+				if errors.Is(err, config.ErrParamNotFound) {
 					return &MessageCreate{config: processorConfig, Address: addressTemplate}, nil
 				} else {
 					return nil, fmt.Errorf("osc.message.create args error: %w", err)

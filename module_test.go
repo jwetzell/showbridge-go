@@ -5,7 +5,6 @@ import (
 
 	"github.com/jwetzell/showbridge-go"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
 	"github.com/stretchr/testify/require"
 )
 
@@ -19,7 +18,7 @@ func TestGoodNewModule(t *testing.T) {
 			moduleConfig: config.ModuleConfig{
 				Id:   "test-module",
 				Type: "time.timer",
-				Params: params.Params{
+				Params: config.Params{
 					"duration": 1000,
 				},
 			},

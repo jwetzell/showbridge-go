@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/internal/types"
 	"github.com/jwetzell/showbridge-go/routing"
 	"modernc.org/quickjs"
 )
@@ -72,7 +72,7 @@ func (sj *ScriptJS) Process(ctx context.Context, wrappedPayload routing.WrappedP
 	_, isByteSlice := wrappedPayload.Payload.([]byte)
 
 	if isUint8Slice || isByteSlice {
-		intSlice, ok := params.GetAnyAsIntSlice(wrappedPayload.Payload)
+		intSlice, ok := types.GetAnyAsIntSlice(wrappedPayload.Payload)
 
 		if ok {
 			wrappedPayload.Payload = intSlice

@@ -9,7 +9,6 @@ import (
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
@@ -43,7 +42,7 @@ func init() {
 
 			baseNum, err := processorParams.GetInt("base")
 			if err != nil {
-				if errors.Is(err, params.ErrParamNotFound) {
+				if errors.Is(err, config.ErrParamNotFound) {
 					baseNum = 10
 				} else {
 					return nil, fmt.Errorf("int.parse base error: %w", err)
@@ -52,7 +51,7 @@ func init() {
 
 			bitSizeNum, err := processorParams.GetInt("bitSize")
 			if err != nil {
-				if errors.Is(err, params.ErrParamNotFound) {
+				if errors.Is(err, config.ErrParamNotFound) {
 					bitSizeNum = 64
 				} else {
 					return nil, fmt.Errorf("int.parse bitSize error: %w", err)

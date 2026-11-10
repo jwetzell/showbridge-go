@@ -12,7 +12,7 @@ import (
 	"github.com/coder/websocket"
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/internal/types"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
@@ -168,7 +168,7 @@ func (wc *WebSocketClient) Output(ctx context.Context, payload any) error {
 	if ok {
 		return wc.outputString(ctx, payloadString)
 	}
-	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
 	if ok {
 		return wc.outputBytes(ctx, payloadBytes)
 	}

@@ -1,4 +1,4 @@
-package params
+package types
 
 func GetAnyAsFloat32(value any) (float32, bool) {
 	float32Value, ok := value.(float32)

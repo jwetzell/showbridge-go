@@ -3,7 +3,7 @@ package showbridge
 import (
 	"time"
 
-	"github.com/jwetzell/showbridge-go/events"
+	"github.com/jwetzell/showbridge-go/internal/events"
 )
 
 func (r *Router) HandleEvent(event events.Event, sender events.EventDestination) {

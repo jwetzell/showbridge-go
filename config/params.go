@@ -1,7 +1,9 @@
-package params
+package config
 
 import (
 	"errors"
+
+	"github.com/jwetzell/showbridge-go/internal/types"
 )
 
 type Params map[string]any
@@ -40,7 +42,7 @@ func (p Params) GetInt(key string) (int, error) {
 		return 0, ErrParamNotFound
 	}
 
-	intValue, ok := GetAnyAsInt(value)
+	intValue, ok := types.GetAnyAsInt(value)
 	if ok {
 		return intValue, nil
 	}
@@ -54,7 +56,7 @@ func (p Params) GetFloat32(key string) (float32, error) {
 		return 0, ErrParamNotFound
 	}
 
-	floatValue, ok := GetAnyAsFloat32(value)
+	floatValue, ok := types.GetAnyAsFloat32(value)
 	if ok {
 		return floatValue, nil
 	}
@@ -68,7 +70,7 @@ func (p Params) GetFloat64(key string) (float64, error) {
 		return 0, ErrParamNotFound
 	}
 
-	floatValue, ok := GetAnyAsFloat64(value)
+	floatValue, ok := types.GetAnyAsFloat64(value)
 	if ok {
 		return floatValue, nil
 	}
@@ -122,27 +124,12 @@ func (p Params) GetIntSlice(key string) ([]int, error) {
 		return nil, ErrParamNotFound
 	}
 
-	intSlice, ok := GetAnyAsIntSlice(value)
+	intSlice, ok := types.GetAnyAsIntSlice(value)
 	if !ok {
 		return nil, ErrParamNotIntSlice
 	}
 
 	return intSlice, nil
-}
-
-func (p Params) GetByteSlice(key string) ([]byte, error) {
-	value, ok := p[key]
-	if !ok {
-		return nil, ErrParamNotFound
-	}
-
-	byteSlice, ok := GetAnyAsByteSlice(value)
-
-	if !ok {
-		return nil, ErrParamNotByteSlice
-	}
-
-	return byteSlice, nil
 }
 
 func (p Params) GetStringMap(key string) (map[string]string, error) {

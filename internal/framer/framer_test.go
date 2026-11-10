@@ -3,7 +3,7 @@ package framer_test
 import (
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/framer"
+	"github.com/jwetzell/showbridge-go/internal/framer"
 )
 
 func TestNilGetFramer(t *testing.T) {

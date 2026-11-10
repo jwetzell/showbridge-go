@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/coder/websocket"
-	"github.com/jwetzell/showbridge-go/events"
+	"github.com/jwetzell/showbridge-go/internal/events"
 )
 
 type WebsocketEventDestination struct {

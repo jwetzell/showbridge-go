@@ -5,7 +5,6 @@ import (
 
 	"github.com/jwetzell/showbridge-go"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
 	"github.com/jwetzell/showbridge-go/routing"
 	"github.com/stretchr/testify/require"
 )
@@ -67,7 +66,7 @@ func TestBadNewRoute(t *testing.T) {
 				Processors: []config.ProcessorConfig{
 					{
 						Type: "float.parse",
-						Params: params.Params{
+						Params: config.Params{
 							"bitSize": "asdf",
 						},
 					},
@@ -150,7 +149,7 @@ func TestGoodRouteProcessPayload(t *testing.T) {
 				Processors: []config.ProcessorConfig{
 					{
 						Type:   "float.parse",
-						Params: params.Params{},
+						Params: config.Params{},
 					},
 				},
 			},
@@ -169,13 +168,13 @@ func TestGoodRouteProcessPayload(t *testing.T) {
 				Processors: []config.ProcessorConfig{
 					{
 						Type: "filter.expr",
-						Params: params.Params{
+						Params: config.Params{
 							"expression": "Payload != \"123.45\"",
 						},
 					},
 					{
 						Type:   "float.parse",
-						Params: params.Params{},
+						Params: config.Params{},
 					},
 				},
 			},
@@ -220,7 +219,7 @@ func TestBadRouteProcessPayload(t *testing.T) {
 				Processors: []config.ProcessorConfig{
 					{
 						Type:   "float.parse",
-						Params: params.Params{},
+						Params: config.Params{},
 					},
 				},
 			},

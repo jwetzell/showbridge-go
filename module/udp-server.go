@@ -12,7 +12,6 @@ import (
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
@@ -58,7 +57,7 @@ func init() {
 
 			ipString, err := moduleParams.GetString("ip")
 			if err != nil {
-				if errors.Is(err, params.ErrParamNotFound) {
+				if errors.Is(err, config.ErrParamNotFound) {
 					ipString = "0.0.0.0"
 				} else {
 					return nil, fmt.Errorf("net.udp.server ip error: %w", err)
@@ -72,7 +71,7 @@ func init() {
 
 			bufferSizeNum, err := moduleParams.GetInt("bufferSize")
 			if err != nil {
-				if errors.Is(err, params.ErrParamNotFound) {
+				if errors.Is(err, config.ErrParamNotFound) {
 					bufferSizeNum = 2048
 				} else {
 					return nil, fmt.Errorf("net.udp.server bufferSize error: %w", err)

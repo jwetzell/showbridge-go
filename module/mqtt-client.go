@@ -11,7 +11,7 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/internal/types"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
@@ -79,7 +79,7 @@ func init() {
 			qosInt, err := moduleParams.GetInt("qos")
 
 			if err != nil {
-				if errors.Is(err, params.ErrParamNotFound) {
+				if errors.Is(err, config.ErrParamNotFound) {
 					qosInt = 0
 				} else {
 					return nil, fmt.Errorf("mqtt.client qos error: %w", err)
@@ -89,7 +89,7 @@ func init() {
 			retainedBool, err := moduleParams.GetBool("retained")
 
 			if err != nil {
-				if errors.Is(err, params.ErrParamNotFound) {
+				if errors.Is(err, config.ErrParamNotFound) {
 					retainedBool = false
 				} else {
 					return nil, fmt.Errorf("mqtt.client retained error: %w", err)
@@ -156,7 +156,7 @@ func (mc *MQTTClient) Start(ctx context.Context, router routing.Router) error {
 }
 
 func (mc *MQTTClient) Publish(ctx context.Context, topic string, payload any) error {
-	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
 
 	if !ok {
 		payloadString, ok := payload.(string)

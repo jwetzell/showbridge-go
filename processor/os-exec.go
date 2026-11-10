@@ -10,7 +10,6 @@ import (
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
@@ -44,7 +43,7 @@ func init() {
 
 			commandString, err := processorParams.GetString("command")
 			if err != nil {
-				if errors.Is(err, params.ErrParamNotFound) {
+				if errors.Is(err, config.ErrParamNotFound) {
 					return nil, fmt.Errorf("os.exec command error: not found")
 				} else {
 					return nil, fmt.Errorf("os.exec command error: %w", err)
@@ -58,7 +57,7 @@ func init() {
 
 			argStrings, err := processorParams.GetStringSlice("args")
 			if err != nil {
-				if errors.Is(err, params.ErrParamNotFound) {
+				if errors.Is(err, config.ErrParamNotFound) {
 					argStrings = []string{}
 				} else {
 					return nil, fmt.Errorf("os.exec args error: %w", err)

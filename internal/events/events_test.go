@@ -3,7 +3,7 @@ package events_test
 import (
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/events"
+	"github.com/jwetzell/showbridge-go/internal/events"
 )
 
 func TestEventToJson(t *testing.T) {

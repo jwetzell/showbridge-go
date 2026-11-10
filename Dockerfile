@@ -11,7 +11,7 @@ WORKDIR /build
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-COPY --from=webui-builder /webui/dist/webui ./api/webui
+COPY --from=webui-builder /webui/dist/webui ./internal/api/webui
 RUN CGO_ENABLED=1 GOOS=linux go build -tags embed_webui ./cmd/showbridge
 
 FROM alpine:3.24.4

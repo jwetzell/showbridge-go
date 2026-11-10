@@ -1,4 +1,4 @@
-package params_test
+package config_test
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/config"
 )
 
 func TestGoodStringParamsJSON(t *testing.T) {
@@ -27,7 +27,7 @@ func TestGoodStringParamsJSON(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
+			params := config.Params{}
 			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal params JSON: %v", err)
@@ -54,19 +54,19 @@ func TestBadStringParamsJSON(t *testing.T) {
 			name:        "key not found",
 			paramsJSON:  `{"key": "value"}`,
 			key:         "test",
-			returnError: params.ErrParamNotFound,
+			returnError: config.ErrParamNotFound,
 		},
 		{
 			name:        "not a string",
 			paramsJSON:  `{"key": 1}`,
 			key:         "key",
-			returnError: params.ErrParamNotString,
+			returnError: config.ErrParamNotString,
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
+			params := config.Params{}
 			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal params JSON: %v", err)
@@ -99,7 +99,7 @@ func TestGoodIntParamsJSON(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
+			params := config.Params{}
 			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal params JSON: %v", err)
@@ -126,19 +126,19 @@ func TestBadIntParamsJSON(t *testing.T) {
 			name:        "key not found",
 			paramsJSON:  `{"key": 1}`,
 			key:         "test",
-			returnError: params.ErrParamNotFound,
+			returnError: config.ErrParamNotFound,
 		},
 		{
 			name:        "not a number",
 			paramsJSON:  `{"key": "1"}`,
 			key:         "key",
-			returnError: params.ErrParamNotNumber,
+			returnError: config.ErrParamNotNumber,
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
+			params := config.Params{}
 			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal params JSON: %v", err)
@@ -177,7 +177,7 @@ func TestGoodFloat32ParamsJSON(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
+			params := config.Params{}
 			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal params JSON: %v", err)
@@ -204,19 +204,19 @@ func TestBadFloat32ParamsJSON(t *testing.T) {
 			name:        "key not found",
 			paramsJSON:  `{"key": 1}`,
 			key:         "test",
-			returnError: params.ErrParamNotFound,
+			returnError: config.ErrParamNotFound,
 		},
 		{
 			name:        "not a number",
 			paramsJSON:  `{"key": "1"}`,
 			key:         "key",
-			returnError: params.ErrParamNotNumber,
+			returnError: config.ErrParamNotNumber,
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
+			params := config.Params{}
 			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal params JSON: %v", err)
@@ -255,7 +255,7 @@ func TestGoodFloat64ParamsJSON(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
+			params := config.Params{}
 			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal params JSON: %v", err)
@@ -282,19 +282,19 @@ func TestBadFloat64ParamsJSON(t *testing.T) {
 			name:        "key not found",
 			paramsJSON:  `{"key": 1}`,
 			key:         "test",
-			returnError: params.ErrParamNotFound,
+			returnError: config.ErrParamNotFound,
 		},
 		{
 			name:        "not a number",
 			paramsJSON:  `{"key": "1"}`,
 			key:         "key",
-			returnError: params.ErrParamNotNumber,
+			returnError: config.ErrParamNotNumber,
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
+			params := config.Params{}
 			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal params JSON: %v", err)
@@ -327,7 +327,7 @@ func TestGoodBoolParamsJSON(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
+			params := config.Params{}
 			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal params JSON: %v", err)
@@ -354,19 +354,19 @@ func TestBadBoolParamsJSON(t *testing.T) {
 			name:        "key not found",
 			paramsJSON:  `{"key": 1}`,
 			key:         "test",
-			returnError: params.ErrParamNotFound,
+			returnError: config.ErrParamNotFound,
 		},
 		{
 			name:        "not a bool",
 			paramsJSON:  `{"key": "1"}`,
 			key:         "key",
-			returnError: params.ErrParamNotBool,
+			returnError: config.ErrParamNotBool,
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
+			params := config.Params{}
 			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal params JSON: %v", err)
@@ -399,7 +399,7 @@ func TestGoodStringSliceParamsJSON(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
+			params := config.Params{}
 			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal params JSON: %v", err)
@@ -426,25 +426,25 @@ func TestBadStringSliceParamsJSON(t *testing.T) {
 			name:        "key not found",
 			paramsJSON:  `{"key": ["value1", "value2"]}`,
 			key:         "test",
-			returnError: params.ErrParamNotFound,
+			returnError: config.ErrParamNotFound,
 		},
 		{
 			name:        "not a slice",
 			paramsJSON:  `{"key": "value"}`,
 			key:         "key",
-			returnError: params.ErrParamNotSlice,
+			returnError: config.ErrParamNotSlice,
 		},
 		{
 			name:        "not a string slice",
 			paramsJSON:  `{"key": ["value1", 2]}`,
 			key:         "key",
-			returnError: params.ErrParamNotStringSlice,
+			returnError: config.ErrParamNotStringSlice,
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
+			params := config.Params{}
 			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal params JSON: %v", err)
@@ -483,7 +483,7 @@ func TestGoodIntSliceParamsJSON(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
+			params := config.Params{}
 			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal params JSON: %v", err)
@@ -510,25 +510,25 @@ func TestBadIntSliceParamsJSON(t *testing.T) {
 			name:        "key not found",
 			paramsJSON:  `{"key": ["value1", "value2"]}`,
 			key:         "test",
-			returnError: params.ErrParamNotFound,
+			returnError: config.ErrParamNotFound,
 		},
 		{
 			name:        "not a slice",
 			paramsJSON:  `{"key": "value"}`,
 			key:         "key",
-			returnError: params.ErrParamNotIntSlice,
+			returnError: config.ErrParamNotIntSlice,
 		},
 		{
 			name:        "not a int slice",
 			paramsJSON:  `{"key": ["value1", 2]}`,
 			key:         "key",
-			returnError: params.ErrParamNotIntSlice,
+			returnError: config.ErrParamNotIntSlice,
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
+			params := config.Params{}
 			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal params JSON: %v", err)
@@ -539,90 +539,6 @@ func TestBadIntSliceParamsJSON(t *testing.T) {
 			}
 			if !errors.Is(err, testCase.returnError) {
 				t.Fatalf("GetIntSlice got error '%s', expected '%s'", err, testCase.returnError)
-			}
-		})
-	}
-}
-
-func TestGoodByteSliceParamsJSON(t *testing.T) {
-	testCases := []struct {
-		name       string
-		paramsJSON string
-		key        string
-		expected   []byte
-	}{
-		{
-			name:       "byte array",
-			paramsJSON: `{"key": [1,2,3,4]}`,
-			key:        "key",
-			expected:   []byte{1, 2, 3, 4},
-		},
-		{
-			name:       "byte array with floats",
-			paramsJSON: `{"key": [1.0,2.0,3.0,4.0]}`,
-			key:        "key",
-			expected:   []byte{1, 2, 3, 4},
-		},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
-			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
-			if err != nil {
-				t.Fatalf("Failed to unmarshal params JSON: %v", err)
-			}
-			value, err := params.GetByteSlice(testCase.key)
-			if err != nil {
-				t.Fatalf("GetByteSlice returned error: %v", err)
-			}
-			if !slices.Equal(value, testCase.expected) {
-				t.Fatalf("GetByteSlice got %v, expected %v", value, testCase.expected)
-			}
-		})
-	}
-}
-
-func TestBadByteSliceParamsJSON(t *testing.T) {
-	testCases := []struct {
-		name        string
-		paramsJSON  string
-		key         string
-		returnError error
-	}{
-		{
-			name:        "key not found",
-			paramsJSON:  `{"key": ["value1", "value2"]}`,
-			key:         "test",
-			returnError: params.ErrParamNotFound,
-		},
-		{
-			name:        "not a slice",
-			paramsJSON:  `{"key": 123}`,
-			key:         "key",
-			returnError: params.ErrParamNotByteSlice,
-		},
-		{
-			name:        "not a int slice",
-			paramsJSON:  `{"key": ["value1", 2]}`,
-			key:         "key",
-			returnError: params.ErrParamNotByteSlice,
-		},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
-			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
-			if err != nil {
-				t.Fatalf("Failed to unmarshal params JSON: %v", err)
-			}
-			value, err := params.GetByteSlice(testCase.key)
-			if err == nil {
-				t.Fatalf("GetByteSlice expected to fail but succeeded, got: %v", value)
-			}
-			if !errors.Is(err, testCase.returnError) {
-				t.Fatalf("GetByteSlice got error '%s', expected '%s'", err, testCase.returnError)
 			}
 		})
 	}
@@ -645,7 +561,7 @@ func TestGoodMapSliceParamsJSON(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
+			params := config.Params{}
 			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal params JSON: %v", err)
@@ -672,25 +588,25 @@ func TestBadMapSliceParamsJSON(t *testing.T) {
 			name:        "key not found",
 			paramsJSON:  `{"key": ["value1", "value2"]}`,
 			key:         "test",
-			returnError: params.ErrParamNotFound,
+			returnError: config.ErrParamNotFound,
 		},
 		{
 			name:        "not a map",
 			paramsJSON:  `{"key": 123}`,
 			key:         "key",
-			returnError: params.ErrParamNotSlice,
+			returnError: config.ErrParamNotSlice,
 		},
 		{
 			name:        "not a map slice",
 			paramsJSON:  `{"key": [123]}`,
 			key:         "key",
-			returnError: params.ErrParamNotMapSlice,
+			returnError: config.ErrParamNotMapSlice,
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
+			params := config.Params{}
 			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal params JSON: %v", err)
@@ -723,7 +639,7 @@ func TestGoodStringMapParamsJSON(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
+			params := config.Params{}
 			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal params JSON: %v", err)
@@ -750,25 +666,25 @@ func TestBadStringMapParamsJSON(t *testing.T) {
 			name:        "key not found",
 			paramsJSON:  `{"key": ["value1", "value2"]}`,
 			key:         "test",
-			returnError: params.ErrParamNotFound,
+			returnError: config.ErrParamNotFound,
 		},
 		{
 			name:        "not a map",
 			paramsJSON:  `{"key": 123}`,
 			key:         "key",
-			returnError: params.ErrParamNotMap,
+			returnError: config.ErrParamNotMap,
 		},
 		{
 			name:        "not a string map",
 			paramsJSON:  `{"key": {"a": 1}}`,
 			key:         "key",
-			returnError: params.ErrParamNotStringMap,
+			returnError: config.ErrParamNotStringMap,
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			params := params.Params{}
+			params := config.Params{}
 			err := json.Unmarshal([]byte(testCase.paramsJSON), &params)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal params JSON: %v", err)

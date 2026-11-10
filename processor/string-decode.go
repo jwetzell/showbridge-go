@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/params"
+	"github.com/jwetzell/showbridge-go/internal/types"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
@@ -34,7 +34,7 @@ func (sd *StringDecode) Process(ctx context.Context, wrappedPayload routing.Wrap
 	}
 
 	// payload is convertible to a byte slice
-	payloadBytes, ok := params.GetAnyAsByteSlice(payload)
+	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
 	if !ok {
 		wrappedPayload.End = true
 		return wrappedPayload, errors.New("string.decode processor only accepts a []byte")
