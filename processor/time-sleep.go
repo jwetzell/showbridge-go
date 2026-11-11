@@ -45,7 +45,9 @@ type TimeSleep struct {
 	Duration time.Duration
 }
 
-func (ts *TimeSleep) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	time.Sleep(ts.Duration)
-	return wrappedPayload, nil
+func (ts *TimeSleep) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		time.Sleep(ts.Duration)
+		return next(ctx, wrappedPayload, moduleManager, router)
+	}
 }

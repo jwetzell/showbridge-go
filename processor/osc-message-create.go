@@ -125,61 +125,58 @@ type MessageCreate struct {
 	Types   []rune
 }
 
-func (omc *MessageCreate) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (omc *MessageCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
-	templateData := wrappedPayload
+		templateData := wrappedPayload
 
-	var addressBuffer bytes.Buffer
-	err := omc.Address.Execute(&addressBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	addressString := addressBuffer.String()
-
-	if len(addressString) == 0 {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("osc.message.create address must not be empty")
-	}
-
-	if addressString[0] != '/' {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("osc.message.create address must start with '/'")
-	}
-
-	payloadMessage := &osc.Message{
-		Address: addressString,
-	}
-
-	args := []osc.Arg{}
-
-	for argIndex, argTemplate := range omc.Args {
-		var argBuffer bytes.Buffer
-		err := argTemplate.Execute(&argBuffer, templateData)
+		var addressBuffer bytes.Buffer
+		err := omc.Address.Execute(&addressBuffer, templateData)
 
 		if err != nil {
-			wrappedPayload.End = true
 			return wrappedPayload, err
 		}
 
-		argString := argBuffer.String()
+		addressString := addressBuffer.String()
 
-		typedArg, err := osc.ArgFromStringAndType(argString, omc.Types[argIndex])
-
-		if err != nil {
-			wrappedPayload.End = true
-			return wrappedPayload, fmt.Errorf("osc.message.create arg conversion error: %w", err)
+		if len(addressString) == 0 {
+			return wrappedPayload, errors.New("osc.message.create address must not be empty")
 		}
 
-		args = append(args, typedArg)
-	}
+		if addressString[0] != '/' {
+			return wrappedPayload, errors.New("osc.message.create address must start with '/'")
+		}
 
-	if len(args) > 0 {
-		payloadMessage.Args = args
-	}
+		payloadMessage := &osc.Message{
+			Address: addressString,
+		}
 
-	wrappedPayload.Payload = payloadMessage
-	return wrappedPayload, nil
+		args := []osc.Arg{}
+
+		for argIndex, argTemplate := range omc.Args {
+			var argBuffer bytes.Buffer
+			err := argTemplate.Execute(&argBuffer, templateData)
+
+			if err != nil {
+				return wrappedPayload, err
+			}
+
+			argString := argBuffer.String()
+
+			typedArg, err := osc.ArgFromStringAndType(argString, omc.Types[argIndex])
+
+			if err != nil {
+				return wrappedPayload, fmt.Errorf("osc.message.create arg conversion error: %w", err)
+			}
+
+			args = append(args, typedArg)
+		}
+
+		if len(args) > 0 {
+			payloadMessage.Args = args
+		}
+
+		wrappedPayload.Payload = payloadMessage
+		return next(ctx, wrappedPayload, moduleManager, router)
+	}
 }

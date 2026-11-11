@@ -94,54 +94,50 @@ type MIDINoteOnCreate struct {
 	Velocity *template.Template
 }
 
-func (mnoc *MIDINoteOnCreate) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	templateData := wrappedPayload
+func (mnoc *MIDINoteOnCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		templateData := wrappedPayload
 
-	var channelBuffer bytes.Buffer
-	err := mnoc.Channel.Execute(&channelBuffer, templateData)
+		var channelBuffer bytes.Buffer
+		err := mnoc.Channel.Execute(&channelBuffer, templateData)
 
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		var noteBuffer bytes.Buffer
+		err = mnoc.Note.Execute(&noteBuffer, templateData)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		noteValue, err := strconv.ParseUint(noteBuffer.String(), 10, 8)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		var velocityBuffer bytes.Buffer
+		err = mnoc.Velocity.Execute(&velocityBuffer, templateData)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		velocityValue, err := strconv.ParseUint(velocityBuffer.String(), 10, 8)
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		payloadMessage := midi.NoteOn(uint8(channelValue), uint8(noteValue), uint8(velocityValue))
+		wrappedPayload.Payload = payloadMessage
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	var noteBuffer bytes.Buffer
-	err = mnoc.Note.Execute(&noteBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	noteValue, err := strconv.ParseUint(noteBuffer.String(), 10, 8)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	var velocityBuffer bytes.Buffer
-	err = mnoc.Velocity.Execute(&velocityBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	velocityValue, err := strconv.ParseUint(velocityBuffer.String(), 10, 8)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	payloadMessage := midi.NoteOn(uint8(channelValue), uint8(noteValue), uint8(velocityValue))
-	wrappedPayload.Payload = payloadMessage
-	return wrappedPayload, nil
 }

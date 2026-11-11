@@ -67,79 +67,73 @@ type DbQuery struct {
 	module   routing.DatabaseModule
 }
 
-func (dq *DbQuery) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	if dq.module == nil {
-		if moduleManager == nil {
-			wrappedPayload.End = true
-			return wrappedPayload, errors.New("db.query module manager is nil")
+func (dq *DbQuery) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		if dq.module == nil {
+			if moduleManager == nil {
+				return wrappedPayload, errors.New("db.query module manager is nil")
+			}
+
+			module, ok := moduleManager.GetModule(dq.ModuleId)
+			if !ok {
+				return wrappedPayload, fmt.Errorf("db.query unable to find module with id: %s", dq.ModuleId)
+			}
+
+			dbModule, ok := module.(routing.DatabaseModule)
+			if !ok {
+				return wrappedPayload, fmt.Errorf("db.query module with id %s is not a DatabaseModule", dq.ModuleId)
+			}
+			dq.module = dbModule
 		}
 
-		module, ok := moduleManager.GetModule(dq.ModuleId)
-		if !ok {
-			wrappedPayload.End = true
-			return wrappedPayload, fmt.Errorf("db.query unable to find module with id: %s", dq.ModuleId)
+		var queryBuffer bytes.Buffer
+		err := dq.Query.Execute(&queryBuffer, wrappedPayload)
+
+		if err != nil {
+			return wrappedPayload, err
 		}
 
-		dbModule, ok := module.(routing.DatabaseModule)
-		if !ok {
-			wrappedPayload.End = true
-			return wrappedPayload, fmt.Errorf("db.query module with id %s is not a DatabaseModule", dq.ModuleId)
+		// support proper parameterized queries
+		rows, err := dq.module.QueryContext(ctx, queryBuffer.String())
+		if err != nil {
+			return wrappedPayload, fmt.Errorf("db.query error executing query: %w", err)
 		}
-		dq.module = dbModule
-	}
+		defer rows.Close()
 
-	var queryBuffer bytes.Buffer
-	err := dq.Query.Execute(&queryBuffer, wrappedPayload)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	// support proper parameterized queries
-	rows, err := dq.module.QueryContext(ctx, queryBuffer.String())
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("db.query error executing query: %w", err)
-	}
-	defer rows.Close()
-
-	columns, err := rows.Columns()
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("db.query error getting columns: %w", err)
-	}
-
-	// TODO(jwetzell): optimize this
-	results := make([]map[string]any, 0)
-
-	for rows.Next() {
-		columnValues := make([]any, len(columns))
-
-		for i := range columnValues {
-			columnValues[i] = new(any)
+		columns, err := rows.Columns()
+		if err != nil {
+			return wrappedPayload, fmt.Errorf("db.query error getting columns: %w", err)
 		}
 
-		if err := rows.Scan(columnValues...); err != nil {
-			wrappedPayload.End = true
-			return wrappedPayload, fmt.Errorf("db.query error scanning row: %w", err)
+		// TODO(jwetzell): optimize this
+		results := make([]map[string]any, 0)
+
+		for rows.Next() {
+			columnValues := make([]any, len(columns))
+
+			for i := range columnValues {
+				columnValues[i] = new(any)
+			}
+
+			if err := rows.Scan(columnValues...); err != nil {
+				return wrappedPayload, fmt.Errorf("db.query error scanning row: %w", err)
+			}
+
+			rowMap := make(map[string]any)
+			for i, colName := range columns {
+				value := *columnValues[i].(*any)
+				rowMap[colName] = value
+			}
+			results = append(results, rowMap)
 		}
 
-		rowMap := make(map[string]any)
-		for i, colName := range columns {
-			value := *columnValues[i].(*any)
-			rowMap[colName] = value
+		if len(results) == 0 {
+			wrappedPayload.Payload = nil
+		} else if len(results) == 1 {
+			wrappedPayload.Payload = results[0]
+		} else {
+			wrappedPayload.Payload = results
 		}
-		results = append(results, rowMap)
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	if len(results) == 0 {
-		wrappedPayload.Payload = nil
-		return wrappedPayload, nil
-	} else if len(results) == 1 {
-		wrappedPayload.Payload = results[0]
-		return wrappedPayload, nil
-	}
-	wrappedPayload.Payload = results
-	return wrappedPayload, nil
 }

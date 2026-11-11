@@ -211,176 +211,160 @@ type FreeDCreate struct {
 	FocusTemplate *template.Template
 }
 
-func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (fc *FreeDCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
-	templateData := wrappedPayload
+		templateData := wrappedPayload
 
-	var idBuffer bytes.Buffer
-	err := fc.IdTemplate.Execute(&idBuffer, templateData)
+		var idBuffer bytes.Buffer
+		err := fc.IdTemplate.Execute(&idBuffer, templateData)
 
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		idString := idBuffer.String()
+
+		idNum, err := strconv.ParseUint(idString, 10, 8)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		var panBuffer bytes.Buffer
+		err = fc.PanTemplate.Execute(&panBuffer, templateData)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		panString := panBuffer.String()
+
+		panNum, err := strconv.ParseFloat(panString, 32)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		var tiltBuffer bytes.Buffer
+		err = fc.TiltTemplate.Execute(&tiltBuffer, templateData)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		tiltString := tiltBuffer.String()
+
+		tiltNum, err := strconv.ParseFloat(tiltString, 32)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		var rollBuffer bytes.Buffer
+		err = fc.RollTemplate.Execute(&rollBuffer, templateData)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		rollString := rollBuffer.String()
+
+		rollNum, err := strconv.ParseFloat(rollString, 32)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		var posXBuffer bytes.Buffer
+		err = fc.PosXTemplate.Execute(&posXBuffer, templateData)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		posXString := posXBuffer.String()
+
+		posXNum, err := strconv.ParseFloat(posXString, 32)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		var posYBuffer bytes.Buffer
+		err = fc.PosYTemplate.Execute(&posYBuffer, templateData)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		posYString := posYBuffer.String()
+
+		posYNum, err := strconv.ParseFloat(posYString, 32)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		var posZBuffer bytes.Buffer
+		err = fc.PosZTemplate.Execute(&posZBuffer, templateData)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		posZString := posZBuffer.String()
+
+		posZNum, err := strconv.ParseFloat(posZString, 32)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		var zoomBuffer bytes.Buffer
+		err = fc.ZoomTemplate.Execute(&zoomBuffer, templateData)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		zoomString := zoomBuffer.String()
+
+		zoomNum, err := strconv.ParseInt(zoomString, 10, 32)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		var focusBuffer bytes.Buffer
+		err = fc.FocusTemplate.Execute(&focusBuffer, templateData)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		focusString := focusBuffer.String()
+
+		focusNum, err := strconv.ParseInt(focusString, 10, 32)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		payloadMessage := freeD.Position{
+			ID:    uint8(idNum),
+			Pan:   float32(panNum),
+			Tilt:  float32(tiltNum),
+			Roll:  float32(rollNum),
+			PosX:  float32(posXNum),
+			PosY:  float32(posYNum),
+			PosZ:  float32(posZNum),
+			Zoom:  int32(zoomNum),
+			Focus: int32(focusNum),
+		}
+
+		wrappedPayload.Payload = payloadMessage
+
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	idString := idBuffer.String()
-
-	idNum, err := strconv.ParseUint(idString, 10, 8)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	var panBuffer bytes.Buffer
-	err = fc.PanTemplate.Execute(&panBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	panString := panBuffer.String()
-
-	panNum, err := strconv.ParseFloat(panString, 32)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	var tiltBuffer bytes.Buffer
-	err = fc.TiltTemplate.Execute(&tiltBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	tiltString := tiltBuffer.String()
-
-	tiltNum, err := strconv.ParseFloat(tiltString, 32)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	var rollBuffer bytes.Buffer
-	err = fc.RollTemplate.Execute(&rollBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	rollString := rollBuffer.String()
-
-	rollNum, err := strconv.ParseFloat(rollString, 32)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	var posXBuffer bytes.Buffer
-	err = fc.PosXTemplate.Execute(&posXBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	posXString := posXBuffer.String()
-
-	posXNum, err := strconv.ParseFloat(posXString, 32)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	var posYBuffer bytes.Buffer
-	err = fc.PosYTemplate.Execute(&posYBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	posYString := posYBuffer.String()
-
-	posYNum, err := strconv.ParseFloat(posYString, 32)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	var posZBuffer bytes.Buffer
-	err = fc.PosZTemplate.Execute(&posZBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	posZString := posZBuffer.String()
-
-	posZNum, err := strconv.ParseFloat(posZString, 32)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	var zoomBuffer bytes.Buffer
-	err = fc.ZoomTemplate.Execute(&zoomBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	zoomString := zoomBuffer.String()
-
-	zoomNum, err := strconv.ParseInt(zoomString, 10, 32)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	var focusBuffer bytes.Buffer
-	err = fc.FocusTemplate.Execute(&focusBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	focusString := focusBuffer.String()
-
-	focusNum, err := strconv.ParseInt(focusString, 10, 32)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	payloadMessage := freeD.Position{
-		ID:    uint8(idNum),
-		Pan:   float32(panNum),
-		Tilt:  float32(tiltNum),
-		Roll:  float32(rollNum),
-		PosX:  float32(posXNum),
-		PosY:  float32(posYNum),
-		PosZ:  float32(posZNum),
-		Zoom:  int32(zoomNum),
-		Focus: int32(focusNum),
-	}
-
-	wrappedPayload.Payload = payloadMessage
-
-	return wrappedPayload, nil
 }

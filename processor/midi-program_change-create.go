@@ -76,40 +76,38 @@ type MIDIProgramChangeCreate struct {
 	Program *template.Template
 }
 
-func (mpcc *MIDIProgramChangeCreate) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	templateData := wrappedPayload
+func (mpcc *MIDIProgramChangeCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		templateData := wrappedPayload
 
-	var channelBuffer bytes.Buffer
-	err := mpcc.Channel.Execute(&channelBuffer, templateData)
+		var channelBuffer bytes.Buffer
+		err := mpcc.Channel.Execute(&channelBuffer, templateData)
 
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		var programBuffer bytes.Buffer
+		err = mpcc.Program.Execute(&programBuffer, templateData)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		programValue, err := strconv.ParseUint(programBuffer.String(), 10, 8)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		payloadMessage := midi.ProgramChange(uint8(channelValue), uint8(programValue))
+		wrappedPayload.Payload = payloadMessage
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	channelValue, err := strconv.ParseUint(channelBuffer.String(), 10, 8)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	var programBuffer bytes.Buffer
-	err = mpcc.Program.Execute(&programBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	programValue, err := strconv.ParseUint(programBuffer.String(), 10, 8)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	payloadMessage := midi.ProgramChange(uint8(channelValue), uint8(programValue))
-	wrappedPayload.Payload = payloadMessage
-	return wrappedPayload, nil
 }

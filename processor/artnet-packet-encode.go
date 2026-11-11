@@ -24,22 +24,22 @@ type ArtNetPacketEncode struct {
 	config config.ProcessorConfig
 }
 
-func (ape *ArtNetPacketEncode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
-	payloadPacket, ok := payload.(artnet.ArtNetPacket)
+func (ape *ArtNetPacketEncode) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
+		payloadPacket, ok := payload.(artnet.ArtNetPacket)
 
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("artnet.packet.encode processor only accepts an ArtNetPacket")
+		if !ok {
+			return wrappedPayload, fmt.Errorf("artnet.packet.encode processor only accepts an ArtNetPacket")
+		}
+
+		payloadBytes, err := payloadPacket.MarshalBinary()
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		wrappedPayload.Payload = payloadBytes
+
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	payloadBytes, err := payloadPacket.MarshalBinary()
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	wrappedPayload.Payload = payloadBytes
-
-	return wrappedPayload, nil
 }

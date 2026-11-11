@@ -65,74 +65,71 @@ type ScriptJS struct {
 	Program     string
 }
 
-func (sj *ScriptJS) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (sj *ScriptJS) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
-	// NOTE(jwetzell): some weird conversion going on with these types
-	_, isUint8Slice := wrappedPayload.Payload.([]uint8)
-	_, isByteSlice := wrappedPayload.Payload.([]byte)
+		// NOTE(jwetzell): some weird conversion going on with these types
+		_, isUint8Slice := wrappedPayload.Payload.([]uint8)
+		_, isByteSlice := wrappedPayload.Payload.([]byte)
 
-	if isUint8Slice || isByteSlice {
-		intSlice, ok := types.GetAnyAsIntSlice(wrappedPayload.Payload)
+		if isUint8Slice || isByteSlice {
+			intSlice, ok := types.GetAnyAsIntSlice(wrappedPayload.Payload)
 
-		if ok {
-			wrappedPayload.Payload = intSlice
+			if ok {
+				wrappedPayload.Payload = intSlice
+			}
 		}
-	}
 
-	err := sj.vm.SetProperty(sj.vm.GlobalObject(), sj.payloadAtom, wrappedPayload.Payload)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
+		err := sj.vm.SetProperty(sj.vm.GlobalObject(), sj.payloadAtom, wrappedPayload.Payload)
+		if err != nil {
+			return wrappedPayload, err
+		}
 
-	_, err = sj.vm.Eval(sj.Program, quickjs.EvalGlobal)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	output, err := sj.vm.GetProperty(sj.vm.GlobalObject(), sj.payloadAtom)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	// NOTE(jwetzell): turn undefined into nil
-	_, ok := output.(quickjs.Undefined)
-
-	if ok {
-		wrappedPayload.End = true
-		wrappedPayload.Payload = nil
-		return wrappedPayload, nil
-	}
-
-	// NOTE(jwetzell): turn object into map[string]interface{}
-	outputObject, ok := output.(*quickjs.Object)
-
-	if ok {
-		var outputSlice []any
-
-		err = outputObject.Into(&outputSlice)
+		_, err = sj.vm.Eval(sj.Program, quickjs.EvalGlobal)
 
 		if err != nil {
-			var outputMap map[string]any
-			err = outputObject.Into(&outputMap)
-			if err != nil {
-				wrappedPayload.End = true
-				return wrappedPayload, err
-			} else {
-				wrappedPayload.Payload = outputMap
-				return wrappedPayload, nil
-			}
-
-		} else {
-			wrappedPayload.Payload = outputSlice
-			return wrappedPayload, nil
+			return wrappedPayload, err
 		}
-	}
 
-	wrappedPayload.Payload = output
-	return wrappedPayload, nil
+		output, err := sj.vm.GetProperty(sj.vm.GlobalObject(), sj.payloadAtom)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		// NOTE(jwetzell): turn undefined into nil
+		_, ok := output.(quickjs.Undefined)
+
+		if ok {
+			wrappedPayload.Payload = nil
+			return next(ctx, wrappedPayload, moduleManager, router)
+		}
+
+		// NOTE(jwetzell): turn object into map[string]interface{}
+		outputObject, ok := output.(*quickjs.Object)
+
+		if ok {
+			var outputSlice []any
+
+			err = outputObject.Into(&outputSlice)
+
+			if err != nil {
+				var outputMap map[string]any
+				err = outputObject.Into(&outputMap)
+				if err != nil {
+					return wrappedPayload, err
+				} else {
+					wrappedPayload.Payload = outputMap
+					return next(ctx, wrappedPayload, moduleManager, router)
+				}
+
+			} else {
+				wrappedPayload.Payload = outputSlice
+				return next(ctx, wrappedPayload, moduleManager, router)
+			}
+		}
+
+		wrappedPayload.Payload = output
+		return next(ctx, wrappedPayload, moduleManager, router)
+	}
 }

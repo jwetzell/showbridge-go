@@ -83,35 +83,34 @@ type OsExec struct {
 	Args            []*template.Template
 }
 
-func (oe *OsExec) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	templateData := wrappedPayload
+func (oe *OsExec) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		templateData := wrappedPayload
 
-	var commandBuffer bytes.Buffer
-	err := oe.CommandTemplate.Execute(&commandBuffer, templateData)
+		var commandBuffer bytes.Buffer
+		err := oe.CommandTemplate.Execute(&commandBuffer, templateData)
 
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	commandString := commandBuffer.String()
-
-	argStrings := make([]string, len(oe.Args))
-	for i, argTemplate := range oe.Args {
-		var argBuffer bytes.Buffer
-		err := argTemplate.Execute(&argBuffer, templateData)
 		if err != nil {
-			wrappedPayload.End = true
 			return wrappedPayload, err
 		}
-		argStrings[i] = argBuffer.String()
-	}
 
-	out, err := exec.Command(commandString, argStrings...).Output()
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("os.exec command execution error: %w", err)
+		commandString := commandBuffer.String()
+
+		argStrings := make([]string, len(oe.Args))
+		for i, argTemplate := range oe.Args {
+			var argBuffer bytes.Buffer
+			err := argTemplate.Execute(&argBuffer, templateData)
+			if err != nil {
+				return wrappedPayload, err
+			}
+			argStrings[i] = argBuffer.String()
+		}
+
+		out, err := exec.Command(commandString, argStrings...).Output()
+		if err != nil {
+			return wrappedPayload, fmt.Errorf("os.exec command execution error: %w", err)
+		}
+		wrappedPayload.Payload = out
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-	wrappedPayload.Payload = out
-	return wrappedPayload, nil
 }

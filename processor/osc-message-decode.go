@@ -26,30 +26,28 @@ type OSCMessageDecode struct {
 	config config.ProcessorConfig
 }
 
-func (omd *OSCMessageDecode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
-	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
+func (omd *OSCMessageDecode) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
+		payloadBytes, ok := types.GetAnyAsByteSlice(payload)
 
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("osc.message.decode processor only accepts a []byte payload")
-	}
+		if !ok {
+			return wrappedPayload, errors.New("osc.message.decode processor only accepts a []byte payload")
+		}
 
-	if len(payloadBytes) == 0 {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("osc.message.decode processor can't work on empty []byte")
-	}
+		if len(payloadBytes) == 0 {
+			return wrappedPayload, errors.New("osc.message.decode processor can't work on empty []byte")
+		}
 
-	if payloadBytes[0] != '/' {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("osc.message.decode processor needs an OSC looking []byte")
-	}
+		if payloadBytes[0] != '/' {
+			return wrappedPayload, errors.New("osc.message.decode processor needs an OSC looking []byte")
+		}
 
-	message, err := osc.MessageFromBytes(payloadBytes)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("osc.message.decode processor failed to decode OSC message: %w", err)
+		message, err := osc.MessageFromBytes(payloadBytes)
+		if err != nil {
+			return wrappedPayload, fmt.Errorf("osc.message.decode processor failed to decode OSC message: %w", err)
+		}
+		wrappedPayload.Payload = message
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-	wrappedPayload.Payload = message
-	return wrappedPayload, nil
 }

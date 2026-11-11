@@ -117,7 +117,7 @@ func TestGoodDbQuery(t *testing.T) {
 				t.Fatalf("db.query failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{
 				Payload: testCase.payload,
 			}, testModuleManager{
 				"test": NewTestDBModule("test"),
@@ -278,7 +278,7 @@ func TestBadDbQuery(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{
 				Payload: test.payload,
 			}, test.moduleManager, nil)
 

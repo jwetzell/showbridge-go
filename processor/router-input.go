@@ -49,22 +49,22 @@ type RouterInput struct {
 	logger   *slog.Logger
 }
 
-func (ri *RouterInput) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (ri *RouterInput) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
-	payload := wrappedPayload.Payload
-	if router == nil {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("router.input no input handler found")
+		payload := wrappedPayload.Payload
+		if router == nil {
+			return wrappedPayload, errors.New("router.input no input handler found")
+		}
+
+		_, err := router.HandleInput(ctx, ri.SourceId, payload)
+
+		if err != nil {
+			return wrappedPayload, errors.New("router.input failed to send input")
+		}
+
+		wrappedPayload.Payload = payload
+
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	_, err := router.HandleInput(ctx, ri.SourceId, payload)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("router.input failed to send input")
-	}
-
-	wrappedPayload.Payload = payload
-
-	return wrappedPayload, nil
 }

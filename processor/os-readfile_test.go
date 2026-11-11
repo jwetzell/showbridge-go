@@ -33,7 +33,7 @@ func TestGoodOsReadFile(t *testing.T) {
 				t.Fatalf("os.readfile failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, nil)
 
 			if err != nil {
 				t.Fatalf("os.readfile processing failed: %s", err)
@@ -102,7 +102,7 @@ func TestBadOsReadFile(t *testing.T) {
 				}
 				return
 			}
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("os.readfile expected to fail but succeeded, got: %v", got)

@@ -79,51 +79,49 @@ type HTTPGet struct {
 	Headers map[string]string
 }
 
-func (hrd *HTTPGet) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (hg *HTTPGet) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
-	templateData := wrappedPayload
+		templateData := wrappedPayload
 
-	var urlBuffer bytes.Buffer
-	err := hrd.URL.Execute(&urlBuffer, templateData)
+		var urlBuffer bytes.Buffer
+		err := hg.URL.Execute(&urlBuffer, templateData)
 
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		urlString := urlBuffer.String()
+
+		request, err := http.NewRequest("GET", urlString, nil)
+		if err != nil {
+			return wrappedPayload, err
+		}
+		for key, value := range hg.Headers {
+			request.Header.Set(key, value)
+		}
+
+		response, err := hg.client.Do(request)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		defer response.Body.Close()
+
+		body, err := io.ReadAll(response.Body)
+
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		// TODO(jwetzell): support headers, etc
+		wrappedPayload.Payload = httpResponse{
+			Status:     response.Status,
+			StatusCode: response.StatusCode,
+			Proto:      response.Proto,
+			Body:       body,
+		}
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	urlString := urlBuffer.String()
-
-	request, err := http.NewRequest("GET", urlString, nil)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-	for key, value := range hrd.Headers {
-		request.Header.Set(key, value)
-	}
-
-	response, err := hrd.client.Do(request)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	defer response.Body.Close()
-
-	body, err := io.ReadAll(response.Body)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	// TODO(jwetzell): support headers, etc
-	wrappedPayload.Payload = httpResponse{
-		Status:     response.Status,
-		StatusCode: response.StatusCode,
-		Proto:      response.Proto,
-		Body:       body,
-	}
-	return wrappedPayload, nil
 }

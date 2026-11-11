@@ -83,17 +83,18 @@ type FloatRandom struct {
 	config  config.ProcessorConfig
 }
 
-func (fr *FloatRandom) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	if fr.BitSize == 32 {
-		payloadFloat := rand.Float32()*(float32(fr.Max)-float32(fr.Min)) + float32(fr.Min)
-		wrappedPayload.Payload = payloadFloat
-		return wrappedPayload, nil
+func (fr *FloatRandom) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		if fr.BitSize == 32 {
+			payloadFloat := rand.Float32()*(float32(fr.Max)-float32(fr.Min)) + float32(fr.Min)
+			wrappedPayload.Payload = payloadFloat
+			return next(ctx, wrappedPayload, moduleManager, router)
+		}
+		if fr.BitSize == 64 {
+			payloadFloat := rand.Float64()*(fr.Max-fr.Min) + fr.Min
+			wrappedPayload.Payload = payloadFloat
+			return next(ctx, wrappedPayload, moduleManager, router)
+		}
+		return wrappedPayload, errors.New("float.random bitSize error: must be 32 or 64")
 	}
-	if fr.BitSize == 64 {
-		payloadFloat := rand.Float64()*(fr.Max-fr.Min) + fr.Min
-		wrappedPayload.Payload = payloadFloat
-		return wrappedPayload, nil
-	}
-	wrappedPayload.End = true
-	return wrappedPayload, errors.New("float.random bitSize error: must be 32 or 64")
 }

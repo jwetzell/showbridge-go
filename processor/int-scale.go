@@ -87,15 +87,16 @@ type IntScale struct {
 	config config.ProcessorConfig
 }
 
-func (is *IntScale) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
-	payloadInt, ok := types.GetAnyAsInt(payload)
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("int.scale can only process an int")
-	}
+func (is *IntScale) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
+		payloadInt, ok := types.GetAnyAsInt(payload)
+		if !ok {
+			return wrappedPayload, errors.New("int.scale can only process an int")
+		}
 
-	payloadInt = (payloadInt-is.InMin)*(is.OutMax-is.OutMin)/(is.InMax-is.InMin) + is.OutMin
-	wrappedPayload.Payload = payloadInt
-	return wrappedPayload, nil
+		payloadInt = (payloadInt-is.InMin)*(is.OutMax-is.OutMin)/(is.InMax-is.InMin) + is.OutMin
+		wrappedPayload.Payload = payloadInt
+		return next(ctx, wrappedPayload, moduleManager, router)
+	}
 }

@@ -195,7 +195,6 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, inputPayload 
 				err := routeInstance.ProcessPayload(ctx, routing.WrappedPayload{
 					Payload: inputPayload,
 					Source:  sourceId,
-					End:     false,
 				}, r.ModuleInstances, r)
 				if err != nil {
 					routeIOErrorsMu.Lock()

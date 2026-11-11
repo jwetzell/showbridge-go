@@ -20,8 +20,11 @@ type TestProcessor struct {
 	Config config.ProcessorConfig
 }
 
-func (p *TestProcessor) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	return wrappedPayload, nil
+func (p *TestProcessor) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		// NOTE(jwetzell): NOP
+		return next(ctx, wrappedPayload, moduleManager, router)
+	}
 }
 
 type TestStruct struct {
@@ -121,4 +124,13 @@ func TestProcessorBadRegistrationExistingType(t *testing.T) {
 			return &TestProcessor{}, nil
 		},
 	})
+}
+
+func EvaluateProcessFunc(processor routing.Processor, ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+
+	pf := processor.Process(func(ctx context.Context, wp routing.WrappedPayload, mm routing.ModuleManager, r routing.Router) (routing.WrappedPayload, error) {
+		return wp, nil
+	})
+
+	return pf(ctx, wrappedPayload, moduleManager, router)
 }

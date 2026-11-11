@@ -1,11 +1,13 @@
 package processor_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/processor"
 	"github.com/jwetzell/showbridge-go/routing"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGoodFilterChange(t *testing.T) {
@@ -39,15 +41,16 @@ func TestGoodFilterChange(t *testing.T) {
 				t.Fatalf("filter.change failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			filtered := false
 
-			if err != nil {
-				t.Fatalf("filter.change processing failed: %s", err)
-			}
+			processFunc := processorInstance.Process(func(ctx context.Context, wp routing.WrappedPayload, mm routing.ModuleManager, r routing.Router) (routing.WrappedPayload, error) {
+				filtered = true
+				return wp, nil
+			})
 
-			if got.End != !test.match {
-				t.Fatalf("filter.change did not filter properly %+v, expected %+v", got, test.match)
-			}
+			_, err = processFunc(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			require.NoError(t, err)
+			require.Equal(t, test.match, filtered)
 		})
 	}
 }
@@ -79,7 +82,7 @@ func TestBadFilterChange(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("filter.change expected to fail but got payload: %+v", got)

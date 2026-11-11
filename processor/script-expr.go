@@ -52,16 +52,17 @@ func init() {
 	})
 }
 
-func (se *ScriptExpr) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (se *ScriptExpr) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
-	exprEnv := wrappedPayload
+		exprEnv := wrappedPayload
 
-	output, err := expr.Run(se.Program, exprEnv)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
+		output, err := expr.Run(se.Program, exprEnv)
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		wrappedPayload.Payload = output
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	wrappedPayload.Payload = output
-	return wrappedPayload, nil
 }

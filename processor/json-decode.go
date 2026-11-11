@@ -25,24 +25,24 @@ type JsonDecode struct {
 	config config.ProcessorConfig
 }
 
-func (jd *JsonDecode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
+func (jd *JsonDecode) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
 
-	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
+		payloadBytes, ok := types.GetAnyAsByteSlice(payload)
 
-	if !ok {
-		return wrappedPayload, errors.New("json.decode can only process a string or []byte")
+		if !ok {
+			return wrappedPayload, errors.New("json.decode can only process a string or []byte")
+		}
+
+		payloadJson := make(map[string]any)
+
+		err := json.Unmarshal(payloadBytes, &payloadJson)
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		wrappedPayload.Payload = payloadJson
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	payloadJson := make(map[string]any)
-
-	err := json.Unmarshal(payloadBytes, &payloadJson)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	wrappedPayload.Payload = payloadJson
-	return wrappedPayload, nil
-
 }

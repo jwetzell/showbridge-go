@@ -24,16 +24,17 @@ type YamlEncode struct {
 	config config.ProcessorConfig
 }
 
-func (je *YamlEncode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
+func (ye *YamlEncode) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
 
-	payloadBytes, err := yaml.Marshal(payload)
+		payloadBytes, err := yaml.Marshal(payload)
 
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		wrappedPayload.Payload = payloadBytes
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	wrappedPayload.Payload = payloadBytes
-	return wrappedPayload, nil
 }

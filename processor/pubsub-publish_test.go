@@ -65,7 +65,7 @@ func TestGoodPubSubPublish(t *testing.T) {
 				t.Fatalf("pubsub.publish failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{
 				Payload: testCase.payload,
 			}, testModuleManager(map[string]routing.Module{
 				"test": NewTestPubSubModule("test"),
@@ -214,7 +214,7 @@ func TestBadPubSubPublish(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{
 				Payload: test.payload,
 			}, test.moduleManager, nil)
 

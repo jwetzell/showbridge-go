@@ -36,7 +36,7 @@ func TestGoodRouterInput(t *testing.T) {
 				t.Fatalf("router.input failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("router.input processing failed: %s", err)
 			}
@@ -107,7 +107,7 @@ func TestBadRouterInput(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, testCase.router)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, testCase.router)
 
 			if err == nil {
 				t.Fatalf("router.input expected to fail but succeeded, got: %v", got)

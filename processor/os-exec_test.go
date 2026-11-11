@@ -33,7 +33,7 @@ func TestGoodOsExec(t *testing.T) {
 				t.Fatalf("os.exec failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, nil)
 
 			if err != nil {
 				t.Fatalf("os.exec processing failed: %s", err)
@@ -129,7 +129,7 @@ func TestBadOsExec(t *testing.T) {
 				}
 				return
 			}
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("os.exec expected to fail but succeeded, got: %v", got)

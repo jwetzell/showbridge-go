@@ -26,15 +26,16 @@ type MIDIMessageEncode struct {
 	config config.ProcessorConfig
 }
 
-func (mme *MIDIMessageEncode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
-	payloadMessage, ok := payload.(midi.Message)
+func (mme *MIDIMessageEncode) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
+		payloadMessage, ok := payload.(midi.Message)
 
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("midi.message.encode processor only accepts a midi.Message")
+		if !ok {
+			return wrappedPayload, errors.New("midi.message.encode processor only accepts a midi.Message")
+		}
+
+		wrappedPayload.Payload = payloadMessage.Bytes()
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	wrappedPayload.Payload = payloadMessage.Bytes()
-	return wrappedPayload, nil
 }

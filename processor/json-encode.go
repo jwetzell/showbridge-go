@@ -24,21 +24,22 @@ type JsonEncode struct {
 	config config.ProcessorConfig
 }
 
-func (je *JsonEncode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
-	var payloadBuffer bytes.Buffer
+func (je *JsonEncode) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
+		var payloadBuffer bytes.Buffer
 
-	err := json.NewEncoder(&payloadBuffer).Encode(payload)
+		err := json.NewEncoder(&payloadBuffer).Encode(payload)
 
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		payloadBytes := payloadBuffer.Bytes()
+
+		payloadBytes = payloadBytes[0 : len(payloadBytes)-1]
+
+		wrappedPayload.Payload = payloadBytes
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	payloadBytes := payloadBuffer.Bytes()
-
-	payloadBytes = payloadBytes[0 : len(payloadBytes)-1]
-
-	wrappedPayload.Payload = payloadBytes
-	return wrappedPayload, nil
 }

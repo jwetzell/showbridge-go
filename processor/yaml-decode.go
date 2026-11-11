@@ -25,24 +25,25 @@ type YamlDecode struct {
 	config config.ProcessorConfig
 }
 
-func (jd *YamlDecode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
+func (yd *YamlDecode) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
 
-	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
+		payloadBytes, ok := types.GetAnyAsByteSlice(payload)
 
-	if !ok {
-		return wrappedPayload, errors.New("yaml.decode can only process a string or []byte")
+		if !ok {
+			return wrappedPayload, errors.New("yaml.decode can only process a string or []byte")
+		}
+
+		payloadYaml := make(map[string]any)
+
+		err := yaml.Unmarshal(payloadBytes, &payloadYaml)
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		wrappedPayload.Payload = payloadYaml
+		return next(ctx, wrappedPayload, moduleManager, router)
+
 	}
-
-	payloadYaml := make(map[string]any)
-
-	err := yaml.Unmarshal(payloadBytes, &payloadYaml)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	wrappedPayload.Payload = payloadYaml
-	return wrappedPayload, nil
-
 }

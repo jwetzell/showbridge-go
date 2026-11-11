@@ -61,36 +61,34 @@ type KVGet struct {
 	mu       sync.Mutex
 }
 
-func (kvg *KVGet) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	kvg.mu.Lock()
-	defer kvg.mu.Unlock()
+func (kvg *KVGet) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		kvg.mu.Lock()
+		defer kvg.mu.Unlock()
 
-	if kvg.module == nil {
-		if moduleManager == nil {
-			wrappedPayload.End = true
-			return wrappedPayload, errors.New("kv.get module manager is nil")
+		if kvg.module == nil {
+			if moduleManager == nil {
+				return wrappedPayload, errors.New("kv.get module manager is nil")
+			}
+
+			module, ok := moduleManager.GetModule(kvg.ModuleId)
+			if !ok {
+				return wrappedPayload, fmt.Errorf("kv.get unable to find module with id: %s", kvg.ModuleId)
+			}
+
+			kvModule, ok := module.(routing.KeyValueModule)
+			if !ok {
+				return wrappedPayload, fmt.Errorf("kv.get module with id %s is not a KeyValueModule", kvg.ModuleId)
+			}
+			kvg.module = kvModule
 		}
 
-		module, ok := moduleManager.GetModule(kvg.ModuleId)
-		if !ok {
-			wrappedPayload.End = true
-			return wrappedPayload, fmt.Errorf("kv.get unable to find module with id: %s", kvg.ModuleId)
+		value, err := kvg.module.Get(ctx, kvg.Key)
+		if err != nil {
+			return wrappedPayload, fmt.Errorf("kv.get error getting key: %w", err)
 		}
 
-		kvModule, ok := module.(routing.KeyValueModule)
-		if !ok {
-			wrappedPayload.End = true
-			return wrappedPayload, fmt.Errorf("kv.get module with id %s is not a KeyValueModule", kvg.ModuleId)
-		}
-		kvg.module = kvModule
+		wrappedPayload.Payload = value
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	value, err := kvg.module.Get(ctx, kvg.Key)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("kv.get error getting key: %w", err)
-	}
-
-	wrappedPayload.Payload = value
-	return wrappedPayload, nil
 }

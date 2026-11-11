@@ -24,14 +24,15 @@ type FilterChange struct {
 	previous any
 }
 
-func (fc *FilterChange) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
+func (fc *FilterChange) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
 
-	if reflect.DeepEqual(payload, fc.previous) {
-		wrappedPayload.End = true
-		return wrappedPayload, nil
+		if reflect.DeepEqual(payload, fc.previous) {
+			return wrappedPayload, nil
+		}
+		fc.previous = payload
+
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-	fc.previous = payload
-
-	return wrappedPayload, nil
 }

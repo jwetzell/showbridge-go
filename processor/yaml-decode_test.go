@@ -46,7 +46,7 @@ func TestGoodYamlDecode(t *testing.T) {
 				Params: nil,
 			})
 			require.NoError(t, err)
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 			require.NoError(t, err)
 
 			gotMap, ok := got.Payload.(map[string]any)
@@ -96,7 +96,7 @@ func TestBadYamlDecode(t *testing.T) {
 				}
 				t.Fatalf("yaml.decode got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("yaml.decode expected to fail but got payload: %+v", got)

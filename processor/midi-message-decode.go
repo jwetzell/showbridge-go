@@ -27,17 +27,18 @@ type MIDIMessageDecode struct {
 	config config.ProcessorConfig
 }
 
-func (mmd *MIDIMessageDecode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
-	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
+func (mmd *MIDIMessageDecode) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
+		payloadBytes, ok := types.GetAnyAsByteSlice(payload)
 
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("midi.message.decode processor only accepts a []byte")
+		if !ok {
+			return wrappedPayload, errors.New("midi.message.decode processor only accepts a []byte")
+		}
+
+		payloadMessage := midi.Message(payloadBytes)
+
+		wrappedPayload.Payload = payloadMessage
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	payloadMessage := midi.Message(payloadBytes)
-
-	wrappedPayload.Payload = payloadMessage
-	return wrappedPayload, nil
 }

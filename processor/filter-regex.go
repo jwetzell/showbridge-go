@@ -52,20 +52,20 @@ type FilterRegex struct {
 	Pattern *regexp.Regexp
 }
 
-func (fr *FilterRegex) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
-	payloadString, ok := payload.(string)
+func (fr *FilterRegex) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
+		payloadString, ok := payload.(string)
 
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("filter.regex processor only accepts a string")
+		if !ok {
+			return wrappedPayload, errors.New("filter.regex processor only accepts a string")
+		}
+
+		if !fr.Pattern.MatchString(payloadString) {
+			return wrappedPayload, nil
+		}
+
+		wrappedPayload.Payload = payloadString
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	if !fr.Pattern.MatchString(payloadString) {
-		wrappedPayload.End = true
-		return wrappedPayload, nil
-	}
-
-	wrappedPayload.Payload = payloadString
-	return wrappedPayload, nil
 }

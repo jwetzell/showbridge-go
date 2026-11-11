@@ -69,44 +69,41 @@ type PubSubPublish struct {
 	mu       sync.Mutex
 }
 
-func (psp *PubSubPublish) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (psp *PubSubPublish) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
-	psp.mu.Lock()
-	defer psp.mu.Unlock()
+		psp.mu.Lock()
+		defer psp.mu.Unlock()
 
-	if psp.module == nil {
-		if moduleManager == nil {
-			wrappedPayload.End = true
-			return wrappedPayload, errors.New("pubsub.publish module manager is nil")
+		if psp.module == nil {
+			if moduleManager == nil {
+				return wrappedPayload, errors.New("pubsub.publish module manager is nil")
+			}
+
+			module, ok := moduleManager.GetModule(psp.ModuleId)
+			if !ok {
+				return wrappedPayload, fmt.Errorf("pubsub.publish unable to find module with id: %s", psp.ModuleId)
+			}
+
+			pubSubModule, ok := module.(routing.PubSubModule)
+			if !ok {
+				return wrappedPayload, fmt.Errorf("pubsub.publish module with id %s is not a PubSubModule", psp.ModuleId)
+			}
+			psp.module = pubSubModule
 		}
 
-		module, ok := moduleManager.GetModule(psp.ModuleId)
-		if !ok {
-			wrappedPayload.End = true
-			return wrappedPayload, fmt.Errorf("pubsub.publish unable to find module with id: %s", psp.ModuleId)
+		var topicBuffer bytes.Buffer
+		err := psp.Topic.Execute(&topicBuffer, wrappedPayload)
+
+		if err != nil {
+			return wrappedPayload, err
 		}
 
-		pubSubModule, ok := module.(routing.PubSubModule)
-		if !ok {
-			wrappedPayload.End = true
-			return wrappedPayload, fmt.Errorf("pubsub.publish module with id %s is not a PubSubModule", psp.ModuleId)
+		err = psp.module.Publish(ctx, topicBuffer.String(), wrappedPayload.Payload)
+		if err != nil {
+			return wrappedPayload, fmt.Errorf("pubsub.publish error publishing: %w", err)
 		}
-		psp.module = pubSubModule
+
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	var topicBuffer bytes.Buffer
-	err := psp.Topic.Execute(&topicBuffer, wrappedPayload)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	err = psp.module.Publish(ctx, topicBuffer.String(), wrappedPayload.Payload)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("pubsub.publish error publishing: %w", err)
-	}
-
-	return wrappedPayload, nil
 }
