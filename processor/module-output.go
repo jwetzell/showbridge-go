@@ -53,40 +53,34 @@ type ModuleOutput struct {
 }
 
 func (mo *ModuleOutput) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, mo.process)
-}
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
-func (mo *ModuleOutput) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		mo.mu.Lock()
+		defer mo.mu.Unlock()
 
-	mo.mu.Lock()
-	defer mo.mu.Unlock()
+		if mo.module == nil {
+			if moduleManager == nil {
+				return wrappedPayload, errors.New("module.output module manager is nil")
+			}
 
-	if mo.module == nil {
-		if moduleManager == nil {
-			wrappedPayload.End = true
-			return wrappedPayload, errors.New("module.output module manager is nil")
+			module, ok := moduleManager.GetModule(mo.ModuleId)
+			if !ok {
+				return wrappedPayload, fmt.Errorf("module.output unable to find module with id: %s", mo.ModuleId)
+			}
+
+			outputModule, ok := module.(routing.OutputModule)
+			if !ok {
+				return wrappedPayload, fmt.Errorf("module.output module with id %s is not an OutputModule", mo.ModuleId)
+			}
+			mo.module = outputModule
 		}
 
-		module, ok := moduleManager.GetModule(mo.ModuleId)
-		if !ok {
-			wrappedPayload.End = true
-			return wrappedPayload, fmt.Errorf("module.output unable to find module with id: %s", mo.ModuleId)
+		err := mo.module.Output(ctx, wrappedPayload.Payload)
+
+		if err != nil {
+			return wrappedPayload, fmt.Errorf("module.output failed to send output: %w", err)
 		}
 
-		outputModule, ok := module.(routing.OutputModule)
-		if !ok {
-			wrappedPayload.End = true
-			return wrappedPayload, fmt.Errorf("module.output module with id %s is not an OutputModule", mo.ModuleId)
-		}
-		mo.module = outputModule
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	err := mo.module.Output(ctx, wrappedPayload.Payload)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("module.output failed to send output: %w", err)
-	}
-
-	return wrappedPayload, nil
 }

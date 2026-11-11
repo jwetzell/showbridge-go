@@ -25,20 +25,17 @@ type FreeDEncode struct {
 }
 
 func (fe *FreeDEncode) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, fe.process)
-}
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
+		payloadPosition, ok := payload.(freeD.Position)
 
-func (fe *FreeDEncode) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
-	payloadPosition, ok := payload.(freeD.Position)
+		if !ok {
+			return wrappedPayload, errors.New("freed.encode processor only accepts a FreeD Position")
+		}
 
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("freed.encode processor only accepts a FreeD Position")
+		payloadBytes := payloadPosition.Encode()
+
+		wrappedPayload.Payload = payloadBytes
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	payloadBytes := payloadPosition.Encode()
-
-	wrappedPayload.Payload = payloadBytes
-	return wrappedPayload, nil
 }

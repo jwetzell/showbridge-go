@@ -25,17 +25,14 @@ type FilterChange struct {
 }
 
 func (fc *FilterChange) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, fc.process)
-}
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
 
-func (fc *FilterChange) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
+		if reflect.DeepEqual(payload, fc.previous) {
+			return wrappedPayload, nil
+		}
+		fc.previous = payload
 
-	if reflect.DeepEqual(payload, fc.previous) {
-		wrappedPayload.End = true
-		return wrappedPayload, nil
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-	fc.previous = payload
-
-	return wrappedPayload, nil
 }

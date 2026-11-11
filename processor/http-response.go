@@ -73,38 +73,32 @@ type httpResponse struct {
 }
 
 func (hrc *HTTPResponse) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, hrc.process)
-}
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		templateData := wrappedPayload
 
-func (hrc *HTTPResponse) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	templateData := wrappedPayload
+		var bodyBuffer bytes.Buffer
+		err := hrc.BodyTmpl.Execute(&bodyBuffer, templateData)
 
-	var bodyBuffer bytes.Buffer
-	err := hrc.BodyTmpl.Execute(&bodyBuffer, templateData)
+		if err != nil {
+			return wrappedPayload, err
+		}
 
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
+		responseWriter, ok := ctx.Value(routing.HttpServerResponseContextKey).(*routing.HTTPServerResponseWriter)
+
+		if !ok {
+			return wrappedPayload, errors.New("http.response input must come from a http.server")
+		}
+
+		if responseWriter.Done() {
+			return wrappedPayload, errors.New("http.response response writer has already been written to")
+		}
+
+		responseWriter.WriteHeader(hrc.Status)
+		_, err = responseWriter.Write(bodyBuffer.Bytes())
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	responseWriter, ok := ctx.Value(routing.HttpServerResponseContextKey).(*routing.HTTPServerResponseWriter)
-
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("http.response input must come from a http.server")
-	}
-
-	if responseWriter.Done() {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("http.response response writer has already been written to")
-	}
-
-	responseWriter.WriteHeader(hrc.Status)
-	_, err = responseWriter.Write(bodyBuffer.Bytes())
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	return wrappedPayload, nil
 }

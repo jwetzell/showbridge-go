@@ -62,11 +62,9 @@ type IntRandom struct {
 }
 
 func (ir *IntRandom) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, ir.process)
-}
-
-func (ir *IntRandom) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payloadInt := rand.IntN(ir.Max-ir.Min+1) + ir.Min
-	wrappedPayload.Payload = payloadInt
-	return wrappedPayload, nil
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payloadInt := rand.IntN(ir.Max-ir.Min+1) + ir.Min
+		wrappedPayload.Payload = payloadInt
+		return next(ctx, wrappedPayload, moduleManager, router)
+	}
 }

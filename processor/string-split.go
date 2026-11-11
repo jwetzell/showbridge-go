@@ -47,19 +47,16 @@ type StringSplit struct {
 }
 
 func (ss *StringSplit) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, ss.process)
-}
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
+		payloadString, ok := payload.(string)
 
-func (ss *StringSplit) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
-	payloadString, ok := payload.(string)
+		if !ok {
+			return wrappedPayload, errors.New("string.split only accepts a string")
+		}
 
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("string.split only accepts a string")
+		wrappedPayload.Payload = strings.Split(payloadString, ss.Separator)
+
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	wrappedPayload.Payload = strings.Split(payloadString, ss.Separator)
-
-	return wrappedPayload, nil
 }

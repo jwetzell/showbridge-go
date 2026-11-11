@@ -58,38 +58,33 @@ type OsWriteFile struct {
 }
 
 func (owf *OsWriteFile) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, owf.process)
-}
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		templateData := wrappedPayload
 
-func (owf *OsWriteFile) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	templateData := wrappedPayload
+		var pathBuffer bytes.Buffer
+		err := owf.PathTemplate.Execute(&pathBuffer, templateData)
 
-	var pathBuffer bytes.Buffer
-	err := owf.PathTemplate.Execute(&pathBuffer, templateData)
-
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	pathString := pathBuffer.String()
-
-	payloadBytes, ok := types.GetAnyAsByteSlice(wrappedPayload.Payload)
-
-	if !ok {
-		payloadString, ok := wrappedPayload.Payload.(string)
-		if !ok {
-			wrappedPayload.End = true
-			return wrappedPayload, errors.New("os.writefile can only process a string or []byte")
+		if err != nil {
+			return wrappedPayload, err
 		}
-		payloadBytes = []byte(payloadString)
-	}
 
-	// TODO(jwetzell): make perm configurable
-	err = os.WriteFile(pathString, payloadBytes, 0644)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("os.writefile error: %w", err)
+		pathString := pathBuffer.String()
+
+		payloadBytes, ok := types.GetAnyAsByteSlice(wrappedPayload.Payload)
+
+		if !ok {
+			payloadString, ok := wrappedPayload.Payload.(string)
+			if !ok {
+				return wrappedPayload, errors.New("os.writefile can only process a string or []byte")
+			}
+			payloadBytes = []byte(payloadString)
+		}
+
+		// TODO(jwetzell): make perm configurable
+		err = os.WriteFile(pathString, payloadBytes, 0644)
+		if err != nil {
+			return wrappedPayload, fmt.Errorf("os.writefile error: %w", err)
+		}
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-	return wrappedPayload, nil
 }

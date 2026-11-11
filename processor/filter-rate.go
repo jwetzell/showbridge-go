@@ -46,14 +46,11 @@ type FilterRate struct {
 }
 
 func (fc *FilterRate) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, fc.process)
-}
-
-func (fc *FilterRate) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	err := fc.limiter.Wait(ctx)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		err := fc.limiter.Wait(ctx)
+		if err != nil {
+			return wrappedPayload, err
+		}
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-	return wrappedPayload, nil
 }

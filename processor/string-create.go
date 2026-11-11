@@ -51,21 +51,18 @@ type StringCreate struct {
 }
 
 func (sc *StringCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, sc.process)
-}
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		templateData := wrappedPayload
 
-func (sc *StringCreate) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	templateData := wrappedPayload
+		var templateBuffer bytes.Buffer
+		err := sc.Template.Execute(&templateBuffer, templateData)
 
-	var templateBuffer bytes.Buffer
-	err := sc.Template.Execute(&templateBuffer, templateData)
+		if err != nil {
+			return wrappedPayload, err
+		}
 
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
+		wrappedPayload.Payload = templateBuffer.String()
+
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	wrappedPayload.Payload = templateBuffer.String()
-
-	return wrappedPayload, nil
 }

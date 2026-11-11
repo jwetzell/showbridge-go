@@ -57,27 +57,23 @@ type OsReadFile struct {
 }
 
 func (orf *OsReadFile) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, orf.process)
-}
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		templateData := wrappedPayload
 
-func (orf *OsReadFile) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	templateData := wrappedPayload
+		var pathBuffer bytes.Buffer
+		err := orf.PathTemplate.Execute(&pathBuffer, templateData)
 
-	var pathBuffer bytes.Buffer
-	err := orf.PathTemplate.Execute(&pathBuffer, templateData)
+		if err != nil {
+			return wrappedPayload, err
+		}
 
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
+		pathString := pathBuffer.String()
+
+		data, err := os.ReadFile(pathString)
+		if err != nil {
+			return wrappedPayload, fmt.Errorf("os.readfile error: %w", err)
+		}
+		wrappedPayload.Payload = data
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	pathString := pathBuffer.String()
-
-	data, err := os.ReadFile(pathString)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("os.readfile error: %w", err)
-	}
-	wrappedPayload.Payload = data
-	return wrappedPayload, nil
 }

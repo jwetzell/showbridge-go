@@ -63,38 +63,32 @@ type KVSet struct {
 }
 
 func (kvs *KVSet) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, kvs.process)
-}
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		kvs.mu.Lock()
+		defer kvs.mu.Unlock()
 
-func (kvs *KVSet) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	kvs.mu.Lock()
-	defer kvs.mu.Unlock()
+		if kvs.module == nil {
+			if moduleManager == nil {
+				return wrappedPayload, errors.New("kv.set module manager is nil")
+			}
 
-	if kvs.module == nil {
-		if moduleManager == nil {
-			wrappedPayload.End = true
-			return wrappedPayload, errors.New("kv.set module manager is nil")
+			module, ok := moduleManager.GetModule(kvs.ModuleId)
+			if !ok {
+				return wrappedPayload, fmt.Errorf("kv.set unable to find module with id: %s", kvs.ModuleId)
+			}
+
+			kvModule, ok := module.(routing.KeyValueModule)
+			if !ok {
+				return wrappedPayload, fmt.Errorf("kv.set module with id %s is not a KeyValueModule", kvs.ModuleId)
+			}
+			kvs.module = kvModule
 		}
 
-		module, ok := moduleManager.GetModule(kvs.ModuleId)
-		if !ok {
-			wrappedPayload.End = true
-			return wrappedPayload, fmt.Errorf("kv.set unable to find module with id: %s", kvs.ModuleId)
+		err := kvs.module.Set(ctx, kvs.Key, wrappedPayload.Payload)
+		if err != nil {
+			return wrappedPayload, fmt.Errorf("kv.set error setting key: %w", err)
 		}
 
-		kvModule, ok := module.(routing.KeyValueModule)
-		if !ok {
-			wrappedPayload.End = true
-			return wrappedPayload, fmt.Errorf("kv.set module with id %s is not a KeyValueModule", kvs.ModuleId)
-		}
-		kvs.module = kvModule
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	err := kvs.module.Set(ctx, kvs.Key, wrappedPayload.Payload)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("kv.set error setting key: %w", err)
-	}
-
-	return wrappedPayload, nil
 }

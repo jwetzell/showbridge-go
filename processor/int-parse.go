@@ -69,23 +69,19 @@ type IntParse struct {
 }
 
 func (ip *IntParse) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, ip.process)
-}
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
+		payloadString, ok := payload.(string)
 
-func (ip *IntParse) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
-	payloadString, ok := payload.(string)
+		if !ok {
+			return wrappedPayload, errors.New("int.parse processor only accepts a string")
+		}
 
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("int.parse processor only accepts a string")
+		payloadInt, err := strconv.ParseInt(payloadString, ip.Base, ip.BitSize)
+		if err != nil {
+			return wrappedPayload, err
+		}
+		wrappedPayload.Payload = payloadInt
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	payloadInt, err := strconv.ParseInt(payloadString, ip.Base, ip.BitSize)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-	wrappedPayload.Payload = payloadInt
-	return wrappedPayload, nil
 }

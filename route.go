@@ -56,7 +56,6 @@ func NewRoute(routeDecl config.RouteConfig) (*Route, error) {
 	routeInstance := &Route{id: routeDecl.Id, input: routeDecl.Input, processors: processors}
 
 	routeInstance.processFunc = func(ctx context.Context, wp routing.WrappedPayload, mm routing.ModuleManager, r routing.Router) (routing.WrappedPayload, error) {
-		wp.End = true
 		return wp, nil
 	}
 

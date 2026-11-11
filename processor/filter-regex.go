@@ -53,23 +53,19 @@ type FilterRegex struct {
 }
 
 func (fr *FilterRegex) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, fr.process)
-}
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
+		payloadString, ok := payload.(string)
 
-func (fr *FilterRegex) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
-	payloadString, ok := payload.(string)
+		if !ok {
+			return wrappedPayload, errors.New("filter.regex processor only accepts a string")
+		}
 
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("filter.regex processor only accepts a string")
+		if !fr.Pattern.MatchString(payloadString) {
+			return wrappedPayload, nil
+		}
+
+		wrappedPayload.Payload = payloadString
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	if !fr.Pattern.MatchString(payloadString) {
-		wrappedPayload.End = true
-		return wrappedPayload, nil
-	}
-
-	wrappedPayload.Payload = payloadString
-	return wrappedPayload, nil
 }

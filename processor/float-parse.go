@@ -52,23 +52,19 @@ type FloatParse struct {
 }
 
 func (fp *FloatParse) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, fp.process)
-}
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
+		payloadString, ok := payload.(string)
 
-func (fp *FloatParse) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
-	payloadString, ok := payload.(string)
+		if !ok {
+			return wrappedPayload, errors.New("float.parse processor only accepts a string")
+		}
 
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("float.parse processor only accepts a string")
+		payloadFloat, err := strconv.ParseFloat(payloadString, fp.BitSize)
+		if err != nil {
+			return wrappedPayload, err
+		}
+		wrappedPayload.Payload = payloadFloat
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	payloadFloat, err := strconv.ParseFloat(payloadString, fp.BitSize)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-	wrappedPayload.Payload = payloadFloat
-	return wrappedPayload, nil
 }

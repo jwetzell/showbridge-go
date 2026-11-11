@@ -26,34 +26,28 @@ type RouteWrite struct {
 }
 
 func (rw *RouteWrite) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, rw.process)
-}
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
-func (rw *RouteWrite) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		bytes, ok := types.GetAnyAsByteSlice(wrappedPayload.Payload)
+		if !ok {
+			return wrappedPayload, errors.New("route.write could not convert payload to byte slice")
+		}
 
-	bytes, ok := types.GetAnyAsByteSlice(wrappedPayload.Payload)
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("route.write could not convert payload to byte slice")
+		contextWriter, ok := ctx.Value(routing.WriterContextKey).(*routing.ContextWriter)
+
+		if !ok {
+			return wrappedPayload, errors.New("route.write input must come from a module that provides a writer")
+		}
+
+		if contextWriter.Done() {
+			return wrappedPayload, errors.New("route.write response writer has already been written to")
+		}
+
+		_, err := contextWriter.Write(bytes)
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	contextWriter, ok := ctx.Value(routing.WriterContextKey).(*routing.ContextWriter)
-
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("route.write input must come from a module that provides a writer")
-	}
-
-	if contextWriter.Done() {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("route.write response writer has already been written to")
-	}
-
-	_, err := contextWriter.Write(bytes)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
-	}
-
-	return wrappedPayload, nil
 }

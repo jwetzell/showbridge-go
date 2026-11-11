@@ -53,30 +53,25 @@ type FilterExpr struct {
 }
 
 func (fe *FilterExpr) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, fe.process)
-}
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
-func (fe *FilterExpr) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		exprEnv := wrappedPayload
 
-	exprEnv := wrappedPayload
+		output, err := expr.Run(fe.Program, exprEnv)
+		if err != nil {
+			return wrappedPayload, err
+		}
 
-	output, err := expr.Run(fe.Program, exprEnv)
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, err
+		outputBool, ok := output.(bool)
+		if !ok {
+			return wrappedPayload, fmt.Errorf("filter.expr expression did not return a boolean")
+		}
+		if !outputBool {
+			return wrappedPayload, nil
+		}
+
+		wrappedPayload.Payload = exprEnv.Payload
+
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	outputBool, ok := output.(bool)
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("filter.expr expression did not return a boolean")
-	}
-	if !outputBool {
-		wrappedPayload.End = true
-		return wrappedPayload, nil
-	}
-
-	wrappedPayload.Payload = exprEnv.Payload
-
-	return wrappedPayload, nil
 }

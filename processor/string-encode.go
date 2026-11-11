@@ -24,19 +24,16 @@ type StringEncode struct {
 }
 
 func (se *StringEncode) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, se.process)
-}
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
+		payloadString, ok := payload.(string)
 
-func (se *StringEncode) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
-	payloadString, ok := payload.(string)
+		if !ok {
+			return wrappedPayload, errors.New("string.encode processor only accepts a string")
+		}
 
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("string.encode processor only accepts a string")
+		wrappedPayload.Payload = []byte(payloadString)
+
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	wrappedPayload.Payload = []byte(payloadString)
-
-	return wrappedPayload, nil
 }

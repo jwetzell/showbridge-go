@@ -25,27 +25,24 @@ type StringDecode struct {
 }
 
 func (sd *StringDecode) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, sd.process)
-}
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
 
-func (sd *StringDecode) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
+		// payload is already a string, return it as is
+		_, ok := payload.(string)
+		if ok {
+			return wrappedPayload, nil
+		}
 
-	// payload is already a string, return it as is
-	_, ok := payload.(string)
-	if ok {
-		return wrappedPayload, nil
+		// payload is convertible to a byte slice
+		payloadBytes, ok := types.GetAnyAsByteSlice(payload)
+		if !ok {
+			return wrappedPayload, errors.New("string.decode processor only accepts a []byte")
+		}
+
+		payloadMessage := string(payloadBytes)
+
+		wrappedPayload.Payload = payloadMessage
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	// payload is convertible to a byte slice
-	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("string.decode processor only accepts a []byte")
-	}
-
-	payloadMessage := string(payloadBytes)
-
-	wrappedPayload.Payload = payloadMessage
-	return wrappedPayload, nil
 }

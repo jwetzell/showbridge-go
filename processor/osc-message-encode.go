@@ -26,23 +26,19 @@ func init() {
 }
 
 func (ome *OSCMessageEncode) Process(next routing.ProcessFunc) routing.ProcessFunc {
-	return routing.NewLinearProcessFunc(next, ome.process)
-}
+	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+		payload := wrappedPayload.Payload
+		payloadMessage, ok := payload.(*osc.Message)
 
-func (ome *OSCMessageEncode) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-	payload := wrappedPayload.Payload
-	payloadMessage, ok := payload.(*osc.Message)
+		if !ok {
+			return wrappedPayload, errors.New("osc.message.encode processor only accepts an *OSCMessage")
+		}
 
-	if !ok {
-		wrappedPayload.End = true
-		return wrappedPayload, errors.New("osc.message.encode processor only accepts an *OSCMessage")
+		bytes, err := payloadMessage.ToBytes()
+		if err != nil {
+			return wrappedPayload, fmt.Errorf("osc.message.encode processor failed to encode OSCMessage: %w", err)
+		}
+		wrappedPayload.Payload = bytes
+		return next(ctx, wrappedPayload, moduleManager, router)
 	}
-
-	bytes, err := payloadMessage.ToBytes()
-	if err != nil {
-		wrappedPayload.End = true
-		return wrappedPayload, fmt.Errorf("osc.message.encode processor failed to encode OSCMessage: %w", err)
-	}
-	wrappedPayload.Payload = bytes
-	return wrappedPayload, nil
 }

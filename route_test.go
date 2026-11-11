@@ -137,7 +137,6 @@ func TestGoodRouteProcessPayload(t *testing.T) {
 			wrappedPayload: routing.WrappedPayload{
 				Payload: "test",
 				Source:  "source1",
-				End:     false,
 			},
 			moduleManager: nil,
 			router:        nil,
@@ -156,7 +155,6 @@ func TestGoodRouteProcessPayload(t *testing.T) {
 			wrappedPayload: routing.WrappedPayload{
 				Payload: "123.45",
 				Source:  "source1",
-				End:     false,
 			},
 			moduleManager: nil,
 			router:        nil,
@@ -181,7 +179,6 @@ func TestGoodRouteProcessPayload(t *testing.T) {
 			wrappedPayload: routing.WrappedPayload{
 				Payload: "123.45",
 				Source:  "source1",
-				End:     false,
 			},
 			moduleManager: nil,
 			router:        nil,
@@ -226,7 +223,6 @@ func TestBadRouteProcessPayload(t *testing.T) {
 			wrappedPayload: routing.WrappedPayload{
 				Payload: "test",
 				Source:  "source1",
-				End:     false,
 			},
 			moduleManager: nil,
 			router:        nil,
