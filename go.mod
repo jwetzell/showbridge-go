@@ -8,7 +8,7 @@ require (
 	github.com/expr-lang/expr v1.17.8
 	github.com/go-sql-driver/mysql v1.10.1
 	github.com/google/jsonschema-go v0.4.3
-	github.com/jackc/pgx/v5 v5.12.0
+	github.com/jackc/pgx/v5 v5.13.0
 	github.com/jwetzell/artnet-go v0.4.0
 	github.com/jwetzell/free-d-go v0.3.0
 	github.com/jwetzell/osc-go v0.7.0
