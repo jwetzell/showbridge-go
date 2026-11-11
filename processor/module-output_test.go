@@ -53,7 +53,7 @@ func TestGoodModuleOutput(t *testing.T) {
 				t.Fatalf("module.output failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("module.output processing failed: %s", err)
 			}
@@ -129,7 +129,7 @@ func TestBadModuleOutput(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: testCase.payload}, testCase.moduleManager, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: testCase.payload}, testCase.moduleManager, nil)
 
 			if err == nil {
 				t.Fatalf("module.output expected to fail but succeeded, got: %v", got)

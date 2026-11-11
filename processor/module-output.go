@@ -52,7 +52,11 @@ type ModuleOutput struct {
 	mu       sync.Mutex
 }
 
-func (mo *ModuleOutput) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (mo *ModuleOutput) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, mo.process)
+}
+
+func (mo *ModuleOutput) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
 	mo.mu.Lock()
 	defer mo.mu.Unlock()

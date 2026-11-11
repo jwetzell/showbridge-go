@@ -57,7 +57,11 @@ type OsWriteFile struct {
 	config       config.ProcessorConfig
 }
 
-func (owf *OsWriteFile) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (owf *OsWriteFile) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, owf.process)
+}
+
+func (owf *OsWriteFile) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	templateData := wrappedPayload
 
 	var pathBuffer bytes.Buffer

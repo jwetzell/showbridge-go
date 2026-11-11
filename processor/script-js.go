@@ -65,7 +65,11 @@ type ScriptJS struct {
 	Program     string
 }
 
-func (sj *ScriptJS) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (sj *ScriptJS) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, sj.process)
+}
+
+func (sj *ScriptJS) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
 	// NOTE(jwetzell): some weird conversion going on with these types
 	_, isUint8Slice := wrappedPayload.Payload.([]uint8)

@@ -25,7 +25,11 @@ type RouteWrite struct {
 	config config.ProcessorConfig
 }
 
-func (hrc *RouteWrite) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (rw *RouteWrite) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, rw.process)
+}
+
+func (rw *RouteWrite) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
 	bytes, ok := types.GetAnyAsByteSlice(wrappedPayload.Payload)
 	if !ok {

@@ -69,7 +69,11 @@ type PubSubPublish struct {
 	mu       sync.Mutex
 }
 
-func (psp *PubSubPublish) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (psp *PubSubPublish) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, psp.process)
+}
+
+func (psp *PubSubPublish) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
 	psp.mu.Lock()
 	defer psp.mu.Unlock()

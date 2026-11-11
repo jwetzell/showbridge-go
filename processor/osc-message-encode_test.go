@@ -10,7 +10,7 @@ import (
 )
 
 func TestGoodOSCMessageEncode(t *testing.T) {
-	processorInstance := processor.OSCMessageEncode{}
+	processorInstance := &processor.OSCMessageEncode{}
 	tests := []struct {
 		name     string
 		payload  any
@@ -40,7 +40,7 @@ func TestGoodOSCMessageEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("osc.message.encode processing failed: %s", err)
 			}
@@ -58,7 +58,7 @@ func TestGoodOSCMessageEncode(t *testing.T) {
 }
 
 func TestBadOSCMessageEncode(t *testing.T) {
-	processorInstance := processor.OSCMessageEncode{}
+	processorInstance := &processor.OSCMessageEncode{}
 	tests := []struct {
 		name        string
 		payload     any
@@ -81,7 +81,7 @@ func TestBadOSCMessageEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("osc.message.encode expected to fail but got payload: %+v", got)

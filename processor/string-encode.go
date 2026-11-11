@@ -23,7 +23,11 @@ type StringEncode struct {
 	config config.ProcessorConfig
 }
 
-func (se *StringEncode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (se *StringEncode) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, se.process)
+}
+
+func (se *StringEncode) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadString, ok := payload.(string)
 

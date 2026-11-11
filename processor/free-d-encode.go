@@ -24,7 +24,11 @@ type FreeDEncode struct {
 	config config.ProcessorConfig
 }
 
-func (fe *FreeDEncode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (fe *FreeDEncode) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, fe.process)
+}
+
+func (fe *FreeDEncode) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadPosition, ok := payload.(freeD.Position)
 

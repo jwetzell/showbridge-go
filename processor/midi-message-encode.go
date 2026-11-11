@@ -26,7 +26,11 @@ type MIDIMessageEncode struct {
 	config config.ProcessorConfig
 }
 
-func (mme *MIDIMessageEncode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (mme *MIDIMessageEncode) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, mme.process)
+}
+
+func (mme *MIDIMessageEncode) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadMessage, ok := payload.(midi.Message)
 

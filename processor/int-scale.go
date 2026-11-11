@@ -87,7 +87,11 @@ type IntScale struct {
 	config config.ProcessorConfig
 }
 
-func (is *IntScale) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (is *IntScale) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, is.process)
+}
+
+func (is *IntScale) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadInt, ok := types.GetAnyAsInt(payload)
 	if !ok {

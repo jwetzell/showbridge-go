@@ -33,7 +33,7 @@ func TestGoodFilterRate(t *testing.T) {
 				t.Fatalf("filter.rate failed to create processor: %s", err)
 			}
 
-			_, err = processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, nil)
+			_, err = EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: testCase.payload}, nil, nil)
 			require.NoError(t, err)
 			// TODO(jwetzell): figure out how to test the rate limiting behavior
 		})
@@ -82,7 +82,7 @@ func TestBadFilterRate(t *testing.T) {
 				}
 				return
 			}
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("filter.rate expected to fail but succeeded, got: %v", got)

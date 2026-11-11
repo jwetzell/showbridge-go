@@ -67,7 +67,11 @@ type DbQuery struct {
 	module   routing.DatabaseModule
 }
 
-func (dq *DbQuery) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (dq *DbQuery) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, dq.process)
+}
+
+func (dq *DbQuery) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	if dq.module == nil {
 		if moduleManager == nil {
 			wrappedPayload.End = true

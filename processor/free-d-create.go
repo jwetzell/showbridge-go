@@ -211,7 +211,11 @@ type FreeDCreate struct {
 	FocusTemplate *template.Template
 }
 
-func (fc *FreeDCreate) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (fc *FreeDCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, fc.process)
+}
+
+func (fc *FreeDCreate) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
 	templateData := wrappedPayload
 

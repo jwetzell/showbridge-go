@@ -24,7 +24,11 @@ type ArtNetPacketEncode struct {
 	config config.ProcessorConfig
 }
 
-func (ape *ArtNetPacketEncode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (ape *ArtNetPacketEncode) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, ape.process)
+}
+
+func (ape *ArtNetPacketEncode) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadPacket, ok := payload.(artnet.ArtNetPacket)
 

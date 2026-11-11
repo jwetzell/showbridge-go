@@ -52,7 +52,11 @@ func init() {
 	})
 }
 
-func (se *ScriptExpr) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (se *ScriptExpr) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, se.process)
+}
+
+func (se *ScriptExpr) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
 	exprEnv := wrappedPayload
 

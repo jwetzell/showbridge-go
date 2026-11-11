@@ -12,7 +12,7 @@ import (
 )
 
 func TestGoodMIDIMessageEncode(t *testing.T) {
-	midiMessageEncoder := processor.MIDIMessageEncode{}
+	midiMessageEncoder := &processor.MIDIMessageEncode{}
 	tests := []struct {
 		name     string
 		payload  any
@@ -27,7 +27,7 @@ func TestGoodMIDIMessageEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := midiMessageEncoder.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(midiMessageEncoder, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("midi.message.encode processing failed: %s", err)
 			}
@@ -45,7 +45,7 @@ func TestGoodMIDIMessageEncode(t *testing.T) {
 }
 
 func TestBadMIDIMessageEncode(t *testing.T) {
-	midiMessageEncoder := processor.MIDIMessageEncode{}
+	midiMessageEncoder := &processor.MIDIMessageEncode{}
 	tests := []struct {
 		name        string
 		payload     any
@@ -60,7 +60,7 @@ func TestBadMIDIMessageEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := midiMessageEncoder.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(midiMessageEncoder, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("midi.message.encode expected to fail but got payload: %+v", got)

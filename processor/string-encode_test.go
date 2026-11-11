@@ -9,7 +9,7 @@ import (
 )
 
 func TestGoodStringEncode(t *testing.T) {
-	stringEncoder := processor.StringEncode{}
+	processorInstance := &processor.StringEncode{}
 	tests := []struct {
 		name     string
 		payload  any
@@ -24,7 +24,7 @@ func TestGoodStringEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := stringEncoder.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("string.encode processing failed: %s", err)
 			}
@@ -41,7 +41,7 @@ func TestGoodStringEncode(t *testing.T) {
 }
 
 func TestBadStringEncode(t *testing.T) {
-	stringEncoder := processor.StringEncode{}
+	processorInstance := &processor.StringEncode{}
 	tests := []struct {
 		name        string
 		payload     any
@@ -56,7 +56,7 @@ func TestBadStringEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := stringEncoder.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("string.encode expected to fail but got payload: %+v", got)

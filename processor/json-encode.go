@@ -24,7 +24,11 @@ type JsonEncode struct {
 	config config.ProcessorConfig
 }
 
-func (je *JsonEncode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (je *JsonEncode) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, je.process)
+}
+
+func (je *JsonEncode) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	var payloadBuffer bytes.Buffer
 

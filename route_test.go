@@ -230,7 +230,7 @@ func TestBadRouteProcessPayload(t *testing.T) {
 			},
 			moduleManager: nil,
 			router:        nil,
-			expectedError: "processor[0] error: strconv.ParseFloat: parsing \"test\": invalid syntax",
+			expectedError: "processing error: strconv.ParseFloat: parsing \"test\": invalid syntax",
 		},
 	}
 

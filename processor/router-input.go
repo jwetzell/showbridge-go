@@ -49,7 +49,11 @@ type RouterInput struct {
 	logger   *slog.Logger
 }
 
-func (ri *RouterInput) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (ri *RouterInput) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, ri.process)
+}
+
+func (ri *RouterInput) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
 	payload := wrappedPayload.Payload
 	if router == nil {

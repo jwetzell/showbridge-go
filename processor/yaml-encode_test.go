@@ -38,7 +38,7 @@ func TestGoodYamlEncode(t *testing.T) {
 				Params: nil,
 			})
 			require.NoError(t, err)
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 			require.NoError(t, err)
 
 			gotBytes, ok := got.Payload.([]byte)
@@ -83,7 +83,7 @@ func TestBadYamlEncode(t *testing.T) {
 				}
 				t.Fatalf("yaml.encode got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("yaml.encode expected to fail but got payload: %+v", got)

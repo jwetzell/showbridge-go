@@ -52,7 +52,11 @@ type FilterExpr struct {
 	Program *vm.Program
 }
 
-func (fe *FilterExpr) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (fe *FilterExpr) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, fe.process)
+}
+
+func (fe *FilterExpr) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
 	exprEnv := wrappedPayload
 

@@ -52,7 +52,11 @@ type FilterRegex struct {
 	Pattern *regexp.Regexp
 }
 
-func (fr *FilterRegex) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (fr *FilterRegex) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, fr.process)
+}
+
+func (fr *FilterRegex) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadString, ok := payload.(string)
 

@@ -26,7 +26,11 @@ type OSCMessageDecode struct {
 	config config.ProcessorConfig
 }
 
-func (omd *OSCMessageDecode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (omd *OSCMessageDecode) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, omd.process)
+}
+
+func (omd *OSCMessageDecode) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
 

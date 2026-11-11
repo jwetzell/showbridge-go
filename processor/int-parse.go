@@ -68,7 +68,11 @@ type IntParse struct {
 	config  config.ProcessorConfig
 }
 
-func (ip *IntParse) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (ip *IntParse) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, ip.process)
+}
+
+func (ip *IntParse) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadString, ok := payload.(string)
 

@@ -61,7 +61,11 @@ type KVGet struct {
 	mu       sync.Mutex
 }
 
-func (kvg *KVGet) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (kvg *KVGet) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, kvg.process)
+}
+
+func (kvg *KVGet) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	kvg.mu.Lock()
 	defer kvg.mu.Unlock()
 

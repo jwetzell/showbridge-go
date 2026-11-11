@@ -27,7 +27,11 @@ type MIDIMessageDecode struct {
 	config config.ProcessorConfig
 }
 
-func (mmd *MIDIMessageDecode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (mmd *MIDIMessageDecode) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, mmd.process)
+}
+
+func (mmd *MIDIMessageDecode) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
 

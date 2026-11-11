@@ -38,7 +38,7 @@ func TestGoodJsonEncode(t *testing.T) {
 				Params: nil,
 			})
 			require.NoError(t, err)
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 			if err != nil {
 				t.Fatalf("json.encode processing failed: %s", err)
 			}
@@ -85,7 +85,7 @@ func TestBadJsonEncode(t *testing.T) {
 				}
 				t.Fatalf("json.encode got error '%s', expected '%s'", err.Error(), test.errorString)
 			}
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("json.encode expected to fail but got payload: %+v", got)

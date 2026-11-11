@@ -25,7 +25,11 @@ type JsonDecode struct {
 	config config.ProcessorConfig
 }
 
-func (jd *JsonDecode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (jd *JsonDecode) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, jd.process)
+}
+
+func (jd *JsonDecode) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 
 	payloadBytes, ok := types.GetAnyAsByteSlice(payload)

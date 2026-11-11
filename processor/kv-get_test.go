@@ -86,7 +86,7 @@ func TestGoodKvGet(t *testing.T) {
 				t.Fatalf("kv.get failed to create processor: %s", err)
 			}
 
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{
 				Payload: testCase.payload,
 			}, testModuleManager(map[string]routing.Module{
 				"test": NewTestKVModule("test", testCase.presetValues),
@@ -211,7 +211,7 @@ func TestBadKvGet(t *testing.T) {
 				return
 			}
 
-			got, err := processorInstance.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, test.moduleManager, nil)
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: test.payload}, test.moduleManager, nil)
 
 			if err == nil {
 				t.Fatalf("kv.get expected to fail but got payload: %+v", got)

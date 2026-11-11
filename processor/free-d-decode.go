@@ -26,7 +26,11 @@ type FreeDDecode struct {
 	buf    [29]byte
 }
 
-func (fd *FreeDDecode) Process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
+func (fd *FreeDDecode) Process(next routing.ProcessFunc) routing.ProcessFunc {
+	return routing.NewLinearProcessFunc(next, fd.process)
+}
+
+func (fd *FreeDDecode) process(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 	payload := wrappedPayload.Payload
 	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
 

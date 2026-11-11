@@ -39,7 +39,7 @@ func TestGoodFreeDEncode(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			got, err := packetEncoder.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(&packetEncoder, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err != nil {
 				t.Fatalf("freed.encode processing failed: %s", err)
@@ -70,7 +70,7 @@ func TestBadFreeDEncode(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			got, err := packetEncoder.Process(t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			got, err := EvaluateProcessFunc(&packetEncoder, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
 
 			if err == nil {
 				t.Fatalf("freed.encode expected to fail but succeeded, got: %v", got)
