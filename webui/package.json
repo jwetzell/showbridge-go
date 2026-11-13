@@ -47,7 +47,7 @@
     "@angular/build": "22.2.7",
     "@angular/cli": "22.2.7",
     "@angular/compiler-cli": "22.2.6",
-    "@playwright/test": "1.65.0",
+    "@playwright/test": "1.65.1",
     "@tailwindcss/postcss": "4.3.5",
     "@types/js-yaml": "4.0.9",
     "@types/lodash-es": "4.17.12",
