@@ -21,6 +21,14 @@ func TestGoodOSCMessageEncode(t *testing.T) {
 			payload: &osc.Message{
 				Address: "/test",
 			},
+			expected: []byte{47, 116, 101, 115, 116, 0, 0, 0},
+		},
+		{
+			name: "basic OSC message with empty arguments",
+			payload: &osc.Message{
+				Address: "/test",
+				Args:    []osc.Arg{},
+			},
 			expected: []byte{47, 116, 101, 115, 116, 0, 0, 0, 44, 0, 0, 0},
 		},
 		{

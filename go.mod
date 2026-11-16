@@ -11,7 +11,7 @@ require (
 	github.com/jackc/pgx/v5 v5.13.0
 	github.com/jwetzell/artnet-go v0.4.0
 	github.com/jwetzell/free-d-go v0.3.0
-	github.com/jwetzell/osc-go v0.7.0
+	github.com/jwetzell/osc-go v0.8.0
 	github.com/jwetzell/psn-go v0.3.0
 	github.com/jwetzell/slip-go v0.2.0
 	github.com/mattn/go-sqlite3 v1.14.53

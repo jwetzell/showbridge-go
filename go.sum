@@ -40,8 +40,8 @@ github.com/jwetzell/artnet-go v0.4.0 h1:qsW6pxgECZTFUd1Znym9YFqLPkcOocJojg5vWDSn
 github.com/jwetzell/artnet-go v0.4.0/go.mod h1:vuEhrw0u0N5aOCSY3YdLZ3QOyB5HrtUD5Uq/GwsK9g4=
 github.com/jwetzell/free-d-go v0.3.0 h1:QG6JISVO5ukI+/4JbHsE/cRvYYt/JO9dnzRiC7AokrY=
 github.com/jwetzell/free-d-go v0.3.0/go.mod h1:lyHg3nUsggj+KaiLyy2L/i3jpgcddR7AwGr3msU9reA=
-github.com/jwetzell/osc-go v0.7.0 h1:gxw6cc0vRCsYFDHCmYSR4WGM+XPPFMZSoEwjGZlF0k0=
-github.com/jwetzell/osc-go v0.7.0/go.mod h1:20C+7NX52uPlrOV79ZS4r51hsFoxEehwmRl5A1esUic=
+github.com/jwetzell/osc-go v0.8.0 h1:ZmhjrNl8882YfZ5YFrdbt8BSg7MnTqZQJkfWPFGYJOE=
+github.com/jwetzell/osc-go v0.8.0/go.mod h1:KSreFhI2MvIqEBO+tDGn+zOE2v65Jq688MEbmpzXXO4=
 github.com/jwetzell/psn-go v0.3.0 h1:WVpCEmExYE8a+I5hQak5jNJJp2x35VdGX/VuMUKPmhY=
 github.com/jwetzell/psn-go v0.3.0/go.mod h1:bcEAeti4sQM375buujb3mIfmUstD4Aby18gq3ENb6+o=
 github.com/jwetzell/slip-go v0.2.0 h1:Fin3SFWZjlgh5Cpc0O2JKVoLQDLFXPtX7JKoXL8+zNw=
