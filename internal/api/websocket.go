@@ -47,8 +47,6 @@ READ_LOOP:
 	for {
 		messageType, message, err := conn.Read(ctx)
 		if err != nil {
-
-			as.logger.Error("websocket read error", "error", err)
 			break READ_LOOP
 		}
 
