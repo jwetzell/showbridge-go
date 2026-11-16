@@ -166,11 +166,11 @@ func (hs *HTTPServer) Start(ctx context.Context, router routing.Router) error {
 }
 
 func (hs *HTTPServer) Stop() {
+	hs.mu.Lock()
+	defer hs.mu.Unlock()
 	if hs.cancel != nil {
 		defer hs.cancel()
 	}
-	hs.mu.Lock()
-	defer hs.mu.Unlock()
 	if hs.server != nil {
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
 		err := hs.server.Shutdown(shutdownCtx)
