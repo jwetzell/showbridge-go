@@ -103,6 +103,9 @@ func (mo *MIDIOutput) Output(ctx context.Context, payload any) error {
 }
 
 func (mo *MIDIOutput) Stop() {
+	mo.mu.Lock()
+	defer mo.mu.Unlock()
+
 	if mo.cancel != nil {
 		defer mo.cancel()
 	}
