@@ -24,12 +24,7 @@ tasks:
     deps: [test:all]
     failfast: true
     cmds:
-      - task: webui:build
-        vars:
-          BASE_HREF: /ui/
-      - rm -rf internal/api/webui
-      - mv webui/dist/webui internal/api/webui
-      - go build -tags=embed_webui -o {{.OUTPUT}} -ldflags="-s -w -X main.version={{.VERSION}}" ./cmd/showbridge 
+      - go build -o {{.OUTPUT}} -ldflags="-s -w -X main.version={{.VERSION}}" ./cmd/showbridge 
 
   test:all:
     desc: Run the test suite for the showbridge project
