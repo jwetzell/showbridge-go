@@ -3,6 +3,7 @@ module github.com/jwetzell/showbridge-go
 go 1.27.3
 
 require (
+	github.com/0xcafed00d/joystick v1.0.1
 	github.com/eclipse/paho.mqtt.golang v1.5.1
 	github.com/expr-lang/expr v1.18.1
 	github.com/go-sql-driver/mysql v1.10.2
