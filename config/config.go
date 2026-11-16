@@ -1,7 +1,5 @@
 package config
 
-import "uuid"
-
 type Config struct {
 	Api     ApiConfig      `json:"api"`
 	Modules []ModuleConfig `json:"modules"`
@@ -14,23 +12,12 @@ type Configurable interface {
 }
 
 func CleanConfig(config Config) Config {
+	// NOTE(jwetzell): this should be done by the schema apply defaults but there is a bug in the jsonschema library
 	if config.Modules == nil {
 		config.Modules = []ModuleConfig{}
 	}
 	if config.Routes == nil {
 		config.Routes = []RouteConfig{}
-	}
-
-	for routeIndex := range config.Routes {
-		if config.Routes[routeIndex].Id == "" {
-			config.Routes[routeIndex].Id = uuid.NewV4().String()
-		}
-
-		for processorIndex := range config.Routes[routeIndex].Processors {
-			if config.Routes[routeIndex].Processors[processorIndex].Id == "" {
-				config.Routes[routeIndex].Processors[processorIndex].Id = uuid.NewV4().String()
-			}
-		}
 	}
 	return config
 }
