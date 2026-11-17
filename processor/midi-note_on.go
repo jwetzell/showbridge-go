@@ -5,8 +5,10 @@ package processor
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
+	"sync"
 	"text/template"
 
 	"github.com/google/jsonschema-go/jsonschema"
@@ -17,12 +19,17 @@ import (
 
 func init() {
 	RegisterProcessor(ProcessorRegistration{
-		Type:        "midi.note_on.create",
+		Type:        "midi.note_on",
 		Title:       "Create MIDI Note On Message",
 		Description: "Creates a MIDI Note On message",
 		ParamsSchema: &jsonschema.Schema{
 			Type: "object",
 			Properties: map[string]*jsonschema.Schema{
+				"module": {
+					Title:       "Module ID",
+					Description: "ID of module to send output to",
+					Type:        "string",
+				},
 				"channel": {
 					Title:       "Channel",
 					Description: "channel number for the note on message",
@@ -39,15 +46,20 @@ func init() {
 					Type:        "string",
 				},
 			},
-			Required:             []string{"channel", "note", "velocity"},
+			Required:             []string{"module", "channel", "note", "velocity"},
 			AdditionalProperties: &jsonschema.Schema{Not: &jsonschema.Schema{}},
 		},
 		New: func(config config.ProcessorConfig) (routing.Processor, error) {
 			processorParams := config.Params
 
+			moduleIdString, err := processorParams.GetString("module")
+			if err != nil {
+				return nil, fmt.Errorf("midi.note_on module error: %w", err)
+			}
+
 			channelString, err := processorParams.GetString("channel")
 			if err != nil {
-				return nil, fmt.Errorf("midi.note_on.create channel error: %w", err)
+				return nil, fmt.Errorf("midi.note_on channel error: %w", err)
 			}
 
 			channelTemplate, err := template.New("channel").Parse(channelString)
@@ -58,7 +70,7 @@ func init() {
 
 			noteString, err := processorParams.GetString("note")
 			if err != nil {
-				return nil, fmt.Errorf("midi.note_on.create note error: %w", err)
+				return nil, fmt.Errorf("midi.note_on note error: %w", err)
 			}
 
 			noteTemplate, err := template.New("note").Parse(noteString)
@@ -69,7 +81,7 @@ func init() {
 
 			velocityString, err := processorParams.GetString("velocity")
 			if err != nil {
-				return nil, fmt.Errorf("midi.note_on.create velocity error: %w", err)
+				return nil, fmt.Errorf("midi.note_on velocity error: %w", err)
 			}
 
 			velocityTemplate, err := template.New("velocity").Parse(velocityString)
@@ -79,6 +91,7 @@ func init() {
 			}
 			return &MIDINoteOnCreate{
 				config:   config,
+				ModuleId: moduleIdString,
 				Channel:  channelTemplate,
 				Note:     noteTemplate,
 				Velocity: velocityTemplate,
@@ -89,6 +102,9 @@ func init() {
 
 type MIDINoteOnCreate struct {
 	config   config.ProcessorConfig
+	ModuleId string
+	module   routing.MIDIOutputModule
+	mu       sync.Mutex
 	Channel  *template.Template
 	Note     *template.Template
 	Velocity *template.Template
@@ -137,7 +153,31 @@ func (mnoc *MIDINoteOnCreate) Process(next routing.ProcessFunc) routing.ProcessF
 		}
 
 		payloadMessage := midi.NoteOn(uint8(channelValue), uint8(noteValue), uint8(velocityValue))
-		wrappedPayload.Payload = payloadMessage
+		mnoc.mu.Lock()
+		defer mnoc.mu.Unlock()
+
+		if mnoc.module == nil {
+			if moduleManager == nil {
+				return wrappedPayload, errors.New("midi.note_on module manager is nil")
+			}
+
+			module, ok := moduleManager.GetModule(mnoc.ModuleId)
+			if !ok {
+				return wrappedPayload, fmt.Errorf("midi.note_on unable to find module with id: %s", mnoc.ModuleId)
+			}
+
+			outputModule, ok := module.(routing.MIDIOutputModule)
+			if !ok {
+				return wrappedPayload, fmt.Errorf("midi.note_on module with id %s is not a MIDIOutputModule", mnoc.ModuleId)
+			}
+			mnoc.module = outputModule
+		}
+
+		err = mnoc.module.Output(ctx, payloadMessage)
+
+		if err != nil {
+			return wrappedPayload, fmt.Errorf("midi.note_on failed to send output: %w", err)
+		}
 		return next(ctx, wrappedPayload, moduleManager, router)
 	}
 }

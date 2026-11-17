@@ -3,6 +3,8 @@ package routing
 import (
 	"context"
 	"database/sql"
+
+	"gitlab.com/gomidi/midi/v2"
 )
 
 type Module interface {
@@ -16,6 +18,10 @@ type ModuleManager interface {
 
 type OutputModule interface {
 	Output(context.Context, any) error
+}
+
+type MIDIOutputModule interface {
+	Output(context.Context, midi.Message) error
 }
 
 type KeyValueModule interface {

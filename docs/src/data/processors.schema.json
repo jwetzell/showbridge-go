@@ -772,7 +772,7 @@
         "type": "object"
       },
       {
-        "$id": "midi.control_change.create",
+        "$id": "midi.control_change",
         "additionalProperties": false,
         "description": "Creates a MIDI Control Change message",
         "properties": {
@@ -793,6 +793,11 @@
                 "title": "Control",
                 "type": "string"
               },
+              "module": {
+                "description": "ID of module to send output to",
+                "title": "Module ID",
+                "type": "string"
+              },
               "value": {
                 "description": "value for the control change message",
                 "title": "Value",
@@ -800,6 +805,7 @@
               }
             },
             "required": [
+              "module",
               "channel",
               "control",
               "value"
@@ -807,7 +813,7 @@
             "type": "object"
           },
           "type": {
-            "const": "midi.control_change.create"
+            "const": "midi.control_change"
           }
         },
         "required": [
@@ -875,7 +881,7 @@
         "type": "object"
       },
       {
-        "$id": "midi.note_off.create",
+        "$id": "midi.note_off",
         "additionalProperties": false,
         "description": "Creates a MIDI Note Off message",
         "properties": {
@@ -891,6 +897,11 @@
                 "title": "Channel",
                 "type": "string"
               },
+              "module": {
+                "description": "ID of module to send output to",
+                "title": "Module ID",
+                "type": "string"
+              },
               "note": {
                 "description": "note number for the note off message",
                 "title": "Note",
@@ -903,6 +914,7 @@
               }
             },
             "required": [
+              "module",
               "channel",
               "note",
               "velocity"
@@ -910,7 +922,7 @@
             "type": "object"
           },
           "type": {
-            "const": "midi.note_off.create"
+            "const": "midi.note_off"
           }
         },
         "required": [
@@ -921,7 +933,7 @@
         "type": "object"
       },
       {
-        "$id": "midi.note_on.create",
+        "$id": "midi.note_on",
         "additionalProperties": false,
         "description": "Creates a MIDI Note On message",
         "properties": {
@@ -937,6 +949,11 @@
                 "title": "Channel",
                 "type": "string"
               },
+              "module": {
+                "description": "ID of module to send output to",
+                "title": "Module ID",
+                "type": "string"
+              },
               "note": {
                 "description": "note number for the note on message",
                 "title": "Note",
@@ -949,6 +966,7 @@
               }
             },
             "required": [
+              "module",
               "channel",
               "note",
               "velocity"
@@ -956,7 +974,7 @@
             "type": "object"
           },
           "type": {
-            "const": "midi.note_on.create"
+            "const": "midi.note_on"
           }
         },
         "required": [
@@ -967,9 +985,9 @@
         "type": "object"
       },
       {
-        "$id": "midi.program_change.create",
+        "$id": "midi.program_change",
         "additionalProperties": false,
-        "description": "Creates a MIDI Program Change message",
+        "description": "Outputs a MIDI Program Change message",
         "properties": {
           "id": {
             "minLength": 1,
@@ -983,6 +1001,11 @@
                 "title": "Channel",
                 "type": "string"
               },
+              "module": {
+                "description": "Output module for the program change message",
+                "title": "Module ID",
+                "type": "string"
+              },
               "program": {
                 "description": "program number for the program change message",
                 "title": "Program",
@@ -990,14 +1013,14 @@
               }
             },
             "required": [
-              "type",
+              "module",
               "channel",
               "program"
             ],
             "type": "object"
           },
           "type": {
-            "const": "midi.program_change.create"
+            "const": "midi.program_change"
           }
         },
         "required": [
