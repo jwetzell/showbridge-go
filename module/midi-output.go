@@ -86,20 +86,14 @@ func (mo *MIDIOutput) Start(ctx context.Context, router routing.Router) error {
 	return nil
 }
 
-func (mo *MIDIOutput) Output(ctx context.Context, payload any) error {
+func (mo *MIDIOutput) Output(ctx context.Context, payload midi.Message) error {
 	mo.mu.Lock()
 	defer mo.mu.Unlock()
 	if mo.sendFunc == nil {
 		return errors.New("midi.output output is not setup")
 	}
 
-	payloadMessage, ok := payload.(midi.Message)
-
-	if !ok {
-		return errors.New("midi.output can only output midi.Message")
-	}
-
-	return mo.sendFunc(payloadMessage)
+	return mo.sendFunc(payload)
 }
 
 func (mo *MIDIOutput) Stop() {
