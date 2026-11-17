@@ -1,6 +1,7 @@
 package processor_test
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -46,7 +47,7 @@ func TestGoodKvSet(t *testing.T) {
 			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{
 				Payload: testCase.payload,
 			}, testModuleManager(map[string]routing.Module{
-				"test": &TestKVModule{},
+				"test": NewTestKVModule("test", nil, nil, nil),
 			}), nil)
 
 			if err != nil {
@@ -75,7 +76,7 @@ func TestBadKvSet(t *testing.T) {
 				"key": "test",
 			},
 			moduleManager: testModuleManager(map[string]routing.Module{
-				"test": &TestKVModule{},
+				"test": NewTestKVModule("test", nil, nil, nil),
 			}),
 			errorString: "kv.set module error: not found",
 		},
@@ -87,7 +88,7 @@ func TestBadKvSet(t *testing.T) {
 				"key":    "test",
 			},
 			moduleManager: testModuleManager(map[string]routing.Module{
-				"test": &TestKVModule{},
+				"test": NewTestKVModule("test", nil, nil, nil),
 			}),
 			errorString: "kv.set module error: not a string",
 		},
@@ -98,7 +99,7 @@ func TestBadKvSet(t *testing.T) {
 				"module": "test",
 			},
 			moduleManager: testModuleManager(map[string]routing.Module{
-				"test": &TestKVModule{},
+				"test": NewTestKVModule("test", nil, nil, nil),
 			}),
 			errorString: "kv.set key error: not found",
 		},
@@ -110,7 +111,7 @@ func TestBadKvSet(t *testing.T) {
 				"key":    1,
 			},
 			moduleManager: testModuleManager(map[string]routing.Module{
-				"test": &TestKVModule{},
+				"test": NewTestKVModule("test", nil, nil, nil),
 			}),
 			errorString: "kv.set key error: not a string",
 		},
@@ -145,6 +146,18 @@ func TestBadKvSet(t *testing.T) {
 				"test": NewTestDBModule("test"),
 			}),
 			errorString: "kv.set module with id test is not a KeyValueModule",
+		},
+		{
+			name:    "module set error",
+			payload: TestStruct{Data: "hello"},
+			params: map[string]any{
+				"module": "test",
+				"key":    "test",
+			},
+			moduleManager: testModuleManager(map[string]routing.Module{
+				"test": NewTestKVModule("test", nil, nil, fmt.Errorf("set error")),
+			}),
+			errorString: "kv.set error setting key: set error",
 		},
 	}
 

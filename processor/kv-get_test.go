@@ -2,6 +2,7 @@ package processor_test
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -10,16 +11,20 @@ import (
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
-func NewTestKVModule(id string, presetValues map[string]any) *TestKVModule {
+func NewTestKVModule(id string, presetValues map[string]any, getError error, setError error) *TestKVModule {
 	return &TestKVModule{
-		id:     id,
-		kvData: presetValues,
+		id:       id,
+		kvData:   presetValues,
+		getError: getError,
+		setError: setError,
 	}
 }
 
 type TestKVModule struct {
-	id     string
-	kvData map[string]any
+	id       string
+	kvData   map[string]any
+	getError error
+	setError error
 }
 
 func (m *TestKVModule) Start(ctx context.Context, router routing.Router) error {
@@ -30,6 +35,9 @@ func (m *TestKVModule) Start(ctx context.Context, router routing.Router) error {
 func (m *TestKVModule) Stop() {}
 
 func (m *TestKVModule) Get(ctx context.Context, key string) (any, error) {
+	if m.getError != nil {
+		return nil, m.getError
+	}
 	if m.kvData == nil {
 		return nil, nil
 	}
@@ -41,6 +49,9 @@ func (m *TestKVModule) Get(ctx context.Context, key string) (any, error) {
 }
 
 func (m *TestKVModule) Set(ctx context.Context, key string, value any) error {
+	if m.setError != nil {
+		return m.setError
+	}
 	if m.kvData == nil {
 		m.kvData = make(map[string]any)
 	}
@@ -89,7 +100,7 @@ func TestGoodKvGet(t *testing.T) {
 			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{
 				Payload: testCase.payload,
 			}, testModuleManager(map[string]routing.Module{
-				"test": NewTestKVModule("test", testCase.presetValues),
+				"test": NewTestKVModule("test", testCase.presetValues, nil, nil),
 			}), nil)
 
 			if err != nil {
@@ -118,7 +129,7 @@ func TestBadKvGet(t *testing.T) {
 				"key": "test",
 			},
 			moduleManager: testModuleManager(map[string]routing.Module{
-				"test": NewTestKVModule("test", nil),
+				"test": NewTestKVModule("test", nil, nil, nil),
 			}),
 			errorString: "kv.get module error: not found",
 		},
@@ -130,7 +141,7 @@ func TestBadKvGet(t *testing.T) {
 				"key":    "test",
 			},
 			moduleManager: testModuleManager(map[string]routing.Module{
-				"test": NewTestKVModule("test", nil),
+				"test": NewTestKVModule("test", nil, nil, nil),
 			}),
 			errorString: "kv.get module error: not a string",
 		},
@@ -141,7 +152,7 @@ func TestBadKvGet(t *testing.T) {
 				"module": "test",
 			},
 			moduleManager: testModuleManager(map[string]routing.Module{
-				"test": NewTestKVModule("test", nil),
+				"test": NewTestKVModule("test", nil, nil, nil),
 			}),
 			errorString: "kv.get key error: not found",
 		},
@@ -153,7 +164,7 @@ func TestBadKvGet(t *testing.T) {
 				"key":    1,
 			},
 			moduleManager: testModuleManager(map[string]routing.Module{
-				"test": NewTestKVModule("test", nil),
+				"test": NewTestKVModule("test", nil, nil, nil),
 			}),
 			errorString: "kv.get key error: not a string",
 		},
@@ -188,6 +199,18 @@ func TestBadKvGet(t *testing.T) {
 				"test": NewTestDBModule("test"),
 			}),
 			errorString: "kv.get module with id test is not a KeyValueModule",
+		},
+		{
+			name:    "module get error",
+			payload: TestStruct{Data: "hello"},
+			params: map[string]any{
+				"module": "test",
+				"key":    "test",
+			},
+			moduleManager: testModuleManager(map[string]routing.Module{
+				"test": NewTestKVModule("test", nil, fmt.Errorf("get error"), nil),
+			}),
+			errorString: "kv.get error getting key: get error",
 		},
 	}
 

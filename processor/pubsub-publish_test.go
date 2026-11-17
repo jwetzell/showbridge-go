@@ -2,6 +2,7 @@ package processor_test
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -10,14 +11,16 @@ import (
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
-func NewTestPubSubModule(id string) *TestPubSubModule {
+func NewTestPubSubModule(id string, publishError error) *TestPubSubModule {
 	return &TestPubSubModule{
-		id: id,
+		id:           id,
+		publishError: publishError,
 	}
 }
 
 type TestPubSubModule struct {
-	id string
+	id           string
+	publishError error
 }
 
 func (m *TestPubSubModule) Start(ctx context.Context, router routing.Router) error {
@@ -26,7 +29,7 @@ func (m *TestPubSubModule) Start(ctx context.Context, router routing.Router) err
 }
 
 func (m *TestPubSubModule) Publish(ctx context.Context, topic string, payload any) error {
-	return nil
+	return m.publishError
 }
 
 func (m *TestPubSubModule) Stop() {}
@@ -68,7 +71,7 @@ func TestGoodPubSubPublish(t *testing.T) {
 			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{
 				Payload: testCase.payload,
 			}, testModuleManager(map[string]routing.Module{
-				"test": NewTestPubSubModule("test"),
+				"test": NewTestPubSubModule("test", nil),
 			}), nil)
 
 			if err != nil {
@@ -97,7 +100,7 @@ func TestBadPubSubPublish(t *testing.T) {
 				"topic": "test",
 			},
 			moduleManager: testModuleManager(map[string]routing.Module{
-				"test": NewTestPubSubModule("test"),
+				"test": NewTestPubSubModule("test", nil),
 			}),
 			errorString: "pubsub.publish module error: not found",
 		},
@@ -109,7 +112,7 @@ func TestBadPubSubPublish(t *testing.T) {
 				"topic":  "test",
 			},
 			moduleManager: testModuleManager(map[string]routing.Module{
-				"test": NewTestPubSubModule("test"),
+				"test": NewTestPubSubModule("test", nil),
 			}),
 			errorString: "pubsub.publish module error: not a string",
 		},
@@ -120,7 +123,7 @@ func TestBadPubSubPublish(t *testing.T) {
 				"module": "test",
 			},
 			moduleManager: testModuleManager(map[string]routing.Module{
-				"test": NewTestPubSubModule("test"),
+				"test": NewTestPubSubModule("test", nil),
 			}),
 			errorString: "pubsub.publish topic error: not found",
 		},
@@ -132,7 +135,7 @@ func TestBadPubSubPublish(t *testing.T) {
 				"topic":  1,
 			},
 			moduleManager: testModuleManager(map[string]routing.Module{
-				"test": NewTestPubSubModule("test"),
+				"test": NewTestPubSubModule("test", nil),
 			}),
 			errorString: "pubsub.publish topic error: not a string",
 		},
@@ -144,7 +147,7 @@ func TestBadPubSubPublish(t *testing.T) {
 				"topic":  "{{",
 			},
 			moduleManager: testModuleManager(map[string]routing.Module{
-				"test": NewTestPubSubModule("test"),
+				"test": NewTestPubSubModule("test", nil),
 			}),
 			errorString: "template: topic:1: unclosed action",
 		},
@@ -156,7 +159,7 @@ func TestBadPubSubPublish(t *testing.T) {
 				"topic":  "{{.Data}}",
 			},
 			moduleManager: testModuleManager(map[string]routing.Module{
-				"test": NewTestPubSubModule("test"),
+				"test": NewTestPubSubModule("test", nil),
 			}),
 			errorString: "template: topic:1:2: executing \"topic\" at <.Data>: can't evaluate field Data in type routing.WrappedPayload",
 		},
@@ -188,9 +191,21 @@ func TestBadPubSubPublish(t *testing.T) {
 				"topic":  "test",
 			},
 			moduleManager: testModuleManager(map[string]routing.Module{
-				"test": NewTestKVModule("test", nil),
+				"test": NewTestKVModule("test", nil, nil, nil),
 			}),
 			errorString: "pubsub.publish module with id test is not a PubSubModule",
+		},
+		{
+			name:    "module publish error",
+			payload: TestStruct{Data: "hello"},
+			params: map[string]any{
+				"module": "test",
+				"topic":  "test",
+			},
+			moduleManager: testModuleManager(map[string]routing.Module{
+				"test": NewTestPubSubModule("test", fmt.Errorf("publish error")),
+			}),
+			errorString: "pubsub.publish error publishing: publish error",
 		},
 	}
 

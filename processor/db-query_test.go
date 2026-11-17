@@ -252,7 +252,7 @@ func TestBadDbQuery(t *testing.T) {
 				"query":  "select * from test;",
 			},
 			moduleManager: testModuleManager(map[string]routing.Module{
-				"test": NewTestKVModule("test", nil),
+				"test": NewTestKVModule("test", nil, nil, nil),
 			}),
 			errorString: "db.query module with id test is not a DatabaseModule",
 		},

@@ -444,7 +444,7 @@ func TestBadMIDIControlChange(t *testing.T) {
 			},
 			payload: nil,
 			moduleManager: testModuleManager{
-				"test": NewTestPubSubModule("test"),
+				"test": NewTestPubSubModule("test", nil),
 			},
 			errorString: "midi.control_change module with id test is not a MIDIOutputModule",
 		},

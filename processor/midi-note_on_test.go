@@ -420,7 +420,7 @@ func TestBadMIDINoteOn(t *testing.T) {
 			},
 			payload: nil,
 			moduleManager: testModuleManager{
-				"test": NewTestPubSubModule("test"),
+				"test": NewTestPubSubModule("test", nil),
 			},
 			errorString: "midi.note_on module with id test is not a MIDIOutputModule",
 		},
