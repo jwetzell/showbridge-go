@@ -1,0 +1,23 @@
+---
+title: Send MIDI Note On
+sidebar:
+  label: Note On
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+This processor will send a MIDI Note On message with the specified channel, note, and velocity.
+
+<SchemaInfo type="processor" id="midi.note_on"/>
+
+### Example
+
+```yaml
+- id: send
+  type: midi.note_on
+  params:
+    module: midi-out
+    channel: "1"
+    note: "60"
+    velocity: "127"
+```

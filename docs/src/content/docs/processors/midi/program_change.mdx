@@ -1,0 +1,22 @@
+---
+title: Send MIDI Program Change
+sidebar:
+  label: Program Change
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+This processor will send a MIDI Program Change message with the specified channel and program number.
+
+<SchemaInfo type="processor" id="midi.program_change"/>
+
+### Example
+
+```yaml
+- id: send
+  type: midi.program_change
+  params:
+    module: midi-out
+    channel: "1"
+    program: "10"
+```

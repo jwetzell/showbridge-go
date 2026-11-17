@@ -182,41 +182,8 @@ export default defineConfig({
                   ],
                 },
                 {
-                  label: "Note On",
-                  collapsed: true,
-                  items: [
-                    { autogenerate: { directory: "processors/midi/note_on" } },
-                  ],
-                },
-                {
-                  label: "Note Off",
-                  collapsed: true,
-                  items: [
-                    { autogenerate: { directory: "processors/midi/note_off" } },
-                  ],
-                },
-                {
-                  label: "Control Change",
-                  collapsed: true,
-                  items: [
-                    {
-                      autogenerate: {
-                        directory: "processors/midi/control_change",
-                      },
-                    },
-                  ],
-                },
-                {
-                  label: "Program Change",
-                  collapsed: true,
-                  items: [
-                    {
-                      autogenerate: {
-                        directory: "processors/midi/program_change",
-                      },
-                    },
-                  ],
-                },
+                  autogenerate: { directory: "processors/midi" }
+                }
               ],
             },
             {
