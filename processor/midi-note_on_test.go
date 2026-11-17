@@ -2,6 +2,7 @@ package processor_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/config"
@@ -89,10 +90,11 @@ func TestGoodMIDINoteOn(t *testing.T) {
 
 func TestBadMIDINoteOn(t *testing.T) {
 	testCases := []struct {
-		name        string
-		params      map[string]any
-		payload     any
-		errorString string
+		name          string
+		params        map[string]any
+		payload       any
+		moduleManager routing.ModuleManager
+		errorString   string
 	}{
 		{
 			name: "note off no module",
@@ -101,7 +103,13 @@ func TestBadMIDINoteOn(t *testing.T) {
 				"note":     "64",
 				"velocity": "64",
 			},
-			payload:     nil,
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
 			errorString: "midi.note_on module error: not found",
 		},
 		{
@@ -112,7 +120,13 @@ func TestBadMIDINoteOn(t *testing.T) {
 				"note":     "64",
 				"velocity": "64",
 			},
-			payload:     nil,
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
 			errorString: "midi.note_on module error: not a string",
 		},
 		{
@@ -122,7 +136,13 @@ func TestBadMIDINoteOn(t *testing.T) {
 				"note":     "64",
 				"velocity": "64",
 			},
-			payload:     nil,
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
 			errorString: "midi.note_on channel error: not found",
 		},
 		{
@@ -133,7 +153,13 @@ func TestBadMIDINoteOn(t *testing.T) {
 				"note":     "64",
 				"velocity": "64",
 			},
-			payload:     nil,
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
 			errorString: "midi.note_on channel error: not a string",
 		},
 		{
@@ -143,7 +169,13 @@ func TestBadMIDINoteOn(t *testing.T) {
 				"channel":  "1",
 				"velocity": "64",
 			},
-			payload:     nil,
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
 			errorString: "midi.note_on note error: not found",
 		},
 		{
@@ -154,7 +186,13 @@ func TestBadMIDINoteOn(t *testing.T) {
 				"note":     123,
 				"velocity": "64",
 			},
-			payload:     nil,
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
 			errorString: "midi.note_on note error: not a string",
 		},
 		{
@@ -164,7 +202,13 @@ func TestBadMIDINoteOn(t *testing.T) {
 				"channel": "1",
 				"note":    "64",
 			},
-			payload:     nil,
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
 			errorString: "midi.note_on velocity error: not found",
 		},
 		{
@@ -175,8 +219,226 @@ func TestBadMIDINoteOn(t *testing.T) {
 				"note":     "64",
 				"velocity": 123,
 			},
-			payload:     nil,
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
 			errorString: "midi.note_on velocity error: not a string",
+		},
+		{
+			name: "channel template syntax error",
+			params: map[string]any{
+				"module":   "test",
+				"channel":  "{{.Payload",
+				"note":     "64",
+				"velocity": "127",
+			},
+			payload: 1,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "template: channel:1: unclosed action",
+		},
+		{
+			name: "note template syntax error",
+			params: map[string]any{
+				"module":   "test",
+				"channel":  "1",
+				"note":     "{{.Payload",
+				"velocity": "127",
+			},
+			payload: 1,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "template: note:1: unclosed action",
+		},
+		{
+			name: "velocity template syntax error",
+			params: map[string]any{
+				"module":   "test",
+				"channel":  "1",
+				"note":     "64",
+				"velocity": "{{.Payload",
+			},
+			payload: 1,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "template: velocity:1: unclosed action",
+		},
+		{
+			name: "channel template undefined variable",
+			params: map[string]any{
+				"module":   "test",
+				"channel":  "{{.Undefined}}",
+				"note":     "64",
+				"velocity": "127",
+			},
+			payload: 1,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "template: channel:1:2: executing \"channel\" at <.Undefined>: can't evaluate field Undefined in type routing.WrappedPayload",
+		},
+		{
+			name: "note template undefined variable",
+			params: map[string]any{
+				"module":   "test",
+				"channel":  "1",
+				"note":     "{{.Undefined}}",
+				"velocity": "127",
+			},
+			payload: 1,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "template: note:1:2: executing \"note\" at <.Undefined>: can't evaluate field Undefined in type routing.WrappedPayload",
+		},
+		{
+			name: "velocity template undefined variable",
+			params: map[string]any{
+				"module":   "test",
+				"channel":  "1",
+				"note":     "64",
+				"velocity": "{{.Undefined}}",
+			},
+			payload: 1,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "template: velocity:1:2: executing \"velocity\" at <.Undefined>: can't evaluate field Undefined in type routing.WrappedPayload",
+		},
+		{
+			name: "channel not parseable",
+			params: map[string]any{
+				"module":   "test",
+				"channel":  "abc",
+				"note":     "64",
+				"velocity": "127",
+			},
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "strconv.ParseUint: parsing \"abc\": invalid syntax",
+		},
+		{
+			name: "note not parseable",
+			params: map[string]any{
+				"module":   "test",
+				"channel":  "1",
+				"note":     "abc",
+				"velocity": "127",
+			},
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "strconv.ParseUint: parsing \"abc\": invalid syntax",
+		},
+		{
+			name: "velocity not parseable",
+			params: map[string]any{
+				"module":   "test",
+				"channel":  "1",
+				"note":     "64",
+				"velocity": "abc",
+			},
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "strconv.ParseUint: parsing \"abc\": invalid syntax",
+		},
+		{
+			name: "missing module manager",
+			params: map[string]any{
+				"module":   "test",
+				"channel":  "1",
+				"note":     "64",
+				"velocity": "127",
+			},
+			payload:       nil,
+			moduleManager: nil,
+			errorString:   "midi.note_on module manager is nil",
+		},
+		{
+			name: "missing module",
+			params: map[string]any{
+				"module":   "test",
+				"channel":  "1",
+				"note":     "64",
+				"velocity": "127",
+			},
+			payload: nil,
+			moduleManager: testModuleManager{
+				"asdf": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "midi.note_on unable to find module with id: test",
+		},
+		{
+			name: "module not a MIDIOutputModule",
+			params: map[string]any{
+				"module":   "test",
+				"channel":  "1",
+				"note":     "64",
+				"velocity": "127",
+			},
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestPubSubModule("test"),
+			},
+			errorString: "midi.note_on module with id test is not a MIDIOutputModule",
+		},
+		{
+			name: "module output errored",
+			params: map[string]any{
+				"module":   "test",
+				"channel":  "1",
+				"note":     "64",
+				"velocity": "127",
+			},
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					return errors.New("output error")
+				}),
+			},
+			errorString: "midi.note_on failed to send output: output error",
 		},
 	}
 
@@ -194,12 +456,7 @@ func TestBadMIDINoteOn(t *testing.T) {
 				return
 			}
 
-			_, err = EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: tc.payload}, testModuleManager{
-				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
-					require.Fail(t, "unexpected call to MIDI output module")
-					return nil
-				}),
-			}, nil)
+			_, err = EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: tc.payload}, tc.moduleManager, nil)
 			require.EqualError(t, err, tc.errorString)
 		})
 	}

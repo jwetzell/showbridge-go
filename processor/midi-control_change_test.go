@@ -2,6 +2,7 @@ package processor_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/jwetzell/showbridge-go/config"
@@ -113,10 +114,11 @@ func TestGoodMIDIControlChange(t *testing.T) {
 
 func TestBadMIDIControlChange(t *testing.T) {
 	testCases := []struct {
-		name        string
-		params      map[string]any
-		payload     any
-		errorString string
+		name          string
+		params        map[string]any
+		payload       any
+		moduleManager routing.ModuleManager
+		errorString   string
 	}{
 		{
 			name: "control change no module",
@@ -125,7 +127,13 @@ func TestBadMIDIControlChange(t *testing.T) {
 				"control": "64",
 				"value":   "64",
 			},
-			payload:     nil,
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
 			errorString: "midi.control_change module error: not found",
 		},
 		{
@@ -136,7 +144,13 @@ func TestBadMIDIControlChange(t *testing.T) {
 				"control": "64",
 				"value":   "64",
 			},
-			payload:     nil,
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
 			errorString: "midi.control_change module error: not a string",
 		},
 		{
@@ -146,7 +160,13 @@ func TestBadMIDIControlChange(t *testing.T) {
 				"control": "64",
 				"value":   "64",
 			},
-			payload:     nil,
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
 			errorString: "midi.control_change channel error: not found",
 		},
 		{
@@ -157,7 +177,13 @@ func TestBadMIDIControlChange(t *testing.T) {
 				"control": "64",
 				"value":   "64",
 			},
-			payload:     nil,
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
 			errorString: "midi.control_change channel error: not a string",
 		},
 		{
@@ -167,7 +193,13 @@ func TestBadMIDIControlChange(t *testing.T) {
 				"channel": "1",
 				"value":   "64",
 			},
-			payload:     nil,
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
 			errorString: "midi.control_change control error: not found",
 		},
 		{
@@ -178,7 +210,13 @@ func TestBadMIDIControlChange(t *testing.T) {
 				"control": 123,
 				"value":   "64",
 			},
-			payload:     nil,
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
 			errorString: "midi.control_change control error: not a string",
 		},
 		{
@@ -188,7 +226,13 @@ func TestBadMIDIControlChange(t *testing.T) {
 				"channel": "1",
 				"control": "64",
 			},
-			payload:     nil,
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
 			errorString: "midi.control_change value error: not found",
 		},
 		{
@@ -199,8 +243,226 @@ func TestBadMIDIControlChange(t *testing.T) {
 				"control": "64",
 				"value":   123,
 			},
-			payload:     nil,
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
 			errorString: "midi.control_change value error: not a string",
+		},
+		{
+			name: "channel template syntax error",
+			params: map[string]any{
+				"module":  "test",
+				"channel": "{{.Payload",
+				"control": "64",
+				"value":   "127",
+			},
+			payload: 1,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "template: channel:1: unclosed action",
+		},
+		{
+			name: "control template syntax error",
+			params: map[string]any{
+				"module":  "test",
+				"channel": "1",
+				"control": "{{.Payload",
+				"value":   "127",
+			},
+			payload: 1,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "template: control:1: unclosed action",
+		},
+		{
+			name: "value template syntax error",
+			params: map[string]any{
+				"module":  "test",
+				"channel": "1",
+				"control": "64",
+				"value":   "{{.Payload",
+			},
+			payload: 1,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "template: value:1: unclosed action",
+		},
+		{
+			name: "channel template undefined variable",
+			params: map[string]any{
+				"module":  "test",
+				"channel": "{{.Undefined}}",
+				"control": "64",
+				"value":   "127",
+			},
+			payload: 1,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "template: channel:1:2: executing \"channel\" at <.Undefined>: can't evaluate field Undefined in type routing.WrappedPayload",
+		},
+		{
+			name: "control template undefined variable",
+			params: map[string]any{
+				"module":  "test",
+				"channel": "1",
+				"control": "{{.Undefined}}",
+				"value":   "127",
+			},
+			payload: 1,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "template: control:1:2: executing \"control\" at <.Undefined>: can't evaluate field Undefined in type routing.WrappedPayload",
+		},
+		{
+			name: "value template undefined variable",
+			params: map[string]any{
+				"module":  "test",
+				"channel": "1",
+				"control": "64",
+				"value":   "{{.Undefined}}",
+			},
+			payload: 1,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "template: value:1:2: executing \"value\" at <.Undefined>: can't evaluate field Undefined in type routing.WrappedPayload",
+		},
+		{
+			name: "channel not parseable",
+			params: map[string]any{
+				"module":  "test",
+				"channel": "abc",
+				"control": "64",
+				"value":   "127",
+			},
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "strconv.ParseUint: parsing \"abc\": invalid syntax",
+		},
+		{
+			name: "control not parseable",
+			params: map[string]any{
+				"module":  "test",
+				"channel": "1",
+				"control": "abc",
+				"value":   "127",
+			},
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "strconv.ParseUint: parsing \"abc\": invalid syntax",
+		},
+		{
+			name: "value not parseable",
+			params: map[string]any{
+				"module":  "test",
+				"channel": "1",
+				"control": "64",
+				"value":   "abc",
+			},
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "strconv.ParseUint: parsing \"abc\": invalid syntax",
+		},
+		{
+			name: "missing module manager",
+			params: map[string]any{
+				"module":  "test",
+				"channel": "1",
+				"control": "64",
+				"value":   "127",
+			},
+			payload:       nil,
+			moduleManager: nil,
+			errorString:   "midi.control_change module manager is nil",
+		},
+		{
+			name: "missing module",
+			params: map[string]any{
+				"module":  "test",
+				"channel": "1",
+				"control": "64",
+				"value":   "127",
+			},
+			payload: nil,
+			moduleManager: testModuleManager{
+				"asdf": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					require.Fail(t, "unexpected call to MIDI output module")
+					return nil
+				}),
+			},
+			errorString: "midi.control_change unable to find module with id: test",
+		},
+		{
+			name: "module not a MIDIOutputModule",
+			params: map[string]any{
+				"module":  "test",
+				"channel": "1",
+				"control": "64",
+				"value":   "127",
+			},
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestPubSubModule("test"),
+			},
+			errorString: "midi.control_change module with id test is not a MIDIOutputModule",
+		},
+		{
+			name: "module output errored",
+			params: map[string]any{
+				"module":  "test",
+				"channel": "1",
+				"control": "64",
+				"value":   "127",
+			},
+			payload: nil,
+			moduleManager: testModuleManager{
+				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
+					return errors.New("output error")
+				}),
+			},
+			errorString: "midi.control_change failed to send output: output error",
 		},
 	}
 
@@ -218,12 +480,7 @@ func TestBadMIDIControlChange(t *testing.T) {
 				return
 			}
 
-			_, err = EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: tc.payload}, testModuleManager{
-				"test": NewTestMIDIOutputModule(func(ctx context.Context, msg midi.Message) error {
-					require.Fail(t, "unexpected call to MIDI output module")
-					return nil
-				}),
-			}, nil)
+			_, err = EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: tc.payload}, tc.moduleManager, nil)
 			require.EqualError(t, err, tc.errorString)
 		})
 	}
