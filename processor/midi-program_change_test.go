@@ -28,6 +28,26 @@ func TestGoodMIDIProgramChange(t *testing.T) {
 			payload:  nil,
 			expected: midi.ProgramChange(1, 64),
 		},
+		{
+			name: "templated channel",
+			params: map[string]any{
+				"module":  "test",
+				"channel": "{{.Payload}}",
+				"program": "64",
+			},
+			payload:  1,
+			expected: midi.ProgramChange(1, 64),
+		},
+		{
+			name: "templated program",
+			params: map[string]any{
+				"module":  "test",
+				"channel": "1",
+				"program": "{{.Payload}}",
+			},
+			payload:  64,
+			expected: midi.ProgramChange(1, 64),
+		},
 	}
 
 	for _, tc := range testCases {

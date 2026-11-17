@@ -48,10 +48,43 @@ func TestGoodMIDIControlChange(t *testing.T) {
 				"module":  "test",
 				"channel": "1",
 				"control": "64",
-				"value":   "64",
+				"value":   "65",
 			},
 			payload:  nil,
-			expected: midi.ControlChange(1, 64, 64),
+			expected: midi.ControlChange(1, 64, 65),
+		},
+		{
+			name: "templated channel",
+			params: map[string]any{
+				"module":  "test",
+				"channel": "{{.Payload}}",
+				"control": "64",
+				"value":   "65",
+			},
+			payload:  1,
+			expected: midi.ControlChange(1, 64, 65),
+		},
+		{
+			name: "templated control",
+			params: map[string]any{
+				"module":  "test",
+				"channel": "1",
+				"control": "{{.Payload}}",
+				"value":   "65",
+			},
+			payload:  64,
+			expected: midi.ControlChange(1, 64, 65),
+		},
+		{
+			name: "templated value",
+			params: map[string]any{
+				"module":  "test",
+				"channel": "1",
+				"control": "64",
+				"value":   "{{.Payload}}",
+			},
+			payload:  65,
+			expected: midi.ControlChange(1, 64, 65),
 		},
 	}
 

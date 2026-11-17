@@ -24,10 +24,43 @@ func TestGoodMIDINoteOff(t *testing.T) {
 				"module":   "test",
 				"channel":  "1",
 				"note":     "64",
-				"velocity": "64",
+				"velocity": "127",
 			},
 			payload:  nil,
-			expected: midi.NoteOffVelocity(1, 64, 64),
+			expected: midi.NoteOffVelocity(1, 64, 127),
+		},
+		{
+			name: "templated channel",
+			params: map[string]any{
+				"module":   "test",
+				"channel":  "{{.Payload}}",
+				"note":     "64",
+				"velocity": "127",
+			},
+			payload:  1,
+			expected: midi.NoteOffVelocity(1, 64, 127),
+		},
+		{
+			name: "templated note",
+			params: map[string]any{
+				"module":   "test",
+				"channel":  "1",
+				"note":     "{{.Payload}}",
+				"velocity": "127",
+			},
+			payload:  64,
+			expected: midi.NoteOffVelocity(1, 64, 127),
+		},
+		{
+			name: "templated velocity",
+			params: map[string]any{
+				"module":   "test",
+				"channel":  "1",
+				"note":     "64",
+				"velocity": "{{.Payload}}",
+			},
+			payload:  127,
+			expected: midi.NoteOffVelocity(1, 64, 127),
 		},
 	}
 
