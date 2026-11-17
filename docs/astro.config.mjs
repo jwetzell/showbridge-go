@@ -175,13 +175,6 @@ export default defineConfig({
               collapsed: true,
               items: [
                 {
-                  label: "Message",
-                  collapsed: true,
-                  items: [
-                    { autogenerate: { directory: "processors/midi/message" } },
-                  ],
-                },
-                {
                   autogenerate: { directory: "processors/midi" }
                 }
               ],
