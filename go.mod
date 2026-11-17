@@ -15,7 +15,7 @@ require (
 	github.com/jwetzell/psn-go v0.3.0
 	github.com/jwetzell/slip-go v0.2.0
 	github.com/mattn/go-sqlite3 v1.14.53
-	github.com/nats-io/nats.go v1.55.0
+	github.com/nats-io/nats.go v1.56.0
 	github.com/redis/go-redis/v9 v9.23.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/stretchr/testify v1.12.1
