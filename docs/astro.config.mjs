@@ -220,9 +220,9 @@ export default defineConfig({
               ],
             },
             {
-              label: "Module",
+              label: "IO",
               collapsed: true,
-              items: [{ autogenerate: { directory: "processors/module" } }],
+              items: [{ autogenerate: { directory: "processors/io" } }],
             },
             {
               label: "OS",

@@ -1,0 +1,22 @@
+---
+title: Output to module
+sidebar:
+  label: Output
+  order: 1
+---
+import SchemaInfo from '../../../../components/SchemaInfo.astro';
+
+The `io.write` processor takes any payload that can be converted to bytes and writes it to the specified module if that module supports it.
+
+<SchemaInfo type="processor" id="io.write"/>
+
+### Example
+
+Write whatever payload comes through this processor to the `udp-out` module if possible.
+
+```yaml
+- id: output
+  type: io.write
+  params:
+    module: udp-out
+```
