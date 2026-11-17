@@ -3,16 +3,16 @@
 package processor_test
 
 import (
-	"slices"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/processor"
 	"github.com/jwetzell/showbridge-go/routing"
+	"github.com/stretchr/testify/require"
 	"gitlab.com/gomidi/midi/v2"
 )
 
 func TestGoodMIDIMessageEncode(t *testing.T) {
-	midiMessageEncoder := &processor.MIDIMessageEncode{}
 	tests := []struct {
 		name     string
 		payload  any
@@ -27,19 +27,19 @@ func TestGoodMIDIMessageEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := EvaluateProcessFunc(midiMessageEncoder, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
-			if err != nil {
-				t.Fatalf("midi.message.encode processing failed: %s", err)
-			}
+			registration, ok := processor.GetProcessorRegistration("midi.message.encode")
+			require.True(t, ok, "processor registration not found")
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type: "midi.message.encode",
+			})
+			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
+			require.NoError(t, err, "midi.message.encode processing failed")
 
 			gotBytes, ok := got.Payload.([]byte)
-			if !ok {
-				t.Fatalf("midi.message.encode returned a %T payload: %+v", got, got)
-			}
+			require.True(t, ok, "midi.message.encode returned a non-[]byte payload")
 
-			if !slices.Equal(gotBytes, test.expected) {
-				t.Fatalf("midi.message.encode got %+v, expected %+v", got, test.expected)
-			}
+			require.Equal(t, test.expected, gotBytes, "midi.message.encode returned unexpected bytes")
 		})
 	}
 }

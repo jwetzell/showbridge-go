@@ -49,7 +49,7 @@ func init() {
 
 			moduleIdString, err := processorParams.GetString("module")
 			if err != nil {
-				return nil, fmt.Errorf("midi.program_change output error: %w", err)
+				return nil, fmt.Errorf("midi.program_change module error: %w", err)
 			}
 
 			channelString, err := processorParams.GetString("channel")

@@ -3,16 +3,16 @@
 package processor_test
 
 import (
-	"reflect"
 	"testing"
 
+	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/processor"
 	"github.com/jwetzell/showbridge-go/routing"
+	"github.com/stretchr/testify/require"
 	"gitlab.com/gomidi/midi/v2"
 )
 
 func TestGoodMIDIMessageDecode(t *testing.T) {
-	processorInstance := &processor.MIDIMessageDecode{}
 	tests := []struct {
 		name     string
 		payload  any
@@ -27,19 +27,20 @@ func TestGoodMIDIMessageDecode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			registration, ok := processor.GetProcessorRegistration("midi.message.decode")
+			require.True(t, ok, "processor registration not found")
+
+			processorInstance, err := registration.New(config.ProcessorConfig{
+				Type: "midi.message.decode",
+			})
+
 			got, err := EvaluateProcessFunc(processorInstance, t.Context(), routing.WrappedPayload{Payload: test.payload}, nil, nil)
-			if err != nil {
-				t.Fatalf("midi.message.decode processing failed: %s", err)
-			}
+			require.NoError(t, err, "midi.message.decode processing failed")
 
 			gotMessage, ok := got.Payload.(midi.Message)
-			if !ok {
-				t.Fatalf("midi.message.decode returned a %T payload: %+v", got, got)
-			}
+			require.True(t, ok, "midi.message.decode returned a non-midi.Message payload")
 
-			if !reflect.DeepEqual(gotMessage, test.expected) {
-				t.Fatalf("midi.message.decode got %+v, expected %+v", gotMessage, test.expected)
-			}
+			require.Equal(t, test.expected, gotMessage, "midi.message.decode returned unexpected message")
 		})
 	}
 }
