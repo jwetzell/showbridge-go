@@ -107,11 +107,6 @@ export default defineConfig({
               collapsed: true,
               items: [{ autogenerate: { directory: "modules/sqlite" } }],
             },
-            {
-              label: "WebSocket",
-              collapsed: true,
-              items: [{ autogenerate: { directory: "modules/websocket" } }],
-            },
           ],
         },
         {

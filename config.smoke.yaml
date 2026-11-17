@@ -36,19 +36,7 @@ modules:
     type: net.udp.server
     params:
       port: 9001
-  - id: wsecho
-    type: websocket.client
-    params:
-      url: "wss://echo.websocket.org"
 routes:
-  - input: ticker
-    processors:
-      - type: string.create
-        params:
-          template: "wsecho: {{.Payload.UnixMilli}}"
-      - type: module.output
-        params:
-          module: wsecho
   - input: ticker
     processors:
       - type: string.create
