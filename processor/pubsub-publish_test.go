@@ -181,7 +181,7 @@ func TestBadPubSubPublish(t *testing.T) {
 			errorString:   "pubsub.publish unable to find module with id: test",
 		},
 		{
-			name:    "module not an OutputModule",
+			name:    "module not a PubSubModule",
 			payload: TestStruct{Data: "hello"},
 			params: map[string]any{
 				"module": "test",

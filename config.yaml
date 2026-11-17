@@ -19,6 +19,6 @@ routes:
       - type: osc.message.create
         params:
           address: "{{.Payload.URL.Path}}"
-      - type: module.output
+      - type: io.write
         params:
           module: udp

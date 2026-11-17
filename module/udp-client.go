@@ -10,7 +10,6 @@ import (
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/internal/types"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
@@ -92,15 +91,14 @@ func (uc *UDPClient) Start(ctx context.Context, router routing.Router) error {
 	return nil
 }
 
-func (uc *UDPClient) Output(ctx context.Context, payload any) error {
+func (uc *UDPClient) Write(ctx context.Context, data []byte) error {
 	uc.mu.Lock()
 	defer uc.mu.Unlock()
-	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
-	if !ok {
-		return errors.New("net.udp.client is only able to output bytes")
+	if data == nil {
+		return errors.New("data cannot be nil")
 	}
 	if uc.conn != nil {
-		_, err := uc.conn.Write(payloadBytes)
+		_, err := uc.conn.Write(data)
 
 		if err != nil {
 			return err

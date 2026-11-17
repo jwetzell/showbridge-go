@@ -42,7 +42,7 @@ routes:
       - type: string.create
         params:
           template: "tcpout: {{.Payload.UnixMilli}}"
-      - type: module.output
+      - type: io.write
         params:
           module: tcpout
   - input: ticker
@@ -50,7 +50,7 @@ routes:
       - type: string.create
         params:
           template: "udpout: {{.Payload.UnixMilli}}"
-      - type: module.output
+      - type: io.write
         params:
           module: udpout
   - input: ticker

@@ -15,7 +15,6 @@ import (
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/framer"
-	"github.com/jwetzell/showbridge-go/internal/types"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
@@ -212,18 +211,16 @@ AcceptLoop:
 	return nil
 }
 
-func (ts *TCPServer) Output(ctx context.Context, payload any) error {
-	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
-
-	if !ok {
-		return errors.New("net.tcp.server is only able to output bytes")
+func (ts *TCPServer) Write(ctx context.Context, data []byte) error {
+	if data == nil {
+		return errors.New("data cannot be nil")
 	}
 	ts.connectionsMu.Lock()
 	defer ts.connectionsMu.Unlock()
 	var errorString strings.Builder
 
 	for _, connection := range ts.connections {
-		_, err := connection.framedWriter.Write(payloadBytes)
+		_, err := connection.framedWriter.Write(data)
 		if err != nil {
 			fmt.Fprintf(&errorString, "%s\n", err.Error())
 		}
