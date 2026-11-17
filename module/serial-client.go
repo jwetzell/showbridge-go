@@ -13,7 +13,6 @@ import (
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/framer"
-	"github.com/jwetzell/showbridge-go/internal/types"
 	"github.com/jwetzell/showbridge-go/routing"
 	"go.bug.st/serial"
 )
@@ -166,15 +165,13 @@ func (sc *SerialClient) Start(ctx context.Context, router routing.Router) error 
 	return nil
 }
 
-func (sc *SerialClient) Output(ctx context.Context, payload any) error {
+func (sc *SerialClient) Write(ctx context.Context, data []byte) error {
 
-	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
-
-	if !ok {
-		return errors.New("serial.client can only output bytes")
+	if data == nil {
+		return errors.New("data cannot be nil")
 	}
 
-	_, err := sc.port.Write(sc.outFramer.Encode(payloadBytes))
+	_, err := sc.port.Write(sc.outFramer.Encode(data))
 	return err
 }
 

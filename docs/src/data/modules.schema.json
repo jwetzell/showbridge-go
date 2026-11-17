@@ -792,41 +792,6 @@
         ],
         "title": "Timer",
         "type": "object"
-      },
-      {
-        "$id": "websocket.client",
-        "additionalProperties": false,
-        "description": "Opens a WebSocket connection to the specified server",
-        "properties": {
-          "id": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "params": {
-            "additionalProperties": false,
-            "properties": {
-              "url": {
-                "description": "the URL of the WebSocket server to connect",
-                "title": "URL",
-                "type": "string"
-              }
-            },
-            "required": [
-              "url"
-            ],
-            "type": "object"
-          },
-          "type": {
-            "const": "websocket.client"
-          }
-        },
-        "required": [
-          "id",
-          "type",
-          "params"
-        ],
-        "title": "WebSocket Client",
-        "type": "object"
       }
     ]
   },

@@ -31,7 +31,7 @@ routes:
         params:
           address: "{{.Payload.URL.Path}}"  # template the address from the incoming message
       - id: send-osc
-        type: module.output         # output to the udp module
+        type: io.write         # write to the udp module
         params:
           module: udp
 `;

@@ -12,7 +12,6 @@ import (
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/framer"
-	"github.com/jwetzell/showbridge-go/internal/types"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
@@ -169,17 +168,13 @@ func (tc *TCPClient) SetupConn() error {
 	return err
 }
 
-func (tc *TCPClient) Output(ctx context.Context, payload any) error {
+func (tc *TCPClient) Write(ctx context.Context, data []byte) error {
 	tc.mu.Lock()
 	defer tc.mu.Unlock()
 	if tc.conn == nil {
 		return errors.New("net.tcp.client client is not setup")
 	}
-	payloadBytes, ok := types.GetAnyAsByteSlice(payload)
-	if !ok {
-		return errors.New("net.tcp.client is only able to output bytes")
-	}
-	_, err := tc.outFramedWriter.Write(payloadBytes)
+	_, err := tc.outFramedWriter.Write(data)
 	return err
 }
 

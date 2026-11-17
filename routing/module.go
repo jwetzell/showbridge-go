@@ -16,8 +16,8 @@ type ModuleManager interface {
 	GetModule(string) (Module, bool)
 }
 
-type OutputModule interface {
-	Output(context.Context, any) error
+type WriterModule interface {
+	Write(context.Context, []byte) error
 }
 
 type MIDIOutputModule interface {

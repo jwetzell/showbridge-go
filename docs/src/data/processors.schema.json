@@ -654,6 +654,40 @@
         "type": "object"
       },
       {
+        "$id": "io.write",
+        "additionalProperties": false,
+        "description": "Sends the incoming payload to the specified module output",
+        "properties": {
+          "id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": false,
+            "properties": {
+              "module": {
+                "description": "ID of module to send output to",
+                "title": "Module ID",
+                "type": "string"
+              }
+            },
+            "required": [
+              "module"
+            ],
+            "type": "object"
+          },
+          "type": {
+            "const": "io.write"
+          }
+        },
+        "required": [
+          "type",
+          "params"
+        ],
+        "title": "Write IO",
+        "type": "object"
+      },
+      {
         "$id": "json.decode",
         "additionalProperties": false,
         "description": "Decodes bytes into a JSON object",
@@ -1027,41 +1061,7 @@
           "type",
           "params"
         ],
-        "title": "Create MIDI Prgoram Change Message",
-        "type": "object"
-      },
-      {
-        "$id": "module.output",
-        "additionalProperties": false,
-        "description": "Sends the incoming payload to the specified module output",
-        "properties": {
-          "id": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "params": {
-            "additionalProperties": false,
-            "properties": {
-              "module": {
-                "description": "ID of module to send output to",
-                "title": "Module ID",
-                "type": "string"
-              }
-            },
-            "required": [
-              "module"
-            ],
-            "type": "object"
-          },
-          "type": {
-            "const": "module.output"
-          }
-        },
-        "required": [
-          "type",
-          "params"
-        ],
-        "title": "Module Output",
+        "title": "Output MIDI Program Change Message",
         "type": "object"
       },
       {
