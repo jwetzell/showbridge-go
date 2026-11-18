@@ -19,7 +19,6 @@ import { cloneDeep } from 'lodash-es';
 import { debounceTime, tap } from 'rxjs';
 import { ModuleConfig } from '../../models/config';
 import { ConfigService } from '../../services/config';
-import { EventsService } from '../../services/events';
 import { SchemaService } from '../../services/schema';
 
 @Component({
@@ -84,7 +83,6 @@ export class ModuleComponent {
   outputIndicatorColor = signal<string>('gray');
 
   private schemaService = inject(SchemaService);
-  private eventsService = inject(EventsService);
   private configService = inject(ConfigService);
   ngOnInit(): void {
     this.formGroup.patchValue({
@@ -100,30 +98,6 @@ export class ModuleComponent {
         this.updated.emit(cloneDeep(currentModule));
       }
     });
-    if (this.id() !== undefined) {
-      this.eventsService
-        .getInputEventsForSource(this.id()!)
-        .pipe(
-          tap((inputEvent) => {
-            this.inputIndicatorColor.set(inputEvent.error ? 'red' : 'greenyellow');
-          }),
-          debounceTime(100),
-        )
-        .subscribe((inputEvent) => {
-          this.inputIndicatorColor.set('gray');
-        });
-      this.eventsService
-        .getOutputEventsForDestination(this.id()!)
-        .pipe(
-          tap((outputEvent) => {
-            this.outputIndicatorColor.set(outputEvent.error ? 'red' : 'greenyellow');
-          }),
-          debounceTime(100),
-        )
-        .subscribe((outputEvent) => {
-          this.outputIndicatorColor.set('gray');
-        });
-    }
   }
 
   paramsUpdated(params: any) {

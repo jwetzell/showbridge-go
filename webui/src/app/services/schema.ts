@@ -6,7 +6,6 @@ import { SomeJSONSchema } from 'ajv/dist/types/json-schema';
 import { sortBy } from 'lodash-es';
 import { Config, ModuleConfig, ProcessorConfig, RouteConfig } from '../models/config';
 import { ObjectInfo } from '../models/form';
-import { EventsService } from './events';
 import { SettingsService } from './settings';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -43,32 +42,20 @@ export class SchemaService {
 
   private settingsService = inject(SettingsService);
   private http = inject(HttpClient);
-  private eventsService = inject(EventsService);
 
   constructor() {
     effect(() => {
-      switch (this.eventsService.status()) {
-        case 'open':
-          if (this.settingsService.configSchemaUrl()) {
-            this.loadConfigSchema();
-          }
-          if (this.settingsService.modulesSchemaUrl()) {
-            this.loadModulesSchema();
-          }
-          if (this.settingsService.routesSchemaUrl()) {
-            this.loadRoutesSchema();
-          }
-          if (this.settingsService.processorsSchemaUrl()) {
-            this.loadProcessorsSchema();
-          }
-          break;
-        case 'closed':
-          this.resetAjv();
-          this.configSchema.set(undefined);
-          this.modulesSchema.set(undefined);
-          this.routesSchema.set(undefined);
-          this.processorsSchema.set(undefined);
-          break;
+      if (this.settingsService.configSchemaUrl()) {
+        this.loadConfigSchema();
+      }
+      if (this.settingsService.modulesSchemaUrl()) {
+        this.loadModulesSchema();
+      }
+      if (this.settingsService.routesSchemaUrl()) {
+        this.loadRoutesSchema();
+      }
+      if (this.settingsService.processorsSchemaUrl()) {
+        this.loadProcessorsSchema();
       }
     });
   }

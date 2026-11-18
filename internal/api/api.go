@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/jwetzell/showbridge-go/config"
-	"github.com/jwetzell/showbridge-go/internal/events"
 	"github.com/jwetzell/showbridge-go/schema"
 )
 
@@ -22,13 +21,11 @@ type ApiServer struct {
 	server             *http.Server
 	logger             *slog.Logger
 	configurableRouter config.Configurable
-	eventRouter        events.EventRouter
 }
 
-func NewApiServer(configurableRouter config.Configurable, eventRouter events.EventRouter) *ApiServer {
+func NewApiServer(configurableRouter config.Configurable) *ApiServer {
 	return &ApiServer{
 		configurableRouter: configurableRouter,
-		eventRouter:        eventRouter,
 		logger:             slog.Default().With("component", "api"),
 	}
 }
@@ -41,7 +38,6 @@ func (as *ApiServer) Start(config config.ApiConfig) {
 	}
 	as.logger.Debug("starting", "port", as.config.Port)
 	mux := http.NewServeMux()
-	mux.HandleFunc("/ws", as.handleWebsocket)
 	mux.HandleFunc("/health", as.handleHealthHTTP)
 	mux.HandleFunc("/api/v1/config", as.handleConfigHTTP)
 	mux.HandleFunc("/config.schema.json", handleConfigSchema)

@@ -11,7 +11,6 @@ import { ModuleListComponent } from './components/module-list/module-list';
 import { RouteListComponent } from './components/route-list/route-list';
 import { Config, ModuleConfig, RouteConfig } from './models/config';
 import { ConfigService } from './services/config';
-import { EventsService } from './services/events';
 import { SchemaService } from './services/schema';
 import { SettingsService } from './services/settings';
 
@@ -50,7 +49,6 @@ export class App {
   public configService = inject(ConfigService);
 
   public settingsService = inject(SettingsService);
-  public eventsService = inject(EventsService);
   private snackBar = inject(MatSnackBar);
   constructor() {
     effect(() => {
