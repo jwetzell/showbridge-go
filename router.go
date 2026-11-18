@@ -9,7 +9,6 @@ import (
 
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/api"
-	"github.com/jwetzell/showbridge-go/internal/events"
 	"github.com/jwetzell/showbridge-go/routing"
 )
 
@@ -20,15 +19,13 @@ type Router struct {
 	// TODO(jwetzell): do these need to be guarded against concurrency?
 	ModuleInstances moduleManager
 	// TODO(jwetzell): change to something easier to lookup
-	RouteInstances      []routing.Route
-	ConfigChange        chan config.Config
-	moduleWait          sync.WaitGroup
-	logger              *slog.Logger
-	runningConfig       config.Config
-	runningConfigMu     sync.RWMutex
-	apiServer           *api.ApiServer
-	eventDestinations   []events.EventDestination
-	eventDestinationsMu sync.Mutex
+	RouteInstances  []routing.Route
+	ConfigChange    chan config.Config
+	moduleWait      sync.WaitGroup
+	logger          *slog.Logger
+	runningConfig   config.Config
+	runningConfigMu sync.RWMutex
+	apiServer       *api.ApiServer
 }
 
 func (r *Router) addModule(moduleDecl config.ModuleConfig) error {
@@ -136,7 +133,7 @@ func NewRouter(routerConfig config.Config) (*Router, []config.ModuleError, []con
 		}
 	}
 
-	apiServer := api.NewApiServer(&router, &router)
+	apiServer := api.NewApiServer(&router)
 
 	router.apiServer = apiServer
 
@@ -172,14 +169,6 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, inputPayload 
 	var routeIOErrors []routing.RouteIOError
 	var routeIOErrorsMu sync.Mutex
 	var routeFound atomic.Bool
-
-	r.broadcastEvent(events.Event{
-		Type: "input",
-		Data: map[string]any{
-			"source": sourceId,
-		},
-	})
-
 	var routeWaitGroup sync.WaitGroup
 
 	for routeIndex, routeInstance := range r.RouteInstances {
@@ -207,21 +196,8 @@ func (r *Router) HandleInput(ctx context.Context, sourceId string, inputPayload 
 						ProcessError: err,
 					})
 					routeIOErrorsMu.Unlock()
-					r.broadcastEvent(events.Event{
-						Type: "route",
-						Data: map[string]any{
-							"index": routeIndex,
-						},
-						Error: err.Error(),
-					})
 					return
 				}
-				r.broadcastEvent(events.Event{
-					Type: "route",
-					Data: map[string]any{
-						"index": routeIndex,
-					},
-				})
 			})
 		}
 	}

@@ -27,7 +27,6 @@ import { cloneDeep } from 'lodash-es';
 import { debounceTime, tap } from 'rxjs';
 import { ProcessorConfig, RouteConfig } from '../../models/config';
 import { ConfigService } from '../../services/config';
-import { EventsService } from '../../services/events';
 import { ListsService } from '../../services/lists';
 import { SchemaService } from '../../services/schema';
 import { ProcessorComponent } from '../processor/processor';
@@ -100,7 +99,6 @@ export class RouteComponent {
 
   public schemaService = inject(SchemaService);
   private snackBar = inject(MatSnackBar);
-  private eventsService = inject(EventsService);
   private configService = inject(ConfigService);
   public listsService = inject(ListsService);
 
@@ -128,20 +126,6 @@ export class RouteComponent {
         input: value.input,
       });
     });
-
-    if (this.index() !== undefined) {
-      this.eventsService
-        .getRouteEventsForIndex(this.index()!)
-        .pipe(
-          tap((routeEvent) => {
-            this.indicatorColor.set(routeEvent.error ? 'red' : 'greenyellow');
-          }),
-          debounceTime(100),
-        )
-        .subscribe((routeEvent) => {
-          this.indicatorColor.set('gray');
-        });
-    }
     this.processorListId.set(this.listsService.registerProcessorList(this.path() + '/processors'));
   }
 

@@ -9,7 +9,6 @@ export class SettingsService {
   public modulesSchemaPath = signal('/modules.schema.json');
   public routesSchemaPath = signal('/routes.schema.json');
   public processorsSchemaPath = signal('/processors.schema.json');
-  public wsPath = signal('/ws');
   public baseUrl = signal('http://localhost:8080');
 
   public configUrl = computed(() => {
@@ -30,13 +29,6 @@ export class SettingsService {
 
   public processorsSchemaUrl = computed(() => {
     return new URL(this.processorsSchemaPath(), this.baseUrl());
-  });
-
-  public wsUrl = computed(() => {
-    const url = new URL(this.baseUrl());
-    url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
-    url.pathname = this.wsPath();
-    return url;
   });
 
   constructor() {

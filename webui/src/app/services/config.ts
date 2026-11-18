@@ -9,7 +9,6 @@ import {
   RouteConfig,
   RouteError,
 } from '../models/config';
-import { EventsService } from './events';
 import { SchemaService } from './schema';
 import { SettingsService } from './settings';
 @Injectable({
@@ -41,20 +40,10 @@ export class ConfigService {
 
   private http = inject(HttpClient);
   private settingsService = inject(SettingsService);
-  private eventsService = inject(EventsService);
 
   constructor(private schemaService: SchemaService) {
     effect(() => {
       console.log('config state changed', this._currentlyShownConfig());
-    });
-
-    effect(() => {
-      switch (this.eventsService.status()) {
-        case 'open':
-          console.log('Websocket connection opened, reloading config');
-          this.loadConfig();
-          break;
-      }
     });
   }
 
