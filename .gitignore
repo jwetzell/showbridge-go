@@ -1,4 +1,5 @@
 .DS_Store
-./showbridge
-./showbridge.exe
+showbridge
+!showbridge/
+showbridge.exe
 coverage.out
