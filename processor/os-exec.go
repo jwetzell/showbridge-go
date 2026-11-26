@@ -85,10 +85,10 @@ type OsExec struct {
 
 func (oe *OsExec) Process(next routing.ProcessFunc) routing.ProcessFunc {
 	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-		templateData := wrappedPayload
+		tmplData := newTemplateData(ctx, wrappedPayload, moduleManager)
 
 		var commandBuffer bytes.Buffer
-		err := oe.CommandTemplate.Execute(&commandBuffer, templateData)
+		err := oe.CommandTemplate.Execute(&commandBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err
@@ -99,7 +99,7 @@ func (oe *OsExec) Process(next routing.ProcessFunc) routing.ProcessFunc {
 		argStrings := make([]string, len(oe.Args))
 		for i, argTemplate := range oe.Args {
 			var argBuffer bytes.Buffer
-			err := argTemplate.Execute(&argBuffer, templateData)
+			err := argTemplate.Execute(&argBuffer, tmplData)
 			if err != nil {
 				return wrappedPayload, err
 			}

@@ -94,10 +94,10 @@ type MIDIProgramChangeCreate struct {
 
 func (mpcc *MIDIProgramChangeCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
 	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-		templateData := wrappedPayload
+		tmplData := newTemplateData(ctx, wrappedPayload, moduleManager)
 
 		var channelBuffer bytes.Buffer
-		err := mpcc.Channel.Execute(&channelBuffer, templateData)
+		err := mpcc.Channel.Execute(&channelBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err
@@ -110,7 +110,7 @@ func (mpcc *MIDIProgramChangeCreate) Process(next routing.ProcessFunc) routing.P
 		}
 
 		var programBuffer bytes.Buffer
-		err = mpcc.Program.Execute(&programBuffer, templateData)
+		err = mpcc.Program.Execute(&programBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err

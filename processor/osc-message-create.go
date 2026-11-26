@@ -128,10 +128,10 @@ type MessageCreate struct {
 func (omc *MessageCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
 	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
-		templateData := wrappedPayload
+		tmplData := newTemplateData(ctx, wrappedPayload, moduleManager)
 
 		var addressBuffer bytes.Buffer
-		err := omc.Address.Execute(&addressBuffer, templateData)
+		err := omc.Address.Execute(&addressBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err
@@ -155,7 +155,7 @@ func (omc *MessageCreate) Process(next routing.ProcessFunc) routing.ProcessFunc 
 
 		for argIndex, argTemplate := range omc.Args {
 			var argBuffer bytes.Buffer
-			err := argTemplate.Execute(&argBuffer, templateData)
+			err := argTemplate.Execute(&argBuffer, tmplData)
 
 			if err != nil {
 				return wrappedPayload, err

@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/dop251/goja"
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/jwetzell/showbridge-go/config"
 	"github.com/jwetzell/showbridge-go/internal/types"
 	"github.com/jwetzell/showbridge-go/routing"
-	"modernc.org/quickjs"
 )
 
 func init() {
@@ -36,33 +36,17 @@ func init() {
 				return nil, fmt.Errorf("script.js program error: %w", err)
 			}
 
-			vm, err := quickjs.NewVM()
+			vm := goja.New()
 
-			if err != nil {
-				return nil, err
-			}
-
-			payloadAtom, err := vm.NewAtom("payload")
-			if err != nil {
-				return nil, err
-			}
-
-			senderAtom, err := vm.NewAtom("sender")
-			if err != nil {
-				return nil, err
-			}
-
-			return &ScriptJS{config: config, Program: programString, vm: vm, payloadAtom: payloadAtom, senderAtom: senderAtom}, nil
+			return &ScriptJS{config: config, Program: programString, vm: vm}, nil
 		},
 	})
 }
 
 type ScriptJS struct {
-	config      config.ProcessorConfig
-	vm          *quickjs.VM
-	payloadAtom quickjs.Atom
-	senderAtom  quickjs.Atom
-	Program     string
+	config  config.ProcessorConfig
+	vm      *goja.Runtime
+	Program string
 }
 
 func (sj *ScriptJS) Process(next routing.ProcessFunc) routing.ProcessFunc {
@@ -80,56 +64,34 @@ func (sj *ScriptJS) Process(next routing.ProcessFunc) routing.ProcessFunc {
 			}
 		}
 
-		err := sj.vm.SetProperty(sj.vm.GlobalObject(), sj.payloadAtom, wrappedPayload.Payload)
+		err := sj.vm.Set("payload", wrappedPayload.Payload)
 		if err != nil {
 			return wrappedPayload, err
 		}
 
-		_, err = sj.vm.Eval(sj.Program, quickjs.EvalGlobal)
+		err = sj.vm.Set("source", wrappedPayload.Source)
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		err = sj.vm.Set("kv", kvGetter{
+			ctx: ctx,
+			mm:  moduleManager,
+		})
+		if err != nil {
+			return wrappedPayload, err
+		}
+
+		_, err = sj.vm.RunString(sj.Program)
 
 		if err != nil {
 			return wrappedPayload, err
 		}
 
-		output, err := sj.vm.GetProperty(sj.vm.GlobalObject(), sj.payloadAtom)
+		jsPayload := sj.vm.Get("payload").Export()
+		// TODO(jwetzell): handle any potential post-processing for specific "troublesome" types
 
-		if err != nil {
-			return wrappedPayload, err
-		}
-
-		// NOTE(jwetzell): turn undefined into nil
-		_, ok := output.(quickjs.Undefined)
-
-		if ok {
-			wrappedPayload.Payload = nil
-			return next(ctx, wrappedPayload, moduleManager, router)
-		}
-
-		// NOTE(jwetzell): turn object into map[string]interface{}
-		outputObject, ok := output.(*quickjs.Object)
-
-		if ok {
-			var outputSlice []any
-
-			err = outputObject.Into(&outputSlice)
-
-			if err != nil {
-				var outputMap map[string]any
-				err = outputObject.Into(&outputMap)
-				if err != nil {
-					return wrappedPayload, err
-				} else {
-					wrappedPayload.Payload = outputMap
-					return next(ctx, wrappedPayload, moduleManager, router)
-				}
-
-			} else {
-				wrappedPayload.Payload = outputSlice
-				return next(ctx, wrappedPayload, moduleManager, router)
-			}
-		}
-
-		wrappedPayload.Payload = output
+		wrappedPayload.Payload = jsPayload
 		return next(ctx, wrappedPayload, moduleManager, router)
 	}
 }

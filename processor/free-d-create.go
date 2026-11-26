@@ -214,10 +214,10 @@ type FreeDCreate struct {
 func (fc *FreeDCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
 	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
-		templateData := wrappedPayload
+		tmplData := newTemplateData(ctx, wrappedPayload, moduleManager)
 
 		var idBuffer bytes.Buffer
-		err := fc.IdTemplate.Execute(&idBuffer, templateData)
+		err := fc.IdTemplate.Execute(&idBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err
@@ -232,7 +232,7 @@ func (fc *FreeDCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
 		}
 
 		var panBuffer bytes.Buffer
-		err = fc.PanTemplate.Execute(&panBuffer, templateData)
+		err = fc.PanTemplate.Execute(&panBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err
@@ -247,7 +247,7 @@ func (fc *FreeDCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
 		}
 
 		var tiltBuffer bytes.Buffer
-		err = fc.TiltTemplate.Execute(&tiltBuffer, templateData)
+		err = fc.TiltTemplate.Execute(&tiltBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err
@@ -262,7 +262,7 @@ func (fc *FreeDCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
 		}
 
 		var rollBuffer bytes.Buffer
-		err = fc.RollTemplate.Execute(&rollBuffer, templateData)
+		err = fc.RollTemplate.Execute(&rollBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err
@@ -277,7 +277,7 @@ func (fc *FreeDCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
 		}
 
 		var posXBuffer bytes.Buffer
-		err = fc.PosXTemplate.Execute(&posXBuffer, templateData)
+		err = fc.PosXTemplate.Execute(&posXBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err
@@ -292,7 +292,7 @@ func (fc *FreeDCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
 		}
 
 		var posYBuffer bytes.Buffer
-		err = fc.PosYTemplate.Execute(&posYBuffer, templateData)
+		err = fc.PosYTemplate.Execute(&posYBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err
@@ -307,7 +307,7 @@ func (fc *FreeDCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
 		}
 
 		var posZBuffer bytes.Buffer
-		err = fc.PosZTemplate.Execute(&posZBuffer, templateData)
+		err = fc.PosZTemplate.Execute(&posZBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err
@@ -322,7 +322,7 @@ func (fc *FreeDCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
 		}
 
 		var zoomBuffer bytes.Buffer
-		err = fc.ZoomTemplate.Execute(&zoomBuffer, templateData)
+		err = fc.ZoomTemplate.Execute(&zoomBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err
@@ -337,7 +337,7 @@ func (fc *FreeDCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
 		}
 
 		var focusBuffer bytes.Buffer
-		err = fc.FocusTemplate.Execute(&focusBuffer, templateData)
+		err = fc.FocusTemplate.Execute(&focusBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err

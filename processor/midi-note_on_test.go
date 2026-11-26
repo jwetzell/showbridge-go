@@ -294,7 +294,7 @@ func TestBadMIDINoteOn(t *testing.T) {
 					return nil
 				}),
 			},
-			errorString: "template: channel:1:2: executing \"channel\" at <.Undefined>: can't evaluate field Undefined in type routing.WrappedPayload",
+			errorString: "template: channel:1:2: executing \"channel\" at <.Undefined>: can't evaluate field Undefined in type processor.templateData",
 		},
 		{
 			name: "note template undefined variable",
@@ -311,7 +311,7 @@ func TestBadMIDINoteOn(t *testing.T) {
 					return nil
 				}),
 			},
-			errorString: "template: note:1:2: executing \"note\" at <.Undefined>: can't evaluate field Undefined in type routing.WrappedPayload",
+			errorString: "template: note:1:2: executing \"note\" at <.Undefined>: can't evaluate field Undefined in type processor.templateData",
 		},
 		{
 			name: "velocity template undefined variable",
@@ -328,7 +328,7 @@ func TestBadMIDINoteOn(t *testing.T) {
 					return nil
 				}),
 			},
-			errorString: "template: velocity:1:2: executing \"velocity\" at <.Undefined>: can't evaluate field Undefined in type routing.WrappedPayload",
+			errorString: "template: velocity:1:2: executing \"velocity\" at <.Undefined>: can't evaluate field Undefined in type processor.templateData",
 		},
 		{
 			name: "channel not parseable",

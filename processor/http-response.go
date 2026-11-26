@@ -74,10 +74,10 @@ type httpResponse struct {
 
 func (hrc *HTTPResponse) Process(next routing.ProcessFunc) routing.ProcessFunc {
 	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-		templateData := wrappedPayload
+		tmplData := newTemplateData(ctx, wrappedPayload, moduleManager)
 
 		var bodyBuffer bytes.Buffer
-		err := hrc.BodyTmpl.Execute(&bodyBuffer, templateData)
+		err := hrc.BodyTmpl.Execute(&bodyBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err

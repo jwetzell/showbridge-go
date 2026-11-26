@@ -1,6 +1,7 @@
 package processor
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
@@ -60,3 +61,39 @@ var (
 	processorRegistryMu sync.RWMutex
 	processorRegistry   = make(map[string]ProcessorRegistration)
 )
+
+type kvGetter struct {
+	ctx context.Context
+	mm  routing.ModuleManager
+}
+
+type templateData struct {
+	routing.WrappedPayload
+	KV kvGetter
+}
+
+func (kvg kvGetter) Get(store string, key string) (any, error) {
+	module, ok := kvg.mm.GetModule(store)
+	if !ok {
+		return nil, fmt.Errorf("module not found: %s", store)
+	}
+	kvModule, ok := module.(routing.KeyValueModule)
+	if !ok {
+		return nil, fmt.Errorf("module is not a key-value module: %s", store)
+	}
+	value, err := kvModule.Get(kvg.ctx, key)
+	if err != nil {
+		return nil, err
+	}
+	return value, nil
+}
+
+func newTemplateData(ctx context.Context, payload routing.WrappedPayload, mm routing.ModuleManager) templateData {
+	return templateData{
+		WrappedPayload: payload,
+		KV: kvGetter{
+			ctx: ctx,
+			mm:  mm,
+		},
+	}
+}

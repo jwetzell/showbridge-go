@@ -58,10 +58,10 @@ type OsReadFile struct {
 
 func (orf *OsReadFile) Process(next routing.ProcessFunc) routing.ProcessFunc {
 	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-		templateData := wrappedPayload
+		tmplData := newTemplateData(ctx, wrappedPayload, moduleManager)
 
 		var pathBuffer bytes.Buffer
-		err := orf.PathTemplate.Execute(&pathBuffer, templateData)
+		err := orf.PathTemplate.Execute(&pathBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err

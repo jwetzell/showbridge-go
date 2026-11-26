@@ -75,7 +75,7 @@ func TestBadHTTPGet(t *testing.T) {
 				"url": "http://example.com/{{.Unknown}}",
 			},
 			payload:     nil,
-			errorString: "template: url:1:21: executing \"url\" at <.Unknown>: can't evaluate field Unknown in type routing.WrappedPayload",
+			errorString: "template: url:1:21: executing \"url\" at <.Unknown>: can't evaluate field Unknown in type processor.templateData",
 		},
 		{
 			name: "url template syntax error",

@@ -52,10 +52,21 @@ func init() {
 	})
 }
 
+type exprEnv struct {
+	routing.WrappedPayload
+	KV kvGetter
+}
+
 func (se *ScriptExpr) Process(next routing.ProcessFunc) routing.ProcessFunc {
 	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
 
-		exprEnv := wrappedPayload
+		exprEnv := exprEnv{
+			WrappedPayload: wrappedPayload,
+			KV: kvGetter{
+				ctx: ctx,
+				mm:  moduleManager,
+			},
+		}
 
 		output, err := expr.Run(se.Program, exprEnv)
 		if err != nil {

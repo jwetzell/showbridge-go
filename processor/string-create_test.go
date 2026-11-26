@@ -116,7 +116,7 @@ func TestBadStringCreate(t *testing.T) {
 			params: map[string]any{
 				"template": "{{.Invalid}}",
 			},
-			errorString: "template: template:1:2: executing \"template\" at <.Invalid>: can't evaluate field Invalid in type routing.WrappedPayload",
+			errorString: "template: template:1:2: executing \"template\" at <.Invalid>: can't evaluate field Invalid in type processor.templateData",
 		},
 	}
 

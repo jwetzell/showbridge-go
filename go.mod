@@ -3,6 +3,7 @@ module github.com/jwetzell/showbridge-go
 go 1.27.3
 
 require (
+	github.com/dop251/goja v0.0.0-20261124180248-00ef7861e082
 	github.com/eclipse/paho.mqtt.golang v1.5.2
 	github.com/expr-lang/expr v1.18.1
 	github.com/go-sql-driver/mysql v1.10.2
@@ -22,26 +23,23 @@ require (
 	gitlab.com/gomidi/midi/v2 v2.3.24
 	go.bug.st/serial v1.8.0
 	golang.org/x/time v0.16.0
-	modernc.org/quickjs v0.27.0
 	sigs.k8s.io/yaml v1.6.0
 )
 
 require (
 	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/dustin/go-humanize v1.1.0 // indirect
-	github.com/google/uuid v1.6.0 // indirect
+	github.com/dlclark/regexp2/v2 v2.11.0 // indirect
+	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
+	github.com/google/pprof v0.0.0-20230207041349-798e818bf904 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.3 // indirect
 	github.com/klauspost/compress v1.20.3 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
-	github.com/mattn/go-isatty v0.0.24 // indirect
 	github.com/nats-io/nkeys v0.4.16 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
-	github.com/ncruces/go-strftime v1.1.0 // indirect
-	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	go.uber.org/atomic v1.12.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
@@ -51,8 +49,4 @@ require (
 	golang.org/x/sync v0.24.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
 	golang.org/x/text v0.43.0 // indirect
-	modernc.org/libc v1.80.1 // indirect
-	modernc.org/libquickjs v0.14.0 // indirect
-	modernc.org/mathutil v1.7.1 // indirect
-	modernc.org/memory v1.12.1 // indirect
 )

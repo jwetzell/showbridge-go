@@ -318,7 +318,7 @@ func TestBadMIDIControlChange(t *testing.T) {
 					return nil
 				}),
 			},
-			errorString: "template: channel:1:2: executing \"channel\" at <.Undefined>: can't evaluate field Undefined in type routing.WrappedPayload",
+			errorString: "template: channel:1:2: executing \"channel\" at <.Undefined>: can't evaluate field Undefined in type processor.templateData",
 		},
 		{
 			name: "control template undefined variable",
@@ -335,7 +335,7 @@ func TestBadMIDIControlChange(t *testing.T) {
 					return nil
 				}),
 			},
-			errorString: "template: control:1:2: executing \"control\" at <.Undefined>: can't evaluate field Undefined in type routing.WrappedPayload",
+			errorString: "template: control:1:2: executing \"control\" at <.Undefined>: can't evaluate field Undefined in type processor.templateData",
 		},
 		{
 			name: "value template undefined variable",
@@ -352,7 +352,7 @@ func TestBadMIDIControlChange(t *testing.T) {
 					return nil
 				}),
 			},
-			errorString: "template: value:1:2: executing \"value\" at <.Undefined>: can't evaluate field Undefined in type routing.WrappedPayload",
+			errorString: "template: value:1:2: executing \"value\" at <.Undefined>: can't evaluate field Undefined in type processor.templateData",
 		},
 		{
 			name: "channel not parseable",

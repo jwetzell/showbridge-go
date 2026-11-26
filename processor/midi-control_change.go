@@ -113,10 +113,10 @@ type MIDIControlChangeCreate struct {
 
 func (mccc *MIDIControlChangeCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
 	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-		templateData := wrappedPayload
+		tmplData := newTemplateData(ctx, wrappedPayload, moduleManager)
 
 		var channelBuffer bytes.Buffer
-		err := mccc.Channel.Execute(&channelBuffer, templateData)
+		err := mccc.Channel.Execute(&channelBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err
@@ -129,7 +129,7 @@ func (mccc *MIDIControlChangeCreate) Process(next routing.ProcessFunc) routing.P
 		}
 
 		var controlBuffer bytes.Buffer
-		err = mccc.Control.Execute(&controlBuffer, templateData)
+		err = mccc.Control.Execute(&controlBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err
@@ -142,7 +142,7 @@ func (mccc *MIDIControlChangeCreate) Process(next routing.ProcessFunc) routing.P
 		}
 
 		var valueBuffer bytes.Buffer
-		err = mccc.Value.Execute(&valueBuffer, templateData)
+		err = mccc.Value.Execute(&valueBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err

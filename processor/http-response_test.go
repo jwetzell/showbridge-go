@@ -83,7 +83,7 @@ func TestBadHTTPResponseCreate(t *testing.T) {
 			name:        "bodyTemplate template error",
 			params:      map[string]any{"status": 200, "bodyTemplate": "{{.MissingField}}"},
 			payload:     nil,
-			errorString: "template: body:1:2: executing \"body\" at <.MissingField>: can't evaluate field MissingField in type routing.WrappedPayload",
+			errorString: "template: body:1:2: executing \"body\" at <.MissingField>: can't evaluate field MissingField in type processor.templateData",
 		},
 		{
 			name:        "bodyTemplate template syntax error",

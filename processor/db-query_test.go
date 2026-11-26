@@ -210,7 +210,7 @@ func TestBadDbQuery(t *testing.T) {
 			moduleManager: testModuleManager(map[string]routing.Module{
 				"test": NewTestDBModule("test"),
 			}),
-			errorString: "template: query:1:16: executing \"query\" at <.Data>: can't evaluate field Data in type routing.WrappedPayload",
+			errorString: "template: query:1:16: executing \"query\" at <.Data>: can't evaluate field Data in type processor.templateData",
 		},
 		{
 			name:    "query error",

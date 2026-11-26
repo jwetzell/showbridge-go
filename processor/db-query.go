@@ -86,8 +86,10 @@ func (dq *DbQuery) Process(next routing.ProcessFunc) routing.ProcessFunc {
 			dq.module = dbModule
 		}
 
+		tmplData := newTemplateData(ctx, wrappedPayload, moduleManager)
+
 		var queryBuffer bytes.Buffer
-		err := dq.Query.Execute(&queryBuffer, wrappedPayload)
+		err := dq.Query.Execute(&queryBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err

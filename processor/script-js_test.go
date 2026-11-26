@@ -58,7 +58,7 @@ func TestGoodScriptJS(t *testing.T) {
 				`,
 			},
 			payload:  1,
-			expected: 2,
+			expected: int64(2),
 		},
 		{
 			name: "string",
@@ -110,7 +110,7 @@ func TestGoodScriptJS(t *testing.T) {
 				"program": "",
 			},
 			payload:  []byte("test"),
-			expected: []any{float64('t'), float64('e'), float64('s'), float64('t')},
+			expected: []int{116, 101, 115, 116},
 		},
 	}
 
@@ -158,7 +158,7 @@ func TestBadScriptJS(t *testing.T) {
 				`,
 			},
 			payload:     0,
-			errorString: "ReferenceError: 'foo' is not defined",
+			errorString: "ReferenceError: foo is not defined at <eval>:2:14(1)",
 		},
 	}
 

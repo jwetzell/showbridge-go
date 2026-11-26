@@ -161,7 +161,7 @@ func TestBadPubSubPublish(t *testing.T) {
 			moduleManager: testModuleManager(map[string]routing.Module{
 				"test": NewTestPubSubModule("test", nil),
 			}),
-			errorString: "template: topic:1:2: executing \"topic\" at <.Data>: can't evaluate field Data in type routing.WrappedPayload",
+			errorString: "template: topic:1:2: executing \"topic\" at <.Data>: can't evaluate field Data in type processor.templateData",
 		},
 		{
 			name:    "no modules",

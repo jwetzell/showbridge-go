@@ -256,7 +256,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 				"address": "/test/{{.missing}}",
 			},
 			payload:     "test",
-			errorString: "template: address:1:8: executing \"address\" at <.missing>: can't evaluate field missing in type routing.WrappedPayload",
+			errorString: "template: address:1:8: executing \"address\" at <.missing>: can't evaluate field missing in type processor.templateData",
 		},
 		{
 			name: "address doesn't start with slash",
@@ -273,7 +273,7 @@ func TestBadOSCMessageCreate(t *testing.T) {
 				"args":    []map[string]any{{"value": "{{.missing}}", "type": "s"}},
 			},
 			payload:     "test",
-			errorString: "template: arg:1:2: executing \"arg\" at <.missing>: can't evaluate field missing in type routing.WrappedPayload",
+			errorString: "template: arg:1:2: executing \"arg\" at <.missing>: can't evaluate field missing in type processor.templateData",
 		},
 		{
 			name: "wrong arg type for int arg",

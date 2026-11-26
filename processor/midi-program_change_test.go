@@ -221,7 +221,7 @@ func TestBadMIDIProgramChange(t *testing.T) {
 					return nil
 				}),
 			},
-			errorString: "template: channel:1:2: executing \"channel\" at <.Undefined>: can't evaluate field Undefined in type routing.WrappedPayload",
+			errorString: "template: channel:1:2: executing \"channel\" at <.Undefined>: can't evaluate field Undefined in type processor.templateData",
 		},
 		{
 			name: "program template undefined variable",
@@ -237,7 +237,7 @@ func TestBadMIDIProgramChange(t *testing.T) {
 					return nil
 				}),
 			},
-			errorString: "template: program:1:2: executing \"program\" at <.Undefined>: can't evaluate field Undefined in type routing.WrappedPayload",
+			errorString: "template: program:1:2: executing \"program\" at <.Undefined>: can't evaluate field Undefined in type processor.templateData",
 		},
 		{
 			name: "channel not parseable",

@@ -112,10 +112,10 @@ type MIDINoteOffCreate struct {
 
 func (mnoc *MIDINoteOffCreate) Process(next routing.ProcessFunc) routing.ProcessFunc {
 	return func(ctx context.Context, wrappedPayload routing.WrappedPayload, moduleManager routing.ModuleManager, router routing.Router) (routing.WrappedPayload, error) {
-		templateData := wrappedPayload
+		tmplData := newTemplateData(ctx, wrappedPayload, moduleManager)
 
 		var channelBuffer bytes.Buffer
-		err := mnoc.Channel.Execute(&channelBuffer, templateData)
+		err := mnoc.Channel.Execute(&channelBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err
@@ -128,7 +128,7 @@ func (mnoc *MIDINoteOffCreate) Process(next routing.ProcessFunc) routing.Process
 		}
 
 		var noteBuffer bytes.Buffer
-		err = mnoc.Note.Execute(&noteBuffer, templateData)
+		err = mnoc.Note.Execute(&noteBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err
@@ -141,7 +141,7 @@ func (mnoc *MIDINoteOffCreate) Process(next routing.ProcessFunc) routing.Process
 		}
 
 		var velocityBuffer bytes.Buffer
-		err = mnoc.Velocity.Execute(&velocityBuffer, templateData)
+		err = mnoc.Velocity.Execute(&velocityBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err

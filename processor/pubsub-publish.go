@@ -92,8 +92,10 @@ func (psp *PubSubPublish) Process(next routing.ProcessFunc) routing.ProcessFunc 
 			psp.module = pubSubModule
 		}
 
+		tmplData := newTemplateData(ctx, wrappedPayload, moduleManager)
+
 		var topicBuffer bytes.Buffer
-		err := psp.Topic.Execute(&topicBuffer, wrappedPayload)
+		err := psp.Topic.Execute(&topicBuffer, tmplData)
 
 		if err != nil {
 			return wrappedPayload, err

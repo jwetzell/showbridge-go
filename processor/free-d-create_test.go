@@ -520,7 +520,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				"zoom":  "66051",
 				"focus": "263430",
 			},
-			errorString: "template: id:1:2: executing \"id\" at <.Unknown>: can't evaluate field Unknown in type routing.WrappedPayload",
+			errorString: "template: id:1:2: executing \"id\" at <.Unknown>: can't evaluate field Unknown in type processor.templateData",
 			payload:     nil,
 		},
 		{
@@ -536,7 +536,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				"zoom":  "66051",
 				"focus": "263430",
 			},
-			errorString: "template: pan:1:2: executing \"pan\" at <.Unknown>: can't evaluate field Unknown in type routing.WrappedPayload",
+			errorString: "template: pan:1:2: executing \"pan\" at <.Unknown>: can't evaluate field Unknown in type processor.templateData",
 			payload:     nil,
 		},
 		{
@@ -552,7 +552,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				"zoom":  "66051",
 				"focus": "263430",
 			},
-			errorString: "template: tilt:1:2: executing \"tilt\" at <.Unknown>: can't evaluate field Unknown in type routing.WrappedPayload",
+			errorString: "template: tilt:1:2: executing \"tilt\" at <.Unknown>: can't evaluate field Unknown in type processor.templateData",
 			payload:     nil,
 		},
 		{
@@ -568,7 +568,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				"zoom":  "66051",
 				"focus": "263430",
 			},
-			errorString: "template: roll:1:2: executing \"roll\" at <.Unknown>: can't evaluate field Unknown in type routing.WrappedPayload",
+			errorString: "template: roll:1:2: executing \"roll\" at <.Unknown>: can't evaluate field Unknown in type processor.templateData",
 			payload:     nil,
 		},
 		{
@@ -584,7 +584,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				"zoom":  "66051",
 				"focus": "263430",
 			},
-			errorString: "template: posX:1:2: executing \"posX\" at <.Unknown>: can't evaluate field Unknown in type routing.WrappedPayload",
+			errorString: "template: posX:1:2: executing \"posX\" at <.Unknown>: can't evaluate field Unknown in type processor.templateData",
 			payload:     nil,
 		},
 		{
@@ -600,7 +600,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				"zoom":  "66051",
 				"focus": "263430",
 			},
-			errorString: "template: posY:1:2: executing \"posY\" at <.Unknown>: can't evaluate field Unknown in type routing.WrappedPayload",
+			errorString: "template: posY:1:2: executing \"posY\" at <.Unknown>: can't evaluate field Unknown in type processor.templateData",
 			payload:     nil,
 		},
 		{
@@ -616,7 +616,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				"zoom":  "66051",
 				"focus": "263430",
 			},
-			errorString: "template: posZ:1:2: executing \"posZ\" at <.Unknown>: can't evaluate field Unknown in type routing.WrappedPayload",
+			errorString: "template: posZ:1:2: executing \"posZ\" at <.Unknown>: can't evaluate field Unknown in type processor.templateData",
 			payload:     nil,
 		},
 		{
@@ -632,7 +632,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				"zoom":  "{{.Unknown}}",
 				"focus": "263430",
 			},
-			errorString: "template: zoom:1:2: executing \"zoom\" at <.Unknown>: can't evaluate field Unknown in type routing.WrappedPayload",
+			errorString: "template: zoom:1:2: executing \"zoom\" at <.Unknown>: can't evaluate field Unknown in type processor.templateData",
 			payload:     nil,
 		},
 		{
@@ -648,7 +648,7 @@ func TestBadFreeDCreate(t *testing.T) {
 				"zoom":  "66051",
 				"focus": "{{.Unknown}}",
 			},
-			errorString: "template: focus:1:2: executing \"focus\" at <.Unknown>: can't evaluate field Unknown in type routing.WrappedPayload",
+			errorString: "template: focus:1:2: executing \"focus\" at <.Unknown>: can't evaluate field Unknown in type processor.templateData",
 			payload:     nil,
 		},
 		{

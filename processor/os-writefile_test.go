@@ -81,7 +81,7 @@ func TestBadOsWriteFile(t *testing.T) {
 				"path": "{{.NonExistentField}}",
 			},
 			payload:     TestStruct{},
-			errorString: "template: path:1:2: executing \"path\" at <.NonExistentField>: can't evaluate field NonExistentField in type routing.WrappedPayload",
+			errorString: "template: path:1:2: executing \"path\" at <.NonExistentField>: can't evaluate field NonExistentField in type processor.templateData",
 		},
 	}
 

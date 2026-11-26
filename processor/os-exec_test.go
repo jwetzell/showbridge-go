@@ -81,7 +81,7 @@ func TestBadOsExec(t *testing.T) {
 				"command": "{{.NonExistentField}}",
 			},
 			payload:     TestStruct{},
-			errorString: "template: command:1:2: executing \"command\" at <.NonExistentField>: can't evaluate field NonExistentField in type routing.WrappedPayload",
+			errorString: "template: command:1:2: executing \"command\" at <.NonExistentField>: can't evaluate field NonExistentField in type processor.templateData",
 		},
 		{
 			name: "non-string in args",
@@ -108,7 +108,7 @@ func TestBadOsExec(t *testing.T) {
 				"args":    []any{"{{.Unknown}}"},
 			},
 			payload:     TestStruct{},
-			errorString: "template: arg-0:1:2: executing \"arg-0\" at <.Unknown>: can't evaluate field Unknown in type routing.WrappedPayload",
+			errorString: "template: arg-0:1:2: executing \"arg-0\" at <.Unknown>: can't evaluate field Unknown in type processor.templateData",
 		},
 	}
 
