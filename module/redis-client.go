@@ -96,11 +96,11 @@ func (rc *RedisClient) Start(ctx context.Context, router routing.Router) error {
 }
 
 func (rc *RedisClient) Stop() {
+	rc.mu.Lock()
+	defer rc.mu.Unlock()
 	if rc.cancel != nil {
 		defer rc.cancel()
 	}
-	rc.mu.Lock()
-	defer rc.mu.Unlock()
 	if rc.client != nil {
 		err := rc.client.Close()
 		if err != nil {
@@ -110,6 +110,8 @@ func (rc *RedisClient) Stop() {
 }
 
 func (rc *RedisClient) Get(ctx context.Context, key string) (any, error) {
+	rc.mu.Lock()
+	defer rc.mu.Unlock()
 	if rc.client != nil {
 		val, err := rc.client.Get(ctx, key).Result()
 		if err != nil {
@@ -121,6 +123,8 @@ func (rc *RedisClient) Get(ctx context.Context, key string) (any, error) {
 }
 
 func (rc *RedisClient) Set(ctx context.Context, key string, value any) error {
+	rc.mu.Lock()
+	defer rc.mu.Unlock()
 	if rc.client != nil {
 		status := rc.client.Set(ctx, key, value, 0)
 		return status.Err()
