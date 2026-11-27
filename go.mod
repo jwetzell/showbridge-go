@@ -5,7 +5,7 @@ go 1.27.3
 require (
 	github.com/eclipse/paho.mqtt.golang v1.5.2
 	github.com/expr-lang/expr v1.18.1
-	github.com/go-sql-driver/mysql v1.10.2
+	github.com/go-sql-driver/mysql v1.11.0
 	github.com/google/jsonschema-go v0.4.3
 	github.com/jackc/pgx/v5 v5.13.0
 	github.com/jwetzell/artnet-go v0.4.0
