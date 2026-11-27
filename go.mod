@@ -15,7 +15,7 @@ require (
 	github.com/jwetzell/slip-go v0.2.0
 	github.com/mattn/go-sqlite3 v1.14.53
 	github.com/nats-io/nats.go v1.56.0
-	github.com/redis/go-redis/v9 v9.23.0
+	github.com/redis/go-redis/v9 v9.24.1
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/stretchr/testify v1.12.1
 	github.com/urfave/cli/v3 v3.14.0
@@ -49,7 +49,7 @@ require (
 	golang.org/x/crypto v0.58.0 // indirect
 	golang.org/x/net v0.60.0 // indirect
 	golang.org/x/sync v0.24.0 // indirect
-	golang.org/x/sys v0.49.0 // indirect
+	golang.org/x/sys v0.50.0 // indirect
 	golang.org/x/text v0.43.0 // indirect
 	modernc.org/libc v1.80.1 // indirect
 	modernc.org/libquickjs v0.14.0 // indirect
